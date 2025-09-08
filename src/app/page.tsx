@@ -1,5 +1,5 @@
-import { LoginForm } from '@/features/home/components/LoginForm';
+import { InvestorLoginForm } from '@/features/home/components/InvestorLoginForm';
 
 export default function Home() {
-  return <LoginForm />;
+  return <InvestorLoginForm />;
 }

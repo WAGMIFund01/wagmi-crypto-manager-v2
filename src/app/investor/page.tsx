@@ -1,31 +1,26 @@
 'use client';
 
-import { useSession, signOut } from 'next-auth/react';
 import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle, Button } from '@/shared/components';
 import { formatCurrency, formatPercentage } from '@/shared/utils';
 
 export default function InvestorPage() {
-  const { data: session, status } = useSession();
   const router = useRouter();
   const [privacyMode, setPrivacyMode] = useState(false);
+  const [investorId, setInvestorId] = useState<string>('');
 
   useEffect(() => {
-    if (status === 'loading') return;
-    
-    if (!session) {
-      router.push('/login');
+    // Check if investor ID is stored in session storage
+    const storedInvestorId = sessionStorage.getItem('investorId');
+    if (!storedInvestorId) {
+      router.push('/');
       return;
     }
-    
-    if (session.user?.role !== 'investor') {
-      router.push('/dashboard');
-      return;
-    }
-  }, [session, status, router]);
+    setInvestorId(storedInvestorId);
+  }, [router]);
 
-  if (status === 'loading') {
+  if (!investorId) {
     return (
       <div className="flex items-center justify-center min-h-screen">
         <div className="text-center">
@@ -34,10 +29,6 @@ export default function InvestorPage() {
         </div>
       </div>
     );
-  }
-
-  if (!session || session.user?.role !== 'investor') {
-    return null;
   }
 
   // Mock portfolio data - will be replaced with real data later
@@ -62,7 +53,7 @@ export default function InvestorPage() {
                 Investor Dashboard
               </h1>
               <p className="text-sm text-gray-500">
-                {session.user?.email} | ID: {session.user?.investorId}
+                Investor ID: {investorId}
               </p>
             </div>
             <div className="flex items-center gap-4">
@@ -75,7 +66,10 @@ export default function InvestorPage() {
               </Button>
               <Button
                 variant="outline"
-                onClick={() => signOut()}
+                onClick={() => {
+                  sessionStorage.removeItem('investorId');
+                  router.push('/');
+                }}
               >
                 Sign Out
               </Button>

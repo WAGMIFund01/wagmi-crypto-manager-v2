@@ -13,14 +13,12 @@ export default function DashboardPage() {
     if (status === 'loading') return;
     
     if (!session) {
-      router.push('/login');
+      router.push('/');
       return;
     }
     
-    if (session.user?.role !== 'manager') {
-      router.push('/investor');
-      return;
-    }
+    // For now, allow any authenticated user to access manager dashboard
+    // TODO: Add proper role checking when Google OAuth is set up
   }, [session, status, router]);
 
   if (status === 'loading') {
@@ -34,7 +32,7 @@ export default function DashboardPage() {
     );
   }
 
-  if (!session || session.user?.role !== 'manager') {
+  if (!session) {
     return null;
   }
 
