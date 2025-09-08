@@ -48,17 +48,37 @@ export function InvestorLoginForm() {
   };
 
   return (
-    <div className="min-h-screen bg-black flex items-center justify-center p-4">
+    <div 
+      className="min-h-screen flex items-center justify-center p-4 relative"
+      style={{
+        backgroundColor: '#0B0C10',
+        background: `
+          radial-gradient(circle at center, rgba(0, 255, 149, 0.12) 0%, rgba(0, 0, 0, 0) 70%),
+          #0B0C10
+        `
+      }}
+    >
       {/* Main Container */}
       <div className="w-full max-w-2xl">
         {/* Main Dark Card */}
-        <div className="bg-gray-900 rounded-2xl p-8 shadow-2xl">
+        <div 
+          className="bg-gray-900 rounded-xl p-8 relative"
+          style={{
+            boxShadow: '0px 8px 24px rgba(0, 255, 149, 0.15)'
+          }}
+        >
           {/* Header */}
           <div className="text-center mb-8">
-            <h1 className="text-5xl font-bold text-green-400 mb-2">
+            <h1 
+              className="text-5xl font-bold mb-2"
+              style={{ color: '#00FF95' }}
+            >
               WAGMI
             </h1>
-            <p className="text-gray-400 text-lg">
+            <p 
+              className="text-lg"
+              style={{ color: '#A0A0A0' }}
+            >
               We&apos;re All Gonna Make It
             </p>
           </div>
@@ -80,7 +100,13 @@ export function InvestorLoginForm() {
                   value={investorId}
                   onChange={(e) => setInvestorId(e.target.value.toUpperCase())}
                   placeholder="Enter your Investor ID"
-                  className="w-full px-4 py-3 bg-gray-700 border border-gray-600 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-green-400 focus:border-transparent"
+                  className="w-full px-4 py-3 bg-gray-700 border border-gray-600 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:border-transparent transition-all duration-200"
+                  onFocus={(e) => {
+                    e.target.style.borderColor = 'rgba(0, 255, 149, 0.3)';
+                  }}
+                  onBlur={(e) => {
+                    e.target.style.borderColor = '#4B5563';
+                  }}
                   required
                 />
               </div>
@@ -94,7 +120,23 @@ export function InvestorLoginForm() {
               <button
                 type="submit"
                 disabled={!investorId.trim() || isLoading}
-                className="w-full bg-green-400 hover:bg-green-500 disabled:bg-gray-600 disabled:cursor-not-allowed text-black font-semibold py-3 px-4 rounded-lg transition-colors duration-200"
+                className="w-full disabled:bg-gray-600 disabled:cursor-not-allowed text-white font-semibold py-3 px-4 rounded-lg transition-all duration-200"
+                style={{
+                  backgroundColor: '#00C76F',
+                  boxShadow: 'none'
+                }}
+                onMouseEnter={(e) => {
+                  if (!e.currentTarget.disabled) {
+                    e.currentTarget.style.backgroundColor = '#00B863';
+                    e.currentTarget.style.boxShadow = '0px 0px 8px rgba(0, 255, 149, 0.4)';
+                  }
+                }}
+                onMouseLeave={(e) => {
+                  if (!e.currentTarget.disabled) {
+                    e.currentTarget.style.backgroundColor = '#00C76F';
+                    e.currentTarget.style.boxShadow = 'none';
+                  }
+                }}
               >
                 {isLoading ? 'Verifying...' : 'Access Portfolio'}
               </button>
@@ -110,7 +152,19 @@ export function InvestorLoginForm() {
         <div className="flex justify-end mt-6">
           <button
             onClick={handleManagerLogin}
-            className="bg-green-400 hover:bg-green-500 text-black font-semibold py-3 px-6 rounded-lg transition-colors duration-200 flex items-center"
+            className="text-white font-semibold py-3 px-6 rounded-lg transition-all duration-200 flex items-center"
+            style={{
+              backgroundColor: '#00C76F',
+              boxShadow: 'none'
+            }}
+            onMouseEnter={(e) => {
+              e.currentTarget.style.backgroundColor = '#00B863';
+              e.currentTarget.style.boxShadow = '0px 0px 10px rgba(0, 255, 149, 0.4)';
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.backgroundColor = '#00C76F';
+              e.currentTarget.style.boxShadow = 'none';
+            }}
           >
             <svg className="w-5 h-5 mr-2" viewBox="0 0 24 24">
               <path
