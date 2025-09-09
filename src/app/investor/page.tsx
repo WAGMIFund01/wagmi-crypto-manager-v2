@@ -233,61 +233,91 @@ export default function InvestorPage() {
         {/* KPI Cards */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
           {/* Initial Investment */}
-          <Card className="hover:shadow-lg transition-shadow duration-200" style={{ backgroundColor: '#16181D', boxShadow: '0 4px 6px rgba(0, 0, 0, 0.3)' }}>
-            <CardHeader className="pb-2">
-              <CardTitle style={{ color: '#E0E0E0' }}>
+          <div 
+            className="group relative p-6 rounded-2xl transition-all duration-300 hover:shadow-[0_0_20px_rgba(0,255,149,0.15)] hover:shadow-green-500/20"
+            style={{ 
+              backgroundColor: '#1A1A1A',
+              borderRadius: '16px',
+              boxShadow: '0 8px 32px rgba(0, 0, 0, 0.4), 0 0 0 1px rgba(255, 255, 255, 0.05)'
+            }}
+          >
+            <div className="space-y-2">
+              <h3 className="text-sm font-normal text-gray-400 leading-none">
                 Initial Investment
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <p style={{ color: '#FFFFFF' }}>
+              </h3>
+              <p className="text-2xl font-bold text-white">
                 {formatCurrency(portfolioData.initialInvestment, privacyMode)}
               </p>
-            </CardContent>
-          </Card>
+            </div>
+          </div>
 
           {/* Current Value */}
-          <Card className="hover:shadow-lg transition-shadow duration-200" style={{ backgroundColor: '#16181D', boxShadow: '0 4px 6px rgba(0, 0, 0, 0.3)' }}>
-            <CardHeader className="pb-2">
-              <CardTitle style={{ color: '#E0E0E0' }}>
+          <div 
+            className="group relative p-6 rounded-2xl transition-all duration-300 hover:shadow-[0_0_20px_rgba(0,255,149,0.15)] hover:shadow-green-500/20"
+            style={{ 
+              backgroundColor: '#1A1A1A',
+              borderRadius: '16px',
+              boxShadow: '0 8px 32px rgba(0, 0, 0, 0.4), 0 0 0 1px rgba(255, 255, 255, 0.05)'
+            }}
+          >
+            <div className="space-y-2">
+              <h3 className="text-sm font-normal text-gray-400 leading-none">
                 Current Value
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <p style={{ color: '#FFFFFF' }}>
+              </h3>
+              <p className="text-2xl font-bold text-white">
                 {formatCurrency(portfolioData.totalValue, privacyMode)}
               </p>
-            </CardContent>
-          </Card>
+            </div>
+          </div>
 
           {/* Total P&L */}
-          <Card className="hover:shadow-lg transition-shadow duration-200" style={{ backgroundColor: '#16181D', boxShadow: '0 4px 6px rgba(0, 0, 0, 0.3)' }}>
-            <CardHeader className="pb-2">
-              <CardTitle style={{ color: '#E0E0E0' }}>
+          <div 
+            className="group relative p-6 rounded-2xl transition-all duration-300 hover:shadow-[0_0_20px_rgba(0,255,149,0.15)] hover:shadow-green-500/20"
+            style={{ 
+              backgroundColor: '#1A1A1A',
+              borderRadius: '16px',
+              boxShadow: '0 8px 32px rgba(0, 0, 0, 0.4), 0 0 0 1px rgba(255, 255, 255, 0.05)'
+            }}
+          >
+            <div className="space-y-2">
+              <h3 className="text-sm font-normal text-gray-400 leading-none">
                 Total P&L
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <p className={`text-2xl font-bold ${portfolioData.totalPnl >= 0 ? 'text-green-600' : 'text-red-600'}`}>
+              </h3>
+              <p 
+                className="text-2xl font-bold"
+                style={{ 
+                  color: portfolioData.totalPnl >= 0 ? '#00FF95' : '#FF4444'
+                }}
+              >
                 {privacyMode ? formatCurrency(portfolioData.totalPnl, privacyMode) : 
                  (portfolioData.totalPnl >= 0 ? '+' : '') + formatCurrency(portfolioData.totalPnl, privacyMode)}
               </p>
-            </CardContent>
-          </Card>
+            </div>
+          </div>
 
           {/* Total Return */}
-          <Card className="hover:shadow-lg transition-shadow duration-200" style={{ backgroundColor: '#16181D', boxShadow: '0 4px 6px rgba(0, 0, 0, 0.3)' }}>
-            <CardHeader className="pb-2">
-              <CardTitle style={{ color: '#E0E0E0' }}>
+          <div 
+            className="group relative p-6 rounded-2xl transition-all duration-300 hover:shadow-[0_0_20px_rgba(0,255,149,0.15)] hover:shadow-green-500/20"
+            style={{ 
+              backgroundColor: '#1A1A1A',
+              borderRadius: '16px',
+              boxShadow: '0 8px 32px rgba(0, 0, 0, 0.4), 0 0 0 1px rgba(255, 255, 255, 0.05)'
+            }}
+          >
+            <div className="space-y-2">
+              <h3 className="text-sm font-normal text-gray-400 leading-none">
                 Total Return
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <p className={`text-2xl font-bold ${portfolioData.totalPnlPercentage >= 0 ? 'text-green-600' : 'text-red-600'}`}>
+              </h3>
+              <p 
+                className="text-2xl font-bold"
+                style={{ 
+                  color: portfolioData.totalPnlPercentage >= 0 ? '#00FF95' : '#FF4444'
+                }}
+              >
                 {formatPercentage(portfolioData.totalPnlPercentage, privacyMode, true)}
               </p>
-            </CardContent>
-          </Card>
+            </div>
+          </div>
         </div>
 
 
