@@ -31,13 +31,11 @@ export function formatCurrency(value: number, isEnabled: boolean = false): strin
     return maskSensitiveData(value, true);
   }
   
-  if (value >= 1000000) {
-    return `$${(value / 1000000).toFixed(1)}M`;
-  } else if (value >= 1000) {
-    return `$${(value / 1000).toFixed(1)}K`;
-  } else {
-    return `$${value.toFixed(2)}`;
-  }
+  // Format with commas for thousands separators and 2 decimal places
+  return `$${value.toLocaleString('en-US', { 
+    minimumFractionDigits: 2, 
+    maximumFractionDigits: 2 
+  })}`;
 }
 
 /**
