@@ -11,6 +11,7 @@ interface InvestorData {
   investmentValue: number;
   currentValue: number;
   returnPercentage: number;
+}
 
 interface Transaction {
   transactionId: string;
@@ -19,6 +20,7 @@ interface Transaction {
   amount: number;
   date: string;
   note: string;
+}
 
 export default function InvestorPage() {
   const router = useRouter();
