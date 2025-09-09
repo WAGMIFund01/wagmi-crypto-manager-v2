@@ -165,7 +165,13 @@ export default function InvestorPage() {
             <div className="flex items-center space-x-6">
               {/* WAGMI Logo */}
               <div className="flex items-center">
-                <h1 className="text-2xl font-bold text-green-600">
+                <h1 
+                  className="text-2xl font-bold"
+                  style={{ 
+                    color: '#00FF95',
+                    textShadow: '0 0 20px rgba(0, 255, 149, 0.5), 0 0 40px rgba(0, 255, 149, 0.3)'
+                  }}
+                >
                   WAGMI
                 </h1>
               </div>
