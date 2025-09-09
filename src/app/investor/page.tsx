@@ -166,15 +166,15 @@ export default function InvestorPage() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div style={{ backgroundColor: '#111' }}>
       {/* Header */}
-      <header className="bg-white shadow-sm border-b">
+      <header style={{ backgroundColor: '#16181D', borderColor: '#333' }}>
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center h-16">
             <div className="flex items-center space-x-6">
               {/* WAGMI Logo */}
               <div className="flex items-center">
-                <h1 className="text-2xl font-bold" style={{ color: '#00FF95', textShadow: '0 0 20px rgba(0, 255, 149, 0.5), 0 0 40px rgba(0, 255, 149, 0.3)' }}>
+                <h1 className="text-2xl font-bold text-green-600">
                   WAGMI
                 </h1>
               </div>
@@ -240,7 +240,7 @@ export default function InvestorPage() {
               </CardTitle>
             </CardHeader>
             <CardContent>
-              <p className="text-3xl font-bold text-white">
+              <p className="text-2xl font-bold text-gray-900">
                 {formatCurrency(portfolioData.initialInvestment, privacyMode)}
               </p>
             </CardContent>
@@ -254,7 +254,7 @@ export default function InvestorPage() {
               </CardTitle>
             </CardHeader>
             <CardContent>
-              <p className="text-3xl font-bold text-white">
+              <p className="text-2xl font-bold text-gray-900">
                 {formatCurrency(portfolioData.totalValue, privacyMode)}
               </p>
             </CardContent>
@@ -268,7 +268,7 @@ export default function InvestorPage() {
               </CardTitle>
             </CardHeader>
             <CardContent>
-              <p className="text-3xl font-bold" style={{ color: portfolioData.totalPnlPercentage >= 0 ? '#00FF95' : '#FF4444' }}>
+              <p className={`text-2xl font-bold ${portfolioData.totalPnl >= 0 ? 'text-green-600' : 'text-red-600'}`}>
                 {privacyMode ? formatCurrency(portfolioData.totalPnl, privacyMode) : 
                  (portfolioData.totalPnl >= 0 ? '+' : '') + formatCurrency(portfolioData.totalPnl, privacyMode)}
               </p>
@@ -283,7 +283,7 @@ export default function InvestorPage() {
               </CardTitle>
             </CardHeader>
             <CardContent>
-              <p className="text-3xl font-bold" style={{ color: portfolioData.totalPnlPercentage >= 0 ? '#00FF95' : '#FF4444' }}>
+              <p className={`text-2xl font-bold ${portfolioData.totalPnlPercentage >= 0 ? 'text-green-600' : 'text-red-600'}`}>
                 {formatPercentage(portfolioData.totalPnlPercentage, privacyMode, true)}
               </p>
             </CardContent>
