@@ -196,3 +196,4 @@ export default function InvestorPage() {
     </div>
   );
 }
+// Test commit to trigger Vercel branch detection
