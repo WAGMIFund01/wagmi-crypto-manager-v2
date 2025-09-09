@@ -240,7 +240,7 @@ export default function InvestorPage() {
               </CardTitle>
             </CardHeader>
             <CardContent>
-              <p className="text-2xl font-bold text-gray-900">
+              <p className="text-3xl font-bold text-white">
                 {formatCurrency(portfolioData.initialInvestment, privacyMode)}
               </p>
             </CardContent>
@@ -254,7 +254,7 @@ export default function InvestorPage() {
               </CardTitle>
             </CardHeader>
             <CardContent>
-              <p className="text-2xl font-bold text-gray-900">
+              <p className="text-3xl font-bold text-white">
                 {formatCurrency(portfolioData.totalValue, privacyMode)}
               </p>
             </CardContent>
@@ -268,7 +268,7 @@ export default function InvestorPage() {
               </CardTitle>
             </CardHeader>
             <CardContent>
-              <p className={`text-2xl font-bold ${portfolioData.totalPnl >= 0 ? 'text-green-600' : 'text-red-600'}`}>
+              <p className="text-3xl font-bold" style={{ color: portfolioData.totalPnl >= 0 ? '#00FF95' : '#FF4444' }}
                 {privacyMode ? formatCurrency(portfolioData.totalPnl, privacyMode) : 
                  (portfolioData.totalPnl >= 0 ? '+' : '') + formatCurrency(portfolioData.totalPnl, privacyMode)}
               </p>
@@ -283,7 +283,7 @@ export default function InvestorPage() {
               </CardTitle>
             </CardHeader>
             <CardContent>
-              <p className={`text-2xl font-bold ${portfolioData.totalPnlPercentage >= 0 ? 'text-green-600' : 'text-red-600'}`}>
+              <p className="text-3xl font-bold" style={{ color: portfolioData.totalPnl >= 0 ? '#00FF95' : '#FF4444' }}
                 {formatPercentage(portfolioData.totalPnlPercentage, privacyMode, true)}
               </p>
             </CardContent>
