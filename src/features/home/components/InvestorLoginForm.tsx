@@ -2,6 +2,7 @@
 
 import React, { useState } from 'react';
 import { useRouter } from 'next/navigation';
+import { signIn } from 'next-auth/react';
 // import { Button, Card, CardContent, CardHeader, CardTitle } from '@/shared/components';
 
 export function InvestorLoginForm() {
