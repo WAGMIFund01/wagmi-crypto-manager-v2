@@ -181,10 +181,10 @@ export default function InvestorPage() {
               
               {/* Investor Info */}
               <div>
-                <h2 className="text-xl font-bold text-gray-900">
+                <h2 style={{ color: '#FFFFFF' }}>
                   {portfolioData.investorName}
                 </h2>
-                <p className="text-sm text-gray-500">
+                <p style={{ color: '#A0A0A0' }}>
                   ID: {investorId}
                 </p>
               </div>
@@ -302,7 +302,7 @@ export default function InvestorPage() {
               <div className="flex items-center justify-center py-12">
                 <div className="text-center">
                   <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto mb-4"></div>
-                  <p className="text-sm text-gray-500">
+                  <p style={{ color: '#A0A0A0' }}>
                     Loading transaction history...
                   </p>
                 </div>
