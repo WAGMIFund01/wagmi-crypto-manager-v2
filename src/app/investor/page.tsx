@@ -97,7 +97,7 @@ export default function InvestorPage() {
       <div className="flex items-center justify-center min-h-screen bg-gray-50">
         <div className="text-center">
           <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto mb-4"></div>
-          <p className="text-gray-600">Loading...</p>
+          <p className="style={{ color: '#E0E0E0' }}">Loading...</p>
         </div>
       </div>
     );
@@ -126,7 +126,7 @@ export default function InvestorPage() {
             <h2 className="text-lg font-semibold mb-2 text-red-600">
               Error Loading Data
             </h2>
-            <p className="text-sm mb-4 text-gray-600">
+            <p className="text-sm mb-4 style={{ color: '#E0E0E0' }}">
               {error}
             </p>
             <Button
@@ -312,16 +312,16 @@ export default function InvestorPage() {
                 <table className="w-full">
                   <thead>
                     <tr className="border-b">
-                      <th className="text-left py-3 px-4 font-medium text-gray-500">
+                      <th className="text-left py-3 px-4 font-medium style={{ color: '#E0E0E0' }}">
                         Date
                       </th>
-                      <th className="text-left py-3 px-4 font-medium text-gray-500">
+                      <th className="text-left py-3 px-4 font-medium style={{ color: '#E0E0E0' }}">
                         Transaction Type
                       </th>
-                      <th className="text-right py-3 px-4 font-medium text-gray-500">
+                      <th className="text-right py-3 px-4 font-medium style={{ color: '#E0E0E0' }}">
                         Amount
                       </th>
-                      <th className="text-left py-3 px-4 font-medium text-gray-500">
+                      <th className="text-left py-3 px-4 font-medium style={{ color: '#E0E0E0' }}">
                         Note
                       </th>
                     </tr>
@@ -329,7 +329,7 @@ export default function InvestorPage() {
                   <tbody>
                     {transactions.map((transaction, index) => (
                       <tr key={transaction.transactionId || index} className="border-b">
-                        <td className="py-3 px-4 text-gray-900">
+                        <td className="py-3 px-4 style={{ color: '#E0E0E0' }}">
                           {formatDate(transaction.date)}
                         </td>
                         <td className="py-3 px-4">
@@ -350,7 +350,7 @@ export default function InvestorPage() {
                           {privacyMode ? formatCurrency(transaction.amount, privacyMode) :
                            (transaction.amount >= 0 ? '+' : '') + formatCurrency(transaction.amount, privacyMode)}
                         </td>
-                        <td className="py-3 px-4 text-gray-600">
+                        <td className="py-3 px-4 style={{ color: '#E0E0E0' }}">
                           {transaction.note}
                         </td>
                       </tr>
@@ -361,7 +361,7 @@ export default function InvestorPage() {
             ) : (
               <div className="text-center py-12">
                 <svg 
-                  className="w-12 h-12 mx-auto text-gray-400 mb-4"
+                  className="w-12 h-12 mx-auto style={{ color: '#E0E0E0' }} mb-4"
                   fill="none" 
                   stroke="currentColor" 
                   viewBox="0 0 24 24"
@@ -373,7 +373,7 @@ export default function InvestorPage() {
                     d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" 
                   />
                 </svg>
-                <p className="text-gray-500">No transactions found</p>
+                <p className="style={{ color: '#E0E0E0' }}">No transactions found</p>
               </div>
             )}
           </CardContent>
