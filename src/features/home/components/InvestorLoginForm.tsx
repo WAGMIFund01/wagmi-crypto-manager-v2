@@ -59,13 +59,19 @@ export function InvestorLoginForm() {
     }
   };
 
-  const handleManagerLogin = () => {
+  const handleManagerLogin = async () => {
+    try {
+      // Trigger Google OAuth sign-in
+      await signIn('google', { 
+        callbackUrl: '/dashboard',
+        redirect: true 
+      });
+    } catch (error) {
+      console.error('OAuth sign-in error:', error);
+      setError('Failed to initiate manager login. Please try again.');
+    }
     // For now, show a message about setting up OAuth
     // TODO: Enable Google OAuth when credentials are configured
-    alert('Manager access requires Google OAuth setup. Please contact the administrator to configure OAuth credentials.');                                                                                              
-    
-    // Uncomment this line when OAuth is ready:
-    // window.location.href = '/api/auth/signin/google';
   };
 
   return (
