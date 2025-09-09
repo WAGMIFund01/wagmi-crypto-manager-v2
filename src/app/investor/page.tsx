@@ -405,7 +405,7 @@ export default function InvestorPage() {
                               backgroundColor: transaction.type === 'Investment' ? '#00FF95' : 
                                              transaction.type === 'Dividend' ? '#00FF95' :
                                              transaction.type === 'Fee' ? '#FF4444' : '#A0A0A0',
-                              color: 'white',
+                              color: transaction.type === 'Investment' || transaction.type === 'Dividend' ? '#1A1A1A' : 'white',
                             }}
                           >
                             {transaction.type}
