@@ -12,9 +12,11 @@ interface InvestorData {
 }
 
 interface Transaction {
-  date: string;
-  type: 'Investment' | 'Withdrawal' | 'Dividend' | 'Fee';
+  transactionId: string;
+  investorId: string;
+  type: string;
   amount: number;
+  date: string;
   note: string;
 }
 
@@ -23,7 +25,9 @@ export default function InvestorPage() {
   const [privacyMode, setPrivacyMode] = useState(false);
   const [investorId, setInvestorId] = useState<string>('');
   const [investorData, setInvestorData] = useState<InvestorData | null>(null);
+  const [transactions, setTransactions] = useState<Transaction[]>([]);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     // Check if investor ID is stored in session storage
@@ -42,11 +46,49 @@ export default function InvestorPage() {
         setInvestorData(JSON.parse(storedInvestorData));
       } catch (error) {
         console.error('Error parsing investor data:', error);
+        setError('Failed to load investor data. Please try logging in again.');
+        setLoading(false);
+        return;
       }
+    } else {
+      setError('No investor data found. Please try logging in again.');
+      setLoading(false);
+      return;
     }
+    
+    // Fetch transactions for this investor
+    fetchTransactions(storedInvestorId);
     
     setLoading(false);
   }, [router]);
+
+  const fetchTransactions = async (investorId: string) => {
+    try {
+      const response = await fetch('/api/get-transactions', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ investorId }),
+      });
+
+      const data = await response.json();
+      
+      if (data.success && data.transactions) {
+        if (data.transactions.length === 0) {
+          setError('No transactions found for this investor. Please contact support if this is unexpected.');
+        } else {
+          setTransactions(data.transactions);
+        }
+      } else {
+        console.error('Failed to fetch transactions:', data.error);
+        setError(`Failed to load transaction data: ${data.error || 'Unknown error'}`);
+      }
+    } catch (error) {
+      console.error('Error fetching transactions:', error);
+      setError('Unable to connect to transaction database. Please try again later.');
+    }
+  };
 
   if (loading || !investorId) {
     return (
@@ -62,50 +104,85 @@ export default function InvestorPage() {
     );
   }
 
-  // Use real data from Google Sheets or fallback to mock data
-  const portfolioData = investorData ? {
-    totalValue: investorData.currentValue,
-    totalPnl: investorData.currentValue - investorData.investmentValue,
-    totalPnlPercentage: investorData.returnPercentage,
-    investorName: investorData.name,
-    investorEmail: investorData.email,
-    initialInvestment: investorData.investmentValue
-  } : {
-    totalValue: 0,
-    totalPnl: 0,
-    totalPnlPercentage: 0,
-    investorName: 'Unknown',
-    investorEmail: 'unknown@example.com',
-    initialInvestment: 0
-  };
+  if (error) {
+    return (
+      <div 
+        className="min-h-screen flex items-center justify-center p-4"
+        style={{ backgroundColor: '#111' }}
+      >
+        <div 
+          className="max-w-md w-full p-6 rounded-xl text-center"
+          style={{ 
+            backgroundColor: '#16181D',
+            border: '1px solid #FF4444'
+          }}
+        >
+          <div className="mb-4">
+            <svg 
+              className="w-12 h-12 mx-auto"
+              style={{ color: '#FF4444' }}
+              fill="none" 
+              stroke="currentColor" 
+              viewBox="0 0 24 24"
+            >
+              <path 
+                strokeLinecap="round" 
+                strokeLinejoin="round" 
+                strokeWidth={2} 
+                d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.732-.833-2.5 0L4.268 19.5c-.77.833.192 2.5 1.732 2.5z" 
+              />
+            </svg>
+          </div>
+          <h2 
+            className="text-lg font-semibold mb-2"
+            style={{ color: '#FF4444' }}
+          >
+            Error Loading Data
+          </h2>
+          <p 
+            className="text-sm mb-4"
+            style={{ color: '#A0A0A0' }}
+          >
+            {error}
+          </p>
+          <button
+            onClick={() => {
+              sessionStorage.removeItem('investorId');
+              sessionStorage.removeItem('investorData');
+              router.push('/');
+            }}
+            className="font-semibold py-2 px-4 rounded-lg transition-all duration-200"
+            style={{
+              backgroundColor: 'transparent',
+              border: '1px solid #00FF95',
+              color: '#00FF95',
+              boxShadow: 'none'
+            }}
+            onMouseEnter={(e) => {
+              e.currentTarget.style.backgroundColor = 'rgba(0, 255, 149, 0.1)';
+              e.currentTarget.style.boxShadow = '0px 0px 10px rgba(0, 255, 149, 0.3)';
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.backgroundColor = 'transparent';
+              e.currentTarget.style.boxShadow = 'none';
+            }}
+          >
+            Return to Login
+          </button>
+        </div>
+      </div>
+    );
+  }
 
-  // Mock transaction data - in real app, this would come from the database
-  const transactions: Transaction[] = [
-    {
-      date: '2024-01-15',
-      type: 'Investment',
-      amount: portfolioData.initialInvestment,
-      note: 'Initial investment'
-    },
-    {
-      date: '2024-02-20',
-      type: 'Dividend',
-      amount: 150.00,
-      note: 'Quarterly dividend payment'
-    },
-    {
-      date: '2024-03-10',
-      type: 'Fee',
-      amount: -25.00,
-      note: 'Management fee'
-    },
-    {
-      date: '2024-04-05',
-      type: 'Dividend',
-      amount: 200.00,
-      note: 'Performance bonus'
-    }
-  ];
+  // Use real data from Google Sheets - no fallbacks
+  const portfolioData = {
+    totalValue: investorData!.currentValue,
+    totalPnl: investorData!.currentValue - investorData!.investmentValue,
+    totalPnlPercentage: investorData!.returnPercentage,
+    investorName: investorData!.name,
+    investorEmail: investorData!.email,
+    initialInvestment: investorData!.investmentValue
+  };
 
   // Format currency with proper formatting rules
   const formatCurrency = (value: number, privacy: boolean) => {
@@ -147,46 +224,53 @@ export default function InvestorPage() {
           <div className="flex justify-between items-center h-16">
             <div>
               <h1 
-                className="text-xl font-semibold"
-                style={{ color: '#00FF95' }}
+                className="text-xl font-bold"
+                style={{ color: '#FFFFFF' }}
               >
-                Investor Dashboard
+                {portfolioData.investorName}
               </h1>
               <p 
                 className="text-sm"
                 style={{ color: '#A0A0A0' }}
               >
-                {portfolioData.investorName} | ID: {investorId}
+                ID: {investorId}
               </p>
             </div>
             <div className="flex items-center gap-4">
               <button
                 onClick={() => setPrivacyMode(!privacyMode)}
-                className="font-semibold py-2 px-4 rounded-lg transition-all duration-200"
+                className="p-2 rounded-lg transition-all duration-200"
                 style={{
-                  backgroundColor: privacyMode ? '#00FF95' : 'transparent',
+                  backgroundColor: 'transparent',
                   border: '1px solid #00FF95',
-                  color: privacyMode ? '#111' : '#00FF95',
+                  color: '#00FF95',
                   boxShadow: 'none'
                 }}
                 onMouseEnter={(e) => {
-                  if (!privacyMode) {
-                    e.currentTarget.style.backgroundColor = 'rgba(0, 255, 149, 0.1)';
-                    e.currentTarget.style.boxShadow = '0px 0px 10px rgba(0, 255, 149, 0.3)';
-                  }
+                  e.currentTarget.style.backgroundColor = 'rgba(0, 255, 149, 0.1)';
+                  e.currentTarget.style.boxShadow = '0px 0px 10px rgba(0, 255, 149, 0.3)';
                 }}
                 onMouseLeave={(e) => {
-                  if (!privacyMode) {
-                    e.currentTarget.style.backgroundColor = 'transparent';
-                    e.currentTarget.style.boxShadow = 'none';
-                  }
+                  e.currentTarget.style.backgroundColor = 'transparent';
+                  e.currentTarget.style.boxShadow = 'none';
                 }}
+                title={privacyMode ? 'Show Data' : 'Hide Data'}
               >
-                {privacyMode ? 'Show Data' : 'Privacy Mode'}
+                {privacyMode ? (
+                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.878 9.878L3 3m6.878 6.878L21 21" />
+                  </svg>
+                ) : (
+                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                  </svg>
+                )}
               </button>
               <button
                 onClick={() => {
                   sessionStorage.removeItem('investorId');
+                  sessionStorage.removeItem('investorData');
                   router.push('/');
                 }}
                 className="font-semibold py-2 px-4 rounded-lg transition-all duration-200"
@@ -364,7 +448,7 @@ export default function InvestorPage() {
                     className="text-left py-3 px-4 font-medium"
                     style={{ color: '#A0A0A0' }}
                   >
-                    Type
+                    Transaction Type
                   </th>
                   <th 
                     className="text-right py-3 px-4 font-medium"
@@ -383,7 +467,7 @@ export default function InvestorPage() {
               <tbody>
                 {transactions.map((transaction, index) => (
                   <tr 
-                    key={index}
+                    key={transaction.transactionId || index}
                     className="border-b"
                     style={{ borderColor: '#333' }}
                   >
