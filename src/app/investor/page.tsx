@@ -162,7 +162,7 @@ export default function InvestorPage() {
       <header style={{ backgroundColor: '#16181D', borderColor: '#333' }}>
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center h-16">
-            <div className="flex items-center space-x-6">
+            <div className="flex items-center">
               {/* WAGMI Logo */}
               <div className="flex items-center">
                 <h1 
@@ -175,19 +175,19 @@ export default function InvestorPage() {
                   WAGMI
                 </h1>
               </div>
-              
-              {/* Investor Info */}
-              <div>
-                <h2 style={{ color: '#FFFFFF' }}>
-                  {portfolioData.investorName}
-                </h2>
-                <p style={{ color: '#E0E0E0' }}>
-                  ID: {investorId}
-                </p>
-              </div>
             </div>
             
             <div className="flex items-center gap-4">
+              {/* Investor Info */}
+              <div className="text-right mr-4">
+                <h2 style={{ color: '#FFFFFF', fontSize: '16px', fontWeight: '600', margin: 0 }}>
+                  {portfolioData.investorName}
+                </h2>
+                <p style={{ color: '#E0E0E0', fontSize: '14px', margin: 0 }}>
+                  ID: {investorId}
+                </p>
+              </div>
+              
               <button
                 onClick={() => setPrivacyMode(!privacyMode)}
                 className="p-2 rounded-lg transition-all duration-200 flex items-center justify-center"
