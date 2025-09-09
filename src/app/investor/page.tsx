@@ -268,7 +268,7 @@ export default function InvestorPage() {
               </CardTitle>
             </CardHeader>
             <CardContent>
-              <p className="text-3xl font-bold" style={{ color: portfolioData.totalPnl >= 0 ? '#00FF95' : '#FF4444' }}
+              <p className="text-3xl font-bold" style={{ color: portfolioData.totalPnlPercentage >= 0 ? '#00FF95' : '#FF4444' }}>
                 {privacyMode ? formatCurrency(portfolioData.totalPnl, privacyMode) : 
                  (portfolioData.totalPnl >= 0 ? '+' : '') + formatCurrency(portfolioData.totalPnl, privacyMode)}
               </p>
@@ -283,7 +283,7 @@ export default function InvestorPage() {
               </CardTitle>
             </CardHeader>
             <CardContent>
-              <p className="text-3xl font-bold" style={{ color: portfolioData.totalPnl >= 0 ? '#00FF95' : '#FF4444' }}
+              <p className="text-3xl font-bold" style={{ color: portfolioData.totalPnlPercentage >= 0 ? '#00FF95' : '#FF4444' }}>
                 {formatPercentage(portfolioData.totalPnlPercentage, privacyMode, true)}
               </p>
             </CardContent>
