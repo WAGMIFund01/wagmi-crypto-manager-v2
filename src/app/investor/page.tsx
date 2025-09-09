@@ -408,12 +408,16 @@ export default function InvestorPage() {
                         </td>
                         <td className="py-3 px-4">
                           <span 
-                            className="px-3 py-1 rounded-full text-xs font-medium"
+                            className="px-3 py-1 rounded-full text-xs font-medium whitespace-nowrap inline-block"
                             style={{
-                              backgroundColor: transaction.type === 'Investment' ? '#00FF95' : 
-                                             transaction.type === 'Dividend' ? '#00FF95' :
-                                             transaction.type === 'Fee' ? '#FF4444' : '#A0A0A0',
-                              color: transaction.type === 'Investment' || transaction.type === 'Dividend' ? '#1A1A1A' : 'white',
+                              backgroundColor: '#00FF95',
+                              color: '#1A1A1A',
+                              minWidth: 'fit-content',
+                              fontSize: '12px',
+                              fontWeight: '600',
+                              padding: '6px 12px',
+                              borderRadius: '9999px',
+                              lineHeight: '1.2'
                             }}
                           >
                             {transaction.type}
