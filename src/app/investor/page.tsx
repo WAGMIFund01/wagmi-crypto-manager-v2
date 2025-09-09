@@ -196,4 +196,3 @@ export default function InvestorPage() {
     </div>
   );
 }
-// Light theme restored
