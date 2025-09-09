@@ -96,7 +96,7 @@ export default function InvestorPage() {
     return (
       <div className="flex items-center justify-center min-h-screen bg-gray-50">
         <div className="text-center">
-          <div className="animate-spin rounded-full h-8 w-8 border-b-2 #00FF95 mx-auto mb-4"></div>
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto mb-4"></div>
           <p className="text-gray-600">Loading...</p>
         </div>
       </div>
@@ -123,7 +123,7 @@ export default function InvestorPage() {
                 />
               </svg>
             </div>
-            <h2 className="text-lg font-semibold mb-2 #FF4444">
+            <h2 className="text-lg font-semibold mb-2 text-red-600">
               Error Loading Data
             </h2>
             <p className="text-sm mb-4 text-gray-600">
@@ -174,7 +174,7 @@ export default function InvestorPage() {
             <div className="flex items-center space-x-6">
               {/* WAGMI Logo */}
               <div className="flex items-center">
-                <h1 className="text-2xl font-bold #00FF95">
+                <h1 className="text-2xl font-bold text-green-600">
                   WAGMI
                 </h1>
               </div>
@@ -268,7 +268,7 @@ export default function InvestorPage() {
               </CardTitle>
             </CardHeader>
             <CardContent>
-              <p className={`text-2xl font-bold ${portfolioData.totalPnl >= 0 ? '#00FF95' : '#FF4444'}`}>
+              <p className={`text-2xl font-bold ${portfolioData.totalPnl >= 0 ? 'text-green-600' : 'text-red-600'}`}>
                 {privacyMode ? formatCurrency(portfolioData.totalPnl, privacyMode) : 
                  (portfolioData.totalPnl >= 0 ? '+' : '') + formatCurrency(portfolioData.totalPnl, privacyMode)}
               </p>
@@ -283,7 +283,7 @@ export default function InvestorPage() {
               </CardTitle>
             </CardHeader>
             <CardContent>
-              <p className={`text-2xl font-bold ${portfolioData.totalPnlPercentage >= 0 ? '#00FF95' : '#FF4444'}`}>
+              <p className={`text-2xl font-bold ${portfolioData.totalPnlPercentage >= 0 ? 'text-green-600' : 'text-red-600'}`}>
                 {formatPercentage(portfolioData.totalPnlPercentage, privacyMode, true)}
               </p>
             </CardContent>
@@ -301,7 +301,7 @@ export default function InvestorPage() {
             {transactionsLoading ? (
               <div className="flex items-center justify-center py-12">
                 <div className="text-center">
-                  <div className="animate-spin rounded-full h-8 w-8 border-b-2 #00FF95 mx-auto mb-4"></div>
+                  <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto mb-4"></div>
                   <p style={{ color: '#A0A0A0' }}>
                     Loading transaction history...
                   </p>
@@ -311,46 +311,46 @@ export default function InvestorPage() {
               <div className="overflow-x-auto">
                 <table className="w-full">
                   <thead>
-                    <tr style={{ borderColor: '#333' }}>
-                      <th style={{ color: '#A0A0A0' }}>
+                    <tr className="border-b">
+                      <th className="text-left py-3 px-4 font-medium text-gray-500">
                         Date
                       </th>
-                      <th style={{ color: '#A0A0A0' }}>
+                      <th className="text-left py-3 px-4 font-medium text-gray-500">
                         Transaction Type
                       </th>
-                      <th style={{ color: '#A0A0A0' }}>
+                      <th className="text-right py-3 px-4 font-medium text-gray-500">
                         Amount
                       </th>
-                      <th style={{ color: '#A0A0A0' }}>
+                      <th className="text-left py-3 px-4 font-medium text-gray-500">
                         Note
                       </th>
                     </tr>
                   </thead>
                   <tbody>
                     {transactions.map((transaction, index) => (
-                      <tr key={transaction.transactionId || index} style={{ borderColor: '#333' }}>
-                        <td style={{ color: '#FFFFFF' }}>
+                      <tr key={transaction.transactionId || index} className="border-b">
+                        <td className="py-3 px-4 text-gray-900">
                           {formatDate(transaction.date)}
                         </td>
                         <td className="py-3 px-4">
                           <span 
                             className={`px-2 py-1 rounded text-xs font-medium ${
-                              transaction.type === 'Investment' ? 'rgba(0, 255, 149, 0.1) #00FF95' :
-                              transaction.type === 'Dividend' ? 'rgba(0, 255, 149, 0.1) #00FF95' :
-                              transaction.type === 'Fee' ? 'rgba(255, 68, 68, 0.1) #FF4444' :
-                              'rgba(160, 160, 160, 0.1) #A0A0A0'
+                              transaction.type === 'Investment' ? 'bg-green-100 text-green-800' :
+                              transaction.type === 'Dividend' ? 'bg-green-100 text-green-800' :
+                              transaction.type === 'Fee' ? 'bg-red-100 text-red-800' :
+                              'bg-gray-100 text-gray-800'
                             }`}
                           >
                             {transaction.type}
                           </span>
                         </td>
                         <td className={`py-3 px-4 text-right font-semibold ${
-                          transaction.amount >= 0 ? '#00FF95' : '#FF4444'
+                          transaction.amount >= 0 ? 'text-green-600' : 'text-red-600'
                         }`}>
                           {privacyMode ? formatCurrency(transaction.amount, privacyMode) :
                            (transaction.amount >= 0 ? '+' : '') + formatCurrency(transaction.amount, privacyMode)}
                         </td>
-                        <td style={{ color: '#A0A0A0' }}>
+                        <td className="py-3 px-4 text-gray-600">
                           {transaction.note}
                         </td>
                       </tr>
@@ -361,7 +361,7 @@ export default function InvestorPage() {
             ) : (
               <div className="text-center py-12">
                 <svg 
-                  className="w-12 h-12 mx-auto #A0A0A0 mb-4"
+                  className="w-12 h-12 mx-auto text-gray-400 mb-4"
                   fill="none" 
                   stroke="currentColor" 
                   viewBox="0 0 24 24"
@@ -373,7 +373,7 @@ export default function InvestorPage() {
                     d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" 
                   />
                 </svg>
-                <p className="#A0A0A0">No transactions found</p>
+                <p className="text-gray-500">No transactions found</p>
               </div>
             )}
           </CardContent>
