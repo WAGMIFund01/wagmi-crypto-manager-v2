@@ -11,7 +11,6 @@ interface InvestorData {
   investmentValue: number;
   currentValue: number;
   returnPercentage: number;
-}
 
 interface Transaction {
   transactionId: string;
@@ -20,7 +19,6 @@ interface Transaction {
   amount: number;
   date: string;
   note: string;
-}
 
 export default function InvestorPage() {
   const router = useRouter();
@@ -290,10 +288,17 @@ export default function InvestorPage() {
           </Card>
         </div>
 
+
         {/* Transaction History */}
-        <Card style={{ backgroundColor: '#16181D', boxShadow: '0 4px 6px rgba(0, 0, 0, 0.3)' }}>
+        <Card
+          style={{
+            backgroundColor: '#2D2D2D',
+            border: '1px solid #404040',
+            borderRadius: '12px',
+          }}
+        >
           <CardHeader>
-            <CardTitle style={{ color: '#00FF95' }}>
+            <CardTitle className="text-lg font-semibold" style={{ color: '#00FF95' }}>
               Transaction History
             </CardTitle>
           </CardHeader>
@@ -301,56 +306,51 @@ export default function InvestorPage() {
             {transactionsLoading ? (
               <div className="flex items-center justify-center py-12">
                 <div className="text-center">
-                  <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto mb-4"></div>
-                  <p style={{ color: '#E0E0E0' }}>
-                    Loading transaction history...
-                  </p>
+                  <div className="animate-spin rounded-full h-8 w-8 border-b-2 mx-auto mb-4" style={{ borderColor: '#00FF95' }}></div>
+                  <p style={{ color: '#E0E0E0' }}>Loading transactions...</p>
                 </div>
               </div>
             ) : transactions.length > 0 ? (
               <div className="overflow-x-auto">
                 <table className="w-full">
                   <thead>
-                    <tr className="border-b">
-                      <th className="text-left py-3 px-4 font-medium style={{ color: '#E0E0E0' }}">
-                        Date
-                      </th>
-                      <th className="text-left py-3 px-4 font-medium style={{ color: '#E0E0E0' }}">
-                        Transaction Type
-                      </th>
-                      <th className="text-right py-3 px-4 font-medium style={{ color: '#E0E0E0' }}">
-                        Amount
-                      </th>
-                      <th className="text-left py-3 px-4 font-medium style={{ color: '#E0E0E0' }}">
-                        Note
-                      </th>
+                    <tr className="border-b" style={{ borderColor: '#404040' }}>
+                      <th className="text-left py-3 px-4 font-medium" style={{ color: '#E0E0E0' }}>Date</th>
+                      <th className="text-left py-3 px-4 font-medium" style={{ color: '#E0E0E0' }}>Transaction Type</th>
+                      <th className="text-right py-3 px-4 font-medium" style={{ color: '#E0E0E0' }}>Amount</th>
+                      <th className="text-left py-3 px-4 font-medium" style={{ color: '#E0E0E0' }}>Note</th>
                     </tr>
                   </thead>
                   <tbody>
                     {transactions.map((transaction, index) => (
-                      <tr key={transaction.transactionId || index} className="border-b">
-                        <td className="py-3 px-4 style={{ color: '#E0E0E0' }}">
-                          {formatDate(transaction.date)}
+                      <tr key={transaction.transactionId || index} className="border-b" style={{ borderColor: '#404040' }}>
+                        <td className="py-3 px-4" style={{ color: '#E0E0E0' }}>
+                          {new Date(transaction.date).toLocaleDateString('en-US', { 
+                            year: 'numeric', 
+                            month: 'short', 
+                            day: 'numeric' 
+                          })}
                         </td>
                         <td className="py-3 px-4">
                           <span 
-                            className={`px-2 py-1 rounded text-xs font-medium ${
-                              transaction.type === 'Investment' ? 'bg-green-100 text-green-800' :
-                              transaction.type === 'Dividend' ? 'bg-green-100 text-green-800' :
-                              transaction.type === 'Fee' ? 'bg-red-100 text-red-800' :
-                              'bg-gray-100 text-gray-800'
-                            }`}
+                            className="px-3 py-1 rounded-full text-xs font-medium"
+                            style={{
+                              backgroundColor: transaction.type === 'Investment' ? '#00FF95' : 
+                                             transaction.type === 'Dividend' ? '#00FF95' :
+                                             transaction.type === 'Fee' ? '#FF4444' : '#A0A0A0',
+                              color: 'white',
+                            }}
                           >
                             {transaction.type}
                           </span>
                         </td>
-                        <td className={`py-3 px-4 text-right font-semibold ${
-                          transaction.amount >= 0 ? 'text-green-600' : 'text-red-600'
-                        }`}>
-                          {privacyMode ? formatCurrency(transaction.amount, privacyMode) :
-                           (transaction.amount >= 0 ? '+' : '') + formatCurrency(transaction.amount, privacyMode)}
+                        <td className="py-3 px-4 text-right font-semibold" style={{ 
+                          color: transaction.amount >= 0 ? '#00FF95' : '#FF4444' 
+                        }}>
+                          {privacyMode ? '•••••' : 
+                           (transaction.amount >= 0 ? '+' : '') + formatCurrency(transaction.amount, false)}
                         </td>
-                        <td className="py-3 px-4 style={{ color: '#E0E0E0' }}">
+                        <td className="py-3 px-4" style={{ color: '#E0E0E0' }}>
                           {transaction.note}
                         </td>
                       </tr>
@@ -361,7 +361,8 @@ export default function InvestorPage() {
             ) : (
               <div className="text-center py-12">
                 <svg 
-                  className="w-12 h-12 mx-auto style={{ color: '#E0E0E0' }} mb-4"
+                  className="w-12 h-12 mx-auto mb-4"
+                  style={{ color: '#E0E0E0' }}
                   fill="none" 
                   stroke="currentColor" 
                   viewBox="0 0 24 24"
@@ -373,7 +374,7 @@ export default function InvestorPage() {
                     d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" 
                   />
                 </svg>
-                <p className="style={{ color: '#E0E0E0' }}">No transactions found</p>
+                <p style={{ color: '#E0E0E0' }}>No transactions found</p>
               </div>
             )}
           </CardContent>
