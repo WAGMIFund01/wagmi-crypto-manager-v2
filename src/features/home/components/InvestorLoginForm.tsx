@@ -83,9 +83,9 @@ export function InvestorLoginForm() {
       }}
     >
       {/* Main Container */}
-      <div className="w-full max-w-2xl">
+      <div className="w-full max-w-2xl bg-gray-900 rounded-xl p-8 relative">
         {/* Main Dark Card */}
-        <div className="bg-gray-900 rounded-xl p-8 relative">
+        <div>
           {/* Header */}
           <div className="text-center mb-8">
             <h1 
@@ -103,7 +103,7 @@ export function InvestorLoginForm() {
             >
               We&apos;re All Gonna Make It
             </p>
-          </div>
+      </div>
 
           {/* Investor Login Section */}
           <div className="bg-gray-800 rounded-xl p-6 mb-6">
@@ -131,12 +131,12 @@ export function InvestorLoginForm() {
                   }}
                   required
                 />
-              </div>
+          </div>
               
               {error && (
                 <div className="text-red-400 text-sm bg-red-900/20 border border-red-800 p-3 rounded-lg">
                   {error}
-                </div>
+            </div>
               )}
               
               <button
@@ -167,8 +167,8 @@ export function InvestorLoginForm() {
             <p className="text-gray-400 text-sm text-center mt-4">
               Don&apos;t have your Investor ID? Contact your fund manager for access credentials.
             </p>
-          </div>
-        </div>
+      </div>
+    </div>
 
         {/* Manager Access Button - Positioned outside main card */}
         <div className="flex justify-end mt-6">
@@ -210,8 +210,8 @@ export function InvestorLoginForm() {
             </svg>
             Manager Access
           </button>
-        </div>
-      </div>
+    </div>
+    </div>
     </div>
   );
 }
