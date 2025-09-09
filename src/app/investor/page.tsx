@@ -11,6 +11,13 @@ interface InvestorData {
   returnPercentage: number;
 }
 
+interface Transaction {
+  date: string;
+  type: 'Investment' | 'Withdrawal' | 'Dividend' | 'Fee';
+  amount: number;
+  note: string;
+}
+
 export default function InvestorPage() {
   const router = useRouter();
   const [privacyMode, setPrivacyMode] = useState(false);
@@ -61,28 +68,66 @@ export default function InvestorPage() {
     totalPnl: investorData.currentValue - investorData.investmentValue,
     totalPnlPercentage: investorData.returnPercentage,
     investorName: investorData.name,
-    investorEmail: investorData.email
+    investorEmail: investorData.email,
+    initialInvestment: investorData.investmentValue
   } : {
     totalValue: 0,
     totalPnl: 0,
     totalPnlPercentage: 0,
     investorName: 'Unknown',
-    investorEmail: 'unknown@example.com'
+    investorEmail: 'unknown@example.com',
+    initialInvestment: 0
   };
 
-  // Format currency with privacy mode
+  // Mock transaction data - in real app, this would come from the database
+  const transactions: Transaction[] = [
+    {
+      date: '2024-01-15',
+      type: 'Investment',
+      amount: portfolioData.initialInvestment,
+      note: 'Initial investment'
+    },
+    {
+      date: '2024-02-20',
+      type: 'Dividend',
+      amount: 150.00,
+      note: 'Quarterly dividend payment'
+    },
+    {
+      date: '2024-03-10',
+      type: 'Fee',
+      amount: -25.00,
+      note: 'Management fee'
+    },
+    {
+      date: '2024-04-05',
+      type: 'Dividend',
+      amount: 200.00,
+      note: 'Performance bonus'
+    }
+  ];
+
+  // Format currency with proper formatting rules
   const formatCurrency = (value: number, privacy: boolean) => {
     if (privacy) return '••••••';
-    if (value >= 1000000) return `$${(value / 1000000).toFixed(1)}M`;
-    if (value >= 1000) return `$${(value / 1000).toFixed(1)}K`;
-    return `$${value.toFixed(2)}`;
+    return `$${value.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
   };
 
-  // Format percentage with privacy mode and direction
+  // Format percentage with proper formatting rules
   const formatPercentage = (value: number, privacy: boolean, showSign: boolean = false) => {
     if (privacy) return '••••';
     const sign = showSign && value > 0 ? '+' : '';
     return `${sign}${value.toFixed(1)}%`;
+  };
+
+  // Format date for display
+  const formatDate = (dateString: string) => {
+    const date = new Date(dateString);
+    return date.toLocaleDateString('en-US', { 
+      year: 'numeric', 
+      month: 'short', 
+      day: 'numeric' 
+    });
   };
 
   return (
@@ -168,9 +213,9 @@ export default function InvestorPage() {
       </header>
 
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        {/* KPI Cards */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-          {/* Portfolio Value Card */}
+        {/* KPI Cards - 4 tiles with glow effects */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+          {/* Initial Investment Card */}
           <div 
             className="rounded-xl p-6 transition-all duration-200"
             style={{ 
@@ -178,7 +223,7 @@ export default function InvestorPage() {
               boxShadow: '0 4px 6px rgba(0, 0, 0, 0.3)'
             }}
             onMouseEnter={(e) => {
-              e.currentTarget.style.boxShadow = '0 8px 25px rgba(0, 255, 149, 0.1)';
+              e.currentTarget.style.boxShadow = '0 8px 25px rgba(0, 255, 149, 0.15)';
             }}
             onMouseLeave={(e) => {
               e.currentTarget.style.boxShadow = '0 4px 6px rgba(0, 0, 0, 0.3)';
@@ -188,7 +233,35 @@ export default function InvestorPage() {
               className="text-sm font-medium mb-2"
               style={{ color: '#A0A0A0' }}
             >
-              Total Portfolio Value
+              Initial Investment
+            </h3>
+            <p 
+              className="text-2xl font-bold"
+              style={{ color: '#FFFFFF' }}
+            >
+              {formatCurrency(portfolioData.initialInvestment, privacyMode)}
+            </p>
+          </div>
+
+          {/* Current Value Card */}
+          <div 
+            className="rounded-xl p-6 transition-all duration-200"
+            style={{ 
+              backgroundColor: '#16181D',
+              boxShadow: '0 4px 6px rgba(0, 0, 0, 0.3)'
+            }}
+            onMouseEnter={(e) => {
+              e.currentTarget.style.boxShadow = '0 8px 25px rgba(0, 255, 149, 0.15)';
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.boxShadow = '0 4px 6px rgba(0, 0, 0, 0.3)';
+            }}
+          >
+            <h3 
+              className="text-sm font-medium mb-2"
+              style={{ color: '#A0A0A0' }}
+            >
+              Current Value
             </h3>
             <p 
               className="text-2xl font-bold"
@@ -206,7 +279,7 @@ export default function InvestorPage() {
               boxShadow: '0 4px 6px rgba(0, 0, 0, 0.3)'
             }}
             onMouseEnter={(e) => {
-              e.currentTarget.style.boxShadow = '0 8px 25px rgba(0, 255, 149, 0.1)';
+              e.currentTarget.style.boxShadow = '0 8px 25px rgba(0, 255, 149, 0.15)';
             }}
             onMouseLeave={(e) => {
               e.currentTarget.style.boxShadow = '0 4px 6px rgba(0, 0, 0, 0.3)';
@@ -236,7 +309,7 @@ export default function InvestorPage() {
               boxShadow: '0 4px 6px rgba(0, 0, 0, 0.3)'
             }}
             onMouseEnter={(e) => {
-              e.currentTarget.style.boxShadow = '0 8px 25px rgba(0, 255, 149, 0.1)';
+              e.currentTarget.style.boxShadow = '0 8px 25px rgba(0, 255, 149, 0.15)';
             }}
             onMouseLeave={(e) => {
               e.currentTarget.style.boxShadow = '0 4px 6px rgba(0, 0, 0, 0.3)';
@@ -259,7 +332,7 @@ export default function InvestorPage() {
           </div>
         </div>
 
-        {/* Portfolio Summary Section */}
+        {/* Transaction Details Table */}
         <div 
           className="rounded-xl p-6"
           style={{ 
@@ -271,107 +344,92 @@ export default function InvestorPage() {
             className="text-lg font-semibold mb-6"
             style={{ color: '#00FF95' }}
           >
-            Portfolio Summary
+            Transaction History
           </h2>
           
-          <div className="space-y-4">
-            {/* Initial Investment Row */}
-            <div 
-              className="flex items-center justify-between p-4 rounded-lg"
-              style={{ 
-                backgroundColor: '#1A1D23',
-                border: '1px solid #333'
-              }}
-            >
-              <div>
-                <h3 
-                  className="font-semibold"
-                  style={{ color: '#FFFFFF' }}
+          <div className="overflow-x-auto">
+            <table className="w-full">
+              <thead>
+                <tr 
+                  className="border-b"
+                  style={{ borderColor: '#333' }}
                 >
-                  Initial Investment
-                </h3>
-                <p 
-                  className="text-sm"
-                  style={{ color: '#A0A0A0' }}
-                >
-                  Initial investment amount
-                </p>
-              </div>
-              <div className="text-right">
-                <p 
-                  className="font-semibold"
-                  style={{ color: '#FFFFFF' }}
-                >
-                  {formatCurrency(investorData?.investmentValue || 0, privacyMode)}
-                </p>
-              </div>
-            </div>
-            
-            {/* Current Value Row */}
-            <div 
-              className="flex items-center justify-between p-4 rounded-lg"
-              style={{ 
-                backgroundColor: '#1A1D23',
-                border: '1px solid #333'
-              }}
-            >
-              <div>
-                <h3 
-                  className="font-semibold"
-                  style={{ color: '#FFFFFF' }}
-                >
-                  Current Value
-                </h3>
-                <p 
-                  className="text-sm"
-                  style={{ color: '#A0A0A0' }}
-                >
-                  Current portfolio value
-                </p>
-              </div>
-              <div className="text-right">
-                <p 
-                  className="font-semibold"
-                  style={{ color: '#FFFFFF' }}
-                >
-                  {formatCurrency(portfolioData.totalValue, privacyMode)}
-                </p>
-              </div>
-            </div>
-            
-            {/* Total Return Row */}
-            <div 
-              className="flex items-center justify-between p-4 rounded-lg"
-              style={{ 
-                backgroundColor: '#1A1D23',
-                border: '1px solid #333'
-              }}
-            >
-              <div>
-                <h3 
-                  className="font-semibold"
-                  style={{ color: '#FFFFFF' }}
-                >
-                  Total Return
-                </h3>
-                <p 
-                  className="text-sm"
-                  style={{ color: '#A0A0A0' }}
-                >
-                  Performance since investment
-                </p>
-              </div>
-              <div className="text-right">
-                <p 
-                  className="font-semibold"
-                  style={{ 
-                    color: portfolioData.totalPnlPercentage >= 0 ? '#00FF95' : '#FF4444'
-                  }}
-                >
-                  {formatPercentage(portfolioData.totalPnlPercentage, privacyMode, true)}
-                </p>
-              </div>
-            </div>
+                  <th 
+                    className="text-left py-3 px-4 font-medium"
+                    style={{ color: '#A0A0A0' }}
+                  >
+                    Date
+                  </th>
+                  <th 
+                    className="text-left py-3 px-4 font-medium"
+                    style={{ color: '#A0A0A0' }}
+                  >
+                    Type
+                  </th>
+                  <th 
+                    className="text-right py-3 px-4 font-medium"
+                    style={{ color: '#A0A0A0' }}
+                  >
+                    Amount
+                  </th>
+                  <th 
+                    className="text-left py-3 px-4 font-medium"
+                    style={{ color: '#A0A0A0' }}
+                  >
+                    Note
+                  </th>
+                </tr>
+              </thead>
+              <tbody>
+                {transactions.map((transaction, index) => (
+                  <tr 
+                    key={index}
+                    className="border-b"
+                    style={{ borderColor: '#333' }}
+                  >
+                    <td 
+                      className="py-3 px-4"
+                      style={{ color: '#FFFFFF' }}
+                    >
+                      {formatDate(transaction.date)}
+                    </td>
+                    <td 
+                      className="py-3 px-4"
+                    >
+                      <span 
+                        className="px-2 py-1 rounded text-xs font-medium"
+                        style={{
+                          backgroundColor: transaction.type === 'Investment' ? 'rgba(0, 255, 149, 0.1)' :
+                                         transaction.type === 'Dividend' ? 'rgba(0, 255, 149, 0.1)' :
+                                         transaction.type === 'Fee' ? 'rgba(255, 68, 68, 0.1)' :
+                                         'rgba(160, 160, 160, 0.1)',
+                          color: transaction.type === 'Investment' ? '#00FF95' :
+                                transaction.type === 'Dividend' ? '#00FF95' :
+                                transaction.type === 'Fee' ? '#FF4444' :
+                                '#A0A0A0'
+                        }}
+                      >
+                        {transaction.type}
+                      </span>
+                    </td>
+                    <td 
+                      className="py-3 px-4 text-right font-semibold"
+                      style={{ 
+                        color: transaction.amount >= 0 ? '#00FF95' : '#FF4444'
+                      }}
+                    >
+                      {transaction.amount >= 0 ? '+' : ''}{formatCurrency(transaction.amount, privacyMode)}
+                    </td>
+                    <td 
+                      className="py-3 px-4"
+                      style={{ color: '#A0A0A0' }}
+                    >
+                      {transaction.note}
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
           </div>
         </div>
       </main>
