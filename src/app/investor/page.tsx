@@ -135,7 +135,7 @@ export default function InvestorPage() {
                 sessionStorage.removeItem('investorData');
                 router.push('/');
               }}
-              variant="outline"
+              variant="outline" style={{ backgroundColor: "transparent", color: "#00FF95", borderColor: "#00FF95", borderWidth: "1px", borderStyle: "solid" }}
             >
               Return to Login
             </Button>
@@ -192,7 +192,7 @@ export default function InvestorPage() {
             
             <div className="flex items-center gap-4">
               <Button
-                variant={privacyMode ? "primary" : "outline"}
+                variant={privacyMode ? "primary" : "outline"} style={{ backgroundColor: privacyMode ? "#00FF95" : "transparent", color: privacyMode ? "white" : "#00FF95", borderColor: "#00FF95", borderWidth: "1px", borderStyle: "solid" }}
                 size="sm"
                 onClick={() => setPrivacyMode(!privacyMode)}
                 className="flex items-center gap-2"
@@ -215,7 +215,7 @@ export default function InvestorPage() {
                 )}
               </Button>
               <Button
-                variant="outline"
+                variant="outline" style={{ backgroundColor: "transparent", color: "#00FF95", borderColor: "#00FF95", borderWidth: "1px", borderStyle: "solid" }}
                 onClick={() => {
                   sessionStorage.removeItem('investorId');
                   sessionStorage.removeItem('investorData');
