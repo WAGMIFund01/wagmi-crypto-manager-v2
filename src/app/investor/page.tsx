@@ -162,14 +162,17 @@ export default function InvestorPage() {
       <header style={{ backgroundColor: '#16181D', borderColor: '#333' }}>
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center h-16">
-            <div className="flex items-center">
+            <div className="flex items-center" style={{ paddingLeft: '32px' }}>
               {/* WAGMI Logo */}
               <div className="flex items-center">
                 <h1 
-                  className="text-2xl font-bold"
+                  className="font-bold"
                   style={{ 
                     color: '#00FF95',
-                    textShadow: '0 0 20px rgba(0, 255, 149, 0.5), 0 0 40px rgba(0, 255, 149, 0.3)'
+                    fontSize: '32px',
+                    lineHeight: '1.2',
+                    textShadow: '0 0 25px rgba(0, 255, 149, 0.6), 0 0 50px rgba(0, 255, 149, 0.4), 0 0 75px rgba(0, 255, 149, 0.2)',
+                    letterSpacing: '0.05em'
                   }}
                 >
                   WAGMI
