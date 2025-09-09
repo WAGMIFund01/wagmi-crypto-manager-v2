@@ -520,4 +520,3 @@ export default function InvestorPage() {
     </div>
   );
 }
-// Force commit the 3-dot changes
