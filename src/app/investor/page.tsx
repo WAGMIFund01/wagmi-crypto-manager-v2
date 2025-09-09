@@ -184,12 +184,14 @@ export default function InvestorPage() {
             <div className="flex items-center gap-4">
               <button
                 onClick={() => setPrivacyMode(!privacyMode)}
-                className="font-semibold py-2 px-4 rounded-lg transition-all duration-200 flex items-center gap-2 text-sm"
+                className="p-2 rounded-lg transition-all duration-200 flex items-center justify-center"
                 style={{
                   backgroundColor: privacyMode ? '#00FF95' : 'transparent',
                   border: '1px solid #00FF95',
                   color: privacyMode ? 'white' : '#00FF95',
-                  boxShadow: 'none'
+                  boxShadow: 'none',
+                  width: '40px',
+                  height: '40px'
                 }}
                 onMouseEnter={(e) => {
                   if (privacyMode) {
@@ -209,22 +211,19 @@ export default function InvestorPage() {
                     e.currentTarget.style.boxShadow = 'none';
                   }
                 }}
+                title={privacyMode ? 'Show Data' : 'Privacy Mode'}
               >
                 {privacyMode ? (
-                  <>
-                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.878 9.878L3 3m6.878 6.878L21 21" />
-                    </svg>
-                    Show Data
-                  </>
+                  // Eye with slash (Privacy Mode ON)
+                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.878 9.878L3 3m6.878 6.878L21 21" />
+                  </svg>
                 ) : (
-                  <>
-                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
-                    </svg>
-                    Privacy Mode
-                  </>
+                  // Open eye (Privacy Mode OFF)
+                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                  </svg>
                 )}
               </button>
               <button
