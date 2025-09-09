@@ -157,9 +157,9 @@ export default function InvestorPage() {
 
 
   return (
-    <div style={{ backgroundColor: '#111' }}>
+    <div style={{ backgroundColor: '#0B0C10' }}>
       {/* Header */}
-      <header style={{ backgroundColor: '#16181D', borderColor: '#333' }}>
+      <header style={{ backgroundColor: '#0B0C10', borderColor: '#333' }}>
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center h-16">
             <div className="flex items-center" style={{ paddingLeft: '32px' }}>
