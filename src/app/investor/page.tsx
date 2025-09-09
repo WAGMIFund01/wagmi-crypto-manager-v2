@@ -184,7 +184,7 @@ export default function InvestorPage() {
                 <h2 style={{ color: '#FFFFFF' }}>
                   {portfolioData.investorName}
                 </h2>
-                <p style={{ color: '#A0A0A0' }}>
+                <p style={{ color: '#E0E0E0' }}>
                   ID: {investorId}
                 </p>
               </div>
@@ -235,7 +235,7 @@ export default function InvestorPage() {
           {/* Initial Investment */}
           <Card className="hover:shadow-lg transition-shadow duration-200" style={{ backgroundColor: '#16181D', boxShadow: '0 4px 6px rgba(0, 0, 0, 0.3)' }}>
             <CardHeader className="pb-2">
-              <CardTitle style={{ color: '#A0A0A0' }}>
+              <CardTitle style={{ color: '#E0E0E0' }}>
                 Initial Investment
               </CardTitle>
             </CardHeader>
@@ -249,7 +249,7 @@ export default function InvestorPage() {
           {/* Current Value */}
           <Card className="hover:shadow-lg transition-shadow duration-200" style={{ backgroundColor: '#16181D', boxShadow: '0 4px 6px rgba(0, 0, 0, 0.3)' }}>
             <CardHeader className="pb-2">
-              <CardTitle style={{ color: '#A0A0A0' }}>
+              <CardTitle style={{ color: '#E0E0E0' }}>
                 Current Value
               </CardTitle>
             </CardHeader>
@@ -263,7 +263,7 @@ export default function InvestorPage() {
           {/* Total P&L */}
           <Card className="hover:shadow-lg transition-shadow duration-200" style={{ backgroundColor: '#16181D', boxShadow: '0 4px 6px rgba(0, 0, 0, 0.3)' }}>
             <CardHeader className="pb-2">
-              <CardTitle style={{ color: '#A0A0A0' }}>
+              <CardTitle style={{ color: '#E0E0E0' }}>
                 Total P&L
               </CardTitle>
             </CardHeader>
@@ -278,7 +278,7 @@ export default function InvestorPage() {
           {/* Total Return */}
           <Card className="hover:shadow-lg transition-shadow duration-200" style={{ backgroundColor: '#16181D', boxShadow: '0 4px 6px rgba(0, 0, 0, 0.3)' }}>
             <CardHeader className="pb-2">
-              <CardTitle style={{ color: '#A0A0A0' }}>
+              <CardTitle style={{ color: '#E0E0E0' }}>
                 Total Return
               </CardTitle>
             </CardHeader>
@@ -302,7 +302,7 @@ export default function InvestorPage() {
               <div className="flex items-center justify-center py-12">
                 <div className="text-center">
                   <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto mb-4"></div>
-                  <p style={{ color: '#A0A0A0' }}>
+                  <p style={{ color: '#E0E0E0' }}>
                     Loading transaction history...
                   </p>
                 </div>
