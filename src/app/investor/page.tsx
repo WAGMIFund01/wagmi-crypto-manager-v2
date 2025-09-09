@@ -265,7 +265,7 @@ export default function InvestorPage() {
             style={{ 
               backgroundColor: '#1A1A1A',
               borderRadius: '16px',
-              boxShadow: '0 8px 32px rgba(0, 0, 0, 0.4), 0 0 0 1px rgba(255, 255, 255, 0.05)'
+              boxShadow: '0 8px 32px rgba(0, 0, 0, 0.4), 0 0 0 1px rgba(255, 255, 255, 0.05), 0 0 15px rgba(0, 255, 149, 0.1)'
             }}
           >
             <div className="space-y-2">
@@ -284,7 +284,7 @@ export default function InvestorPage() {
             style={{ 
               backgroundColor: '#1A1A1A',
               borderRadius: '16px',
-              boxShadow: '0 8px 32px rgba(0, 0, 0, 0.4), 0 0 0 1px rgba(255, 255, 255, 0.05)'
+              boxShadow: '0 8px 32px rgba(0, 0, 0, 0.4), 0 0 0 1px rgba(255, 255, 255, 0.05), 0 0 15px rgba(0, 255, 149, 0.1)'
             }}
           >
             <div className="space-y-2">
@@ -303,7 +303,7 @@ export default function InvestorPage() {
             style={{ 
               backgroundColor: '#1A1A1A',
               borderRadius: '16px',
-              boxShadow: '0 8px 32px rgba(0, 0, 0, 0.4), 0 0 0 1px rgba(255, 255, 255, 0.05)'
+              boxShadow: '0 8px 32px rgba(0, 0, 0, 0.4), 0 0 0 1px rgba(255, 255, 255, 0.05), 0 0 15px rgba(0, 255, 149, 0.1)'
             }}
           >
             <div className="space-y-2">
@@ -328,7 +328,7 @@ export default function InvestorPage() {
             style={{ 
               backgroundColor: '#1A1A1A',
               borderRadius: '16px',
-              boxShadow: '0 8px 32px rgba(0, 0, 0, 0.4), 0 0 0 1px rgba(255, 255, 255, 0.05)'
+              boxShadow: '0 8px 32px rgba(0, 0, 0, 0.4), 0 0 0 1px rgba(255, 255, 255, 0.05), 0 0 15px rgba(0, 255, 149, 0.1)'
             }}
           >
             <div className="space-y-2">
