@@ -350,11 +350,11 @@ export default function InvestorPage() {
 
         {/* Transaction History */}
         <div
-          className="group relative rounded-2xl transition-all duration-300 hover:shadow-[0_0_20px_rgba(0,255,149,0.15)] hover:shadow-green-500/20"
+          className="group relative rounded-2xl transition-all duration-300"
           style={{
             backgroundColor: '#1A1A1A',
             borderRadius: '16px',
-            boxShadow: '0 8px 32px rgba(0, 0, 0, 0.4), 0 0 0 1px rgba(255, 255, 255, 0.05)',
+            boxShadow: '0 8px 32px rgba(0, 0, 0, 0.4), 0 0 0 1px rgba(255, 255, 255, 0.05), 0 0 15px rgba(0, 255, 149, 0.1)',
             padding: '24px'
           }}
         >
