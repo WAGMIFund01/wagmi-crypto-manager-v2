@@ -2,7 +2,7 @@
 
 import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
-import { Card, CardContent, CardHeader, CardTitle, Button } from '@/shared/components';
+import { Card, CardContent, Button } from '@/shared/components';
 import { formatCurrency, formatPercentage } from '@/shared/utils';
 
 interface InvestorData {
@@ -155,15 +155,6 @@ export default function InvestorPage() {
     initialInvestment: investorData!.investmentValue
   };
 
-  // Format date for display
-  const formatDate = (dateString: string) => {
-    const date = new Date(dateString);
-    return date.toLocaleDateString('en-US', { 
-      year: 'numeric', 
-      month: 'short', 
-      day: 'numeric' 
-    });
-  };
 
   return (
     <div style={{ backgroundColor: '#111' }}>
@@ -191,11 +182,33 @@ export default function InvestorPage() {
             </div>
             
             <div className="flex items-center gap-4">
-              <Button
-                variant={privacyMode ? "primary" : "outline"} style={{ backgroundColor: privacyMode ? "#00FF95" : "transparent", color: privacyMode ? "white" : "#00FF95", borderColor: "#00FF95", borderWidth: "1px", borderStyle: "solid" }}
-                size="sm"
+              <button
                 onClick={() => setPrivacyMode(!privacyMode)}
-                className="flex items-center gap-2"
+                className="font-semibold py-2 px-4 rounded-lg transition-all duration-200 flex items-center gap-2 text-sm"
+                style={{
+                  backgroundColor: privacyMode ? '#00FF95' : 'transparent',
+                  border: '1px solid #00FF95',
+                  color: privacyMode ? 'white' : '#00FF95',
+                  boxShadow: 'none'
+                }}
+                onMouseEnter={(e) => {
+                  if (privacyMode) {
+                    e.currentTarget.style.backgroundColor = '#00B863';
+                    e.currentTarget.style.boxShadow = '0px 0px 8px rgba(0, 255, 149, 0.4)';
+                  } else {
+                    e.currentTarget.style.backgroundColor = 'rgba(0, 255, 149, 0.1)';
+                    e.currentTarget.style.boxShadow = '0px 0px 10px rgba(0, 255, 149, 0.3)';
+                  }
+                }}
+                onMouseLeave={(e) => {
+                  if (privacyMode) {
+                    e.currentTarget.style.backgroundColor = '#00FF95';
+                    e.currentTarget.style.boxShadow = 'none';
+                  } else {
+                    e.currentTarget.style.backgroundColor = 'transparent';
+                    e.currentTarget.style.boxShadow = 'none';
+                  }
+                }}
               >
                 {privacyMode ? (
                   <>
@@ -213,17 +226,31 @@ export default function InvestorPage() {
                     Privacy Mode
                   </>
                 )}
-              </Button>
-              <Button
-                variant="outline" style={{ backgroundColor: "transparent", color: "#00FF95", borderColor: "#00FF95", borderWidth: "1px", borderStyle: "solid" }}
+              </button>
+              <button
                 onClick={() => {
                   sessionStorage.removeItem('investorId');
                   sessionStorage.removeItem('investorData');
                   router.push('/');
                 }}
+                className="font-semibold py-2 px-4 rounded-lg transition-all duration-200"
+                style={{
+                  backgroundColor: 'transparent',
+                  border: '1px solid #00FF95',
+                  color: '#00FF95',
+                  boxShadow: 'none'
+                }}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.backgroundColor = 'rgba(0, 255, 149, 0.1)';
+                  e.currentTarget.style.boxShadow = '0px 0px 10px rgba(0, 255, 149, 0.3)';
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.backgroundColor = 'transparent';
+                  e.currentTarget.style.boxShadow = 'none';
+                }}
               >
                 Sign Out
-              </Button>
+              </button>
             </div>
           </div>
         </div>
@@ -322,19 +349,27 @@ export default function InvestorPage() {
 
 
         {/* Transaction History */}
-        <Card
+        <div
+          className="group relative rounded-2xl transition-all duration-300 hover:shadow-[0_0_20px_rgba(0,255,149,0.15)] hover:shadow-green-500/20"
           style={{
-            backgroundColor: '#2D2D2D',
-            border: '1px solid #404040',
-            borderRadius: '12px',
+            backgroundColor: '#1A1A1A',
+            borderRadius: '16px',
+            boxShadow: '0 8px 32px rgba(0, 0, 0, 0.4), 0 0 0 1px rgba(255, 255, 255, 0.05)',
+            padding: '24px'
           }}
         >
-          <CardHeader>
-            <CardTitle className="text-lg font-semibold" style={{ color: '#00FF95' }}>
+          <div className="mb-6">
+            <h2 
+              className="text-lg font-semibold"
+              style={{ 
+                color: '#00FF95',
+                textShadow: '0 0 20px rgba(0, 255, 149, 0.5), 0 0 40px rgba(0, 255, 149, 0.3)'
+              }}
+            >
               Transaction History
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
+            </h2>
+          </div>
+          <div>
             {transactionsLoading ? (
               <div className="flex items-center justify-center py-12">
                 <div className="text-center">
@@ -409,8 +444,8 @@ export default function InvestorPage() {
                 <p style={{ color: '#E0E0E0' }}>No transactions found</p>
               </div>
             )}
-          </CardContent>
-        </Card>
+          </div>
+        </div>
       </main>
     </div>
   );
