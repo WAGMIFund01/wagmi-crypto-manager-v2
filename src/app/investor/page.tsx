@@ -233,37 +233,37 @@ export default function InvestorPage() {
         {/* KPI Cards */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
           {/* Initial Investment */}
-          <Card className="hover:shadow-lg transition-shadow duration-200">
+          <Card className="hover:shadow-lg transition-shadow duration-200" style={{ backgroundColor: '#16181D', boxShadow: '0 4px 6px rgba(0, 0, 0, 0.3)' }}>
             <CardHeader className="pb-2">
-              <CardTitle className="text-sm font-medium text-gray-500">
+              <CardTitle style={{ color: '#A0A0A0' }}>
                 Initial Investment
               </CardTitle>
             </CardHeader>
             <CardContent>
-              <p className="text-2xl font-bold text-gray-900">
+              <p style={{ color: '#FFFFFF' }}>
                 {formatCurrency(portfolioData.initialInvestment, privacyMode)}
               </p>
             </CardContent>
           </Card>
 
           {/* Current Value */}
-          <Card className="hover:shadow-lg transition-shadow duration-200">
+          <Card className="hover:shadow-lg transition-shadow duration-200" style={{ backgroundColor: '#16181D', boxShadow: '0 4px 6px rgba(0, 0, 0, 0.3)' }}>
             <CardHeader className="pb-2">
-              <CardTitle className="text-sm font-medium text-gray-500">
+              <CardTitle style={{ color: '#A0A0A0' }}>
                 Current Value
               </CardTitle>
             </CardHeader>
             <CardContent>
-              <p className="text-2xl font-bold text-gray-900">
+              <p style={{ color: '#FFFFFF' }}>
                 {formatCurrency(portfolioData.totalValue, privacyMode)}
               </p>
             </CardContent>
           </Card>
 
           {/* Total P&L */}
-          <Card className="hover:shadow-lg transition-shadow duration-200">
+          <Card className="hover:shadow-lg transition-shadow duration-200" style={{ backgroundColor: '#16181D', boxShadow: '0 4px 6px rgba(0, 0, 0, 0.3)' }}>
             <CardHeader className="pb-2">
-              <CardTitle className="text-sm font-medium text-gray-500">
+              <CardTitle style={{ color: '#A0A0A0' }}>
                 Total P&L
               </CardTitle>
             </CardHeader>
@@ -276,9 +276,9 @@ export default function InvestorPage() {
           </Card>
 
           {/* Total Return */}
-          <Card className="hover:shadow-lg transition-shadow duration-200">
+          <Card className="hover:shadow-lg transition-shadow duration-200" style={{ backgroundColor: '#16181D', boxShadow: '0 4px 6px rgba(0, 0, 0, 0.3)' }}>
             <CardHeader className="pb-2">
-              <CardTitle className="text-sm font-medium text-gray-500">
+              <CardTitle style={{ color: '#A0A0A0' }}>
                 Total Return
               </CardTitle>
             </CardHeader>
@@ -291,9 +291,9 @@ export default function InvestorPage() {
         </div>
 
         {/* Transaction History */}
-        <Card>
+        <Card style={{ backgroundColor: '#16181D', boxShadow: '0 4px 6px rgba(0, 0, 0, 0.3)' }}>
           <CardHeader>
-            <CardTitle className="text-lg font-semibold text-gray-900">
+            <CardTitle style={{ color: '#00FF95' }}>
               Transaction History
             </CardTitle>
           </CardHeader>
