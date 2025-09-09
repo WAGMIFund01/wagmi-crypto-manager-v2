@@ -46,8 +46,12 @@ export function InvestorLoginForm() {
   };
 
   const handleManagerLogin = () => {
-    // Redirect to Google OAuth for manager access
-    window.location.href = '/api/auth/signin/google';
+    // For now, show a message about setting up OAuth
+    // TODO: Enable Google OAuth when credentials are configured
+    alert('Manager access requires Google OAuth setup. Please contact the administrator to configure OAuth credentials.');
+    
+    // Uncomment this line when OAuth is ready:
+    // window.location.href = '/api/auth/signin/google';
   };
 
   return (
