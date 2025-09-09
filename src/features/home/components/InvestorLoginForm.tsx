@@ -51,27 +51,21 @@ export function InvestorLoginForm() {
     <div 
       className="min-h-screen flex items-center justify-center p-4 relative"
       style={{
-        backgroundColor: '#0B0C10',
-        background: `
-          radial-gradient(circle at center, rgba(0, 255, 149, 0.12) 0%, rgba(0, 0, 0, 0) 70%),
-          #0B0C10
-        `
+        backgroundColor: '#0B0C10'
       }}
     >
       {/* Main Container */}
       <div className="w-full max-w-2xl">
         {/* Main Dark Card */}
-        <div 
-          className="bg-gray-900 rounded-xl p-8 relative"
-          style={{
-            boxShadow: '0px 8px 24px rgba(0, 255, 149, 0.15)'
-          }}
-        >
+        <div className="bg-gray-900 rounded-xl p-8 relative">
           {/* Header */}
           <div className="text-center mb-8">
             <h1 
               className="text-5xl font-bold mb-2"
-              style={{ color: '#00FF95' }}
+              style={{ 
+                color: '#00FF95',
+                textShadow: '0 0 20px rgba(0, 255, 149, 0.5), 0 0 40px rgba(0, 255, 149, 0.3)'
+              }}
             >
               WAGMI
             </h1>
@@ -85,7 +79,7 @@ export function InvestorLoginForm() {
 
           {/* Investor Login Section */}
           <div className="bg-gray-800 rounded-xl p-6 mb-6">
-            <h2 className="text-white text-xl font-semibold text-center mb-6">
+            <h2 className="text-white text-xl font-semibold text-left mb-6">
               Investor Login
             </h2>
             
@@ -152,17 +146,19 @@ export function InvestorLoginForm() {
         <div className="flex justify-end mt-6">
           <button
             onClick={handleManagerLogin}
-            className="text-white font-semibold py-3 px-6 rounded-lg transition-all duration-200 flex items-center"
+            className="font-semibold py-3 px-6 rounded-lg transition-all duration-200 flex items-center"
             style={{
-              backgroundColor: '#00C76F',
+              backgroundColor: 'transparent',
+              border: '1px solid #00FF95',
+              color: '#00FF95',
               boxShadow: 'none'
             }}
             onMouseEnter={(e) => {
-              e.currentTarget.style.backgroundColor = '#00B863';
-              e.currentTarget.style.boxShadow = '0px 0px 10px rgba(0, 255, 149, 0.4)';
+              e.currentTarget.style.backgroundColor = 'rgba(0, 255, 149, 0.1)';
+              e.currentTarget.style.boxShadow = '0px 0px 10px rgba(0, 255, 149, 0.3)';
             }}
             onMouseLeave={(e) => {
-              e.currentTarget.style.backgroundColor = '#00C76F';
+              e.currentTarget.style.backgroundColor = 'transparent';
               e.currentTarget.style.boxShadow = 'none';
             }}
           >
