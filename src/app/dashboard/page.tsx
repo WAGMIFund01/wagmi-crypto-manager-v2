@@ -17,8 +17,17 @@ export default function DashboardPage() {
       return;
     }
     
-    // For now, allow any authenticated user to access manager dashboard
-    // TODO: Add proper role checking when Google OAuth is set up
+    if (session.user?.role === 'unauthorized') {
+      // Redirect unauthorized users back to homepage
+      router.push('/');
+      return;
+    }
+    
+    if (session.user?.role !== 'manager') {
+      // Redirect non-manager users to investor page or homepage
+      router.push('/');
+      return;
+    }
   }, [session, status, router]);
 
   if (status === 'loading') {
@@ -32,7 +41,7 @@ export default function DashboardPage() {
     );
   }
 
-  if (!session) {
+  if (!session || session.user?.role !== 'manager') {
     return null;
   }
 

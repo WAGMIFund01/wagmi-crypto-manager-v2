@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server';
-// import { config } from '@/lib/config'; // TODO: Use when Google Sheets integration is ready
+import { sheetsAdapter } from '@/lib/sheetsAdapter';
 
 export async function POST(request: Request) {
   try {
@@ -9,14 +9,20 @@ export async function POST(request: Request) {
       return NextResponse.json({ valid: false, error: 'Investor ID is required' }, { status: 400 });
     }
 
-    // For now, we'll use a simple validation
-    // TODO: Replace with actual Google Sheets API call when ready
-    const validInvestorIds = ['INV001', 'INV002', 'INV003', 'INV004', 'INV005', 'INV006'];
+    // Validate investor ID against Google Sheets
+    const result = await sheetsAdapter.validateInvestor(investorId.toUpperCase());
     
-    if (validInvestorIds.includes(investorId.toUpperCase())) {
+    if (result.valid && result.investor) {
       return NextResponse.json({ 
         valid: true, 
-        investorId: investorId.toUpperCase(),
+        investorId: result.investor.investor_id,
+        investor: {
+          name: result.investor.name,
+          email: result.investor.email,
+          investmentValue: result.investor.investment_value,
+          currentValue: result.investor.current_value,
+          returnPercentage: result.investor.return_percentage
+        },
         message: 'Investor ID validated successfully'
       });
     } else {
@@ -25,12 +31,6 @@ export async function POST(request: Request) {
         error: 'Invalid Investor ID. Please check your ID and try again.' 
       }, { status: 401 });
     }
-
-    // Future Google Sheets integration:
-    // const googleSheetsUrl = `${config.googleSheetsEndpoint}?action=validateInvestor&investorId=${investorId}`;
-    // const response = await fetch(googleSheetsUrl);
-    // const data = await response.json();
-    // return NextResponse.json({ valid: data.success && data.data.length > 0 });
 
   } catch (error: unknown) {
     console.error('Error validating investor ID:', error);

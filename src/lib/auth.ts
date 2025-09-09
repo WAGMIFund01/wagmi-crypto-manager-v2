@@ -21,13 +21,21 @@ export const authOptions: NextAuthOptions = {
         const email = user.email || '';
         
         // Manager role for specific emails (you can customize this)
-        if (email === 'manager@wagmi.com' || email.includes('manager')) {
+        // Add your manager email addresses here
+        const managerEmails = [
+          'wagmifund01@gmail.com', // Your main manager email
+          'manager@wagmi.com',
+          // Add more manager emails as needed
+        ];
+        
+        if (managerEmails.includes(email.toLowerCase())) {
           token.role = 'manager';
           token.investorId = undefined;
         } else {
-          // Investor role with generated investorId
-          token.role = 'investor';
-          token.investorId = `INV${Math.floor(Math.random() * 1000).toString().padStart(3, '0')}`;
+          // For now, redirect non-manager users back to homepage
+          // In the future, you might want to allow investor Google login too
+          token.role = 'unauthorized';
+          token.investorId = undefined;
         }
       }
       return token;

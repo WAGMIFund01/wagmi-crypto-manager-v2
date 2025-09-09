@@ -29,8 +29,11 @@ export function InvestorLoginForm() {
       const data = await response.json();
 
       if (data.valid) {
-        // Store investor ID in session storage for now
+        // Store investor ID and data in session storage
         sessionStorage.setItem('investorId', investorId);
+        if (data.investor) {
+          sessionStorage.setItem('investorData', JSON.stringify(data.investor));
+        }
         router.push('/investor');
       } else {
         setError('Invalid Investor ID. Please check your ID and try again.');

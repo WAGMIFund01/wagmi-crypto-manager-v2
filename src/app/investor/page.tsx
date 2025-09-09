@@ -5,22 +5,45 @@ import { useEffect, useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle, Button } from '@/shared/components';
 import { formatCurrency, formatPercentage } from '@/shared/utils';
 
+interface InvestorData {
+  name: string;
+  email: string;
+  investmentValue: number;
+  currentValue: number;
+  returnPercentage: number;
+}
+
 export default function InvestorPage() {
   const router = useRouter();
   const [privacyMode, setPrivacyMode] = useState(false);
   const [investorId, setInvestorId] = useState<string>('');
+  const [investorData, setInvestorData] = useState<InvestorData | null>(null);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     // Check if investor ID is stored in session storage
     const storedInvestorId = sessionStorage.getItem('investorId');
+    const storedInvestorData = sessionStorage.getItem('investorData');
+    
     if (!storedInvestorId) {
       router.push('/');
       return;
     }
+    
     setInvestorId(storedInvestorId);
+    
+    if (storedInvestorData) {
+      try {
+        setInvestorData(JSON.parse(storedInvestorData));
+      } catch (error) {
+        console.error('Error parsing investor data:', error);
+      }
+    }
+    
+    setLoading(false);
   }, [router]);
 
-  if (!investorId) {
+  if (loading || !investorId) {
     return (
       <div className="flex items-center justify-center min-h-screen">
         <div className="text-center">
@@ -31,16 +54,19 @@ export default function InvestorPage() {
     );
   }
 
-  // Mock portfolio data - will be replaced with real data later
-  const mockPortfolio = {
-    totalValue: 125000,
-    totalPnl: 15000,
-    totalPnlPercentage: 13.6,
-    assets: [
-      { symbol: 'BTC', name: 'Bitcoin', quantity: 0.5, currentPrice: 45000, value: 22500, pnl: 5000, pnlPercentage: 28.6 },
-      { symbol: 'ETH', name: 'Ethereum', quantity: 2.0, currentPrice: 3000, value: 6000, pnl: 1000, pnlPercentage: 20.0 },
-      { symbol: 'SOL', name: 'Solana', quantity: 100, currentPrice: 95, value: 9500, pnl: -500, pnlPercentage: -5.0 },
-    ]
+  // Use real data from Google Sheets or fallback to mock data
+  const portfolioData = investorData ? {
+    totalValue: investorData.currentValue,
+    totalPnl: investorData.currentValue - investorData.investmentValue,
+    totalPnlPercentage: investorData.returnPercentage,
+    investorName: investorData.name,
+    investorEmail: investorData.email
+  } : {
+    totalValue: 0,
+    totalPnl: 0,
+    totalPnlPercentage: 0,
+    investorName: 'Unknown',
+    investorEmail: 'unknown@example.com'
   };
 
   return (
@@ -53,7 +79,7 @@ export default function InvestorPage() {
                 Investor Dashboard
               </h1>
               <p className="text-sm text-gray-500">
-                Investor ID: {investorId}
+                {portfolioData.investorName} | ID: {investorId}
               </p>
             </div>
             <div className="flex items-center gap-4">
@@ -89,7 +115,7 @@ export default function InvestorPage() {
             </CardHeader>
             <CardContent>
               <p className="text-2xl font-semibold">
-                {formatCurrency(mockPortfolio.totalValue, privacyMode)}
+                {formatCurrency(portfolioData.totalValue, privacyMode)}
               </p>
             </CardContent>
           </Card>
@@ -101,8 +127,8 @@ export default function InvestorPage() {
               </CardTitle>
             </CardHeader>
             <CardContent>
-              <p className={`text-2xl font-semibold ${mockPortfolio.totalPnl >= 0 ? 'text-green-600' : 'text-red-600'}`}>
-                {formatCurrency(mockPortfolio.totalPnl, privacyMode)}
+              <p className={`text-2xl font-semibold ${portfolioData.totalPnl >= 0 ? 'text-green-600' : 'text-red-600'}`}>
+                {formatCurrency(portfolioData.totalPnl, privacyMode)}
               </p>
             </CardContent>
           </Card>
@@ -114,36 +140,55 @@ export default function InvestorPage() {
               </CardTitle>
             </CardHeader>
             <CardContent>
-              <p className={`text-2xl font-semibold ${mockPortfolio.totalPnlPercentage >= 0 ? 'text-green-600' : 'text-red-600'}`}>
-                {formatPercentage(mockPortfolio.totalPnlPercentage, privacyMode, true)}
+              <p className={`text-2xl font-semibold ${portfolioData.totalPnlPercentage >= 0 ? 'text-green-600' : 'text-red-600'}`}>
+                {formatPercentage(portfolioData.totalPnlPercentage, privacyMode, true)}
               </p>
             </CardContent>
           </Card>
         </div>
 
-        {/* Portfolio Assets */}
+        {/* Portfolio Summary */}
         <Card>
           <CardHeader>
-            <CardTitle>Portfolio Holdings</CardTitle>
+            <CardTitle>Portfolio Summary</CardTitle>
           </CardHeader>
           <CardContent>
             <div className="space-y-4">
-              {mockPortfolio.assets.map((asset) => (
-                <div key={asset.symbol} className="flex items-center justify-between p-4 border rounded-lg">
-                  <div>
-                    <h3 className="font-semibold">{asset.symbol}</h3>
-                    <p className="text-sm text-gray-500">{asset.name}</p>
-                  </div>
-                  <div className="text-right">
-                    <p className="font-semibold">
-                      {formatCurrency(asset.value, privacyMode)}
-                    </p>
-                    <p className={`text-sm ${asset.pnl >= 0 ? 'text-green-600' : 'text-red-600'}`}>
-                      {formatPercentage(asset.pnlPercentage, privacyMode, true)}
-                    </p>
-                  </div>
+              <div className="flex items-center justify-between p-4 border rounded-lg">
+                <div>
+                  <h3 className="font-semibold">Investment Value</h3>
+                  <p className="text-sm text-gray-500">Initial investment amount</p>
                 </div>
-              ))}
+                <div className="text-right">
+                  <p className="font-semibold">
+                    {formatCurrency(investorData?.investmentValue || 0, privacyMode)}
+                  </p>
+                </div>
+              </div>
+              
+              <div className="flex items-center justify-between p-4 border rounded-lg">
+                <div>
+                  <h3 className="font-semibold">Current Value</h3>
+                  <p className="text-sm text-gray-500">Current portfolio value</p>
+                </div>
+                <div className="text-right">
+                  <p className="font-semibold">
+                    {formatCurrency(portfolioData.totalValue, privacyMode)}
+                  </p>
+                </div>
+              </div>
+              
+              <div className="flex items-center justify-between p-4 border rounded-lg">
+                <div>
+                  <h3 className="font-semibold">Total Return</h3>
+                  <p className="text-sm text-gray-500">Performance since investment</p>
+                </div>
+                <div className="text-right">
+                  <p className={`font-semibold ${portfolioData.totalPnlPercentage >= 0 ? 'text-green-600' : 'text-red-600'}`}>
+                    {formatPercentage(portfolioData.totalPnlPercentage, privacyMode, true)}
+                  </p>
+                </div>
+              </div>
             </div>
           </CardContent>
         </Card>
