@@ -79,7 +79,7 @@ export function InvestorLoginForm() {
     <div 
       className="min-h-screen flex items-center justify-center p-4 relative"
       style={{
-        backgroundColor: '#0B0C10'
+        backgroundColor: '#0B0B0B'
       }}
     >
       {/* Main Container */}

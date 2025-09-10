@@ -157,9 +157,9 @@ export default function InvestorPage() {
 
 
   return (
-    <div style={{ backgroundColor: '#0B0C10' }}>
+    <div style={{ backgroundColor: '#0B0B0B' }}>
       {/* Header */}
-      <header style={{ backgroundColor: '#0B0C10', borderColor: '#333' }}>
+      <header style={{ backgroundColor: '#0B0B0B', borderColor: '#333' }}>
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center h-16">
             <div className="flex items-center" style={{ paddingLeft: '32px' }}>
@@ -271,7 +271,7 @@ export default function InvestorPage() {
           <div 
             className="group relative p-6 rounded-2xl transition-all duration-300 hover:shadow-[0_0_20px_rgba(0,255,149,0.15)] hover:shadow-green-500/20"
             style={{ 
-              backgroundColor: '#1A1A1A',
+              backgroundColor: '#1A1F1A',
               borderRadius: '16px',
               boxShadow: '0 8px 32px rgba(0, 0, 0, 0.4), 0 0 0 1px rgba(255, 255, 255, 0.05), 0 0 15px rgba(0, 255, 149, 0.1)'
             }}
@@ -290,7 +290,7 @@ export default function InvestorPage() {
           <div 
             className="group relative p-6 rounded-2xl transition-all duration-300 hover:shadow-[0_0_20px_rgba(0,255,149,0.15)] hover:shadow-green-500/20"
             style={{ 
-              backgroundColor: '#1A1A1A',
+              backgroundColor: '#1A1F1A',
               borderRadius: '16px',
               boxShadow: '0 8px 32px rgba(0, 0, 0, 0.4), 0 0 0 1px rgba(255, 255, 255, 0.05), 0 0 15px rgba(0, 255, 149, 0.1)'
             }}
@@ -309,7 +309,7 @@ export default function InvestorPage() {
           <div 
             className="group relative p-6 rounded-2xl transition-all duration-300 hover:shadow-[0_0_20px_rgba(0,255,149,0.15)] hover:shadow-green-500/20"
             style={{ 
-              backgroundColor: '#1A1A1A',
+              backgroundColor: '#1A1F1A',
               borderRadius: '16px',
               boxShadow: '0 8px 32px rgba(0, 0, 0, 0.4), 0 0 0 1px rgba(255, 255, 255, 0.05), 0 0 15px rgba(0, 255, 149, 0.1)'
             }}
@@ -334,7 +334,7 @@ export default function InvestorPage() {
           <div 
             className="group relative p-6 rounded-2xl transition-all duration-300 hover:shadow-[0_0_20px_rgba(0,255,149,0.15)] hover:shadow-green-500/20"
             style={{ 
-              backgroundColor: '#1A1A1A',
+              backgroundColor: '#1A1F1A',
               borderRadius: '16px',
               boxShadow: '0 8px 32px rgba(0, 0, 0, 0.4), 0 0 0 1px rgba(255, 255, 255, 0.05), 0 0 15px rgba(0, 255, 149, 0.1)'
             }}
@@ -360,7 +360,7 @@ export default function InvestorPage() {
         <div
           className="group relative rounded-2xl transition-all duration-300"
           style={{
-            backgroundColor: '#1A1A1A',
+            backgroundColor: '#1A1F1A',
             borderRadius: '16px',
             boxShadow: '0 8px 32px rgba(0, 0, 0, 0.4), 0 0 0 1px rgba(255, 255, 255, 0.05), 0 0 15px rgba(0, 255, 149, 0.1)',
             padding: '24px'
