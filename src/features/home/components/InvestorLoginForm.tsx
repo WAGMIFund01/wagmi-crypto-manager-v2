@@ -389,12 +389,6 @@ export function InvestorLoginForm() {
             </div>
           </form>
 
-          {/* Dev Info */}
-          <div className="mt-4 p-3 rounded-lg" style={{ backgroundColor: 'rgba(255, 107, 53, 0.1)' }}>
-            <p className="text-xs text-orange-300 text-center">
-              💡 Dev mode: Password is &quot;DEV&quot; (case sensitive)
-            </p>
-          </div>
         </div>
       </div>
     )}
