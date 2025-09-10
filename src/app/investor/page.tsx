@@ -162,14 +162,14 @@ export default function InvestorPage() {
       <header style={{ backgroundColor: '#0B0B0B', borderColor: '#333' }}>
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           {/* Mobile Layout - Stacked */}
-          <div className="flex flex-col space-y-4 py-4 md:hidden">
-            {/* Top Row - Logo */}
+          <div className="flex flex-col space-y-6 py-6 md:hidden">
+            {/* Top Row - Centered Logo */}
             <div className="flex justify-center">
               <h1 
                 className="font-bold"
                 style={{ 
                   color: '#00FF95',
-                  fontSize: '24px',
+                  fontSize: '28px',
                   lineHeight: '1.2',
                   textShadow: '0 0 25px rgba(0, 255, 149, 0.6), 0 0 50px rgba(0, 255, 149, 0.4), 0 0 75px rgba(0, 255, 149, 0.2)',
                   letterSpacing: '0.05em'
@@ -180,19 +180,20 @@ export default function InvestorPage() {
             </div>
             
             {/* Bottom Row - Investor Info + Buttons */}
-            <div className="flex items-center justify-between">
-              {/* Investor Info */}
+            <div className="flex items-center justify-between px-2">
+              {/* Investor Info - Left Aligned */}
               <div className="text-left">
-                <h2 style={{ color: '#FFFFFF', fontSize: '14px', fontWeight: '600', margin: 0 }}>
+                <h2 style={{ color: '#FFFFFF', fontSize: '16px', fontWeight: '600', margin: 0, lineHeight: '1.3' }}>
                   {portfolioData.investorName}
                 </h2>
-                <p style={{ color: '#E0E0E0', fontSize: '12px', margin: 0 }}>
+                <p style={{ color: '#E0E0E0', fontSize: '14px', margin: 0, lineHeight: '1.3' }}>
                   ID: {investorId}
                 </p>
               </div>
               
-              {/* Buttons */}
+              {/* Buttons - Right Aligned */}
               <div className="flex items-center gap-3">
+                {/* Privacy Mode Button */}
                 <button
                   onClick={() => setPrivacyMode(!privacyMode)}
                   className="p-3 rounded-lg transition-all duration-200 flex items-center justify-center"
@@ -237,18 +238,22 @@ export default function InvestorPage() {
                     </svg>
                   )}
                 </button>
+                
+                {/* Sign Out Button - Compact */}
                 <button
                   onClick={() => {
                     sessionStorage.removeItem('investorId');
                     sessionStorage.removeItem('investorData');
                     router.push('/');
                   }}
-                  className="font-semibold py-2 px-3 rounded-lg transition-all duration-200 text-sm"
+                  className="font-semibold py-2 px-4 rounded-lg transition-all duration-200 text-sm"
                   style={{
                     backgroundColor: 'transparent',
                     border: '1px solid #00FF95',
                     color: '#00FF95',
-                    boxShadow: 'none'
+                    boxShadow: 'none',
+                    minWidth: '60px',
+                    height: '44px'
                   }}
                   onMouseEnter={(e) => {
                     e.currentTarget.style.backgroundColor = 'rgba(0, 255, 149, 0.1)';
