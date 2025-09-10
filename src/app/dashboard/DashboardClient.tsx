@@ -219,9 +219,9 @@ export default function DashboardClient({ session, kpiData, hasError }: Dashboar
             </div>
             
             {/* Right - Controls */}
-            <div className="flex items-center space-x-6">
+            <div className="flex items-center space-x-4">
               {/* Last Updated Timestamp */}
-              <p style={{ color: '#A0A0A0', fontSize: '12px', margin: 0 }}>
+              <p className="mr-8" style={{ color: '#A0A0A0', fontSize: '12px', margin: 0 }}>
                 Last updated: {formatLastRefresh(kpiData?.lastUpdated || '')}
               </p>
               
