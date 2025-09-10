@@ -161,7 +161,112 @@ export default function InvestorPage() {
       {/* Header */}
       <header style={{ backgroundColor: '#0B0B0B', borderColor: '#333' }}>
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between items-center h-16">
+          {/* Mobile Layout - Stacked */}
+          <div className="flex flex-col space-y-4 py-4 md:hidden">
+            {/* Top Row - Logo */}
+            <div className="flex justify-center">
+              <h1 
+                className="font-bold"
+                style={{ 
+                  color: '#00FF95',
+                  fontSize: '24px',
+                  lineHeight: '1.2',
+                  textShadow: '0 0 25px rgba(0, 255, 149, 0.6), 0 0 50px rgba(0, 255, 149, 0.4), 0 0 75px rgba(0, 255, 149, 0.2)',
+                  letterSpacing: '0.05em'
+                }}
+              >
+                WAGMI
+              </h1>
+            </div>
+            
+            {/* Bottom Row - Investor Info + Buttons */}
+            <div className="flex items-center justify-between">
+              {/* Investor Info */}
+              <div className="text-left">
+                <h2 style={{ color: '#FFFFFF', fontSize: '14px', fontWeight: '600', margin: 0 }}>
+                  {portfolioData.investorName}
+                </h2>
+                <p style={{ color: '#E0E0E0', fontSize: '12px', margin: 0 }}>
+                  ID: {investorId}
+                </p>
+              </div>
+              
+              {/* Buttons */}
+              <div className="flex items-center gap-3">
+                <button
+                  onClick={() => setPrivacyMode(!privacyMode)}
+                  className="p-3 rounded-lg transition-all duration-200 flex items-center justify-center"
+                  style={{
+                    backgroundColor: privacyMode ? '#00FF95' : 'transparent',
+                    border: '1px solid #00FF95',
+                    color: privacyMode ? 'white' : '#00FF95',
+                    boxShadow: 'none',
+                    width: '44px',
+                    height: '44px'
+                  }}
+                  onMouseEnter={(e) => {
+                    if (privacyMode) {
+                      e.currentTarget.style.backgroundColor = '#00B863';
+                      e.currentTarget.style.boxShadow = '0px 0px 8px rgba(0, 255, 149, 0.4)';
+                    } else {
+                      e.currentTarget.style.backgroundColor = 'rgba(0, 255, 149, 0.1)';
+                      e.currentTarget.style.boxShadow = '0px 0px 10px rgba(0, 255, 149, 0.3)';
+                    }
+                  }}
+                  onMouseLeave={(e) => {
+                    if (privacyMode) {
+                      e.currentTarget.style.backgroundColor = '#00FF95';
+                      e.currentTarget.style.boxShadow = 'none';
+                    } else {
+                      e.currentTarget.style.backgroundColor = 'transparent';
+                      e.currentTarget.style.boxShadow = 'none';
+                    }
+                  }}
+                  title={privacyMode ? 'Show Data' : 'Privacy Mode'}
+                >
+                  {privacyMode ? (
+                    // Eye with slash (Privacy Mode ON)
+                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.878 9.878L3 3m6.878 6.878L21 21" />
+                    </svg>
+                  ) : (
+                    // Open eye (Privacy Mode OFF)
+                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                    </svg>
+                  )}
+                </button>
+                <button
+                  onClick={() => {
+                    sessionStorage.removeItem('investorId');
+                    sessionStorage.removeItem('investorData');
+                    router.push('/');
+                  }}
+                  className="font-semibold py-2 px-3 rounded-lg transition-all duration-200 text-sm"
+                  style={{
+                    backgroundColor: 'transparent',
+                    border: '1px solid #00FF95',
+                    color: '#00FF95',
+                    boxShadow: 'none'
+                  }}
+                  onMouseEnter={(e) => {
+                    e.currentTarget.style.backgroundColor = 'rgba(0, 255, 149, 0.1)';
+                    e.currentTarget.style.boxShadow = '0px 0px 10px rgba(0, 255, 149, 0.3)';
+                  }}
+                  onMouseLeave={(e) => {
+                    e.currentTarget.style.backgroundColor = 'transparent';
+                    e.currentTarget.style.boxShadow = 'none';
+                  }}
+                >
+                  Sign Out
+                </button>
+              </div>
+            </div>
+          </div>
+
+          {/* Desktop Layout - Horizontal */}
+          <div className="hidden md:flex justify-between items-center h-16">
             <div className="flex items-center" style={{ paddingLeft: '32px' }}>
               {/* WAGMI Logo */}
               <div className="flex items-center">
