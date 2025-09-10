@@ -118,17 +118,45 @@ export default function DashboardClient({ session, kpiData, hasError }: Dashboar
 
   // Format timestamp for display from Google Sheets data
   const formatLastRefresh = (timestamp: string) => {
-    if (!timestamp) return 'Unknown';
+    if (!timestamp || timestamp.trim() === '') return 'Unknown';
+    
+    console.log('Raw timestamp from Google Sheets:', timestamp);
     
     try {
-      const date = new Date(timestamp);
+      let date: Date;
+      
+      // Try parsing as-is first
+      date = new Date(timestamp);
+      
+      // If that fails, try common Google Sheets formats
+      if (isNaN(date.getTime())) {
+        // Try replacing hyphens with slashes (more compatible)
+        const normalizedTimestamp = timestamp.replace(/-/g, '/');
+        date = new Date(normalizedTimestamp);
+      }
+      
+      // If still fails, try parsing the specific format
+      if (isNaN(date.getTime())) {
+        // Handle format: "2024-01-15 14:30:00"
+        const match = timestamp.match(/(\d{4})-(\d{2})-(\d{2})\s+(\d{2}):(\d{2}):(\d{2})/);
+        if (match) {
+          const [, year, month, day, hour, minute, second] = match;
+          date = new Date(parseInt(year), parseInt(month) - 1, parseInt(day), parseInt(hour), parseInt(minute), parseInt(second));
+        }
+      }
+      
+      if (isNaN(date.getTime())) {
+        console.error('Could not parse timestamp:', timestamp);
+        return 'Invalid date';
+      }
+      
       return date.toLocaleTimeString('en-US', { 
         hour: 'numeric', 
         minute: '2-digit',
         hour12: true 
       });
     } catch (error) {
-      console.error('Error parsing timestamp:', error);
+      console.error('Error parsing timestamp:', error, 'Timestamp:', timestamp);
       return 'Invalid date';
     }
   };

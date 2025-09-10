@@ -89,6 +89,7 @@ export async function fetchKPIData(): Promise<KPIData | null> {
               break;
             case 'last updated':
               kpiData.lastUpdated = value.toString();
+              console.log('Timestamp from Google Sheets:', value, 'Type:', typeof value);
               break;
           }
         }
