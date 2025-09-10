@@ -223,8 +223,9 @@ export default function DashboardClient({ session, kpiData, hasError }: Dashboar
             </div>
           </div>
 
-          {/* Navigation Tabs */}
-          <div className="flex items-center border-b border-gray-700">
+          {/* Navigation Tabs with KPI Ribbon and Refresh Controls */}
+          <div className="flex items-center justify-between border-b border-gray-700 py-4">
+            {/* Left - Navigation Tabs */}
             <nav className="flex space-x-8" style={{ paddingLeft: '32px' }}>
               {[
                 { id: 'portfolio', label: 'Portfolio Overview' },
@@ -234,7 +235,7 @@ export default function DashboardClient({ session, kpiData, hasError }: Dashboar
                 <button
                   key={tab.id}
                   onClick={() => setActiveTab(tab.id)}
-                  className="py-4 px-1 text-sm font-medium transition-colors duration-200 relative"
+                  className="py-2 px-1 text-sm font-medium transition-colors duration-200 relative"
                   style={{
                     color: activeTab === tab.id ? '#00FF95' : '#A0A0A0',
                     borderBottom: activeTab === tab.id ? '2px solid #00FF95' : '2px solid transparent'
@@ -244,148 +245,148 @@ export default function DashboardClient({ session, kpiData, hasError }: Dashboar
                 </button>
               ))}
             </nav>
-          </div>
 
-          {/* KPI Ribbon */}
-          <div className="flex items-center justify-between py-4 border-b border-gray-700">
-            {hasError ? (
-              /* Error State */
-              <div className="flex items-center space-x-6">
-                <div className="flex items-center space-x-3">
-                  {/* Error Icon */}
-                  <div 
-                    className="flex items-center justify-center rounded-full"
-                    style={{
-                      width: '40px',
-                      height: '40px',
-                      backgroundColor: 'rgba(255, 107, 107, 0.1)',
-                      border: '1px solid #FF6B6B'
-                    }}
-                  >
-                    <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24" style={{ color: '#FF6B6B' }}>
-                      <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/>
-                    </svg>
-                  </div>
-                  
-                  {/* Error Message */}
-                  <div>
-                    <p style={{ color: '#FF6B6B', fontSize: '16px', fontWeight: '600', margin: 0 }}>
-                      KPI Data Unavailable
-                    </p>
-                    <p style={{ color: '#A0A0A0', fontSize: '12px', margin: '2px 0 0 0' }}>
-                      Unable to connect to Google Sheets
-                    </p>
-                  </div>
-                </div>
-                
-                {/* Retry Button */}
-                <button
-                  onClick={handleRetryKPI}
-                  disabled={isRetrying}
-                  className="px-4 py-2 text-sm font-medium rounded-lg transition-all duration-200 flex items-center space-x-2"
-                  style={{
-                    backgroundColor: isRetrying ? 'rgba(0, 255, 149, 0.3)' : 'transparent',
-                    border: '1px solid #00FF95',
-                    color: '#00FF95',
-                    opacity: isRetrying ? 0.7 : 1
-                  }}
-                  onMouseEnter={(e) => {
-                    if (!isRetrying) {
-                      e.currentTarget.style.backgroundColor = 'rgba(0, 255, 149, 0.1)';
-                      e.currentTarget.style.boxShadow = '0px 0px 10px rgba(0, 255, 149, 0.3)';
-                    }
-                  }}
-                  onMouseLeave={(e) => {
-                    if (!isRetrying) {
-                      e.currentTarget.style.backgroundColor = 'transparent';
-                      e.currentTarget.style.boxShadow = 'none';
-                    }
-                  }}
-                >
-                  {isRetrying ? (
-                    <>
-                      <div className="animate-spin rounded-full h-4 w-4 border-b-2" style={{ borderColor: '#00FF95' }}></div>
-                      <span>Retrying...</span>
-                    </>
-                  ) : (
-                    <>
-                      <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
-                        <path d="M17.65 6.35C16.2 4.9 14.21 4 12 4c-4.42 0-7.99 3.58-7.99 8s3.57 8 7.99 8c3.73 0 6.84-2.55 7.73-6h-2.08c-.82 2.33-3.04 4-5.65 4-3.31 0-6-2.69-6-6s2.69-6 6-6c1.66 0 3.14.69 4.22 1.78L13 11h7V4l-2.35 2.35z"/>
+            {/* Center - KPI Ribbon */}
+            <div className="flex-1 flex justify-center">
+              {hasError ? (
+                /* Error State */
+                <div className="flex items-center space-x-4">
+                  <div className="flex items-center space-x-3">
+                    {/* Error Icon */}
+                    <div 
+                      className="flex items-center justify-center rounded-full"
+                      style={{
+                        width: '32px',
+                        height: '32px',
+                        backgroundColor: 'rgba(255, 107, 107, 0.1)',
+                        border: '1px solid #FF6B6B'
+                      }}
+                    >
+                      <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 24 24" style={{ color: '#FF6B6B' }}>
+                        <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/>
                       </svg>
-                      <span>Retry</span>
-                    </>
-                  )}
-                </button>
+                    </div>
+                    
+                    {/* Error Message */}
+                    <div>
+                      <p style={{ color: '#FF6B6B', fontSize: '14px', fontWeight: '600', margin: 0 }}>
+                        KPI Data Unavailable
+                      </p>
+                      <p style={{ color: '#A0A0A0', fontSize: '10px', margin: '2px 0 0 0' }}>
+                        Unable to connect to Google Sheets
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              ) : (
+                /* KPI Data */
+                <div className="flex items-center space-x-6">
+                  {/* Active Investors */}
+                  <div className="text-center">
+                    <p style={{ color: '#A0A0A0', fontSize: '10px', margin: 0, textTransform: 'uppercase', letterSpacing: '0.05em' }}>
+                      Active investors
+                    </p>
+                    <p style={{ color: '#FFFFFF', fontSize: '16px', fontWeight: '600', margin: '2px 0 0 0' }}>
+                      {formattedKpiData?.activeInvestors || '--'}
+                    </p>
+                  </div>
+
+                  {/* Separator */}
+                  <div style={{ width: '1px', height: '24px', backgroundColor: '#333' }}></div>
+
+                  {/* Total AUM */}
+                  <div className="text-center">
+                    <p style={{ color: '#A0A0A0', fontSize: '10px', margin: 0, textTransform: 'uppercase', letterSpacing: '0.05em' }}>
+                      Total AUM
+                    </p>
+                    <p style={{ color: '#FFFFFF', fontSize: '16px', fontWeight: '600', margin: '2px 0 0 0' }}>
+                      {formattedKpiData?.totalAUM || '--'}
+                    </p>
+                  </div>
+
+                  {/* Separator */}
+                  <div style={{ width: '1px', height: '24px', backgroundColor: '#333' }}></div>
+
+                  {/* Cumulative Return */}
+                  <div className="text-center">
+                    <p style={{ color: '#A0A0A0', fontSize: '10px', margin: 0, textTransform: 'uppercase', letterSpacing: '0.05em' }}>
+                      Cumulative Return
+                    </p>
+                    <p style={{ 
+                      color: formattedKpiData?.cumulativeReturn?.startsWith('+') ? '#00FF95' : '#FF6B6B', 
+                      fontSize: '16px', 
+                      fontWeight: '600', 
+                      margin: '2px 0 0 0' 
+                    }}>
+                      {formattedKpiData?.cumulativeReturn || '--'}
+                    </p>
+                  </div>
+
+                  {/* Separator */}
+                  <div style={{ width: '1px', height: '24px', backgroundColor: '#333' }}></div>
+
+                  {/* Month-on-Month */}
+                  <div className="text-center">
+                    <p style={{ color: '#A0A0A0', fontSize: '10px', margin: 0, textTransform: 'uppercase', letterSpacing: '0.05em' }}>
+                      Month-on-Month
+                    </p>
+                    <p style={{ 
+                      color: formattedKpiData?.monthOnMonth?.startsWith('+') ? '#00FF95' : '#FF6B6B', 
+                      fontSize: '16px', 
+                      fontWeight: '600', 
+                      margin: '2px 0 0 0' 
+                    }}>
+                      {formattedKpiData?.monthOnMonth || '--'}
+                    </p>
+                  </div>
+                </div>
+              )}
+            </div>
+
+            {/* Right - Refresh Controls */}
+            <div className="flex items-center space-x-3" style={{ paddingRight: '32px' }}>
+              {/* Last Updated Timestamp */}
+              <div className="text-right">
+                <p style={{ color: '#A0A0A0', fontSize: '10px', margin: 0 }}>
+                  Last updated: {formatLastRefresh()}
+                </p>
               </div>
-            ) : (
-              /* KPI Data */
-              <div className="flex items-center space-x-8">
-                {/* Active Investors */}
-                <div className="text-center">
-                  <p style={{ color: '#A0A0A0', fontSize: '12px', margin: 0, textTransform: 'uppercase', letterSpacing: '0.05em' }}>
-                    Active investors
-                  </p>
-                  <p style={{ color: '#FFFFFF', fontSize: '18px', fontWeight: '600', margin: '4px 0 0 0' }}>
-                    {formattedKpiData?.activeInvestors || '--'}
-                  </p>
-                </div>
-
-                {/* Separator */}
-                <div style={{ width: '1px', height: '32px', backgroundColor: '#333' }}></div>
-
-                {/* Total AUM */}
-                <div className="text-center">
-                  <p style={{ color: '#A0A0A0', fontSize: '12px', margin: 0, textTransform: 'uppercase', letterSpacing: '0.05em' }}>
-                    Total AUM
-                  </p>
-                  <p style={{ color: '#FFFFFF', fontSize: '18px', fontWeight: '600', margin: '4px 0 0 0' }}>
-                    {formattedKpiData?.totalAUM || '--'}
-                  </p>
-                </div>
-
-                {/* Separator */}
-                <div style={{ width: '1px', height: '32px', backgroundColor: '#333' }}></div>
-
-                {/* Cumulative Return */}
-                <div className="text-center">
-                  <p style={{ color: '#A0A0A0', fontSize: '12px', margin: 0, textTransform: 'uppercase', letterSpacing: '0.05em' }}>
-                    Cumulative Return
-                  </p>
-                  <p style={{ 
-                    color: formattedKpiData?.cumulativeReturn?.startsWith('+') ? '#00FF95' : '#FF6B6B', 
-                    fontSize: '18px', 
-                    fontWeight: '600', 
-                    margin: '4px 0 0 0' 
-                  }}>
-                    {formattedKpiData?.cumulativeReturn || '--'}
-                  </p>
-                </div>
-
-                {/* Separator */}
-                <div style={{ width: '1px', height: '32px', backgroundColor: '#333' }}></div>
-
-                {/* Month-on-Month */}
-                <div className="text-center">
-                  <p style={{ color: '#A0A0A0', fontSize: '12px', margin: 0, textTransform: 'uppercase', letterSpacing: '0.05em' }}>
-                    Month-on-Month
-                  </p>
-                  <p style={{ 
-                    color: formattedKpiData?.monthOnMonth?.startsWith('+') ? '#00FF95' : '#FF6B6B', 
-                    fontSize: '18px', 
-                    fontWeight: '600', 
-                    margin: '4px 0 0 0' 
-                  }}>
-                    {formattedKpiData?.monthOnMonth || '--'}
-                  </p>
-                </div>
-              </div>
-            )}
-
-            {/* Last Updated Timestamp */}
-            <div className="text-right">
-              <p style={{ color: '#A0A0A0', fontSize: '12px', margin: 0 }}>
-                Last updated: {formatLastRefresh()}
-              </p>
+              
+              {/* Manual Refresh Button */}
+              <button
+                onClick={handleRetryKPI}
+                disabled={isRetrying}
+                className="p-2 rounded-lg transition-all duration-200 flex items-center justify-center"
+                style={{
+                  backgroundColor: isRetrying ? 'rgba(0, 255, 149, 0.3)' : 'transparent',
+                  border: '1px solid #00FF95',
+                  color: '#00FF95',
+                  width: '32px',
+                  height: '32px',
+                  opacity: isRetrying ? 0.7 : 1
+                }}
+                onMouseEnter={(e) => {
+                  if (!isRetrying) {
+                    e.currentTarget.style.backgroundColor = 'rgba(0, 255, 149, 0.1)';
+                    e.currentTarget.style.boxShadow = '0px 0px 10px rgba(0, 255, 149, 0.3)';
+                  }
+                }}
+                onMouseLeave={(e) => {
+                  if (!isRetrying) {
+                    e.currentTarget.style.backgroundColor = 'transparent';
+                    e.currentTarget.style.boxShadow = 'none';
+                  }
+                }}
+                title="Manual refresh"
+              >
+                {isRetrying ? (
+                  <div className="animate-spin rounded-full h-4 w-4 border-b-2" style={{ borderColor: '#00FF95' }}></div>
+                ) : (
+                  <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
+                    <path d="M17.65 6.35C16.2 4.9 14.21 4 12 4c-4.42 0-7.99 3.58-7.99 8s3.57 8 7.99 8c3.73 0 6.84-2.55 7.73-6h-2.08c-.82 2.33-3.04 4-5.65 4-3.31 0-6-2.69-6-6s2.69-6 6-6c1.66 0 3.14.69 4.22 1.78L13 11h7V4l-2.35 2.35z"/>
+                  </svg>
+                )}
+              </button>
             </div>
           </div>
         </div>
