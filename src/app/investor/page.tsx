@@ -376,21 +376,21 @@ export default function InvestorPage() {
 
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {/* KPI Cards */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6 mb-8">
           {/* Initial Investment */}
           <div 
-            className="group relative p-6 rounded-2xl transition-all duration-300 hover:shadow-[0_0_20px_rgba(0,255,149,0.15)] hover:shadow-green-500/20"
+            className="group relative p-4 md:p-6 rounded-2xl transition-all duration-300 hover:shadow-[0_0_20px_rgba(0,255,149,0.15)] hover:shadow-green-500/20"
             style={{ 
               backgroundColor: '#1A1F1A',
               borderRadius: '16px',
               boxShadow: '0 8px 32px rgba(0, 0, 0, 0.4), 0 0 0 1px rgba(255, 255, 255, 0.05), 0 0 15px rgba(0, 255, 149, 0.1)'
             }}
           >
-            <div className="space-y-2">
-              <h3 className="text-sm font-normal text-gray-400 leading-none">
+            <div className="space-y-1 md:space-y-2">
+              <h3 className="text-xs md:text-sm font-normal text-gray-400 leading-none">
                 Initial Investment
               </h3>
-              <p className="text-2xl font-bold text-white">
+              <p className="text-lg md:text-2xl font-bold text-white leading-tight">
                 {formatCurrency(portfolioData.initialInvestment, privacyMode)}
               </p>
             </div>
@@ -398,18 +398,18 @@ export default function InvestorPage() {
 
           {/* Current Value */}
           <div 
-            className="group relative p-6 rounded-2xl transition-all duration-300 hover:shadow-[0_0_20px_rgba(0,255,149,0.15)] hover:shadow-green-500/20"
+            className="group relative p-4 md:p-6 rounded-2xl transition-all duration-300 hover:shadow-[0_0_20px_rgba(0,255,149,0.15)] hover:shadow-green-500/20"
             style={{ 
               backgroundColor: '#1A1F1A',
               borderRadius: '16px',
               boxShadow: '0 8px 32px rgba(0, 0, 0, 0.4), 0 0 0 1px rgba(255, 255, 255, 0.05), 0 0 15px rgba(0, 255, 149, 0.1)'
             }}
           >
-            <div className="space-y-2">
-              <h3 className="text-sm font-normal text-gray-400 leading-none">
+            <div className="space-y-1 md:space-y-2">
+              <h3 className="text-xs md:text-sm font-normal text-gray-400 leading-none">
                 Current Value
               </h3>
-              <p className="text-2xl font-bold text-white">
+              <p className="text-lg md:text-2xl font-bold text-white leading-tight">
                 {formatCurrency(portfolioData.totalValue, privacyMode)}
               </p>
             </div>
@@ -417,19 +417,19 @@ export default function InvestorPage() {
 
           {/* Total P&L */}
           <div 
-            className="group relative p-6 rounded-2xl transition-all duration-300 hover:shadow-[0_0_20px_rgba(0,255,149,0.15)] hover:shadow-green-500/20"
+            className="group relative p-4 md:p-6 rounded-2xl transition-all duration-300 hover:shadow-[0_0_20px_rgba(0,255,149,0.15)] hover:shadow-green-500/20"
             style={{ 
               backgroundColor: '#1A1F1A',
               borderRadius: '16px',
               boxShadow: '0 8px 32px rgba(0, 0, 0, 0.4), 0 0 0 1px rgba(255, 255, 255, 0.05), 0 0 15px rgba(0, 255, 149, 0.1)'
             }}
           >
-            <div className="space-y-2">
-              <h3 className="text-sm font-normal text-gray-400 leading-none">
+            <div className="space-y-1 md:space-y-2">
+              <h3 className="text-xs md:text-sm font-normal text-gray-400 leading-none">
                 Total P&L
               </h3>
               <p 
-                className="text-2xl font-bold"
+                className="text-lg md:text-2xl font-bold leading-tight"
                 style={{ 
                   color: portfolioData.totalPnl >= 0 ? '#00FF95' : '#FF4444'
                 }}
@@ -442,19 +442,19 @@ export default function InvestorPage() {
 
           {/* Total Return */}
           <div 
-            className="group relative p-6 rounded-2xl transition-all duration-300 hover:shadow-[0_0_20px_rgba(0,255,149,0.15)] hover:shadow-green-500/20"
+            className="group relative p-4 md:p-6 rounded-2xl transition-all duration-300 hover:shadow-[0_0_20px_rgba(0,255,149,0.15)] hover:shadow-green-500/20"
             style={{ 
               backgroundColor: '#1A1F1A',
               borderRadius: '16px',
               boxShadow: '0 8px 32px rgba(0, 0, 0, 0.4), 0 0 0 1px rgba(255, 255, 255, 0.05), 0 0 15px rgba(0, 255, 149, 0.1)'
             }}
           >
-            <div className="space-y-2">
-              <h3 className="text-sm font-normal text-gray-400 leading-none">
+            <div className="space-y-1 md:space-y-2">
+              <h3 className="text-xs md:text-sm font-normal text-gray-400 leading-none">
                 Total Return
               </h3>
               <p 
-                className="text-2xl font-bold"
+                className="text-lg md:text-2xl font-bold leading-tight"
                 style={{ 
                   color: portfolioData.totalPnlPercentage >= 0 ? '#00FF95' : '#FF4444'
                 }}
