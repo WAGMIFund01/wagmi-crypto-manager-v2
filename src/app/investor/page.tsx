@@ -496,56 +496,70 @@ export default function InvestorPage() {
                 </div>
               </div>
             ) : transactions.length > 0 ? (
-              <div className="overflow-x-auto">
-                <table className="w-full">
-                  <thead>
-                    <tr className="border-b" style={{ borderColor: '#404040' }}>
-                      <th className="text-left py-3 px-4 font-medium" style={{ color: '#E0E0E0' }}>Date</th>
-                      <th className="text-left py-3 px-4 font-medium" style={{ color: '#E0E0E0' }}>Transaction Type</th>
-                      <th className="text-right py-3 px-4 font-medium" style={{ color: '#E0E0E0' }}>Amount</th>
-                      <th className="text-left py-3 px-4 font-medium" style={{ color: '#E0E0E0' }}>Note</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {transactions.map((transaction, index) => (
-                      <tr key={transaction.transactionId || index} className="border-b" style={{ borderColor: '#404040' }}>
-                        <td className="py-3 px-4" style={{ color: '#E0E0E0' }}>
+              <div className="space-y-4">
+                {transactions.map((transaction, index) => (
+                  <div 
+                    key={transaction.transactionId || index}
+                    className="p-4 rounded-lg border"
+                    style={{
+                      backgroundColor: '#0B0B0B',
+                      borderColor: '#333',
+                      borderRadius: '12px'
+                    }}
+                  >
+                    {/* Top Row - Date + Type + Amount */}
+                    <div className="flex items-center justify-between mb-2">
+                      <div className="flex items-center gap-3">
+                        {/* Date */}
+                        <span style={{ color: '#E0E0E0', fontSize: '14px', fontWeight: '500' }}>
                           {new Date(transaction.date).toLocaleDateString('en-US', { 
                             year: 'numeric', 
                             month: 'short', 
                             day: 'numeric' 
                           })}
-                        </td>
-                        <td className="py-3 px-4">
-                          <span 
-                            className="px-3 py-1 rounded-full text-xs font-medium whitespace-nowrap inline-block"
-                            style={{
-                              backgroundColor: '#00FF95',
-                              color: '#1A1A1A',
-                              minWidth: 'fit-content',
-                              fontSize: '12px',
-                              fontWeight: '600',
-                              padding: '6px 12px',
-                              borderRadius: '9999px',
-                              lineHeight: '1.2'
-                            }}
-                          >
-                            {transaction.type}
-                          </span>
-                        </td>
-                        <td className="py-3 px-4 text-right font-semibold" style={{ 
+                        </span>
+                        
+                        {/* Type Tag */}
+                        <span 
+                          className="px-3 py-1 rounded-full text-xs font-medium whitespace-nowrap inline-block"
+                          style={{
+                            backgroundColor: '#00FF95',
+                            color: '#1A1A1A',
+                            minWidth: 'fit-content',
+                            fontSize: '12px',
+                            fontWeight: '600',
+                            padding: '6px 12px',
+                            borderRadius: '9999px',
+                            lineHeight: '1.2'
+                          }}
+                        >
+                          {transaction.type}
+                        </span>
+                      </div>
+                      
+                      {/* Amount */}
+                      <span 
+                        className="font-semibold text-sm"
+                        style={{ 
                           color: transaction.amount >= 0 ? '#00FF95' : '#FF4444' 
-                        }}>
-                          {privacyMode ? '•••••' : 
-                           (transaction.amount >= 0 ? '+' : '') + formatCurrency(transaction.amount, false)}
-                        </td>
-                        <td className="py-3 px-4" style={{ color: '#E0E0E0' }}>
-                          {transaction.note}
-                        </td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
+                        }}
+                      >
+                        {privacyMode ? '•••••' : 
+                         (transaction.amount >= 0 ? '+' : '') + formatCurrency(transaction.amount, false)}
+                      </span>
+                    </div>
+                    
+                    {/* Description */}
+                    {transaction.note && (
+                      <p 
+                        className="text-sm leading-relaxed"
+                        style={{ color: '#A0A0A0', margin: 0 }}
+                      >
+                        {transaction.note}
+                      </p>
+                    )}
+                  </div>
+                ))}
               </div>
             ) : (
               <div className="text-center py-12">
