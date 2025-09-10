@@ -99,13 +99,4 @@ export async function fetchKPIData(): Promise<KPIData | null> {
   }
 }
 
-/**
- * Fallback KPI data for when Google Sheets is unavailable
- */
-export const fallbackKPIData: KPIData = {
-  totalInvestors: 0,
-  totalInvested: 0,
-  totalAUM: 0,
-  cumulativeReturn: 0,
-  monthlyReturn: 0
-};
+// No fallback data - errors should be displayed instead of hidden

@@ -21,7 +21,7 @@ interface DashboardClientProps {
     totalAUM: string;
     cumulativeReturn: string;
     monthOnMonth: string;
-  };
+  } | null;
   hasError: boolean;
 }
 
@@ -32,6 +32,7 @@ export default function DashboardClient({ session, kpiData, hasError }: Dashboar
   const [activeTab, setActiveTab] = useState('portfolio');
   const [isPrivacyMode, setIsPrivacyMode] = useState(false);
   const [isCheckingAuth, setIsCheckingAuth] = useState(true);
+  const [isRetrying, setIsRetrying] = useState(false);
 
   useEffect(() => {
     // Check for dev mode session
@@ -88,6 +89,17 @@ export default function DashboardClient({ session, kpiData, hasError }: Dashboar
     }
   };
 
+  const handleRetryKPI = async () => {
+    setIsRetrying(true);
+    try {
+      // Force a page refresh to trigger server-side data fetch
+      window.location.reload();
+    } catch (error) {
+      console.error('Error retrying KPI data:', error);
+      setIsRetrying(false);
+    }
+  };
+
   // Use dev session if in dev mode, otherwise use OAuth session
   const currentSession = isDevMode ? devSession : session;
 
@@ -100,13 +112,13 @@ export default function DashboardClient({ session, kpiData, hasError }: Dashboar
     });
   };
 
-  // Format KPI data with privacy mode
-  const formattedKpiData = {
+  // Format KPI data with privacy mode (only if we have data)
+  const formattedKpiData = kpiData ? {
     activeInvestors: isPrivacyMode ? '•••' : kpiData.activeInvestors,
     totalAUM: isPrivacyMode ? '••••••' : kpiData.totalAUM,
     cumulativeReturn: isPrivacyMode ? '•••' : kpiData.cumulativeReturn,
     monthOnMonth: isPrivacyMode ? '•••' : kpiData.monthOnMonth
-  };
+  } : null;
 
   // Show loading state while checking authentication
   if (isCheckingAuth) {
@@ -238,15 +250,72 @@ export default function DashboardClient({ session, kpiData, hasError }: Dashboar
           <div className="flex items-center justify-between py-4 border-b border-gray-700">
             {hasError ? (
               /* Error State */
-              <div className="flex items-center space-x-4">
-                <div className="text-center">
-                  <p style={{ color: '#FF6B6B', fontSize: '14px', margin: 0 }}>
-                    ⚠️ Error loading KPI data
-                  </p>
-                  <p style={{ color: '#A0A0A0', fontSize: '12px', margin: '4px 0 0 0' }}>
-                    Using fallback data
-                  </p>
+              <div className="flex items-center space-x-6">
+                <div className="flex items-center space-x-3">
+                  {/* Error Icon */}
+                  <div 
+                    className="flex items-center justify-center rounded-full"
+                    style={{
+                      width: '40px',
+                      height: '40px',
+                      backgroundColor: 'rgba(255, 107, 107, 0.1)',
+                      border: '1px solid #FF6B6B'
+                    }}
+                  >
+                    <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24" style={{ color: '#FF6B6B' }}>
+                      <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/>
+                    </svg>
+                  </div>
+                  
+                  {/* Error Message */}
+                  <div>
+                    <p style={{ color: '#FF6B6B', fontSize: '16px', fontWeight: '600', margin: 0 }}>
+                      KPI Data Unavailable
+                    </p>
+                    <p style={{ color: '#A0A0A0', fontSize: '12px', margin: '2px 0 0 0' }}>
+                      Unable to connect to Google Sheets
+                    </p>
+                  </div>
                 </div>
+                
+                {/* Retry Button */}
+                <button
+                  onClick={handleRetryKPI}
+                  disabled={isRetrying}
+                  className="px-4 py-2 text-sm font-medium rounded-lg transition-all duration-200 flex items-center space-x-2"
+                  style={{
+                    backgroundColor: isRetrying ? 'rgba(0, 255, 149, 0.3)' : 'transparent',
+                    border: '1px solid #00FF95',
+                    color: '#00FF95',
+                    opacity: isRetrying ? 0.7 : 1
+                  }}
+                  onMouseEnter={(e) => {
+                    if (!isRetrying) {
+                      e.currentTarget.style.backgroundColor = 'rgba(0, 255, 149, 0.1)';
+                      e.currentTarget.style.boxShadow = '0px 0px 10px rgba(0, 255, 149, 0.3)';
+                    }
+                  }}
+                  onMouseLeave={(e) => {
+                    if (!isRetrying) {
+                      e.currentTarget.style.backgroundColor = 'transparent';
+                      e.currentTarget.style.boxShadow = 'none';
+                    }
+                  }}
+                >
+                  {isRetrying ? (
+                    <>
+                      <div className="animate-spin rounded-full h-4 w-4 border-b-2" style={{ borderColor: '#00FF95' }}></div>
+                      <span>Retrying...</span>
+                    </>
+                  ) : (
+                    <>
+                      <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
+                        <path d="M17.65 6.35C16.2 4.9 14.21 4 12 4c-4.42 0-7.99 3.58-7.99 8s3.57 8 7.99 8c3.73 0 6.84-2.55 7.73-6h-2.08c-.82 2.33-3.04 4-5.65 4-3.31 0-6-2.69-6-6s2.69-6 6-6c1.66 0 3.14.69 4.22 1.78L13 11h7V4l-2.35 2.35z"/>
+                      </svg>
+                      <span>Retry</span>
+                    </>
+                  )}
+                </button>
               </div>
             ) : (
               /* KPI Data */
@@ -257,7 +326,7 @@ export default function DashboardClient({ session, kpiData, hasError }: Dashboar
                     Active investors
                   </p>
                   <p style={{ color: '#FFFFFF', fontSize: '18px', fontWeight: '600', margin: '4px 0 0 0' }}>
-                    {formattedKpiData.activeInvestors}
+                    {formattedKpiData?.activeInvestors || '--'}
                   </p>
                 </div>
 
@@ -270,7 +339,7 @@ export default function DashboardClient({ session, kpiData, hasError }: Dashboar
                     Total AUM
                   </p>
                   <p style={{ color: '#FFFFFF', fontSize: '18px', fontWeight: '600', margin: '4px 0 0 0' }}>
-                    {formattedKpiData.totalAUM}
+                    {formattedKpiData?.totalAUM || '--'}
                   </p>
                 </div>
 
@@ -283,12 +352,12 @@ export default function DashboardClient({ session, kpiData, hasError }: Dashboar
                     Cumulative Return
                   </p>
                   <p style={{ 
-                    color: formattedKpiData.cumulativeReturn.startsWith('+') ? '#00FF95' : '#FF6B6B', 
+                    color: formattedKpiData?.cumulativeReturn?.startsWith('+') ? '#00FF95' : '#FF6B6B', 
                     fontSize: '18px', 
                     fontWeight: '600', 
                     margin: '4px 0 0 0' 
                   }}>
-                    {formattedKpiData.cumulativeReturn}
+                    {formattedKpiData?.cumulativeReturn || '--'}
                   </p>
                 </div>
 
@@ -301,12 +370,12 @@ export default function DashboardClient({ session, kpiData, hasError }: Dashboar
                     Month-on-Month
                   </p>
                   <p style={{ 
-                    color: formattedKpiData.monthOnMonth.startsWith('+') ? '#00FF95' : '#FF6B6B', 
+                    color: formattedKpiData?.monthOnMonth?.startsWith('+') ? '#00FF95' : '#FF6B6B', 
                     fontSize: '18px', 
                     fontWeight: '600', 
                     margin: '4px 0 0 0' 
                   }}>
-                    {formattedKpiData.monthOnMonth}
+                    {formattedKpiData?.monthOnMonth || '--'}
                   </p>
                 </div>
               </div>
