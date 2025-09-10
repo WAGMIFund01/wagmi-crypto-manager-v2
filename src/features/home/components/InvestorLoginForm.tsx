@@ -9,6 +9,9 @@ export function InvestorLoginForm() {
   const [investorId, setInvestorId] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState('');
+  const [showDevModal, setShowDevModal] = useState(false);
+  const [devPassword, setDevPassword] = useState('');
+  const [devError, setDevError] = useState('');
   const router = useRouter();
 
   const handleInvestorLogin = async (e: React.FormEvent) => {
@@ -73,6 +76,44 @@ export function InvestorLoginForm() {
     }
     // For now, show a message about setting up OAuth
     // TODO: Enable Google OAuth when credentials are configured
+  };
+
+  const handleDevAccess = () => {
+    setShowDevModal(true);
+    setDevPassword('');
+    setDevError('');
+  };
+
+  const handleDevLogin = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setDevError('');
+
+    if (devPassword === 'DEV') {
+      // Create a mock session for development
+      const mockSession = {
+        user: {
+          email: 'dev@wagmi.com',
+          name: 'Dev User',
+          role: 'manager'
+        },
+        expires: new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString() // 24 hours
+      };
+
+      // Store in sessionStorage for development
+      sessionStorage.setItem('devSession', JSON.stringify(mockSession));
+      sessionStorage.setItem('isDevMode', 'true');
+      
+      // Redirect to dashboard
+      router.push('/dashboard');
+    } else {
+      setDevError('Invalid dev password. Please try again.');
+    }
+  };
+
+  const closeDevModal = () => {
+    setShowDevModal(false);
+    setDevPassword('');
+    setDevError('');
   };
 
   return (
@@ -170,8 +211,34 @@ export function InvestorLoginForm() {
       </div>
     </div>
 
-        {/* Manager Access Button - Positioned outside main card */}
-        <div className="flex justify-end mt-6">
+        {/* Manager Access Buttons - Positioned outside main card */}
+        <div className="flex justify-end gap-4 mt-6">
+          {/* Dev Access Button */}
+          <button
+            onClick={handleDevAccess}
+            className="font-semibold py-3 px-6 rounded-lg transition-all duration-200 flex items-center"
+            style={{
+              backgroundColor: 'transparent',
+              border: '1px solid #FF6B35',
+              color: '#FF6B35',
+              boxShadow: 'none'
+            }}
+            onMouseEnter={(e) => {
+              e.currentTarget.style.backgroundColor = 'rgba(255, 107, 53, 0.1)';
+              e.currentTarget.style.boxShadow = '0px 0px 10px rgba(255, 107, 53, 0.3)';
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.backgroundColor = 'transparent';
+              e.currentTarget.style.boxShadow = 'none';
+            }}
+          >
+            <svg className="w-5 h-5 mr-2" viewBox="0 0 24 24" fill="currentColor">
+              <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/>
+            </svg>
+            Dev Access
+          </button>
+
+          {/* Manager Access Button */}
           <button
             onClick={handleManagerLogin}
             className="font-semibold py-3 px-6 rounded-lg transition-all duration-200 flex items-center"
@@ -211,6 +278,126 @@ export function InvestorLoginForm() {
             Manager Access
           </button>
     </div>
+
+    {/* Dev Access Modal */}
+    {showDevModal && (
+      <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+        <div 
+          className="w-full max-w-md rounded-xl p-6 relative"
+          style={{ backgroundColor: '#1A1F1A' }}
+        >
+          {/* Close Button */}
+          <button
+            onClick={closeDevModal}
+            className="absolute top-4 right-4 text-gray-400 hover:text-white transition-colors"
+          >
+            <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+            </svg>
+          </button>
+
+          {/* Modal Header */}
+          <div className="text-center mb-6">
+            <h2 
+              className="text-2xl font-bold mb-2"
+              style={{ 
+                color: '#FF6B35',
+                textShadow: '0 0 10px rgba(255, 107, 53, 0.3)'
+              }}
+            >
+              Dev Access
+            </h2>
+            <p style={{ color: '#A0A0A0' }}>
+              Enter dev password to bypass OAuth
+            </p>
+          </div>
+
+          {/* Dev Login Form */}
+          <form onSubmit={handleDevLogin} className="space-y-4">
+            <div>
+              <label htmlFor="devPassword" className="block text-white text-sm font-medium mb-2">
+                Dev Password
+              </label>
+              <input
+                type="password"
+                id="devPassword"
+                value={devPassword}
+                onChange={(e) => setDevPassword(e.target.value)}
+                placeholder="Enter dev password"
+                className="w-full px-4 py-3 bg-gray-700 border border-gray-600 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:border-transparent transition-all duration-200"                    
+                onFocus={(e) => {
+                  e.target.style.borderColor = 'rgba(255, 107, 53, 0.3)';
+                }}
+                onBlur={(e) => {
+                  e.target.style.borderColor = '#4B5563';
+                }}
+                required
+                autoFocus
+              />
+            </div>
+            
+            {devError && (
+              <div className="text-red-400 text-sm bg-red-900/20 border border-red-800 p-3 rounded-lg">
+                {devError}
+              </div>
+            )}
+            
+            <div className="flex gap-3">
+              <button
+                type="button"
+                onClick={closeDevModal}
+                className="flex-1 font-semibold py-3 px-4 rounded-lg transition-all duration-200"
+                style={{
+                  backgroundColor: 'transparent',
+                  border: '1px solid #666',
+                  color: '#A0A0A0'
+                }}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.backgroundColor = 'rgba(160, 160, 160, 0.1)';
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.backgroundColor = 'transparent';
+                }}
+              >
+                Cancel
+              </button>
+              
+              <button
+                type="submit"
+                disabled={!devPassword.trim()}
+                className="flex-1 disabled:bg-gray-600 disabled:cursor-not-allowed font-semibold py-3 px-4 rounded-lg transition-all duration-200"
+                style={{
+                  backgroundColor: '#FF6B35',
+                  color: '#FFFFFF',
+                  border: 'none'
+                }}
+                onMouseEnter={(e) => {
+                  if (!e.currentTarget.disabled) {
+                    e.currentTarget.style.backgroundColor = '#E55A2B';
+                    e.currentTarget.style.boxShadow = '0px 0px 8px rgba(255, 107, 53, 0.4)';
+                  }
+                }}
+                onMouseLeave={(e) => {
+                  if (!e.currentTarget.disabled) {
+                    e.currentTarget.style.backgroundColor = '#FF6B35';
+                    e.currentTarget.style.boxShadow = 'none';
+                  }
+                }}
+              >
+                Access Dashboard
+              </button>
+            </div>
+          </form>
+
+          {/* Dev Info */}
+          <div className="mt-4 p-3 rounded-lg" style={{ backgroundColor: 'rgba(255, 107, 53, 0.1)' }}>
+            <p className="text-xs text-orange-300 text-center">
+              💡 Dev mode: Password is &quot;DEV&quot; (case sensitive)
+            </p>
+          </div>
+        </div>
+      </div>
+    )}
     </div>
     </div>
   );

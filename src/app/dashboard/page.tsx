@@ -2,14 +2,35 @@
 
 import { useSession, signOut } from 'next-auth/react';
 import { useRouter } from 'next/navigation';
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 // Removed unused imports - using custom styled components instead
 
 export default function DashboardPage() {
   const { data: session, status } = useSession();
   const router = useRouter();
+  const [devSession, setDevSession] = useState(null);
+  const [isDevMode, setIsDevMode] = useState(false);
 
   useEffect(() => {
+    // Check for dev mode session
+    const devSessionData = sessionStorage.getItem('devSession');
+    const devMode = sessionStorage.getItem('isDevMode');
+    
+    if (devMode === 'true' && devSessionData) {
+      try {
+        const parsedDevSession = JSON.parse(devSessionData);
+        setDevSession(parsedDevSession);
+        setIsDevMode(true);
+        return; // Skip OAuth session checks in dev mode
+      } catch (error) {
+        console.error('Error parsing dev session:', error);
+        // Clear invalid dev session
+        sessionStorage.removeItem('devSession');
+        sessionStorage.removeItem('isDevMode');
+      }
+    }
+
+    // Regular OAuth session checks
     if (status === 'loading') return;
     
     if (!session) {
@@ -30,18 +51,35 @@ export default function DashboardPage() {
     }
   }, [session, status, router]);
 
-  if (status === 'loading') {
+  const handleSignOut = () => {
+    if (isDevMode) {
+      // Clear dev session
+      sessionStorage.removeItem('devSession');
+      sessionStorage.removeItem('isDevMode');
+      setDevSession(null);
+      setIsDevMode(false);
+      router.push('/');
+    } else {
+      // Regular OAuth sign out
+      signOut({ callbackUrl: '/' });
+    }
+  };
+
+  // Use dev session if in dev mode, otherwise use OAuth session
+  const currentSession = isDevMode ? devSession : session;
+
+  if (status === 'loading' && !isDevMode) {
     return (
-      <div className="flex items-center justify-center min-h-screen">
+      <div className="flex items-center justify-center min-h-screen" style={{ backgroundColor: '#0B0B0B' }}>
         <div className="text-center">
-          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto mb-4"></div>
-          <p className="text-gray-600">Loading...</p>
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 mx-auto mb-4" style={{ borderColor: '#00FF95' }}></div>
+          <p style={{ color: '#E0E0E0' }}>Loading...</p>
         </div>
       </div>
     );
   }
 
-  if (!session || session.user?.role !== 'manager') {
+  if (!currentSession || currentSession.user?.role !== 'manager') {
     return null;
   }
 
@@ -76,12 +114,12 @@ export default function DashboardPage() {
                   Manager Dashboard
                 </h2>
                 <p style={{ color: '#E0E0E0', fontSize: '14px', margin: 0 }}>
-                  {session.user?.email}
+                  {currentSession.user?.email}
                 </p>
               </div>
               
               <button
-                onClick={() => signOut()}
+                onClick={handleSignOut}
                 className="font-semibold py-2 px-4 rounded-lg transition-all duration-200"
                 style={{
                   backgroundColor: 'transparent',
@@ -98,7 +136,7 @@ export default function DashboardPage() {
                   e.currentTarget.style.boxShadow = 'none';
                 }}
               >
-                Sign Out
+                {isDevMode ? 'Exit Dev Mode' : 'Sign Out'}
               </button>
             </div>
           </div>
