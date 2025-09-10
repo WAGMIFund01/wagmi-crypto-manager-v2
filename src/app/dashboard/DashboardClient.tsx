@@ -219,7 +219,7 @@ export default function DashboardClient({ session, kpiData, hasError }: Dashboar
             </div>
             
             {/* Right - Controls */}
-            <div className="flex items-center space-x-4">
+            <div className="flex items-center space-x-6">
               {/* Last Updated Timestamp */}
               <p style={{ color: '#A0A0A0', fontSize: '12px', margin: 0 }}>
                 Last updated: {formatLastRefresh(kpiData?.lastUpdated || '')}
@@ -229,19 +229,19 @@ export default function DashboardClient({ session, kpiData, hasError }: Dashboar
               <button
                 onClick={handleRetryKPI}
                 disabled={isRetrying}
-                className="p-2 rounded-lg transition-all duration-200 flex items-center justify-center"
+                className="p-1.5 rounded-lg transition-all duration-200 flex items-center justify-center"
                 style={{
                   backgroundColor: isRetrying ? 'rgba(0, 255, 149, 0.3)' : 'transparent',
                   border: '1px solid #00FF95',
                   color: '#00FF95',
-                  width: '36px',
-                  height: '36px',
+                  width: '28px',
+                  height: '28px',
                   opacity: isRetrying ? 0.7 : 1
                 }}
                 onMouseEnter={(e) => {
                   if (!isRetrying) {
                     e.currentTarget.style.backgroundColor = 'rgba(0, 255, 149, 0.1)';
-                    e.currentTarget.style.boxShadow = '0px 0px 10px rgba(0, 255, 149, 0.3)';
+                    e.currentTarget.style.boxShadow = '0px 0px 8px rgba(0, 255, 149, 0.3)';
                   }
                 }}
                 onMouseLeave={(e) => {
@@ -253,29 +253,29 @@ export default function DashboardClient({ session, kpiData, hasError }: Dashboar
                 title="Manual refresh"
               >
                 {isRetrying ? (
-                  <div className="animate-spin rounded-full h-4 w-4 border-b-2" style={{ borderColor: '#00FF95' }}></div>
+                  <div className="animate-spin rounded-full h-3 w-3 border-b-2" style={{ borderColor: '#00FF95' }}></div>
                 ) : (
-                  <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
+                  <svg className="w-3 h-3" fill="currentColor" viewBox="0 0 24 24">
                     <path d="M17.65 6.35C16.2 4.9 14.21 4 12 4c-4.42 0-7.99 3.58-7.99 8s3.57 8 7.99 8c3.73 0 6.84-2.55 7.73-6h-2.08c-.82 2.33-3.04 4-5.65 4-3.31 0-6-2.69-6-6s2.69-6 6-6c1.66 0 3.14.69 4.22 1.78L13 11h7V4l-2.35 2.35z"/>
                   </svg>
                 )}
               </button>
 
-              {/* Privacy Toggle - Eye Icon */}
+              {/* Privacy Toggle - Eye Icon with Rounded Square */}
               <button
                 onClick={() => setIsPrivacyMode(!isPrivacyMode)}
-                className="p-2 rounded-full transition-all duration-200 flex items-center justify-center"
+                className="p-1.5 rounded-md transition-all duration-200 flex items-center justify-center"
                 style={{
                   backgroundColor: isPrivacyMode ? '#00FF95' : 'transparent',
                   border: '1px solid #00FF95',
                   color: isPrivacyMode ? '#1A1A1A' : '#00FF95',
-                  width: '36px',
-                  height: '36px'
+                  width: '28px',
+                  height: '28px'
                 }}
                 onMouseEnter={(e) => {
                   if (!isPrivacyMode) {
                     e.currentTarget.style.backgroundColor = 'rgba(0, 255, 149, 0.1)';
-                    e.currentTarget.style.boxShadow = '0px 0px 10px rgba(0, 255, 149, 0.3)';
+                    e.currentTarget.style.boxShadow = '0px 0px 8px rgba(0, 255, 149, 0.3)';
                   }
                 }}
                 onMouseLeave={(e) => {
@@ -287,42 +287,42 @@ export default function DashboardClient({ session, kpiData, hasError }: Dashboar
               >
                 {isPrivacyMode ? (
                   // Eye with slash icon (privacy ON)
-                  <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
+                  <svg className="w-3 h-3" fill="currentColor" viewBox="0 0 24 24">
                     <path d="M12 4.5C7 4.5 2.73 7.61 1 12c1.73 4.39 6 7.5 11 7.5s9.27-3.11 11-7.5c-1.73-4.39-6-7.5-11-7.5zM12 17c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5-5 5zm0-8c-1.66 0-3 1.34-3 3s1.34 3 3 3 3-1.34 3-3-1.34-3-3-3z"/>
                     <path d="M2 2l20 20" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/>
                   </svg>
                 ) : (
                   // Open eye icon (privacy OFF)
-                  <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
+                  <svg className="w-3 h-3" fill="currentColor" viewBox="0 0 24 24">
                     <path d="M12 4.5C7 4.5 2.73 7.61 1 12c1.73 4.39 6 7.5 11 7.5s9.27-3.11 11-7.5c-1.73-4.39-6-7.5-11-7.5zM12 17c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5-5 5zm0-8c-1.66 0-3 1.34-3 3s1.34 3 3 3 3-1.34 3-3-1.34-3-3-3z"/>
                   </svg>
                 )}
               </button>
 
-              {/* Exit Dev Mode Button */}
+              {/* Exit Dev Mode Button - Icon Only */}
               <button
                 onClick={handleSignOut}
-                className="px-4 py-2 rounded-lg transition-all duration-200 flex items-center gap-2"
+                className="p-1.5 rounded-lg transition-all duration-200 flex items-center justify-center"
                 style={{
                   backgroundColor: 'transparent',
                   border: '1px solid #00FF95',
                   color: '#00FF95',
-                  fontSize: '14px',
-                  fontWeight: '500'
+                  width: '28px',
+                  height: '28px'
                 }}
                 onMouseEnter={(e) => {
                   e.currentTarget.style.backgroundColor = 'rgba(0, 255, 149, 0.1)';
-                  e.currentTarget.style.boxShadow = '0px 0px 10px rgba(0, 255, 149, 0.3)';
+                  e.currentTarget.style.boxShadow = '0px 0px 8px rgba(0, 255, 149, 0.3)';
                 }}
                 onMouseLeave={(e) => {
                   e.currentTarget.style.backgroundColor = 'transparent';
                   e.currentTarget.style.boxShadow = 'none';
                 }}
+                title={isDevMode ? 'Exit Dev Mode' : 'Sign Out'}
               >
-                <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
+                <svg className="w-3 h-3" fill="currentColor" viewBox="0 0 24 24">
                   <path d="M17 7l-1.41 1.41L18.17 11H8v2h10.17l-2.58 2.58L17 17l5-5zM4 5h8V3H4c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h8v-2H4V5z"/>
                 </svg>
-                {isDevMode ? 'Exit Dev Mode' : 'Sign Out'}
               </button>
             </div>
           </div>
