@@ -1,0 +1,433 @@
+'use client';
+
+import { signOut } from 'next-auth/react';
+import { useRouter } from 'next/navigation';
+import { useEffect, useState } from 'react';
+
+interface Session {
+  user?: {
+    role?: "manager" | "investor" | "unauthorized";
+    email?: string | null;
+    name?: string | null;
+    image?: string | null;
+    investorId?: string;
+  };
+}
+
+interface DashboardClientProps {
+  session: Session | null;
+  kpiData: {
+    activeInvestors: string;
+    totalAUM: string;
+    cumulativeReturn: string;
+    monthOnMonth: string;
+  };
+  hasError: boolean;
+}
+
+export default function DashboardClient({ session, kpiData, hasError }: DashboardClientProps) {
+  const router = useRouter();
+  const [devSession, setDevSession] = useState(null);
+  const [isDevMode, setIsDevMode] = useState(false);
+  const [activeTab, setActiveTab] = useState('portfolio');
+  const [isPrivacyMode, setIsPrivacyMode] = useState(false);
+
+  useEffect(() => {
+    // Check for dev mode session
+    const devSessionData = sessionStorage.getItem('devSession');
+    const devMode = sessionStorage.getItem('isDevMode');
+    
+    if (devMode === 'true' && devSessionData) {
+      try {
+        const parsedDevSession = JSON.parse(devSessionData);
+        setDevSession(parsedDevSession);
+        setIsDevMode(true);
+        return; // Skip OAuth session checks in dev mode
+      } catch (error) {
+        console.error('Error parsing dev session:', error);
+        // Clear invalid dev session
+        sessionStorage.removeItem('devSession');
+        sessionStorage.removeItem('isDevMode');
+      }
+    }
+
+    // Regular OAuth session checks
+    if (!session) {
+      router.push('/');
+      return;
+    }
+    
+    if (session.user?.role === 'unauthorized') {
+      // Redirect unauthorized users back to homepage
+      router.push('/');
+      return;
+    }
+    
+    if (session.user?.role !== 'manager') {
+      // Redirect non-manager users to investor page or homepage
+      router.push('/');
+      return;
+    }
+  }, [session, router]);
+
+  const handleSignOut = () => {
+    if (isDevMode) {
+      // Clear dev session
+      sessionStorage.removeItem('devSession');
+      sessionStorage.removeItem('isDevMode');
+      setDevSession(null);
+      setIsDevMode(false);
+      router.push('/');
+    } else {
+      // Regular OAuth sign out
+      signOut({ callbackUrl: '/' });
+    }
+  };
+
+  // Use dev session if in dev mode, otherwise use OAuth session
+  const currentSession = isDevMode ? devSession : session;
+
+  // Format timestamp for display (static since data is fetched on server)
+  const formatLastRefresh = () => {
+    return new Date().toLocaleTimeString('en-US', { 
+      hour: 'numeric', 
+      minute: '2-digit',
+      hour12: true 
+    });
+  };
+
+  // Format KPI data with privacy mode
+  const formattedKpiData = {
+    activeInvestors: isPrivacyMode ? '•••' : kpiData.activeInvestors,
+    totalAUM: isPrivacyMode ? '••••••' : kpiData.totalAUM,
+    cumulativeReturn: isPrivacyMode ? '•••' : kpiData.cumulativeReturn,
+    monthOnMonth: isPrivacyMode ? '•••' : kpiData.monthOnMonth
+  };
+
+  if (!currentSession || currentSession.user?.role !== 'manager') {
+    return null;
+  }
+
+  return (
+    <div style={{ backgroundColor: '#0B0B0B' }}>
+      {/* Navigation Header */}
+      <header style={{ backgroundColor: '#0B0B0B', borderBottom: '1px solid #333' }}>
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          {/* Top Row - Logo and Controls */}
+          <div className="flex justify-between items-center h-16">
+            {/* Left - WAGMI Logo */}
+            <div className="flex items-center" style={{ paddingLeft: '32px' }}>
+              <h1 
+                className="font-bold"
+                style={{ 
+                  color: '#00FF95',
+                  fontSize: '32px',
+                  lineHeight: '1.2',
+                  textShadow: '0 0 25px rgba(0, 255, 149, 0.6), 0 0 50px rgba(0, 255, 149, 0.4), 0 0 75px rgba(0, 255, 149, 0.2)',
+                  letterSpacing: '0.05em'
+                }}
+              >
+                WAGMI
+              </h1>
+            </div>
+            
+            {/* Right - Controls */}
+            <div className="flex items-center gap-4">
+              {/* Privacy Toggle */}
+              <button
+                onClick={() => setIsPrivacyMode(!isPrivacyMode)}
+                className="p-2 rounded-lg transition-all duration-200 flex items-center justify-center"
+                style={{
+                  backgroundColor: isPrivacyMode ? '#00FF95' : 'transparent',
+                  border: '1px solid #00FF95',
+                  color: isPrivacyMode ? '#1A1A1A' : '#00FF95',
+                  width: '40px',
+                  height: '40px'
+                }}
+                onMouseEnter={(e) => {
+                  if (!isPrivacyMode) {
+                    e.currentTarget.style.backgroundColor = 'rgba(0, 255, 149, 0.1)';
+                    e.currentTarget.style.boxShadow = '0px 0px 10px rgba(0, 255, 149, 0.3)';
+                  }
+                }}
+                onMouseLeave={(e) => {
+                  if (!isPrivacyMode) {
+                    e.currentTarget.style.backgroundColor = 'transparent';
+                    e.currentTarget.style.boxShadow = 'none';
+                  }
+                }}
+              >
+                {isPrivacyMode ? (
+                  // Eye with slash icon (privacy ON)
+                  <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
+                    <path d="M12 4.5C7 4.5 2.73 7.61 1 12c1.73 4.39 6 7.5 11 7.5s9.27-3.11 11-7.5c-1.73-4.39-6-7.5-11-7.5zM12 17c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5-5 5zm0-8c-1.66 0-3 1.34-3 3s1.34 3 3 3 3-1.34 3-3-1.34-3-3-3z"/>
+                    <path d="M2 2l20 20" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/>
+                  </svg>
+                ) : (
+                  // Open eye icon (privacy OFF)
+                  <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
+                    <path d="M12 4.5C7 4.5 2.73 7.61 1 12c1.73 4.39 6 7.5 11 7.5s9.27-3.11 11-7.5c-1.73-4.39-6-7.5-11-7.5zM12 17c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5-5 5zm0-8c-1.66 0-3 1.34-3 3s1.34 3 3 3 3-1.34 3-3-1.34-3-3-3z"/>
+                  </svg>
+                )}
+              </button>
+
+              {/* Sign Out Button */}
+              <button
+                onClick={handleSignOut}
+                className="font-semibold py-2 px-4 rounded-lg transition-all duration-200"
+                style={{
+                  backgroundColor: 'transparent',
+                  border: '1px solid #00FF95',
+                  color: '#00FF95',
+                  boxShadow: 'none'
+                }}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.backgroundColor = 'rgba(0, 255, 149, 0.1)';
+                  e.currentTarget.style.boxShadow = '0px 0px 10px rgba(0, 255, 149, 0.3)';
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.backgroundColor = 'transparent';
+                  e.currentTarget.style.boxShadow = 'none';
+                }}
+              >
+                {isDevMode ? 'Exit Dev Mode' : 'Sign Out'}
+              </button>
+            </div>
+          </div>
+
+          {/* Navigation Tabs */}
+          <div className="flex items-center border-b border-gray-700">
+            <nav className="flex space-x-8" style={{ paddingLeft: '32px' }}>
+              {[
+                { id: 'portfolio', label: 'Portfolio Overview' },
+                { id: 'analytics', label: 'Analytics' },
+                { id: 'investors', label: 'Investors' }
+              ].map((tab) => (
+                <button
+                  key={tab.id}
+                  onClick={() => setActiveTab(tab.id)}
+                  className="py-4 px-1 text-sm font-medium transition-colors duration-200 relative"
+                  style={{
+                    color: activeTab === tab.id ? '#00FF95' : '#A0A0A0',
+                    borderBottom: activeTab === tab.id ? '2px solid #00FF95' : '2px solid transparent'
+                  }}
+                >
+                  {tab.label}
+                </button>
+              ))}
+            </nav>
+          </div>
+
+          {/* KPI Ribbon */}
+          <div className="flex items-center justify-between py-4 border-b border-gray-700">
+            {hasError ? (
+              /* Error State */
+              <div className="flex items-center space-x-4">
+                <div className="text-center">
+                  <p style={{ color: '#FF6B6B', fontSize: '14px', margin: 0 }}>
+                    ⚠️ Error loading KPI data
+                  </p>
+                  <p style={{ color: '#A0A0A0', fontSize: '12px', margin: '4px 0 0 0' }}>
+                    Using fallback data
+                  </p>
+                </div>
+              </div>
+            ) : (
+              /* KPI Data */
+              <div className="flex items-center space-x-8">
+                {/* Active Investors */}
+                <div className="text-center">
+                  <p style={{ color: '#A0A0A0', fontSize: '12px', margin: 0, textTransform: 'uppercase', letterSpacing: '0.05em' }}>
+                    Active investors
+                  </p>
+                  <p style={{ color: '#FFFFFF', fontSize: '18px', fontWeight: '600', margin: '4px 0 0 0' }}>
+                    {formattedKpiData.activeInvestors}
+                  </p>
+                </div>
+
+                {/* Separator */}
+                <div style={{ width: '1px', height: '32px', backgroundColor: '#333' }}></div>
+
+                {/* Total AUM */}
+                <div className="text-center">
+                  <p style={{ color: '#A0A0A0', fontSize: '12px', margin: 0, textTransform: 'uppercase', letterSpacing: '0.05em' }}>
+                    Total AUM
+                  </p>
+                  <p style={{ color: '#FFFFFF', fontSize: '18px', fontWeight: '600', margin: '4px 0 0 0' }}>
+                    {formattedKpiData.totalAUM}
+                  </p>
+                </div>
+
+                {/* Separator */}
+                <div style={{ width: '1px', height: '32px', backgroundColor: '#333' }}></div>
+
+                {/* Cumulative Return */}
+                <div className="text-center">
+                  <p style={{ color: '#A0A0A0', fontSize: '12px', margin: 0, textTransform: 'uppercase', letterSpacing: '0.05em' }}>
+                    Cumulative Return
+                  </p>
+                  <p style={{ 
+                    color: formattedKpiData.cumulativeReturn.startsWith('+') ? '#00FF95' : '#FF6B6B', 
+                    fontSize: '18px', 
+                    fontWeight: '600', 
+                    margin: '4px 0 0 0' 
+                  }}>
+                    {formattedKpiData.cumulativeReturn}
+                  </p>
+                </div>
+
+                {/* Separator */}
+                <div style={{ width: '1px', height: '32px', backgroundColor: '#333' }}></div>
+
+                {/* Month-on-Month */}
+                <div className="text-center">
+                  <p style={{ color: '#A0A0A0', fontSize: '12px', margin: 0, textTransform: 'uppercase', letterSpacing: '0.05em' }}>
+                    Month-on-Month
+                  </p>
+                  <p style={{ 
+                    color: formattedKpiData.monthOnMonth.startsWith('+') ? '#00FF95' : '#FF6B6B', 
+                    fontSize: '18px', 
+                    fontWeight: '600', 
+                    margin: '4px 0 0 0' 
+                  }}>
+                    {formattedKpiData.monthOnMonth}
+                  </p>
+                </div>
+              </div>
+            )}
+
+            {/* Last Updated Timestamp */}
+            <div className="text-right">
+              <p style={{ color: '#A0A0A0', fontSize: '12px', margin: 0 }}>
+                Last updated: {formatLastRefresh()}
+              </p>
+            </div>
+          </div>
+        </div>
+      </header>
+
+      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        {/* Tab Content */}
+        {activeTab === 'portfolio' && (
+          <div className="space-y-6">
+            <h2 
+              className="text-2xl font-bold"
+              style={{ 
+                color: '#00FF95',
+                textShadow: '0 0 10px rgba(0, 255, 149, 0.3)'
+              }}
+            >
+              Portfolio Overview
+            </h2>
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              {/* Portfolio Cards will go here */}
+              <div 
+                className="group relative p-6 rounded-2xl transition-all duration-300 hover:shadow-[0_0_20px_rgba(0,255,149,0.15)]"
+                style={{ 
+                  backgroundColor: '#1A1F1A',
+                  borderRadius: '16px',
+                  boxShadow: '0 8px 32px rgba(0, 0, 0, 0.4), 0 0 0 1px rgba(255, 255, 255, 0.05), 0 0 15px rgba(0, 255, 149, 0.1)'
+                }}
+              >
+                <div className="space-y-4">
+                  <h3 
+                    className="text-lg font-semibold"
+                    style={{ 
+                      color: '#00FF95',
+                      textShadow: '0 0 10px rgba(0, 255, 149, 0.3)'
+                    }}
+                  >
+                    Portfolio Summary
+                  </h3>
+                  <p style={{ color: '#E0E0E0', fontSize: '14px', lineHeight: '1.5' }}>
+                    View and manage all investor portfolios with real-time performance metrics
+                  </p>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {activeTab === 'analytics' && (
+          <div className="space-y-6">
+            <h2 
+              className="text-2xl font-bold"
+              style={{ 
+                color: '#00FF95',
+                textShadow: '0 0 10px rgba(0, 255, 149, 0.3)'
+              }}
+            >
+              Analytics & Reports
+            </h2>
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              {/* Analytics Cards will go here */}
+              <div 
+                className="group relative p-6 rounded-2xl transition-all duration-300 hover:shadow-[0_0_20px_rgba(0,255,149,0.15)]"
+                style={{ 
+                  backgroundColor: '#1A1F1A',
+                  borderRadius: '16px',
+                  boxShadow: '0 8px 32px rgba(0, 0, 0, 0.4), 0 0 0 1px rgba(255, 255, 255, 0.05), 0 0 15px rgba(0, 255, 149, 0.1)'
+                }}
+              >
+                <div className="space-y-4">
+                  <h3 
+                    className="text-lg font-semibold"
+                    style={{ 
+                      color: '#00FF95',
+                      textShadow: '0 0 10px rgba(0, 255, 149, 0.3)'
+                    }}
+                  >
+                    Performance Analytics
+                  </h3>
+                  <p style={{ color: '#E0E0E0', fontSize: '14px', lineHeight: '1.5' }}>
+                Generate comprehensive performance reports and analytics dashboards
+                  </p>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {activeTab === 'investors' && (
+          <div className="space-y-6">
+            <h2 
+              className="text-2xl font-bold"
+              style={{ 
+                color: '#00FF95',
+                textShadow: '0 0 10px rgba(0, 255, 149, 0.3)'
+              }}
+            >
+              Investor Management
+            </h2>
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              {/* Investor Cards will go here */}
+              <div 
+                className="group relative p-6 rounded-2xl transition-all duration-300 hover:shadow-[0_0_20px_rgba(0,255,149,0.15)]"
+                style={{ 
+                  backgroundColor: '#1A1F1A',
+                  borderRadius: '16px',
+                  boxShadow: '0 8px 32px rgba(0, 0, 0, 0.4), 0 0 0 1px rgba(255, 255, 255, 0.05), 0 0 15px rgba(0, 255, 149, 0.1)'
+                }}
+              >
+                <div className="space-y-4">
+                  <h3 
+                    className="text-lg font-semibold"
+                    style={{ 
+                      color: '#00FF95',
+                      textShadow: '0 0 10px rgba(0, 255, 149, 0.3)'
+                    }}
+                  >
+                    Investor List
+                  </h3>
+                  <p style={{ color: '#E0E0E0', fontSize: '14px', lineHeight: '1.5' }}>
+                Add new investors, manage access permissions, and update investor data
+                  </p>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
+      </main>
+    </div>
+  );
+}
