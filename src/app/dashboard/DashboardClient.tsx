@@ -197,13 +197,14 @@ export default function DashboardClient({ session, kpiData, hasError }: Dashboar
 
   return (
     <div style={{ backgroundColor: '#0B0B0B' }}>
-      {/* Navigation Header */}
+      {/* Navigation Header - Option C: Two-Tier Navbar with KPI Ribbon Integrated Inside Top Bar */}
       <header style={{ backgroundColor: '#0B0B0B', borderBottom: '1px solid #333' }}>
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          {/* Top Row - Logo and Controls */}
-          <div className="flex justify-between items-center h-16">
-            {/* Left - WAGMI Logo */}
-            <div className="flex items-center" style={{ paddingLeft: '32px' }}>
+          {/* Single Bar - Everything integrated on one continuous background */}
+          <div className="flex items-center justify-between h-20 py-4">
+            {/* Left Section - Logo + Navigation Tabs */}
+            <div className="flex items-center space-x-8">
+              {/* WAGMI Logo with Glow */}
               <h1 
                 className="font-bold"
                 style={{ 
@@ -216,97 +217,42 @@ export default function DashboardClient({ session, kpiData, hasError }: Dashboar
               >
                 WAGMI
               </h1>
+              
+              {/* Primary Navigation Tabs */}
+              <nav className="flex space-x-6">
+                {[
+                  { id: 'portfolio', label: 'Portfolio Overview' },
+                  { id: 'analytics', label: 'Analytics' },
+                  { id: 'investors', label: 'Investors' }
+                ].map((tab) => (
+                  <button
+                    key={tab.id}
+                    onClick={() => setActiveTab(tab.id)}
+                    className="py-2 px-3 text-sm font-medium transition-all duration-200 relative"
+                    style={{
+                      color: activeTab === tab.id ? '#00FF95' : '#A0A0A0',
+                      borderBottom: activeTab === tab.id ? '2px solid #00FF95' : '2px solid transparent',
+                      textShadow: activeTab === tab.id ? '0 0 10px rgba(0, 255, 149, 0.5)' : 'none'
+                    }}
+                    onMouseEnter={(e) => {
+                      if (activeTab !== tab.id) {
+                        e.currentTarget.style.color = '#FFFFFF';
+                      }
+                    }}
+                    onMouseLeave={(e) => {
+                      if (activeTab !== tab.id) {
+                        e.currentTarget.style.color = '#A0A0A0';
+                      }
+                    }}
+                  >
+                    {tab.label}
+                  </button>
+                ))}
+              </nav>
             </div>
-            
-            {/* Right - Controls */}
-            <div className="flex items-center gap-4">
-              {/* Privacy Toggle */}
-              <button
-                onClick={() => setIsPrivacyMode(!isPrivacyMode)}
-                className="p-2 rounded-lg transition-all duration-200 flex items-center justify-center"
-                style={{
-                  backgroundColor: isPrivacyMode ? '#00FF95' : 'transparent',
-                  border: '1px solid #00FF95',
-                  color: isPrivacyMode ? '#1A1A1A' : '#00FF95',
-                  width: '40px',
-                  height: '40px'
-                }}
-                onMouseEnter={(e) => {
-                  if (!isPrivacyMode) {
-                    e.currentTarget.style.backgroundColor = 'rgba(0, 255, 149, 0.1)';
-                    e.currentTarget.style.boxShadow = '0px 0px 10px rgba(0, 255, 149, 0.3)';
-                  }
-                }}
-                onMouseLeave={(e) => {
-                  if (!isPrivacyMode) {
-                    e.currentTarget.style.backgroundColor = 'transparent';
-                    e.currentTarget.style.boxShadow = 'none';
-                  }
-                }}
-              >
-                {isPrivacyMode ? (
-                  // Eye with slash icon (privacy ON)
-                  <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
-                    <path d="M12 4.5C7 4.5 2.73 7.61 1 12c1.73 4.39 6 7.5 11 7.5s9.27-3.11 11-7.5c-1.73-4.39-6-7.5-11-7.5zM12 17c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5-5 5zm0-8c-1.66 0-3 1.34-3 3s1.34 3 3 3 3-1.34 3-3-1.34-3-3-3z"/>
-                    <path d="M2 2l20 20" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/>
-                  </svg>
-                ) : (
-                  // Open eye icon (privacy OFF)
-                  <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
-                    <path d="M12 4.5C7 4.5 2.73 7.61 1 12c1.73 4.39 6 7.5 11 7.5s9.27-3.11 11-7.5c-1.73-4.39-6-7.5-11-7.5zM12 17c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5-5 5zm0-8c-1.66 0-3 1.34-3 3s1.34 3 3 3 3-1.34 3-3-1.34-3-3-3z"/>
-                  </svg>
-                )}
-              </button>
 
-              {/* Sign Out Button */}
-              <button
-                onClick={handleSignOut}
-                className="font-semibold py-2 px-4 rounded-lg transition-all duration-200"
-                style={{
-                  backgroundColor: 'transparent',
-                  border: '1px solid #00FF95',
-                  color: '#00FF95',
-                  boxShadow: 'none'
-                }}
-                onMouseEnter={(e) => {
-                  e.currentTarget.style.backgroundColor = 'rgba(0, 255, 149, 0.1)';
-                  e.currentTarget.style.boxShadow = '0px 0px 10px rgba(0, 255, 149, 0.3)';
-                }}
-                onMouseLeave={(e) => {
-                  e.currentTarget.style.backgroundColor = 'transparent';
-                  e.currentTarget.style.boxShadow = 'none';
-                }}
-              >
-                {isDevMode ? 'Exit Dev Mode' : 'Sign Out'}
-              </button>
-            </div>
-          </div>
-
-          {/* Navigation Tabs with KPI Ribbon and Refresh Controls */}
-          <div className="flex items-center justify-between border-b border-gray-700 py-4">
-            {/* Left - Navigation Tabs */}
-            <nav className="flex space-x-8" style={{ paddingLeft: '32px' }}>
-              {[
-                { id: 'portfolio', label: 'Portfolio Overview' },
-                { id: 'analytics', label: 'Analytics' },
-                { id: 'investors', label: 'Investors' }
-              ].map((tab) => (
-                <button
-                  key={tab.id}
-                  onClick={() => setActiveTab(tab.id)}
-                  className="py-2 px-1 text-sm font-medium transition-colors duration-200 relative"
-                  style={{
-                    color: activeTab === tab.id ? '#00FF95' : '#A0A0A0',
-                    borderBottom: activeTab === tab.id ? '2px solid #00FF95' : '2px solid transparent'
-                  }}
-                >
-                  {tab.label}
-                </button>
-              ))}
-            </nav>
-
-            {/* Center - KPI Ribbon */}
-            <div className="flex-1 flex justify-center">
+            {/* Center Section - KPI Metrics Inline */}
+            <div className="flex-1 flex justify-center px-8">
               {hasError ? (
                 /* Error State */
                 <div className="flex items-center space-x-4">
@@ -338,38 +284,43 @@ export default function DashboardClient({ session, kpiData, hasError }: Dashboar
                   </div>
                 </div>
               ) : (
-                /* KPI Data */
+                /* KPI Data - Inline with slim vertical dividers */
                 <div className="flex items-center space-x-6">
                   {/* Active Investors */}
-                  <div className="text-center">
-                    <p style={{ color: '#A0A0A0', fontSize: '10px', margin: 0, textTransform: 'uppercase', letterSpacing: '0.05em' }}>
-                      Active investors
+                  <div className="text-center" style={{ minWidth: '90px' }}>
+                    <p style={{ color: '#A0A0A0', fontSize: '9px', margin: 0, textTransform: 'uppercase', letterSpacing: '0.05em', fontWeight: '500' }}>
+                      ACTIVE INVESTORS
                     </p>
-                    <p style={{ color: '#FFFFFF', fontSize: '16px', fontWeight: '600', margin: '2px 0 0 0' }}>
-                      {formattedKpiData?.activeInvestors || '--'}
-                    </p>
+                    <div className="flex items-center justify-center space-x-1 mt-1">
+                      <p style={{ color: '#FF6B6B', fontSize: '16px', fontWeight: '600', margin: 0 }}>
+                        {formattedKpiData?.activeInvestors || '--'}
+                      </p>
+                      <svg className="w-3 h-3" fill="currentColor" viewBox="0 0 24 24" style={{ color: '#FF6B6B' }}>
+                        <path d="M7 14l5-5 5 5z"/>
+                      </svg>
+                    </div>
                   </div>
 
-                  {/* Separator */}
-                  <div style={{ width: '1px', height: '24px', backgroundColor: '#333' }}></div>
+                  {/* Slim Vertical Divider */}
+                  <div style={{ width: '1px', height: '28px', backgroundColor: '#333' }}></div>
 
                   {/* Total AUM */}
-                  <div className="text-center">
-                    <p style={{ color: '#A0A0A0', fontSize: '10px', margin: 0, textTransform: 'uppercase', letterSpacing: '0.05em' }}>
-                      Total AUM
+                  <div className="text-center" style={{ minWidth: '90px' }}>
+                    <p style={{ color: '#A0A0A0', fontSize: '9px', margin: 0, textTransform: 'uppercase', letterSpacing: '0.05em', fontWeight: '500' }}>
+                      TOTAL AUM
                     </p>
                     <p style={{ color: '#FFFFFF', fontSize: '16px', fontWeight: '600', margin: '2px 0 0 0' }}>
                       {formattedKpiData?.totalAUM || '--'}
                     </p>
                   </div>
 
-                  {/* Separator */}
-                  <div style={{ width: '1px', height: '24px', backgroundColor: '#333' }}></div>
+                  {/* Slim Vertical Divider */}
+                  <div style={{ width: '1px', height: '28px', backgroundColor: '#333' }}></div>
 
                   {/* Cumulative Return */}
-                  <div className="text-center">
-                    <p style={{ color: '#A0A0A0', fontSize: '10px', margin: 0, textTransform: 'uppercase', letterSpacing: '0.05em' }}>
-                      Cumulative Return
+                  <div className="text-center" style={{ minWidth: '90px' }}>
+                    <p style={{ color: '#A0A0A0', fontSize: '9px', margin: 0, textTransform: 'uppercase', letterSpacing: '0.05em', fontWeight: '500' }}>
+                      CUMULATIVE RETURN
                     </p>
                     <p style={{ 
                       color: formattedKpiData?.cumulativeReturn?.startsWith('+') ? '#00FF95' : '#FF6B6B', 
@@ -381,13 +332,13 @@ export default function DashboardClient({ session, kpiData, hasError }: Dashboar
                     </p>
                   </div>
 
-                  {/* Separator */}
-                  <div style={{ width: '1px', height: '24px', backgroundColor: '#333' }}></div>
+                  {/* Slim Vertical Divider */}
+                  <div style={{ width: '1px', height: '28px', backgroundColor: '#333' }}></div>
 
                   {/* Month-on-Month */}
-                  <div className="text-center">
-                    <p style={{ color: '#A0A0A0', fontSize: '10px', margin: 0, textTransform: 'uppercase', letterSpacing: '0.05em' }}>
-                      Month-on-Month
+                  <div className="text-center" style={{ minWidth: '90px' }}>
+                    <p style={{ color: '#A0A0A0', fontSize: '9px', margin: 0, textTransform: 'uppercase', letterSpacing: '0.05em', fontWeight: '500' }}>
+                      MONTH-ON-MONTH
                     </p>
                     <p style={{ 
                       color: formattedKpiData?.monthOnMonth?.startsWith('+') ? '#00FF95' : '#FF6B6B', 
@@ -402,49 +353,112 @@ export default function DashboardClient({ session, kpiData, hasError }: Dashboar
               )}
             </div>
 
-            {/* Right - Refresh Controls */}
-            <div className="flex items-center space-x-3" style={{ paddingRight: '32px' }}>
-              {/* Last Updated Timestamp */}
-              <div className="text-right">
+            {/* Right Section - Controls */}
+            <div className="flex items-center space-x-4">
+              {/* Last Updated Timestamp + Refresh Icon */}
+              <div className="flex items-center space-x-2">
                 <p style={{ color: '#A0A0A0', fontSize: '10px', margin: 0 }}>
                   Last updated: {formatLastRefresh(kpiData?.lastUpdated || '')}
                 </p>
+                <button
+                  onClick={handleRetryKPI}
+                  disabled={isRetrying}
+                  className="p-1.5 rounded transition-all duration-200 flex items-center justify-center"
+                  style={{
+                    backgroundColor: isRetrying ? 'rgba(0, 255, 149, 0.3)' : 'transparent',
+                    border: '1px solid #00FF95',
+                    color: '#00FF95',
+                    width: '28px',
+                    height: '28px',
+                    opacity: isRetrying ? 0.7 : 1
+                  }}
+                  onMouseEnter={(e) => {
+                    if (!isRetrying) {
+                      e.currentTarget.style.backgroundColor = 'rgba(0, 255, 149, 0.1)';
+                      e.currentTarget.style.boxShadow = '0px 0px 8px rgba(0, 255, 149, 0.3)';
+                    }
+                  }}
+                  onMouseLeave={(e) => {
+                    if (!isRetrying) {
+                      e.currentTarget.style.backgroundColor = 'transparent';
+                      e.currentTarget.style.boxShadow = 'none';
+                    }
+                  }}
+                  title="Manual refresh"
+                >
+                  {isRetrying ? (
+                    <div className="animate-spin rounded-full h-3 w-3 border-b-2" style={{ borderColor: '#00FF95' }}></div>
+                  ) : (
+                    <svg className="w-3 h-3" fill="currentColor" viewBox="0 0 24 24">
+                      <path d="M17.65 6.35C16.2 4.9 14.21 4 12 4c-4.42 0-7.99 3.58-7.99 8s3.57 8 7.99 8c3.73 0 6.84-2.55 7.73-6h-2.08c-.82 2.33-3.04 4-5.65 4-3.31 0-6-2.69-6-6s2.69-6 6-6c1.66 0 3.14.69 4.22 1.78L13 11h7V4l-2.35 2.35z"/>
+                    </svg>
+                  )}
+                </button>
               </div>
-              
-              {/* Manual Refresh Button */}
+
+              {/* Privacy Eye Icon Toggle */}
               <button
-                onClick={handleRetryKPI}
-                disabled={isRetrying}
-                className="p-2 rounded-lg transition-all duration-200 flex items-center justify-center"
+                onClick={() => setIsPrivacyMode(!isPrivacyMode)}
+                className="p-2 rounded-full transition-all duration-200 flex items-center justify-center"
                 style={{
-                  backgroundColor: isRetrying ? 'rgba(0, 255, 149, 0.3)' : 'transparent',
+                  backgroundColor: isPrivacyMode ? '#00FF95' : 'transparent',
                   border: '1px solid #00FF95',
-                  color: '#00FF95',
-                  width: '32px',
-                  height: '32px',
-                  opacity: isRetrying ? 0.7 : 1
+                  color: isPrivacyMode ? '#1A1A1A' : '#00FF95',
+                  width: '36px',
+                  height: '36px'
                 }}
                 onMouseEnter={(e) => {
-                  if (!isRetrying) {
+                  if (!isPrivacyMode) {
                     e.currentTarget.style.backgroundColor = 'rgba(0, 255, 149, 0.1)';
                     e.currentTarget.style.boxShadow = '0px 0px 10px rgba(0, 255, 149, 0.3)';
                   }
                 }}
                 onMouseLeave={(e) => {
-                  if (!isRetrying) {
+                  if (!isPrivacyMode) {
                     e.currentTarget.style.backgroundColor = 'transparent';
                     e.currentTarget.style.boxShadow = 'none';
                   }
                 }}
-                title="Manual refresh"
               >
-                {isRetrying ? (
-                  <div className="animate-spin rounded-full h-4 w-4 border-b-2" style={{ borderColor: '#00FF95' }}></div>
-                ) : (
+                {isPrivacyMode ? (
+                  // Eye with slash icon (privacy ON)
                   <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
-                    <path d="M17.65 6.35C16.2 4.9 14.21 4 12 4c-4.42 0-7.99 3.58-7.99 8s3.57 8 7.99 8c3.73 0 6.84-2.55 7.73-6h-2.08c-.82 2.33-3.04 4-5.65 4-3.31 0-6-2.69-6-6s2.69-6 6-6c1.66 0 3.14.69 4.22 1.78L13 11h7V4l-2.35 2.35z"/>
+                    <path d="M12 4.5C7 4.5 2.73 7.61 1 12c1.73 4.39 6 7.5 11 7.5s9.27-3.11 11-7.5c-1.73-4.39-6-7.5-11-7.5zM12 17c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5-5 5zm0-8c-1.66 0-3 1.34-3 3s1.34 3 3 3 3-1.34 3-3-1.34-3-3-3z"/>
+                    <path d="M2 2l20 20" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/>
+                  </svg>
+                ) : (
+                  // Open eye icon (privacy OFF)
+                  <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
+                    <path d="M12 4.5C7 4.5 2.73 7.61 1 12c1.73 4.39 6 7.5 11 7.5s9.27-3.11 11-7.5c-1.73-4.39-6-7.5-11-7.5zM12 17c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5-5 5zm0-8c-1.66 0-3 1.34-3 3s1.34 3 3 3 3-1.34 3-3-1.34-3-3-3z"/>
                   </svg>
                 )}
+              </button>
+
+              {/* Exit Dev Mode Button */}
+              <button
+                onClick={handleSignOut}
+                className="px-4 py-2 rounded-lg transition-all duration-200 flex items-center gap-2"
+                style={{
+                  backgroundColor: '#00FF95',
+                  border: '1px solid #00FF95',
+                  color: '#1A1A1A',
+                  fontSize: '14px',
+                  fontWeight: '600',
+                  boxShadow: '0 0 10px rgba(0, 255, 149, 0.3)'
+                }}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.backgroundColor = 'rgba(0, 255, 149, 0.9)';
+                  e.currentTarget.style.boxShadow = '0 0 15px rgba(0, 255, 149, 0.5)';
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.backgroundColor = '#00FF95';
+                  e.currentTarget.style.boxShadow = '0 0 10px rgba(0, 255, 149, 0.3)';
+                }}
+              >
+                <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
+                  <path d="M17 7l-1.41 1.41L18.17 11H8v2h10.17l-2.58 2.58L17 17l5-5zM4 5h8V3H4c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h8v-2H4V5z"/>
+                </svg>
+                {isDevMode ? 'Exit Dev Mode' : 'Sign Out'}
               </button>
             </div>
           </div>
