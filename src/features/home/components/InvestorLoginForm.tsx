@@ -106,7 +106,7 @@ export function InvestorLoginForm() {
       </div>
 
           {/* Investor Login Section */}
-          <div className="bg-gray-800 rounded-xl p-6 mb-6">
+          <div className="rounded-xl p-6 mb-6" style={{ backgroundColor: '#1A1F1A' }}>
             <h2 className="text-white text-xl font-semibold text-left mb-6">
               Investor Login
             </h2>
