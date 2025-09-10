@@ -13,6 +13,14 @@ export default function DashboardPage() {
   const [activeTab, setActiveTab] = useState('portfolio');
   const [isPrivacyMode, setIsPrivacyMode] = useState(false);
   const [lastRefreshTime, setLastRefreshTime] = useState(new Date());
+  const [kpiData, setKpiData] = useState({
+    activeInvestors: '6',
+    totalAUM: '$21,684.25',
+    cumulativeReturn: '+21.1%',
+    monthOnMonth: '-7.8%'
+  });
+  const [isLoadingKPI, setIsLoadingKPI] = useState(false);
+  const [kpiError, setKpiError] = useState('');
 
   useEffect(() => {
     // Check for dev mode session
@@ -80,12 +88,48 @@ export default function DashboardPage() {
     });
   };
 
-  // Mock KPI data - in real app, this would come from API
-  const kpiData = {
-    activeInvestors: isPrivacyMode ? '•••' : '6',
-    totalAUM: isPrivacyMode ? '••••••' : '$21,684.25',
-    cumulativeReturn: isPrivacyMode ? '•••' : '+21.1%',
-    monthOnMonth: isPrivacyMode ? '•••' : '-7.8%'
+  // Fetch KPI data from Google Sheets
+  const fetchKPIData = async () => {
+    setIsLoadingKPI(true);
+    setKpiError('');
+    
+    try {
+      const response = await fetch('/api/get-kpi-data');
+      const data = await response.json();
+      
+      if (data.success && data.kpiData) {
+        // Transform the data to match our expected format
+        const transformedData = {
+          activeInvestors: data.kpiData.totalInvestors?.toString() || '0',
+          totalAUM: data.kpiData.totalAUM ? `$${parseFloat(data.kpiData.totalAUM).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}` : '$0.00',
+          cumulativeReturn: data.kpiData.cumulativeReturn ? `+${parseFloat(data.kpiData.cumulativeReturn).toFixed(1)}%` : '+0.0%',
+          monthOnMonth: data.kpiData.monthlyReturn ? `${parseFloat(data.kpiData.monthlyReturn) >= 0 ? '+' : ''}${parseFloat(data.kpiData.monthlyReturn).toFixed(1)}%` : '+0.0%'
+        };
+        
+        setKpiData(transformedData);
+        setLastRefreshTime(new Date());
+      } else {
+        throw new Error(data.error || 'Failed to fetch KPI data');
+      }
+    } catch (error) {
+      console.error('Error fetching KPI data:', error);
+      setKpiError(error instanceof Error ? error.message : 'Failed to load KPI data');
+    } finally {
+      setIsLoadingKPI(false);
+    }
+  };
+
+  // Load KPI data on component mount
+  useEffect(() => {
+    fetchKPIData();
+  }, []);
+
+  // Format KPI data with privacy mode
+  const formattedKpiData = {
+    activeInvestors: isPrivacyMode ? '•••' : kpiData.activeInvestors,
+    totalAUM: isPrivacyMode ? '••••••' : kpiData.totalAUM,
+    cumulativeReturn: isPrivacyMode ? '•••' : kpiData.cumulativeReturn,
+    monthOnMonth: isPrivacyMode ? '•••' : kpiData.monthOnMonth
   };
 
   if (status === 'loading' && !isDevMode) {
@@ -215,56 +259,98 @@ export default function DashboardPage() {
 
           {/* KPI Ribbon */}
           <div className="flex items-center justify-between py-4 border-b border-gray-700">
-            <div className="flex items-center space-x-8">
-              {/* Active Investors */}
-              <div className="text-center">
-                <p style={{ color: '#A0A0A0', fontSize: '12px', margin: 0, textTransform: 'uppercase', letterSpacing: '0.05em' }}>
-                  Active investors
-                </p>
-                <p style={{ color: '#FFFFFF', fontSize: '18px', fontWeight: '600', margin: '4px 0 0 0' }}>
-                  {kpiData.activeInvestors}
-                </p>
+            {kpiError ? (
+              /* Error State */
+              <div className="flex items-center space-x-4">
+                <div className="text-center">
+                  <p style={{ color: '#FF6B6B', fontSize: '14px', margin: 0 }}>
+                    ⚠️ Error loading KPI data
+                  </p>
+                  <p style={{ color: '#A0A0A0', fontSize: '12px', margin: '4px 0 0 0' }}>
+                    {kpiError}
+                  </p>
+                </div>
+                <button
+                  onClick={fetchKPIData}
+                  className="px-3 py-1 text-xs font-medium rounded transition-all duration-200"
+                  style={{
+                    backgroundColor: 'transparent',
+                    border: '1px solid #00FF95',
+                    color: '#00FF95'
+                  }}
+                  onMouseEnter={(e) => {
+                    e.currentTarget.style.backgroundColor = 'rgba(0, 255, 149, 0.1)';
+                  }}
+                  onMouseLeave={(e) => {
+                    e.currentTarget.style.backgroundColor = 'transparent';
+                  }}
+                >
+                  Retry
+                </button>
               </div>
+            ) : (
+              /* KPI Data */
+              <div className="flex items-center space-x-8">
+                {/* Active Investors */}
+                <div className="text-center">
+                  <p style={{ color: '#A0A0A0', fontSize: '12px', margin: 0, textTransform: 'uppercase', letterSpacing: '0.05em' }}>
+                    Active investors
+                  </p>
+                  <p style={{ color: '#FFFFFF', fontSize: '18px', fontWeight: '600', margin: '4px 0 0 0' }}>
+                    {isLoadingKPI ? '...' : formattedKpiData.activeInvestors}
+                  </p>
+                </div>
 
-              {/* Separator */}
-              <div style={{ width: '1px', height: '32px', backgroundColor: '#333' }}></div>
+                {/* Separator */}
+                <div style={{ width: '1px', height: '32px', backgroundColor: '#333' }}></div>
 
-              {/* Total AUM */}
-              <div className="text-center">
-                <p style={{ color: '#A0A0A0', fontSize: '12px', margin: 0, textTransform: 'uppercase', letterSpacing: '0.05em' }}>
-                  Total AUM
-                </p>
-                <p style={{ color: '#FFFFFF', fontSize: '18px', fontWeight: '600', margin: '4px 0 0 0' }}>
-                  {kpiData.totalAUM}
-                </p>
+                {/* Total AUM */}
+                <div className="text-center">
+                  <p style={{ color: '#A0A0A0', fontSize: '12px', margin: 0, textTransform: 'uppercase', letterSpacing: '0.05em' }}>
+                    Total AUM
+                  </p>
+                  <p style={{ color: '#FFFFFF', fontSize: '18px', fontWeight: '600', margin: '4px 0 0 0' }}>
+                    {isLoadingKPI ? '...' : formattedKpiData.totalAUM}
+                  </p>
+                </div>
+
+                {/* Separator */}
+                <div style={{ width: '1px', height: '32px', backgroundColor: '#333' }}></div>
+
+                {/* Cumulative Return */}
+                <div className="text-center">
+                  <p style={{ color: '#A0A0A0', fontSize: '12px', margin: 0, textTransform: 'uppercase', letterSpacing: '0.05em' }}>
+                    Cumulative Return
+                  </p>
+                  <p style={{ 
+                    color: formattedKpiData.cumulativeReturn.startsWith('+') ? '#00FF95' : '#FF6B6B', 
+                    fontSize: '18px', 
+                    fontWeight: '600', 
+                    margin: '4px 0 0 0' 
+                  }}>
+                    {isLoadingKPI ? '...' : formattedKpiData.cumulativeReturn}
+                  </p>
+                </div>
+
+                {/* Separator */}
+                <div style={{ width: '1px', height: '32px', backgroundColor: '#333' }}></div>
+
+                {/* Month-on-Month */}
+                <div className="text-center">
+                  <p style={{ color: '#A0A0A0', fontSize: '12px', margin: 0, textTransform: 'uppercase', letterSpacing: '0.05em' }}>
+                    Month-on-Month
+                  </p>
+                  <p style={{ 
+                    color: formattedKpiData.monthOnMonth.startsWith('+') ? '#00FF95' : '#FF6B6B', 
+                    fontSize: '18px', 
+                    fontWeight: '600', 
+                    margin: '4px 0 0 0' 
+                  }}>
+                    {isLoadingKPI ? '...' : formattedKpiData.monthOnMonth}
+                  </p>
+                </div>
               </div>
-
-              {/* Separator */}
-              <div style={{ width: '1px', height: '32px', backgroundColor: '#333' }}></div>
-
-              {/* Cumulative Return */}
-              <div className="text-center">
-                <p style={{ color: '#A0A0A0', fontSize: '12px', margin: 0, textTransform: 'uppercase', letterSpacing: '0.05em' }}>
-                  Cumulative Return
-                </p>
-                <p style={{ color: '#00FF95', fontSize: '18px', fontWeight: '600', margin: '4px 0 0 0' }}>
-                  {kpiData.cumulativeReturn}
-                </p>
-              </div>
-
-              {/* Separator */}
-              <div style={{ width: '1px', height: '32px', backgroundColor: '#333' }}></div>
-
-              {/* Month-on-Month */}
-              <div className="text-center">
-                <p style={{ color: '#A0A0A0', fontSize: '12px', margin: 0, textTransform: 'uppercase', letterSpacing: '0.05em' }}>
-                  Month-on-Month
-                </p>
-                <p style={{ color: '#FF6B6B', fontSize: '18px', fontWeight: '600', margin: '4px 0 0 0' }}>
-                  {kpiData.monthOnMonth}
-                </p>
-              </div>
-            </div>
+            )}
 
             {/* Last Updated Timestamp */}
             <div className="text-right">
