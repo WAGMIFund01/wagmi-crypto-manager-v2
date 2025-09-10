@@ -197,18 +197,18 @@ export default function DashboardClient({ session, kpiData, hasError }: Dashboar
 
   return (
     <div style={{ backgroundColor: '#0B0B0B' }}>
-      {/* Navigation Header */}
-      <header style={{ backgroundColor: '#0B0B0B', borderBottom: '1px solid #333' }}>
+      {/* Navigation Header - Option D: Two-Row Navbar with Clear Separation */}
+      <header style={{ backgroundColor: '#1A1A1A' }}>
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          {/* Top Row - Logo and Controls */}
-          <div className="flex justify-between items-center h-16">
+          {/* Row 1 - Brand + Controls */}
+          <div className="flex justify-between items-center h-18 py-4">
             {/* Left - WAGMI Logo */}
-            <div className="flex items-center" style={{ paddingLeft: '32px' }}>
+            <div className="flex items-center">
               <h1 
                 className="font-bold"
                 style={{ 
                   color: '#00FF95',
-                  fontSize: '32px',
+                  fontSize: '36px',
                   lineHeight: '1.2',
                   textShadow: '0 0 25px rgba(0, 255, 149, 0.6), 0 0 50px rgba(0, 255, 149, 0.4), 0 0 75px rgba(0, 255, 149, 0.2)',
                   letterSpacing: '0.05em'
@@ -219,199 +219,13 @@ export default function DashboardClient({ session, kpiData, hasError }: Dashboar
             </div>
             
             {/* Right - Controls */}
-            <div className="flex items-center gap-4">
-              {/* Privacy Toggle */}
-              <button
-                onClick={() => setIsPrivacyMode(!isPrivacyMode)}
-                className="p-2 rounded-lg transition-all duration-200 flex items-center justify-center"
-                style={{
-                  backgroundColor: isPrivacyMode ? '#00FF95' : 'transparent',
-                  border: '1px solid #00FF95',
-                  color: isPrivacyMode ? '#1A1A1A' : '#00FF95',
-                  width: '40px',
-                  height: '40px'
-                }}
-                onMouseEnter={(e) => {
-                  if (!isPrivacyMode) {
-                    e.currentTarget.style.backgroundColor = 'rgba(0, 255, 149, 0.1)';
-                    e.currentTarget.style.boxShadow = '0px 0px 10px rgba(0, 255, 149, 0.3)';
-                  }
-                }}
-                onMouseLeave={(e) => {
-                  if (!isPrivacyMode) {
-                    e.currentTarget.style.backgroundColor = 'transparent';
-                    e.currentTarget.style.boxShadow = 'none';
-                  }
-                }}
-              >
-                {isPrivacyMode ? (
-                  // Eye with slash icon (privacy ON)
-                  <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
-                    <path d="M12 4.5C7 4.5 2.73 7.61 1 12c1.73 4.39 6 7.5 11 7.5s9.27-3.11 11-7.5c-1.73-4.39-6-7.5-11-7.5zM12 17c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5-5 5zm0-8c-1.66 0-3 1.34-3 3s1.34 3 3 3 3-1.34 3-3-1.34-3-3-3z"/>
-                    <path d="M2 2l20 20" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/>
-                  </svg>
-                ) : (
-                  // Open eye icon (privacy OFF)
-                  <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
-                    <path d="M12 4.5C7 4.5 2.73 7.61 1 12c1.73 4.39 6 7.5 11 7.5s9.27-3.11 11-7.5c-1.73-4.39-6-7.5-11-7.5zM12 17c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5-5 5zm0-8c-1.66 0-3 1.34-3 3s1.34 3 3 3 3-1.34 3-3-1.34-3-3-3z"/>
-                  </svg>
-                )}
-              </button>
-
-              {/* Sign Out Button */}
-              <button
-                onClick={handleSignOut}
-                className="font-semibold py-2 px-4 rounded-lg transition-all duration-200"
-                style={{
-                  backgroundColor: 'transparent',
-                  border: '1px solid #00FF95',
-                  color: '#00FF95',
-                  boxShadow: 'none'
-                }}
-                onMouseEnter={(e) => {
-                  e.currentTarget.style.backgroundColor = 'rgba(0, 255, 149, 0.1)';
-                  e.currentTarget.style.boxShadow = '0px 0px 10px rgba(0, 255, 149, 0.3)';
-                }}
-                onMouseLeave={(e) => {
-                  e.currentTarget.style.backgroundColor = 'transparent';
-                  e.currentTarget.style.boxShadow = 'none';
-                }}
-              >
-                {isDevMode ? 'Exit Dev Mode' : 'Sign Out'}
-              </button>
-            </div>
-          </div>
-
-          {/* Navigation Tabs with KPI Ribbon and Refresh Controls */}
-          <div className="flex items-center justify-between border-b border-gray-700 py-4">
-            {/* Left - Navigation Tabs */}
-            <nav className="flex space-x-8" style={{ paddingLeft: '32px' }}>
-              {[
-                { id: 'portfolio', label: 'Portfolio Overview' },
-                { id: 'analytics', label: 'Analytics' },
-                { id: 'investors', label: 'Investors' }
-              ].map((tab) => (
-                <button
-                  key={tab.id}
-                  onClick={() => setActiveTab(tab.id)}
-                  className="py-2 px-1 text-sm font-medium transition-colors duration-200 relative"
-                  style={{
-                    color: activeTab === tab.id ? '#00FF95' : '#A0A0A0',
-                    borderBottom: activeTab === tab.id ? '2px solid #00FF95' : '2px solid transparent'
-                  }}
-                >
-                  {tab.label}
-                </button>
-              ))}
-            </nav>
-
-            {/* Center - KPI Ribbon */}
-            <div className="flex-1 flex justify-center">
-              {hasError ? (
-                /* Error State */
-                <div className="flex items-center space-x-4">
-                  <div className="flex items-center space-x-3">
-                    {/* Error Icon */}
-                    <div 
-                      className="flex items-center justify-center rounded-full"
-                      style={{
-                        width: '32px',
-                        height: '32px',
-                        backgroundColor: 'rgba(255, 107, 107, 0.1)',
-                        border: '1px solid #FF6B6B'
-                      }}
-                    >
-                      <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 24 24" style={{ color: '#FF6B6B' }}>
-                        <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/>
-                      </svg>
-                    </div>
-                    
-                    {/* Error Message */}
-                    <div>
-                      <p style={{ color: '#FF6B6B', fontSize: '14px', fontWeight: '600', margin: 0 }}>
-                        KPI Data Unavailable
-                      </p>
-                      <p style={{ color: '#A0A0A0', fontSize: '10px', margin: '2px 0 0 0' }}>
-                        Unable to connect to Google Sheets
-                      </p>
-                    </div>
-                  </div>
-                </div>
-              ) : (
-                /* KPI Data */
-                <div className="flex items-center space-x-6">
-                  {/* Active Investors */}
-                  <div className="text-center">
-                    <p style={{ color: '#A0A0A0', fontSize: '10px', margin: 0, textTransform: 'uppercase', letterSpacing: '0.05em' }}>
-                      Active investors
-                    </p>
-                    <p style={{ color: '#FFFFFF', fontSize: '16px', fontWeight: '600', margin: '2px 0 0 0' }}>
-                      {formattedKpiData?.activeInvestors || '--'}
-                    </p>
-                  </div>
-
-                  {/* Separator */}
-                  <div style={{ width: '1px', height: '24px', backgroundColor: '#333' }}></div>
-
-                  {/* Total AUM */}
-                  <div className="text-center">
-                    <p style={{ color: '#A0A0A0', fontSize: '10px', margin: 0, textTransform: 'uppercase', letterSpacing: '0.05em' }}>
-                      Total AUM
-                    </p>
-                    <p style={{ color: '#FFFFFF', fontSize: '16px', fontWeight: '600', margin: '2px 0 0 0' }}>
-                      {formattedKpiData?.totalAUM || '--'}
-                    </p>
-                  </div>
-
-                  {/* Separator */}
-                  <div style={{ width: '1px', height: '24px', backgroundColor: '#333' }}></div>
-
-                  {/* Cumulative Return */}
-                  <div className="text-center">
-                    <p style={{ color: '#A0A0A0', fontSize: '10px', margin: 0, textTransform: 'uppercase', letterSpacing: '0.05em' }}>
-                      Cumulative Return
-                    </p>
-                    <p style={{ 
-                      color: formattedKpiData?.cumulativeReturn?.startsWith('+') ? '#00FF95' : '#FF6B6B', 
-                      fontSize: '16px', 
-                      fontWeight: '600', 
-                      margin: '2px 0 0 0' 
-                    }}>
-                      {formattedKpiData?.cumulativeReturn || '--'}
-                    </p>
-                  </div>
-
-                  {/* Separator */}
-                  <div style={{ width: '1px', height: '24px', backgroundColor: '#333' }}></div>
-
-                  {/* Month-on-Month */}
-                  <div className="text-center">
-                    <p style={{ color: '#A0A0A0', fontSize: '10px', margin: 0, textTransform: 'uppercase', letterSpacing: '0.05em' }}>
-                      Month-on-Month
-                    </p>
-                    <p style={{ 
-                      color: formattedKpiData?.monthOnMonth?.startsWith('+') ? '#00FF95' : '#FF6B6B', 
-                      fontSize: '16px', 
-                      fontWeight: '600', 
-                      margin: '2px 0 0 0' 
-                    }}>
-                      {formattedKpiData?.monthOnMonth || '--'}
-                    </p>
-                  </div>
-                </div>
-              )}
-            </div>
-
-            {/* Right - Refresh Controls */}
-            <div className="flex items-center space-x-3" style={{ paddingRight: '32px' }}>
+            <div className="flex items-center space-x-4">
               {/* Last Updated Timestamp */}
-              <div className="text-right">
-                <p style={{ color: '#A0A0A0', fontSize: '10px', margin: 0 }}>
-                  Last updated: {formatLastRefresh(kpiData?.lastUpdated || '')}
-                </p>
-              </div>
+              <p style={{ color: '#A0A0A0', fontSize: '12px', margin: 0 }}>
+                Last updated: {formatLastRefresh(kpiData?.lastUpdated || '')}
+              </p>
               
-              {/* Manual Refresh Button */}
+              {/* Refresh Icon */}
               <button
                 onClick={handleRetryKPI}
                 disabled={isRetrying}
@@ -420,8 +234,8 @@ export default function DashboardClient({ session, kpiData, hasError }: Dashboar
                   backgroundColor: isRetrying ? 'rgba(0, 255, 149, 0.3)' : 'transparent',
                   border: '1px solid #00FF95',
                   color: '#00FF95',
-                  width: '32px',
-                  height: '32px',
+                  width: '36px',
+                  height: '36px',
                   opacity: isRetrying ? 0.7 : 1
                 }}
                 onMouseEnter={(e) => {
@@ -446,6 +260,190 @@ export default function DashboardClient({ session, kpiData, hasError }: Dashboar
                   </svg>
                 )}
               </button>
+
+              {/* Privacy Toggle - Eye Icon */}
+              <button
+                onClick={() => setIsPrivacyMode(!isPrivacyMode)}
+                className="p-2 rounded-full transition-all duration-200 flex items-center justify-center"
+                style={{
+                  backgroundColor: isPrivacyMode ? '#00FF95' : 'transparent',
+                  border: '1px solid #00FF95',
+                  color: isPrivacyMode ? '#1A1A1A' : '#00FF95',
+                  width: '36px',
+                  height: '36px'
+                }}
+                onMouseEnter={(e) => {
+                  if (!isPrivacyMode) {
+                    e.currentTarget.style.backgroundColor = 'rgba(0, 255, 149, 0.1)';
+                    e.currentTarget.style.boxShadow = '0px 0px 10px rgba(0, 255, 149, 0.3)';
+                  }
+                }}
+                onMouseLeave={(e) => {
+                  if (!isPrivacyMode) {
+                    e.currentTarget.style.backgroundColor = 'transparent';
+                    e.currentTarget.style.boxShadow = 'none';
+                  }
+                }}
+              >
+                {isPrivacyMode ? (
+                  // Eye with slash icon (privacy ON)
+                  <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
+                    <path d="M12 4.5C7 4.5 2.73 7.61 1 12c1.73 4.39 6 7.5 11 7.5s9.27-3.11 11-7.5c-1.73-4.39-6-7.5-11-7.5zM12 17c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5-5 5zm0-8c-1.66 0-3 1.34-3 3s1.34 3 3 3 3-1.34 3-3-1.34-3-3-3z"/>
+                    <path d="M2 2l20 20" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/>
+                  </svg>
+                ) : (
+                  // Open eye icon (privacy OFF)
+                  <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
+                    <path d="M12 4.5C7 4.5 2.73 7.61 1 12c1.73 4.39 6 7.5 11 7.5s9.27-3.11 11-7.5c-1.73-4.39-6-7.5-11-7.5zM12 17c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5-5 5zm0-8c-1.66 0-3 1.34-3 3s1.34 3 3 3 3-1.34 3-3-1.34-3-3-3z"/>
+                  </svg>
+                )}
+              </button>
+
+              {/* Exit Dev Mode Button */}
+              <button
+                onClick={handleSignOut}
+                className="px-4 py-2 rounded-lg transition-all duration-200 flex items-center gap-2"
+                style={{
+                  backgroundColor: 'transparent',
+                  border: '1px solid #00FF95',
+                  color: '#00FF95',
+                  fontSize: '14px',
+                  fontWeight: '500'
+                }}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.backgroundColor = 'rgba(0, 255, 149, 0.1)';
+                  e.currentTarget.style.boxShadow = '0px 0px 10px rgba(0, 255, 149, 0.3)';
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.backgroundColor = 'transparent';
+                  e.currentTarget.style.boxShadow = 'none';
+                }}
+              >
+                <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
+                  <path d="M17 7l-1.41 1.41L18.17 11H8v2h10.17l-2.58 2.58L17 17l5-5zM4 5h8V3H4c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h8v-2H4V5z"/>
+                </svg>
+                {isDevMode ? 'Exit Dev Mode' : 'Sign Out'}
+              </button>
+            </div>
+          </div>
+
+          {/* Row 2 - Navigation Tabs + KPI Ribbon */}
+          <div className="flex items-center justify-between h-16 py-3" style={{ borderBottom: '1px solid #333' }}>
+            {/* Left - Navigation Tabs */}
+            <nav className="flex space-x-8">
+              {[
+                { id: 'portfolio', label: 'Portfolio Overview' },
+                { id: 'analytics', label: 'Analytics' },
+                { id: 'investors', label: 'Investors' }
+              ].map((tab) => (
+                <button
+                  key={tab.id}
+                  onClick={() => setActiveTab(tab.id)}
+                  className="py-2 px-1 text-sm font-medium transition-all duration-200 relative"
+                  style={{
+                    color: activeTab === tab.id ? '#00FF95' : '#A0A0A0',
+                    borderBottom: activeTab === tab.id ? '2px solid #00FF95' : '2px solid transparent',
+                    textShadow: activeTab === tab.id ? '0 0 10px rgba(0, 255, 149, 0.5)' : 'none'
+                  }}
+                  onMouseEnter={(e) => {
+                    if (activeTab !== tab.id) {
+                      e.currentTarget.style.color = '#FFFFFF';
+                      e.currentTarget.style.textShadow = '0 0 5px rgba(0, 255, 149, 0.3)';
+                    }
+                  }}
+                  onMouseLeave={(e) => {
+                    if (activeTab !== tab.id) {
+                      e.currentTarget.style.color = '#A0A0A0';
+                      e.currentTarget.style.textShadow = 'none';
+                    }
+                  }}
+                >
+                  {tab.label}
+                </button>
+              ))}
+            </nav>
+
+            {/* Right - KPI Ribbon */}
+            <div className="flex items-center space-x-6">
+              {hasError ? (
+                /* Error State */
+                <div className="flex items-center space-x-3">
+                  {/* Error Icon */}
+                  <div 
+                    className="flex items-center justify-center rounded-full"
+                    style={{
+                      width: '28px',
+                      height: '28px',
+                      backgroundColor: 'rgba(255, 107, 107, 0.1)',
+                      border: '1px solid #FF6B6B'
+                    }}
+                  >
+                    <svg className="w-3 h-3" fill="currentColor" viewBox="0 0 24 24" style={{ color: '#FF6B6B' }}>
+                      <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/>
+                    </svg>
+                  </div>
+                  
+                  {/* Error Message */}
+                  <div>
+                    <p style={{ color: '#FF6B6B', fontSize: '12px', fontWeight: '600', margin: 0 }}>
+                      KPI Data Unavailable
+                    </p>
+                  </div>
+                </div>
+              ) : (
+                /* KPI Data - Four evenly spaced metrics */
+                <>
+                  {/* Active Investors */}
+                  <div className="text-center" style={{ minWidth: '80px' }}>
+                    <p style={{ color: '#A0A0A0', fontSize: '9px', margin: 0, textTransform: 'uppercase', letterSpacing: '0.05em', fontWeight: '500' }}>
+                      Active Investors
+                    </p>
+                    <p style={{ color: '#FFFFFF', fontSize: '14px', fontWeight: '600', margin: '2px 0 0 0' }}>
+                      {formattedKpiData?.activeInvestors || '--'}
+                    </p>
+                  </div>
+
+                  {/* Total AUM */}
+                  <div className="text-center" style={{ minWidth: '80px' }}>
+                    <p style={{ color: '#A0A0A0', fontSize: '9px', margin: 0, textTransform: 'uppercase', letterSpacing: '0.05em', fontWeight: '500' }}>
+                      Total AUM
+                    </p>
+                    <p style={{ color: '#FFFFFF', fontSize: '14px', fontWeight: '600', margin: '2px 0 0 0' }}>
+                      {formattedKpiData?.totalAUM || '--'}
+                    </p>
+                  </div>
+
+                  {/* Cumulative Return */}
+                  <div className="text-center" style={{ minWidth: '80px' }}>
+                    <p style={{ color: '#A0A0A0', fontSize: '9px', margin: 0, textTransform: 'uppercase', letterSpacing: '0.05em', fontWeight: '500' }}>
+                      Cumulative Return
+                    </p>
+                    <p style={{ 
+                      color: formattedKpiData?.cumulativeReturn?.startsWith('+') ? '#00FF95' : '#FF4D4D', 
+                      fontSize: '14px', 
+                      fontWeight: '600', 
+                      margin: '2px 0 0 0' 
+                    }}>
+                      {formattedKpiData?.cumulativeReturn || '--'}
+                    </p>
+                  </div>
+
+                  {/* Month-on-Month */}
+                  <div className="text-center" style={{ minWidth: '80px' }}>
+                    <p style={{ color: '#A0A0A0', fontSize: '9px', margin: 0, textTransform: 'uppercase', letterSpacing: '0.05em', fontWeight: '500' }}>
+                      Month-on-Month
+                    </p>
+                    <p style={{ 
+                      color: formattedKpiData?.monthOnMonth?.startsWith('+') ? '#00FF95' : '#FF4D4D', 
+                      fontSize: '14px', 
+                      fontWeight: '600', 
+                      margin: '2px 0 0 0' 
+                    }}>
+                      {formattedKpiData?.monthOnMonth || '--'}
+                    </p>
+                  </div>
+                </>
+              )}
             </div>
           </div>
         </div>
