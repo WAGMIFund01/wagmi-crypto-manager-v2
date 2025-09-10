@@ -125,23 +125,33 @@ export default function DashboardClient({ session, kpiData, hasError }: Dashboar
     try {
       let date: Date;
       
-      // Try parsing as-is first
-      date = new Date(timestamp);
-      
-      // If that fails, try common Google Sheets formats
-      if (isNaN(date.getTime())) {
-        // Try replacing hyphens with slashes (more compatible)
-        const normalizedTimestamp = timestamp.replace(/-/g, '/');
-        date = new Date(normalizedTimestamp);
-      }
-      
-      // If still fails, try parsing the specific format
-      if (isNaN(date.getTime())) {
-        // Handle format: "2024-01-15 14:30:00"
-        const match = timestamp.match(/(\d{4})-(\d{2})-(\d{2})\s+(\d{2}):(\d{2}):(\d{2})/);
-        if (match) {
-          const [, year, month, day, hour, minute, second] = match;
-          date = new Date(parseInt(year), parseInt(month) - 1, parseInt(day), parseInt(hour), parseInt(minute), parseInt(second));
+      // Check if it's an Excel serial number (Google Sheets converts dates to this)
+      const serialNumber = parseFloat(timestamp);
+      if (!isNaN(serialNumber) && serialNumber > 0) {
+        // Excel serial date: days since January 1, 1900
+        // Google Sheets uses 1899-12-30 as epoch (Excel uses 1900-01-01)
+        const excelEpoch = new Date(1899, 11, 30); // December 30, 1899
+        date = new Date(excelEpoch.getTime() + (serialNumber * 24 * 60 * 60 * 1000));
+        console.log('Converted Excel serial date:', serialNumber, 'to:', date);
+      } else {
+        // Try parsing as regular date string
+        date = new Date(timestamp);
+        
+        // If that fails, try common Google Sheets formats
+        if (isNaN(date.getTime())) {
+          // Try replacing hyphens with slashes (more compatible)
+          const normalizedTimestamp = timestamp.replace(/-/g, '/');
+          date = new Date(normalizedTimestamp);
+        }
+        
+        // If still fails, try parsing the specific format
+        if (isNaN(date.getTime())) {
+          // Handle format: "2024-01-15 14:30:00"
+          const match = timestamp.match(/(\d{4})-(\d{2})-(\d{2})\s+(\d{2}):(\d{2}):(\d{2})/);
+          if (match) {
+            const [, year, month, day, hour, minute, second] = match;
+            date = new Date(parseInt(year), parseInt(month) - 1, parseInt(day), parseInt(hour), parseInt(minute), parseInt(second));
+          }
         }
       }
       
