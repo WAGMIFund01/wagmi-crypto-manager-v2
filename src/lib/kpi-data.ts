@@ -9,6 +9,7 @@ export interface KPIData {
   totalAUM: number;
   cumulativeReturn: number;
   monthlyReturn: number;
+  lastUpdated: string; // Timestamp from Google Sheets
 }
 
 export async function fetchKPIData(): Promise<KPIData | null> {
@@ -56,7 +57,8 @@ export async function fetchKPIData(): Promise<KPIData | null> {
       totalInvested: 0,
       totalAUM: 0,
       cumulativeReturn: 0,
-      monthlyReturn: 0
+      monthlyReturn: 0,
+      lastUpdated: ''
     };
     
     const rows = data.table.rows;
@@ -84,6 +86,9 @@ export async function fetchKPIData(): Promise<KPIData | null> {
               break;
             case 'monthly return':
               kpiData.monthlyReturn = parseFloat(value) || 0;
+              break;
+            case 'last updated':
+              kpiData.lastUpdated = value.toString();
               break;
           }
         }

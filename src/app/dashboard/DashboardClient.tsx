@@ -21,6 +21,7 @@ interface DashboardClientProps {
     totalAUM: string;
     cumulativeReturn: string;
     monthOnMonth: string;
+    lastUpdated: string;
   } | null;
   hasError: boolean;
 }
@@ -92,8 +93,20 @@ export default function DashboardClient({ session, kpiData, hasError }: Dashboar
   const handleRetryKPI = async () => {
     setIsRetrying(true);
     try {
-      // Force a page refresh to trigger server-side data fetch
-      window.location.reload();
+      // Call revalidation API to clear cache
+      const response = await fetch('/api/revalidate-kpi', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      });
+      
+      if (response.ok) {
+        // Reload page after successful revalidation
+        window.location.reload();
+      } else {
+        throw new Error('Failed to revalidate dashboard');
+      }
     } catch (error) {
       console.error('Error retrying KPI data:', error);
       setIsRetrying(false);
@@ -103,13 +116,21 @@ export default function DashboardClient({ session, kpiData, hasError }: Dashboar
   // Use dev session if in dev mode, otherwise use OAuth session
   const currentSession = isDevMode ? devSession : session;
 
-  // Format timestamp for display (static since data is fetched on server)
-  const formatLastRefresh = () => {
-    return new Date().toLocaleTimeString('en-US', { 
-      hour: 'numeric', 
-      minute: '2-digit',
-      hour12: true 
-    });
+  // Format timestamp for display from Google Sheets data
+  const formatLastRefresh = (timestamp: string) => {
+    if (!timestamp) return 'Unknown';
+    
+    try {
+      const date = new Date(timestamp);
+      return date.toLocaleTimeString('en-US', { 
+        hour: 'numeric', 
+        minute: '2-digit',
+        hour12: true 
+      });
+    } catch (error) {
+      console.error('Error parsing timestamp:', error);
+      return 'Invalid date';
+    }
   };
 
   // Format KPI data with privacy mode (only if we have data)
@@ -348,7 +369,7 @@ export default function DashboardClient({ session, kpiData, hasError }: Dashboar
               {/* Last Updated Timestamp */}
               <div className="text-right">
                 <p style={{ color: '#A0A0A0', fontSize: '10px', margin: 0 }}>
-                  Last updated: {formatLastRefresh()}
+                  Last updated: {formatLastRefresh(kpiData?.lastUpdated || '')}
                 </p>
               </div>
               

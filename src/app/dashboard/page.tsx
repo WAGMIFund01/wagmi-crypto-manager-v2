@@ -19,7 +19,8 @@ export default async function DashboardPage() {
     activeInvestors: kpiData.totalInvestors.toString(),
     totalAUM: `$${kpiData.totalAUM.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`,
     cumulativeReturn: `+${kpiData.cumulativeReturn.toFixed(1)}%`,
-    monthOnMonth: `${kpiData.monthlyReturn >= 0 ? '+' : ''}${kpiData.monthlyReturn.toFixed(1)}%`
+    monthOnMonth: `${kpiData.monthlyReturn >= 0 ? '+' : ''}${kpiData.monthlyReturn.toFixed(1)}%`,
+    lastUpdated: kpiData.lastUpdated
   } : null;
 
   // Always render the client component - let it handle authentication
