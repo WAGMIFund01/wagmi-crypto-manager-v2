@@ -22,17 +22,8 @@ export default async function DashboardPage() {
     monthOnMonth: `${finalKpiData.monthlyReturn >= 0 ? '+' : ''}${finalKpiData.monthlyReturn.toFixed(1)}%`
   };
 
-  // Check if user has access
-  if (!session || session.user?.role !== 'manager') {
-    return (
-      <div className="flex items-center justify-center min-h-screen" style={{ backgroundColor: '#0B0B0B' }}>
-        <div className="text-center">
-          <p style={{ color: '#E0E0E0' }}>Access denied. Redirecting...</p>
-        </div>
-      </div>
-    );
-  }
-
+  // Always render the client component - let it handle authentication
+  // This allows dev mode sessions to work properly
   return (
     <DashboardClient 
       session={session}

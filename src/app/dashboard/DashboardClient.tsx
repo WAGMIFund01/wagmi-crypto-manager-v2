@@ -31,6 +31,7 @@ export default function DashboardClient({ session, kpiData, hasError }: Dashboar
   const [isDevMode, setIsDevMode] = useState(false);
   const [activeTab, setActiveTab] = useState('portfolio');
   const [isPrivacyMode, setIsPrivacyMode] = useState(false);
+  const [isCheckingAuth, setIsCheckingAuth] = useState(true);
 
   useEffect(() => {
     // Check for dev mode session
@@ -42,6 +43,7 @@ export default function DashboardClient({ session, kpiData, hasError }: Dashboar
         const parsedDevSession = JSON.parse(devSessionData);
         setDevSession(parsedDevSession);
         setIsDevMode(true);
+        setIsCheckingAuth(false);
         return; // Skip OAuth session checks in dev mode
       } catch (error) {
         console.error('Error parsing dev session:', error);
@@ -68,6 +70,8 @@ export default function DashboardClient({ session, kpiData, hasError }: Dashboar
       router.push('/');
       return;
     }
+    
+    setIsCheckingAuth(false);
   }, [session, router]);
 
   const handleSignOut = () => {
@@ -103,6 +107,18 @@ export default function DashboardClient({ session, kpiData, hasError }: Dashboar
     cumulativeReturn: isPrivacyMode ? '•••' : kpiData.cumulativeReturn,
     monthOnMonth: isPrivacyMode ? '•••' : kpiData.monthOnMonth
   };
+
+  // Show loading state while checking authentication
+  if (isCheckingAuth) {
+    return (
+      <div className="flex items-center justify-center min-h-screen" style={{ backgroundColor: '#0B0B0B' }}>
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 mx-auto mb-4" style={{ borderColor: '#00FF95' }}></div>
+          <p style={{ color: '#E0E0E0' }}>Loading...</p>
+        </div>
+      </div>
+    );
+  }
 
   if (!currentSession || currentSession.user?.role !== 'manager') {
     return null;
