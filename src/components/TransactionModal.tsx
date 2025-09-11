@@ -70,20 +70,26 @@ export default function TransactionModal({ isOpen, onClose, investorId, investor
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
-      {/* Backdrop */}
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 animate-in fade-in duration-300">
+      {/* Frosted Glass Backdrop */}
       <div 
-        className="absolute inset-0 bg-black bg-opacity-75"
+        className="absolute inset-0 transition-all duration-300 animate-in fade-in"
+        style={{
+          background: 'rgba(0, 0, 0, 0.5)',
+          backdropFilter: 'blur(8px)',
+          WebkitBackdropFilter: 'blur(8px)'
+        }}
         onClick={onClose}
       />
       
       {/* Modal Content */}
       <div 
-        className="relative w-full max-w-4xl max-h-[90vh] overflow-hidden rounded-2xl"
+        className="relative w-full max-w-4xl max-h-[90vh] overflow-hidden rounded-2xl transition-all duration-300 animate-in zoom-in-95 slide-in-from-bottom-4"
         style={{
           backgroundColor: '#1A1F1A',
           borderRadius: '16px',
-          boxShadow: '0 8px 32px rgba(0, 0, 0, 0.4), 0 0 0 1px rgba(255, 255, 255, 0.05), 0 0 15px rgba(0, 255, 149, 0.1)'
+          boxShadow: '0 8px 32px rgba(0, 0, 0, 0.4), 0 0 0 1px rgba(255, 255, 255, 0.05), 0 0 15px rgba(0, 255, 149, 0.1), 0 0 30px rgba(0, 255, 149, 0.05), 0 0 50px rgba(0, 255, 149, 0.02)',
+          border: '1px solid rgba(0, 255, 149, 0.1)'
         }}
       >
         {/* Header */}
