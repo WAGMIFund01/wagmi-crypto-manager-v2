@@ -92,23 +92,35 @@ export default function ButtonDemo() {
           </div>
         </section>
 
-        {/* Icon Buttons */}
+        {/* Icon-Only Buttons */}
         <section className="mb-12">
-          <h2 className="text-xl font-semibold text-white mb-4">Icon Buttons</h2>
+          <h2 className="text-xl font-semibold text-white mb-4">Icon-Only Buttons (size="icon")</h2>
           <div className="flex flex-wrap gap-4">
-            <WagmiButton variant="icon" theme="green" size="sm" icon={<DevIcon />} />
-            <WagmiButton variant="icon" theme="green" size="md" icon={<ManagerIcon />} />
-            <WagmiButton variant="icon" theme="green" size="lg" icon={<RefreshIcon />} />
-            <WagmiButton variant="icon" theme="orange" size="md" icon={<DevIcon />} />
-            <WagmiButton variant="icon" theme="blue" size="md" icon={<EyeIcon />} />
-            <WagmiButton variant="icon" theme="red" size="md" icon={<SignOutIcon />} />
-            <WagmiButton variant="icon" theme="gray" size="md" icon={<RefreshIcon />} />
+            <WagmiButton variant="outline" theme="green" size="icon" icon={<RefreshIcon className="w-3 h-3" />} />
+            <WagmiButton variant="primary" theme="green" size="icon" icon={<EyeIcon className="w-3 h-3" />} />
+            <WagmiButton variant="outline" theme="orange" size="icon" icon={<DevIcon className="w-3 h-3" />} />
+            <WagmiButton variant="outline" theme="blue" size="icon" icon={<ManagerIcon className="w-3 h-3" />} />
+            <WagmiButton variant="outline" theme="red" size="icon" icon={<SignOutIcon className="w-3 h-3" />} />
+            <WagmiButton variant="outline" theme="gray" size="icon" icon={<RefreshIcon className="w-3 h-3" />} />
           </div>
         </section>
 
-        {/* Buttons with Icons */}
+        {/* Buttons with Icons (Different Sizes) */}
         <section className="mb-12">
-          <h2 className="text-xl font-semibold text-white mb-4">Buttons with Icons</h2>
+          <h2 className="text-xl font-semibold text-white mb-4">Buttons with Icons (Different Sizes)</h2>
+          <div className="flex flex-wrap gap-4">
+            <WagmiButton variant="outline" theme="green" size="sm" icon={<DevIcon />}>Small</WagmiButton>
+            <WagmiButton variant="outline" theme="green" size="md" icon={<ManagerIcon />}>Medium</WagmiButton>
+            <WagmiButton variant="outline" theme="green" size="lg" icon={<RefreshIcon />}>Large</WagmiButton>
+            <WagmiButton variant="primary" theme="orange" size="md" icon={<DevIcon />}>Orange</WagmiButton>
+            <WagmiButton variant="primary" theme="blue" size="md" icon={<EyeIcon />}>Blue</WagmiButton>
+            <WagmiButton variant="primary" theme="red" size="md" icon={<SignOutIcon />}>Red</WagmiButton>
+          </div>
+        </section>
+
+        {/* Real Usage Examples */}
+        <section className="mb-12">
+          <h2 className="text-xl font-semibold text-white mb-4">Real Usage Examples</h2>
           <div className="flex flex-wrap gap-4">
             <WagmiButton variant="outline" theme="orange" icon={<DevIcon />}>
               Dev Access

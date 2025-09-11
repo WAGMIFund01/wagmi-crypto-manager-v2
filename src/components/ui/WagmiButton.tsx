@@ -275,7 +275,7 @@ const WagmiButton = forwardRef<HTMLButtonElement, WagmiButtonProps>(
         
         {/* Icon-only button - render icon directly without margin */}
         {!loading && icon && !children && (
-          <span className={iconSizeClasses.icon}>
+          <span className={iconSizeClass}>
             {icon}
           </span>
         )}
