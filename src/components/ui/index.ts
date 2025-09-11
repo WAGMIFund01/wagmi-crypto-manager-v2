@@ -5,6 +5,7 @@ export { default as WagmiCard } from './WagmiCard';
 export { default as WagmiInput } from './WagmiInput';
 export { default as FilterChip } from './FilterChip';
 export { default as FilterGroup } from './FilterGroup';
+export { default as StackedBarChart } from './StackedBarChart';
 
 // Icons
 export * from './icons/WagmiIcons';

@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { PortfolioAsset } from '@/app/api/get-portfolio-data/route';
+import { StackedBarChart } from '@/components/ui';
 
 interface PortfolioOverviewProps {
   className?: string;
@@ -162,73 +163,35 @@ export default function PortfolioOverview({ className }: PortfolioOverviewProps)
     'Stablecoin': '#6B7280'
   };
 
-  const renderStackedBarChart = (
-    title: string,
-    data: { [key: string]: number },
-    colors: { [key: string]: string } | string[],
-    maxItems: number = 10
-  ) => {
-    const sortedEntries = Object.entries(data)
-      .sort(([,a], [,b]) => b - a)
-      .slice(0, maxItems);
-    
-    const total = sortedEntries.reduce((sum, [, value]) => sum + value, 0);
-    
-    return (
-      <div className="bg-gray-800/50 border border-gray-700 rounded-lg p-6">
-        <h3 className="text-lg font-semibold text-white mb-4">{title}</h3>
-        <div className="space-y-3">
-          {/* Stacked Bar */}
-          <div className="h-8 bg-gray-700 rounded-lg overflow-hidden flex">
-            {sortedEntries.map(([key, value], index) => {
-              const percentage = (value / total) * 100;
-              const color = Array.isArray(colors) ? colors[index % colors.length] : colors[key];
-              return (
-                <div
-                  key={key}
-                  className="h-full transition-all duration-300 hover:opacity-80"
-                  style={{
-                    width: `${percentage}%`,
-                    backgroundColor: color,
-                  }}
-                  title={`${key}: ${formatCurrency(value)} (${percentage.toFixed(1)}%)`}
-                />
-              );
-            })}
-          </div>
-          
-          {/* Legend */}
-          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-2 text-xs">
-            {sortedEntries.map(([key, value], index) => {
-              const percentage = (value / total) * 100;
-              const color = Array.isArray(colors) ? colors[index % colors.length] : colors[key];
-              return (
-                <div key={key} className="flex items-center space-x-2">
-                  <div 
-                    className="w-3 h-3 rounded-sm flex-shrink-0"
-                    style={{ backgroundColor: color }}
-                  />
-                  <div className="min-w-0">
-                    <div className="text-gray-300 truncate" title={key}>{key}</div>
-                    <div className="text-gray-400">{percentage.toFixed(1)}%</div>
-                  </div>
-                </div>
-              );
-            })}
-          </div>
-        </div>
-      </div>
-    );
-  };
 
   return (
     <div className={`${className} space-y-6`}>
-      {/* Portfolio Distribution Charts */}
+      {/* Portfolio Breakdown Charts */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        {renderStackedBarChart('Distribution by Asset', assetDistribution, assetColors)}
-        {renderStackedBarChart('Distribution by Risk', riskDistribution, riskColors)}
-        {renderStackedBarChart('Distribution by Location', locationDistribution, locationColors)}
-        {renderStackedBarChart('Distribution by Type', typeDistribution, typeColors)}
+        <StackedBarChart
+          title="Breakdown by Asset"
+          data={assetDistribution}
+          colors={assetColors}
+          formatValue={formatCurrency}
+        />
+        <StackedBarChart
+          title="Breakdown by Risk"
+          data={riskDistribution}
+          colors={riskColors}
+          formatValue={formatCurrency}
+        />
+        <StackedBarChart
+          title="Breakdown by Location"
+          data={locationDistribution}
+          colors={locationColors}
+          formatValue={formatCurrency}
+        />
+        <StackedBarChart
+          title="Breakdown by Type"
+          data={typeDistribution}
+          colors={typeColors}
+          formatValue={formatCurrency}
+        />
       </div>
 
       {/* Assets Table */}

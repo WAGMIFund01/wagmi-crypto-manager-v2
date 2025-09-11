@@ -4,6 +4,7 @@ import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import WagmiButton from '@/components/ui/WagmiButton';
 import WagmiCard from '@/components/ui/WagmiCard';
+import { StackedBarChart } from '@/components/ui';
 import { Card, CardContent, Button } from '@/shared/components';
 import { formatCurrency, formatPercentage } from '@/shared/utils';
 
@@ -377,6 +378,64 @@ export default function InvestorPage() {
           </WagmiCard>
         </div>
 
+        {/* Portfolio Breakdown Charts */}
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
+          <StackedBarChart
+            title="Breakdown by Asset"
+            data={{
+              'Ethereum': portfolioData.totalValue * 0.35,
+              'Solana': portfolioData.totalValue * 0.25,
+              'Bitcoin': portfolioData.totalValue * 0.20,
+              'USDC': portfolioData.totalValue * 0.15,
+              'Other': portfolioData.totalValue * 0.05
+            }}
+            colors={['#00FF95', '#FF6B35', '#3B82F6', '#8B5CF6', '#F59E0B']}
+            formatValue={(value) => privacyMode ? '•••••' : formatCurrency(value, false)}
+          />
+          <StackedBarChart
+            title="Breakdown by Risk"
+            data={{
+              'Low': portfolioData.totalValue * 0.40,
+              'Medium': portfolioData.totalValue * 0.35,
+              'High': portfolioData.totalValue * 0.20,
+              'Degen': portfolioData.totalValue * 0.05
+            }}
+            colors={{
+              'Low': '#10B981',
+              'Medium': '#F59E0B',
+              'High': '#EF4444',
+              'Degen': '#8B5CF6'
+            }}
+            formatValue={(value) => privacyMode ? '•••••' : formatCurrency(value, false)}
+          />
+          <StackedBarChart
+            title="Breakdown by Location"
+            data={{
+              'Phantom': portfolioData.totalValue * 0.45,
+              'Orca': portfolioData.totalValue * 0.25,
+              'Hyperliquid': portfolioData.totalValue * 0.20,
+              'Other': portfolioData.totalValue * 0.10
+            }}
+            colors={['#00FF95', '#FF6B35', '#3B82F6', '#8B5CF6']}
+            formatValue={(value) => privacyMode ? '•••••' : formatCurrency(value, false)}
+          />
+          <StackedBarChart
+            title="Breakdown by Type"
+            data={{
+              'Major': portfolioData.totalValue * 0.50,
+              'Altcoin': portfolioData.totalValue * 0.30,
+              'Stablecoin': portfolioData.totalValue * 0.15,
+              'Memecoin': portfolioData.totalValue * 0.05
+            }}
+            colors={{
+              'Major': '#00FF95',
+              'Altcoin': '#3B82F6',
+              'Stablecoin': '#6B7280',
+              'Memecoin': '#8B5CF6'
+            }}
+            formatValue={(value) => privacyMode ? '•••••' : formatCurrency(value, false)}
+          />
+        </div>
 
         {/* Transaction History */}
         <div
