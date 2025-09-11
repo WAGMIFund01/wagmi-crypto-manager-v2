@@ -2,6 +2,7 @@
 export { default as StandardModal } from './StandardModal';
 export { default as WagmiButton } from './WagmiButton';
 export { default as WagmiCard } from './WagmiCard';
+export { default as WagmiInput } from './WagmiInput';
 
 // Icons
 export * from './icons/WagmiIcons';
