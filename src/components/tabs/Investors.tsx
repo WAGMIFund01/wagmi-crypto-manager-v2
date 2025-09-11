@@ -126,9 +126,6 @@ export default function Investors() {
       >
         Investor Management
       </h2>
-      <p style={{ color: '#A0A0A0' }}>
-        {investors.length} investors found
-      </p>
 
       {/* Investor Table */}
       <div className="rounded-lg overflow-hidden" style={{ backgroundColor: '#1A1F1A' }}>
@@ -141,9 +138,6 @@ export default function Investors() {
                 </th>
                 <th className="px-4 py-3 text-left text-xs font-medium uppercase tracking-wider" style={{ color: '#A0A0A0' }}>
                   Name
-                </th>
-                <th className="px-4 py-3 text-left text-xs font-medium uppercase tracking-wider" style={{ color: '#A0A0A0' }}>
-                  Email
                 </th>
                 <th className="px-4 py-3 text-left text-xs font-medium uppercase tracking-wider" style={{ color: '#A0A0A0' }}>
                   Join Date
@@ -176,9 +170,6 @@ export default function Investors() {
                   </td>
                   <td className="px-4 py-3 text-sm" style={{ color: '#FFFFFF' }}>
                     {investor.name}
-                  </td>
-                  <td className="px-4 py-3 text-sm" style={{ color: '#A0A0A0' }}>
-                    {investor.email}
                   </td>
                   <td className="px-4 py-3 text-sm" style={{ color: '#A0A0A0' }}>
                     {formatDate(investor.joinDate)}
