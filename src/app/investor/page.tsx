@@ -7,6 +7,7 @@ import WagmiCard from '@/components/ui/WagmiCard';
 import { StackedBarChart } from '@/components/ui';
 import { Card, CardContent, Button } from '@/shared/components';
 import { formatCurrency, formatPercentage } from '@/shared/utils';
+import { PortfolioAsset } from '@/app/api/get-portfolio-data/route';
 
 interface InvestorData {
   name: string;
@@ -31,8 +32,10 @@ export default function InvestorPage() {
   const [investorId, setInvestorId] = useState<string>('');
   const [investorData, setInvestorData] = useState<InvestorData | null>(null);
   const [transactions, setTransactions] = useState<Transaction[]>([]);
+  const [portfolioAssets, setPortfolioAssets] = useState<PortfolioAsset[]>([]);
   const [loading, setLoading] = useState(true);
   const [transactionsLoading, setTransactionsLoading] = useState(false);
+  const [portfolioLoading, setPortfolioLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
@@ -62,8 +65,9 @@ export default function InvestorPage() {
       return;
     }
     
-    // Fetch transactions for this investor
+    // Fetch transactions and portfolio data for this investor
     fetchTransactions(storedInvestorId);
+    fetchPortfolioData();
     
     setLoading(false);
   }, [router]);
@@ -93,6 +97,67 @@ export default function InvestorPage() {
     } finally {
       setTransactionsLoading(false);
     }
+  };
+
+  const fetchPortfolioData = async () => {
+    setPortfolioLoading(true);
+    try {
+      const response = await fetch('/api/get-portfolio-data');
+      const data = await response.json();
+
+      if (data.success && data.assets) {
+        setPortfolioAssets(data.assets);
+      } else {
+        console.error('Failed to fetch portfolio data:', data.error);
+        // Don't set error for portfolio - just log it
+      }
+    } catch (error) {
+      console.error('Error fetching portfolio data:', error);
+      // Don't set error for portfolio - just log it
+    } finally {
+      setPortfolioLoading(false);
+    }
+  };
+
+  // Calculate distributions for charts from real portfolio data
+  const calculateDistribution = (groupBy: keyof PortfolioAsset) => {
+    const groups: { [key: string]: number } = {};
+    portfolioAssets.forEach(asset => {
+      const key = asset[groupBy].toString();
+      groups[key] = (groups[key] || 0) + asset.totalValue;
+    });
+    return groups;
+  };
+
+  const assetDistribution = calculateDistribution('assetName');
+  const riskDistribution = calculateDistribution('riskLevel');
+  const locationDistribution = calculateDistribution('location');
+  const typeDistribution = calculateDistribution('coinType');
+
+  // Color palettes for different chart types
+  const assetColors = [
+    '#00FF95', '#FF6B35', '#3B82F6', '#8B5CF6', '#F59E0B', 
+    '#EF4444', '#10B981', '#F97316', '#6366F1', '#EC4899'
+  ];
+  
+  const riskColors = {
+    'High': '#EF4444',
+    'Medium': '#F59E0B', 
+    'Low': '#10B981',
+    'Degen': '#8B5CF6',
+    'None': '#6B7280'
+  };
+
+  const locationColors = [
+    '#00FF95', '#FF6B35', '#3B82F6', '#8B5CF6', '#F59E0B',
+    '#EF4444', '#10B981', '#F97316', '#6366F1', '#EC4899'
+  ];
+
+  const typeColors = {
+    'Memecoin': '#8B5CF6',
+    'Major': '#00FF95',
+    'Altcoin': '#3B82F6',
+    'Stablecoin': '#6B7280'
   };
 
   if (loading || !investorId) {
@@ -379,63 +444,41 @@ export default function InvestorPage() {
         </div>
 
         {/* Portfolio Breakdown Charts */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
-          <StackedBarChart
-            title="Breakdown by Asset"
-            data={{
-              'Ethereum': portfolioData.totalValue * 0.35,
-              'Solana': portfolioData.totalValue * 0.25,
-              'Bitcoin': portfolioData.totalValue * 0.20,
-              'USDC': portfolioData.totalValue * 0.15,
-              'Other': portfolioData.totalValue * 0.05
-            }}
-            colors={['#00FF95', '#FF6B35', '#3B82F6', '#8B5CF6', '#F59E0B']}
-            formatValue={(value) => privacyMode ? '•••••' : formatCurrency(value, false)}
-          />
-          <StackedBarChart
-            title="Breakdown by Risk"
-            data={{
-              'Low': portfolioData.totalValue * 0.40,
-              'Medium': portfolioData.totalValue * 0.35,
-              'High': portfolioData.totalValue * 0.20,
-              'Degen': portfolioData.totalValue * 0.05
-            }}
-            colors={{
-              'Low': '#10B981',
-              'Medium': '#F59E0B',
-              'High': '#EF4444',
-              'Degen': '#8B5CF6'
-            }}
-            formatValue={(value) => privacyMode ? '•••••' : formatCurrency(value, false)}
-          />
-          <StackedBarChart
-            title="Breakdown by Location"
-            data={{
-              'Phantom': portfolioData.totalValue * 0.45,
-              'Orca': portfolioData.totalValue * 0.25,
-              'Hyperliquid': portfolioData.totalValue * 0.20,
-              'Other': portfolioData.totalValue * 0.10
-            }}
-            colors={['#00FF95', '#FF6B35', '#3B82F6', '#8B5CF6']}
-            formatValue={(value) => privacyMode ? '•••••' : formatCurrency(value, false)}
-          />
-          <StackedBarChart
-            title="Breakdown by Type"
-            data={{
-              'Major': portfolioData.totalValue * 0.50,
-              'Altcoin': portfolioData.totalValue * 0.30,
-              'Stablecoin': portfolioData.totalValue * 0.15,
-              'Memecoin': portfolioData.totalValue * 0.05
-            }}
-            colors={{
-              'Major': '#00FF95',
-              'Altcoin': '#3B82F6',
-              'Stablecoin': '#6B7280',
-              'Memecoin': '#8B5CF6'
-            }}
-            formatValue={(value) => privacyMode ? '•••••' : formatCurrency(value, false)}
-          />
-        </div>
+        {portfolioLoading ? (
+          <div className="flex items-center justify-center py-12 mb-8">
+            <div className="text-center">
+              <div className="animate-spin rounded-full h-8 w-8 border-b-2 mx-auto mb-4" style={{ borderColor: '#00FF95' }}></div>
+              <p style={{ color: '#E0E0E0' }}>Loading portfolio breakdown...</p>
+            </div>
+          </div>
+        ) : (
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
+            <StackedBarChart
+              title="Breakdown by Asset"
+              data={assetDistribution}
+              colors={assetColors}
+              formatValue={(value) => privacyMode ? '•••••' : formatCurrency(value, false)}
+            />
+            <StackedBarChart
+              title="Breakdown by Risk"
+              data={riskDistribution}
+              colors={riskColors}
+              formatValue={(value) => privacyMode ? '•••••' : formatCurrency(value, false)}
+            />
+            <StackedBarChart
+              title="Breakdown by Location"
+              data={locationDistribution}
+              colors={locationColors}
+              formatValue={(value) => privacyMode ? '•••••' : formatCurrency(value, false)}
+            />
+            <StackedBarChart
+              title="Breakdown by Type"
+              data={typeDistribution}
+              colors={typeColors}
+              formatValue={(value) => privacyMode ? '•••••' : formatCurrency(value, false)}
+            />
+          </div>
+        )}
 
         {/* Transaction History */}
         <div
