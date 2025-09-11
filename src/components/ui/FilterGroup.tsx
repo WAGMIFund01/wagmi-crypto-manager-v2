@@ -33,13 +33,14 @@ export default function FilterGroup({
       </div>
       
       {/* Filter Chips */}
-      <div className="flex flex-wrap gap-2">
+      <div className="flex flex-wrap gap-2 max-w-full">
         {options.map((option) => (
           <FilterChip
             key={option.value}
             label={option.label}
             isActive={selectedValues.includes(option.value)}
             onClick={() => onToggle(option.value)}
+            className="whitespace-nowrap"
           />
         ))}
       </div>
