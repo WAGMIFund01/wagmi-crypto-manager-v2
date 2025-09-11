@@ -51,22 +51,23 @@ export async function GET() {
 
       const rows = data.table.rows;
       
-      // Skip header row (index 0) and process data rows
-      for (let i = 1; i < rows.length; i++) {
+      // Process all rows (Google Sheets data doesn't include header in rows)
+      for (let i = 0; i < rows.length; i++) {
         const row = rows[i];
-        if (row.c && row.c.length >= 8) {
+        if (row.c) {
+          // Extract data from each cell, handling missing values gracefully
           const investor = {
             id: row.c[0]?.v?.toString() || '', // investor_id
             name: row.c[1]?.v?.toString() || '', // name
             email: row.c[2]?.v?.toString() || '', // email
-            joinDate: row.c[3]?.v?.toString() || '', // join_date
+            joinDate: row.c[3]?.f || row.c[3]?.v?.toString() || '', // join_date (use formatted value if available)
             investmentValue: parseFloat(row.c[4]?.v) || 0, // investment_value
             currentValue: parseFloat(row.c[5]?.v) || 0, // current_value
             sharePercentage: parseFloat(row.c[6]?.v) || 0, // share_percentage
             returnPercentage: parseFloat(row.c[7]?.v) || 0, // return_percentage
           };
           
-          // Only add if we have essential data
+          // Only add if we have essential data (ID and name)
           if (investor.id && investor.name) {
             investors.push(investor);
           }
@@ -74,6 +75,7 @@ export async function GET() {
       }
 
       console.log(`Successfully fetched ${investors.length} investors from Google Sheets`);
+      console.log('Investor data:', investors);
 
       return NextResponse.json({
         success: true,
