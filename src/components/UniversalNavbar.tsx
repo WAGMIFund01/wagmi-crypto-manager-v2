@@ -3,6 +3,7 @@
 import { useRouter } from 'next/navigation';
 import { useState, useEffect } from 'react';
 import WagmiButton from './ui/WagmiButton';
+import WagmiCard from './ui/WagmiCard';
 import { RefreshIcon } from './ui/icons/WagmiIcons';
 
 interface UniversalNavbarProps {
@@ -314,54 +315,54 @@ export default function UniversalNavbar({
               /* KPI Data - Four evenly spaced metrics */
               <>
                 {/* Active Investors */}
-                <div className="text-center" style={{ minWidth: '80px' }}>
-                  <p style={{ color: '#A0A0A0', fontSize: '9px', margin: 0, textTransform: 'uppercase', letterSpacing: '0.05em', fontWeight: '500' }}>
+                <WagmiCard variant="ribbon" theme="green" size="sm">
+                  <p className="text-xs font-normal text-gray-400 mb-1 uppercase tracking-wide">
                     Active Investors
                   </p>
-                  <p style={{ color: '#FFFFFF', fontSize: '14px', fontWeight: '600', margin: '2px 0 0 0' }}>
+                  <p className="text-sm font-semibold text-white">
                     {formattedKpiData?.activeInvestors || '--'}
                   </p>
-                </div>
+                </WagmiCard>
 
                 {/* Total AUM */}
-                <div className="text-center" style={{ minWidth: '80px' }}>
-                  <p style={{ color: '#A0A0A0', fontSize: '9px', margin: 0, textTransform: 'uppercase', letterSpacing: '0.05em', fontWeight: '500' }}>
+                <WagmiCard variant="ribbon" theme="green" size="sm">
+                  <p className="text-xs font-normal text-gray-400 mb-1 uppercase tracking-wide">
                     Total AUM
                   </p>
-                  <p style={{ color: '#FFFFFF', fontSize: '14px', fontWeight: '600', margin: '2px 0 0 0' }}>
+                  <p className="text-sm font-semibold text-white">
                     {formattedKpiData?.totalAUM || '--'}
                   </p>
-                </div>
+                </WagmiCard>
 
                 {/* Cumulative Return */}
-                <div className="text-center" style={{ minWidth: '80px' }}>
-                  <p style={{ color: '#A0A0A0', fontSize: '9px', margin: 0, textTransform: 'uppercase', letterSpacing: '0.05em', fontWeight: '500' }}>
+                <WagmiCard variant="ribbon" theme="green" size="sm">
+                  <p className="text-xs font-normal text-gray-400 mb-1 uppercase tracking-wide">
                     Cumulative Return
                   </p>
-                  <p style={{ 
-                    color: formattedKpiData?.cumulativeReturn?.startsWith('+') ? '#00FF95' : '#FF4D4D', 
-                    fontSize: '14px', 
-                    fontWeight: '600', 
-                    margin: '2px 0 0 0' 
-                  }}>
+                  <p 
+                    className="text-sm font-semibold"
+                    style={{ 
+                      color: formattedKpiData?.cumulativeReturn?.startsWith('+') ? '#00FF95' : '#FF4D4D'
+                    }}
+                  >
                     {formattedKpiData?.cumulativeReturn || '--'}
                   </p>
-                </div>
+                </WagmiCard>
 
                 {/* MoM Return */}
-                <div className="text-center" style={{ minWidth: '80px' }}>
-                  <p style={{ color: '#A0A0A0', fontSize: '9px', margin: 0, textTransform: 'uppercase', letterSpacing: '0.05em', fontWeight: '500' }}>
+                <WagmiCard variant="ribbon" theme="green" size="sm">
+                  <p className="text-xs font-normal text-gray-400 mb-1 uppercase tracking-wide">
                     MoM Return
                   </p>
-                  <p style={{ 
-                    color: formattedKpiData?.monthOnMonth?.startsWith('+') ? '#00FF95' : '#FF4D4D', 
-                    fontSize: '14px', 
-                    fontWeight: '600', 
-                    margin: '2px 0 0 0' 
-                  }}>
+                  <p 
+                    className="text-sm font-semibold"
+                    style={{ 
+                      color: formattedKpiData?.monthOnMonth?.startsWith('+') ? '#00FF95' : '#FF4D4D'
+                    }}
+                  >
                     {formattedKpiData?.monthOnMonth || '--'}
                   </p>
-                </div>
+                </WagmiCard>
               </>
             )}
           </div>

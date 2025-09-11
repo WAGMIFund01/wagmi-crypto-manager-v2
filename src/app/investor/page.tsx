@@ -3,6 +3,7 @@
 import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import WagmiButton from '@/components/ui/WagmiButton';
+import WagmiCard from '@/components/ui/WagmiCard';
 import { Card, CardContent, Button } from '@/shared/components';
 import { formatCurrency, formatPercentage } from '@/shared/utils';
 
@@ -317,14 +318,7 @@ export default function InvestorPage() {
         {/* KPI Cards */}
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6 mb-8">
           {/* Initial Investment */}
-          <div 
-            className="group relative p-4 md:p-6 rounded-2xl transition-all duration-300 hover:shadow-[0_0_20px_rgba(0,255,149,0.15)] hover:shadow-green-500/20"
-            style={{ 
-              backgroundColor: '#1A1F1A',
-              borderRadius: '16px',
-              boxShadow: '0 8px 32px rgba(0, 0, 0, 0.4), 0 0 0 1px rgba(255, 255, 255, 0.05), 0 0 15px rgba(0, 255, 149, 0.1)'
-            }}
-          >
+          <WagmiCard variant="kpi" theme="green" size="md">
             <div className="space-y-1 md:space-y-2">
               <h3 className="text-xs md:text-sm font-normal text-gray-400 leading-none">
                 Total Invested
@@ -333,17 +327,10 @@ export default function InvestorPage() {
                 {formatCurrency(portfolioData.initialInvestment, privacyMode)}
               </p>
             </div>
-          </div>
+          </WagmiCard>
 
           {/* Current Value */}
-          <div 
-            className="group relative p-4 md:p-6 rounded-2xl transition-all duration-300 hover:shadow-[0_0_20px_rgba(0,255,149,0.15)] hover:shadow-green-500/20"
-            style={{ 
-              backgroundColor: '#1A1F1A',
-              borderRadius: '16px',
-              boxShadow: '0 8px 32px rgba(0, 0, 0, 0.4), 0 0 0 1px rgba(255, 255, 255, 0.05), 0 0 15px rgba(0, 255, 149, 0.1)'
-            }}
-          >
+          <WagmiCard variant="kpi" theme="green" size="md">
             <div className="space-y-1 md:space-y-2">
               <h3 className="text-xs md:text-sm font-normal text-gray-400 leading-none">
                 Current Value
@@ -352,17 +339,10 @@ export default function InvestorPage() {
                 {formatCurrency(portfolioData.totalValue, privacyMode)}
               </p>
             </div>
-          </div>
+          </WagmiCard>
 
           {/* Total P&L */}
-          <div 
-            className="group relative p-4 md:p-6 rounded-2xl transition-all duration-300 hover:shadow-[0_0_20px_rgba(0,255,149,0.15)] hover:shadow-green-500/20"
-            style={{ 
-              backgroundColor: '#1A1F1A',
-              borderRadius: '16px',
-              boxShadow: '0 8px 32px rgba(0, 0, 0, 0.4), 0 0 0 1px rgba(255, 255, 255, 0.05), 0 0 15px rgba(0, 255, 149, 0.1)'
-            }}
-          >
+          <WagmiCard variant="kpi" theme="green" size="md">
             <div className="space-y-1 md:space-y-2">
               <h3 className="text-xs md:text-sm font-normal text-gray-400 leading-none">
                 Total P&L
@@ -377,17 +357,10 @@ export default function InvestorPage() {
                  (portfolioData.totalPnl >= 0 ? '+' : '') + formatCurrency(portfolioData.totalPnl, privacyMode)}
               </p>
             </div>
-          </div>
+          </WagmiCard>
 
           {/* Total Return */}
-          <div 
-            className="group relative p-4 md:p-6 rounded-2xl transition-all duration-300 hover:shadow-[0_0_20px_rgba(0,255,149,0.15)] hover:shadow-green-500/20"
-            style={{ 
-              backgroundColor: '#1A1F1A',
-              borderRadius: '16px',
-              boxShadow: '0 8px 32px rgba(0, 0, 0, 0.4), 0 0 0 1px rgba(255, 255, 255, 0.05), 0 0 15px rgba(0, 255, 149, 0.1)'
-            }}
-          >
+          <WagmiCard variant="kpi" theme="green" size="md">
             <div className="space-y-1 md:space-y-2">
               <h3 className="text-xs md:text-sm font-normal text-gray-400 leading-none">
                 Total Return
@@ -401,7 +374,7 @@ export default function InvestorPage() {
                 {formatPercentage(portfolioData.totalPnlPercentage, false, true)}
               </p>
             </div>
-          </div>
+          </WagmiCard>
         </div>
 
 
