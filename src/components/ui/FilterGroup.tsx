@@ -24,7 +24,7 @@ export default function FilterGroup({
   className 
 }: FilterGroupProps) {
   return (
-    <div className={className}>
+    <div className={`${className} min-w-0`}>
       {/* Group Label */}
       <div className="mb-2">
         <h3 className="text-xs font-medium uppercase tracking-wider text-gray-400">
@@ -33,14 +33,14 @@ export default function FilterGroup({
       </div>
       
       {/* Filter Chips */}
-      <div className="flex flex-wrap gap-2 max-w-full">
+      <div className="flex flex-wrap gap-1.5">
         {options.map((option) => (
           <FilterChip
             key={option.value}
             label={option.label}
             isActive={selectedValues.includes(option.value)}
             onClick={() => onToggle(option.value)}
-            className="whitespace-nowrap"
+            className="whitespace-nowrap flex-shrink-0"
           />
         ))}
       </div>
