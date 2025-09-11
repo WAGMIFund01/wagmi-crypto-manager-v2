@@ -4,7 +4,7 @@ import React, { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import StandardModal from '@/components/ui/StandardModal';
 import WagmiButton from '@/components/ui/WagmiButton';
-import { DevIcon, ManagerIcon } from '@/components/ui/icons/WagmiIcons';
+import { DevIcon } from '@/components/ui/icons/WagmiIcons';
 import { signIn } from 'next-auth/react';
 // import { Button, Card, CardContent, CardHeader, CardTitle } from '@/shared/components';
 
