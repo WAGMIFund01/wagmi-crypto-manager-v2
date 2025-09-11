@@ -187,7 +187,7 @@ export default function InvestorPage() {
                   {portfolioData.investorName}
                 </h2>
                 <p style={{ color: '#E0E0E0', fontSize: '14px', margin: 0, lineHeight: '1.3' }}>
-                  ID: {investorId}
+                  ID: {privacyMode ? '•••••' : investorId}
                 </p>
               </div>
               
@@ -297,7 +297,7 @@ export default function InvestorPage() {
                   {portfolioData.investorName}
                 </h2>
                 <p style={{ color: '#E0E0E0', fontSize: '14px', margin: 0 }}>
-                  ID: {investorId}
+                  ID: {privacyMode ? '•••••' : investorId}
                 </p>
             </div>
             
@@ -458,10 +458,10 @@ export default function InvestorPage() {
               <p 
                 className="text-lg md:text-2xl font-bold leading-tight"
                 style={{ 
-                  color: privacyMode ? '#FFFFFF' : (portfolioData.totalPnlPercentage >= 0 ? '#00FF95' : '#FF4444')
+                  color: portfolioData.totalPnlPercentage >= 0 ? '#00FF95' : '#FF4444'
                 }}
               >
-                {formatPercentage(portfolioData.totalPnlPercentage, privacyMode, true)}
+                {formatPercentage(portfolioData.totalPnlPercentage, false, true)}
               </p>
             </div>
           </div>
