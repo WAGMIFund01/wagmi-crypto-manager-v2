@@ -6,6 +6,7 @@ import { useState, useEffect } from 'react';
 interface UniversalNavbarProps {
   activeTab: string;
   onTabChange: (tabId: string) => void;
+  onPrivacyModeChange?: (isPrivacyMode: boolean) => void;
   kpiData?: {
     activeInvestors: string;
     totalAUM: string;
@@ -19,6 +20,7 @@ interface UniversalNavbarProps {
 export default function UniversalNavbar({ 
   activeTab, 
   onTabChange, 
+  onPrivacyModeChange,
   kpiData = null, 
   hasError = false 
 }: UniversalNavbarProps) {
@@ -226,7 +228,11 @@ export default function UniversalNavbar({
 
             {/* Privacy Toggle - Eye Icon with Rounded Square */}
             <button
-              onClick={() => setIsPrivacyMode(!isPrivacyMode)}
+              onClick={() => {
+                const newPrivacyMode = !isPrivacyMode;
+                setIsPrivacyMode(newPrivacyMode);
+                onPrivacyModeChange?.(newPrivacyMode);
+              }}
               className="p-1.5 rounded-md transition-all duration-200 flex items-center justify-center"
               style={{
                 backgroundColor: isPrivacyMode ? '#00FF95' : 'transparent',

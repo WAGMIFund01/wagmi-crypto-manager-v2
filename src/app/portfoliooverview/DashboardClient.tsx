@@ -37,6 +37,7 @@ export default function DashboardClient({ session, kpiData, hasError }: Dashboar
   const [isDevMode, setIsDevMode] = useState(false);
   const [activeTab, setActiveTab] = useState('portfolio');
   const [isCheckingAuth, setIsCheckingAuth] = useState(true);
+  const [isPrivacyMode, setIsPrivacyMode] = useState(false);
 
   // Initialize active tab from URL parameters
   useEffect(() => {
@@ -96,6 +97,11 @@ export default function DashboardClient({ session, kpiData, hasError }: Dashboar
     router.replace(`${pathname}?${params.toString()}`);
   };
 
+  // Handle privacy mode change
+  const handlePrivacyModeChange = (privacyMode: boolean) => {
+    setIsPrivacyMode(privacyMode);
+  };
+
   // Use dev session if in dev mode, otherwise use OAuth session
   const currentSession = isDevMode ? devSession : session;
 
@@ -123,7 +129,7 @@ export default function DashboardClient({ session, kpiData, hasError }: Dashboar
       case 'analytics':
         return <Analytics />;
       case 'investors':
-        return <Investors />;
+        return <Investors isPrivacyMode={isPrivacyMode} />;
       default:
         return <PortfolioOverview />;
     }
@@ -135,6 +141,7 @@ export default function DashboardClient({ session, kpiData, hasError }: Dashboar
       <UniversalNavbar 
         activeTab={activeTab}
         onTabChange={handleTabChange}
+        onPrivacyModeChange={handlePrivacyModeChange}
         kpiData={kpiData}
         hasError={hasError}
       />

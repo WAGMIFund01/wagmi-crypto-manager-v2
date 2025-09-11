@@ -14,7 +14,11 @@ interface Investor {
   returnPercentage: number;
 }
 
-export default function Investors() {
+interface InvestorsProps {
+  isPrivacyMode?: boolean;
+}
+
+export default function Investors({ isPrivacyMode = false }: InvestorsProps) {
   const [investors, setInvestors] = useState<Investor[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -82,6 +86,11 @@ export default function Investors() {
     } catch (err) {
       return dateStr;
     }
+  };
+
+  // Create masking dots for privacy mode
+  const createMask = () => {
+    return '•••••';
   };
 
   // Handle row click to open transaction modal
@@ -164,19 +173,19 @@ export default function Investors() {
                     {investor.id}
                   </td>
                   <td className="px-4 py-3 text-sm" style={{ color: '#FFFFFF' }}>
-                    {investor.name}
+                    {isPrivacyMode ? createMask() : investor.name}
                   </td>
                   <td className="px-4 py-3 text-sm" style={{ color: '#A0A0A0' }}>
                     {formatDate(investor.joinDate)}
                   </td>
                   <td className="px-4 py-3 text-sm" style={{ color: '#FFFFFF' }}>
-                    {formatCurrency(investor.investmentValue)}
+                    {isPrivacyMode ? createMask() : formatCurrency(investor.investmentValue)}
                   </td>
                   <td className="px-4 py-3 text-sm" style={{ color: '#FFFFFF' }}>
-                    {formatCurrency(investor.currentValue)}
+                    {isPrivacyMode ? createMask() : formatCurrency(investor.currentValue)}
                   </td>
                   <td className="px-4 py-3 text-sm" style={{ color: '#A0A0A0' }}>
-                    {(investor.sharePercentage * 100).toFixed(1)}%
+                    {isPrivacyMode ? createMask() : `${(investor.sharePercentage * 100).toFixed(1)}%`}
                   </td>
                   <td className="px-4 py-3 text-sm font-medium" style={{ color: investor.returnPercentage >= 0 ? '#00FF95' : '#FF4D4D' }}>
                     {formatPercentage(investor.returnPercentage)}
