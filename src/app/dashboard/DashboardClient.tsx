@@ -113,6 +113,17 @@ export default function DashboardClient({ session, kpiData, hasError }: Dashboar
     }
   };
 
+  const handleTabClick = (tabId: string) => {
+    setActiveTab(tabId);
+    if (tabId === 'investors') {
+      router.push('/dashboard/investors');
+    } else if (tabId === 'analytics') {
+      router.push('/dashboard/analytics');
+    } else {
+      router.push('/dashboard');
+    }
+  };
+
   // Use dev session if in dev mode, otherwise use OAuth session
   const currentSession = isDevMode ? devSession : session;
 
@@ -338,7 +349,7 @@ export default function DashboardClient({ session, kpiData, hasError }: Dashboar
               ].map((tab) => (
                 <button
                   key={tab.id}
-                  onClick={() => setActiveTab(tab.id)}
+                  onClick={() => handleTabClick(tab.id)}
                   className="py-2 px-1 text-sm font-medium transition-all duration-200 relative"
                   style={{
                     color: activeTab === tab.id ? '#00FF95' : '#A0A0A0',
