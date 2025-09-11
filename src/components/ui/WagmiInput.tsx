@@ -121,7 +121,7 @@ const WagmiInput = forwardRef<HTMLInputElement, WagmiInputProps>(
       color: colors.text,
       borderColor: hasError ? colors.error : colors.border,
       paddingLeft: (icon && iconPosition === 'left') || variant === 'search' ? '2.75rem' : undefined,
-      paddingRight: (icon && iconPosition === 'right') || showPasswordToggle ? '2.75rem' : undefined
+      paddingRight: (icon && iconPosition === 'right') || showPasswordToggle || variant === 'number' || (variant === 'default' && type === 'number') ? '2.75rem' : undefined
     };
     
     const focusStyles: React.CSSProperties = {
