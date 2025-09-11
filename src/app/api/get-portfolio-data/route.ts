@@ -54,8 +54,8 @@ export async function GET() {
       const portfolioAssets: PortfolioAsset[] = [];
       const rows = data.table.rows;
       
-      // Skip the header row (index 0) and process data rows
-      for (let i = 1; i < rows.length; i++) {
+      // Process all rows starting from index 0 (header is automatically handled by Google Sheets API)
+      for (let i = 0; i < rows.length; i++) {
         const row = rows[i];
         if (row.c && row.c.length >= 10) {
           const assetName = row.c[0]?.v?.toString() || '';
@@ -69,8 +69,11 @@ export async function GET() {
           const totalValue = parseFloat(row.c[8]?.v) || 0;
           const lastPriceUpdate = row.c[9]?.v?.toString() || '';
 
-          // Only add assets that have a name and symbol
-          if (assetName && symbol) {
+          // Only add assets that have a name and symbol, and exclude header-like entries
+          if (assetName && symbol && 
+              assetName.toLowerCase() !== 'asset name' && 
+              symbol.toLowerCase() !== 'symbol' &&
+              !isNaN(quantity) && !isNaN(currentPrice) && !isNaN(totalValue)) {
             portfolioAssets.push({
               assetName,
               symbol,
