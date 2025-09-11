@@ -240,7 +240,6 @@ export function InvestorLoginForm() {
               onChange={(e) => setDevPassword(e.target.value)}
               theme="orange"
               size="md"
-              showPasswordToggle
               required
               autoFocus
             />
