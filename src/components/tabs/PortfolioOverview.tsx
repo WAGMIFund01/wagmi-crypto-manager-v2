@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { PortfolioAsset } from '@/app/api/get-portfolio-data/route';
-import { StackedBarChart } from '@/components/ui';
+import { StackedBarChart, WagmiCard } from '@/components/ui';
 
 interface PortfolioOverviewProps {
   className?: string;
@@ -195,7 +195,7 @@ export default function PortfolioOverview({ className }: PortfolioOverviewProps)
       </div>
 
       {/* Assets Table */}
-      <div className="bg-gray-800/50 border border-gray-700 rounded-lg overflow-hidden">
+      <WagmiCard variant="container" theme="green" size="lg" className="overflow-hidden">
         <div className="px-6 py-4 border-b border-gray-700">
           <h2 className="text-xl font-semibold text-white">Portfolio Assets</h2>
         </div>
@@ -271,7 +271,7 @@ export default function PortfolioOverview({ className }: PortfolioOverviewProps)
             </tbody>
           </table>
         </div>
-      </div>
+      </WagmiCard>
     </div>
   );
 }
