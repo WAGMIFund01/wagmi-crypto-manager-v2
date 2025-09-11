@@ -118,10 +118,10 @@ export default function UniversalNavbar({
 
   // Format KPI data with privacy mode (only if we have data)
   const formattedKpiData = kpiData ? {
-    activeInvestors: isPrivacyMode ? '•••' : kpiData.activeInvestors,
-    totalAUM: isPrivacyMode ? '••••••' : kpiData.totalAUM,
-    cumulativeReturn: isPrivacyMode ? '•••' : kpiData.cumulativeReturn,
-    monthOnMonth: isPrivacyMode ? '•••' : kpiData.monthOnMonth
+    activeInvestors: isPrivacyMode ? '•••••' : kpiData.activeInvestors,
+    totalAUM: isPrivacyMode ? '•••••' : kpiData.totalAUM,
+    cumulativeReturn: isPrivacyMode ? '•••••' : kpiData.cumulativeReturn,
+    monthOnMonth: isPrivacyMode ? '•••••' : kpiData.monthOnMonth
   } : null;
 
   // Show loading state during hydration
@@ -388,7 +388,7 @@ export default function UniversalNavbar({
                     Cumulative Return
                   </p>
                   <p style={{ 
-                    color: formattedKpiData?.cumulativeReturn?.startsWith('+') ? '#00FF95' : '#FF4D4D', 
+                    color: isPrivacyMode ? '#FFFFFF' : (formattedKpiData?.cumulativeReturn?.startsWith('+') ? '#00FF95' : '#FF4D4D'), 
                     fontSize: '14px', 
                     fontWeight: '600', 
                     margin: '2px 0 0 0' 
@@ -403,7 +403,7 @@ export default function UniversalNavbar({
                     MoM Return
                   </p>
                   <p style={{ 
-                    color: formattedKpiData?.monthOnMonth?.startsWith('+') ? '#00FF95' : '#FF4D4D', 
+                    color: isPrivacyMode ? '#FFFFFF' : (formattedKpiData?.monthOnMonth?.startsWith('+') ? '#00FF95' : '#FF4D4D'), 
                     fontSize: '14px', 
                     fontWeight: '600', 
                     margin: '2px 0 0 0' 

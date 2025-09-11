@@ -184,7 +184,7 @@ export default function Investors({ isPrivacyMode = false }: InvestorsProps) {
                   <td className="px-4 py-3 text-sm" style={{ color: '#FFFFFF' }}>
                     {isPrivacyMode ? createMask() : formatCurrency(investor.currentValue)}
                   </td>
-                  <td className="px-4 py-3 text-sm" style={{ color: '#A0A0A0' }}>
+                  <td className="px-4 py-3 text-sm" style={{ color: isPrivacyMode ? '#FFFFFF' : '#A0A0A0' }}>
                     {isPrivacyMode ? createMask() : `${(investor.sharePercentage * 100).toFixed(1)}%`}
                   </td>
                   <td className="px-4 py-3 text-sm font-medium" style={{ color: investor.returnPercentage >= 0 ? '#00FF95' : '#FF4D4D' }}>
