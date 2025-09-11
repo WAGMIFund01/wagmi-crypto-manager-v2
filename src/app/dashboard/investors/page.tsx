@@ -100,12 +100,16 @@ export default function InvestorsPage() {
   const [isRetrying, setIsRetrying] = useState(false);
   const [kpiData, setKpiData] = useState<KPIData | null>(null);
   const [hasError, setHasError] = useState(false);
+  const [isClient, setIsClient] = useState(false);
 
-  // Check for dev mode session on mount
+  // Set client-side flag and check for dev mode session
   useEffect(() => {
-    const devSession = sessionStorage.getItem('devSession');
-    if (devSession) {
-      setIsDevMode(true);
+    setIsClient(true);
+    if (typeof window !== 'undefined') {
+      const devSession = sessionStorage.getItem('devSession');
+      if (devSession) {
+        setIsDevMode(true);
+      }
     }
   }, []);
 
@@ -131,7 +135,7 @@ export default function InvestorsPage() {
   }, []);
 
   const handleSignOut = () => {
-    if (isDevMode) {
+    if (isDevMode && typeof window !== 'undefined') {
       sessionStorage.removeItem('devSession');
       setIsDevMode(false);
     }
@@ -308,6 +312,15 @@ export default function InvestorsPage() {
     cumulativeReturn: isPrivacyMode ? '•••' : `+${kpiData.cumulativeReturn.toFixed(1)}%`,
     monthOnMonth: isPrivacyMode ? '•••' : `${kpiData.monthlyReturn >= 0 ? '+' : ''}${kpiData.monthlyReturn.toFixed(1)}%`
   } : null;
+
+  // Show loading state during hydration
+  if (!isClient) {
+    return (
+      <div style={{ backgroundColor: '#0B0B0B', minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+        <div style={{ color: '#00FF95', fontSize: '18px' }}>Loading...</div>
+      </div>
+    );
+  }
 
   return (
     <div style={{ backgroundColor: '#0B0B0B' }}>
