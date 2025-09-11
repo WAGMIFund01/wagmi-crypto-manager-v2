@@ -235,8 +235,8 @@ export default function Investors({ isPrivacyMode = false }: InvestorsProps) {
     <div className="space-y-4">
       {/* Unified Search and Filter Row */}
       <div className="max-w-full overflow-hidden">
-        {/* Desktop: Single horizontal row with equal distribution */}
-        <div className="hidden lg:flex lg:items-end lg:space-x-2 lg:max-w-full">
+        {/* Desktop: Single horizontal row with proper alignment */}
+        <div className="hidden lg:flex lg:items-center lg:space-x-3 lg:max-w-full">
           {/* Search Bar - 1/5 */}
           <div className="flex-1 min-w-0">
             <WagmiInput
@@ -249,28 +249,20 @@ export default function Investors({ isPrivacyMode = false }: InvestorsProps) {
             />
           </div>
 
-          {/* Returns Group - 1/5 */}
-          <div className="flex-1 min-w-0">
+          {/* Filter Groups - 3/5 combined */}
+          <div className="flex-3 flex space-x-4 min-w-0">
             <FilterGroup
               title="Returns"
               options={filterOptions.returns}
               selectedValues={filters.returns}
               onToggle={(value) => toggleFilter('returns', value)}
             />
-          </div>
-
-          {/* Size Group - 1/5 */}
-          <div className="flex-1 min-w-0">
             <FilterGroup
               title="Size"
               options={filterOptions.size}
               selectedValues={filters.size}
               onToggle={(value) => toggleFilter('size', value)}
             />
-          </div>
-
-          {/* Share % Group - 1/5 */}
-          <div className="flex-1 min-w-0">
             <FilterGroup
               title="Share %"
               options={filterOptions.share}
