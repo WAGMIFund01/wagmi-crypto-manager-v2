@@ -15,8 +15,8 @@ export default function FilterChip({ label, isActive, onClick, className }: Filt
     <button
       onClick={onClick}
       className={cn(
-        // Base styles - increased padding for longer text
-        'px-3 py-1 rounded-full text-xs font-medium transition-all duration-150',
+        // Base styles - 5% size reduction
+        'px-2.5 py-0.5 rounded-full text-xs font-medium transition-all duration-150',
         'whitespace-nowrap', // Prevent text wrapping
         'focus:outline-none focus:ring-1 focus:ring-green-400/50 focus:ring-offset-1 focus:ring-offset-gray-900',
         // Default state - outline with transparent fill
