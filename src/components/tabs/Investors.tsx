@@ -246,7 +246,7 @@ export default function Investors({ isPrivacyMode = false }: InvestorsProps) {
               onChange={(e) => setSearchQuery(e.target.value)}
               theme="green"
               size="md"
-              className="w-64"
+              className="w-72"
             />
           </div>
 
