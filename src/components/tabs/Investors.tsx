@@ -31,7 +31,7 @@ export default function Investors({ isPrivacyMode = false }: InvestorsProps) {
   const [filters, setFilters] = useState({
     returns: [] as string[],
     size: [] as string[],
-    aum: [] as string[]
+    share: [] as string[]
   });
 
   // Fetch investor data on component mount
@@ -107,20 +107,17 @@ export default function Investors({ isPrivacyMode = false }: InvestorsProps) {
     returns: [
       { value: 'positive', label: 'Positive' },
       { value: 'negative', label: 'Negative' },
-      { value: 'high', label: 'High (>10%)' },
-      { value: 'low', label: 'Low (<5%)' }
+      { value: 'high', label: 'High (>50%)' }
     ],
     size: [
       { value: 'small', label: 'Small (<$1K)' },
-      { value: 'medium', label: 'Medium ($1K-$5K)' },
-      { value: 'large', label: 'Large (>$5K)' },
-      { value: 'whale', label: 'Whale (>$10K)' }
+      { value: 'medium', label: 'Medium ($1K-5K)' },
+      { value: 'large', label: 'Large (>5K)' }
     ],
-    aum: [
-      { value: 'low', label: 'Low (<1%)' },
-      { value: 'medium', label: 'Medium (1-5%)' },
-      { value: 'high', label: 'High (>5%)' },
-      { value: 'major', label: 'Major (>10%)' }
+    share: [
+      { value: 'minor', label: 'Minor (<5%)' },
+      { value: 'moderate', label: 'Moderate (5-20%)' },
+      { value: 'major', label: 'Major (>20%)' }
     ]
   };
 
@@ -139,7 +136,7 @@ export default function Investors({ isPrivacyMode = false }: InvestorsProps) {
     setFilters({
       returns: [],
       size: [],
-      aum: []
+      share: []
     });
     setSearchQuery('');
   };
@@ -166,8 +163,7 @@ export default function Investors({ isPrivacyMode = false }: InvestorsProps) {
           switch (filter) {
             case 'positive': return returnPct > 0;
             case 'negative': return returnPct < 0;
-            case 'high': return returnPct > 10;
-            case 'low': return returnPct < 5;
+            case 'high': return returnPct > 50;
             default: return false;
           }
         });
@@ -183,23 +179,21 @@ export default function Investors({ isPrivacyMode = false }: InvestorsProps) {
             case 'small': return investment < 1000;
             case 'medium': return investment >= 1000 && investment <= 5000;
             case 'large': return investment > 5000;
-            case 'whale': return investment > 10000;
             default: return false;
           }
         });
       });
     }
 
-    // AUM filter
-    if (filters.aum.length > 0) {
+    // Share % filter
+    if (filters.share.length > 0) {
       filtered = filtered.filter(investor => {
         const sharePct = investor.sharePercentage;
-        return filters.aum.some(filter => {
+        return filters.share.some(filter => {
           switch (filter) {
-            case 'low': return sharePct < 1;
-            case 'medium': return sharePct >= 1 && sharePct <= 5;
-            case 'high': return sharePct > 5;
-            case 'major': return sharePct > 10;
+            case 'minor': return sharePct < 5;
+            case 'moderate': return sharePct >= 5 && sharePct <= 20;
+            case 'major': return sharePct > 20;
             default: return false;
           }
         });
@@ -270,10 +264,10 @@ export default function Investors({ isPrivacyMode = false }: InvestorsProps) {
             className="flex-1"
           />
           <FilterGroup
-            title="AUM %"
-            options={filterOptions.aum}
-            selectedValues={filters.aum}
-            onToggle={(value) => toggleFilter('aum', value)}
+            title="Share %"
+            options={filterOptions.share}
+            selectedValues={filters.share}
+            onToggle={(value) => toggleFilter('share', value)}
             className="flex-1"
           />
         </div>
@@ -298,10 +292,10 @@ export default function Investors({ isPrivacyMode = false }: InvestorsProps) {
           </div>
           <div className="flex space-x-6">
             <FilterGroup
-              title="AUM %"
-              options={filterOptions.aum}
-              selectedValues={filters.aum}
-              onToggle={(value) => toggleFilter('aum', value)}
+              title="Share %"
+              options={filterOptions.share}
+              selectedValues={filters.share}
+              onToggle={(value) => toggleFilter('share', value)}
               className="flex-1"
             />
             <div className="flex-1 flex items-end">
@@ -330,10 +324,10 @@ export default function Investors({ isPrivacyMode = false }: InvestorsProps) {
             onToggle={(value) => toggleFilter('size', value)}
           />
           <FilterGroup
-            title="AUM %"
-            options={filterOptions.aum}
-            selectedValues={filters.aum}
-            onToggle={(value) => toggleFilter('aum', value)}
+            title="Share %"
+            options={filterOptions.share}
+            selectedValues={filters.share}
+            onToggle={(value) => toggleFilter('share', value)}
           />
           <div className="pt-2">
             <FilterChip
