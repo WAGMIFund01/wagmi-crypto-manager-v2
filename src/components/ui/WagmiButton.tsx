@@ -254,8 +254,8 @@ const WagmiButton = forwardRef<HTMLButtonElement, WagmiButtonProps>(
           </div>
         )}
         
-        {!loading && icon && iconPosition === 'left' && (
-          <span className={cn(iconSizeClass, children && 'mr-2')}>
+        {!loading && icon && iconPosition === 'left' && children && (
+          <span className={cn(iconSizeClass, 'mr-2')}>
             {icon}
           </span>
         )}
@@ -264,8 +264,15 @@ const WagmiButton = forwardRef<HTMLButtonElement, WagmiButtonProps>(
           <span>{children}</span>
         )}
         
-        {!loading && icon && iconPosition === 'right' && (
-          <span className={cn(iconSizeClass, children && 'ml-2')}>
+        {!loading && icon && iconPosition === 'right' && children && (
+          <span className={cn(iconSizeClass, 'ml-2')}>
+            {icon}
+          </span>
+        )}
+        
+        {/* Icon-only button - render icon directly without margin */}
+        {!loading && icon && !children && (
+          <span className={iconSizeClass}>
             {icon}
           </span>
         )}
