@@ -433,7 +433,7 @@ export default function InvestorPage() {
               <p 
                 className="text-lg md:text-2xl font-bold leading-tight"
                 style={{ 
-                  color: portfolioData.totalPnl >= 0 ? '#00FF95' : '#FF4444'
+                  color: privacyMode ? '#FFFFFF' : (portfolioData.totalPnl >= 0 ? '#00FF95' : '#FF4444')
                 }}
               >
                 {privacyMode ? formatCurrency(portfolioData.totalPnl, privacyMode) : 
@@ -458,7 +458,7 @@ export default function InvestorPage() {
               <p 
                 className="text-lg md:text-2xl font-bold leading-tight"
                 style={{ 
-                  color: portfolioData.totalPnlPercentage >= 0 ? '#00FF95' : '#FF4444'
+                  color: privacyMode ? '#FFFFFF' : (portfolioData.totalPnlPercentage >= 0 ? '#00FF95' : '#FF4444')
                 }}
               >
                 {formatPercentage(portfolioData.totalPnlPercentage, privacyMode, true)}
