@@ -4,6 +4,7 @@ import React, { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import StandardModal from '@/components/ui/StandardModal';
 import WagmiButton from '@/components/ui/WagmiButton';
+import WagmiInput from '@/components/ui/WagmiInput';
 import { DevIcon } from '@/components/ui/icons/WagmiIcons';
 import { signIn } from 'next-auth/react';
 // import { Button, Card, CardContent, CardHeader, CardTitle } from '@/shared/components';
@@ -156,26 +157,16 @@ export function InvestorLoginForm() {
             </h2>
             
             <form onSubmit={handleInvestorLogin} className="space-y-4">
-              <div>
-                <label htmlFor="investorId" className="block text-white text-sm font-medium mb-2">
-                  Investor ID
-                </label>
-                <input
-                  type="text"
-                  id="investorId"
-                  value={investorId}
-                  onChange={(e) => setInvestorId(e.target.value.toUpperCase())}
-                  placeholder="Enter your Investor ID"
-                  className="w-full px-4 py-3 bg-gray-700 border border-gray-600 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:border-transparent transition-all duration-200"                    
-                  onFocus={(e) => {
-                    e.target.style.borderColor = 'rgba(0, 255, 149, 0.3)';
-                  }}
-                  onBlur={(e) => {
-                    e.target.style.borderColor = '#4B5563';
-                  }}
-                  required
-                />
-          </div>
+              <WagmiInput
+            variant="default"
+            label="Investor ID"
+            placeholder="Enter your Investor ID"
+            value={investorId}
+            onChange={(e) => setInvestorId(e.target.value.toUpperCase())}
+            theme="green"
+            size="md"
+            required
+          />
               
               {error && (
                 <div className="text-red-400 text-sm bg-red-900/20 border border-red-800 p-3 rounded-lg">
@@ -241,27 +232,18 @@ export function InvestorLoginForm() {
 
         {/* Dev Login Form */}
         <form onSubmit={handleDevLogin} className="space-y-4">
-            <div>
-              <label htmlFor="devPassword" className="block text-white text-sm font-medium mb-2">
-                Dev Password
-              </label>
-              <input
-                type="password"
-                id="devPassword"
-                value={devPassword}
-                onChange={(e) => setDevPassword(e.target.value)}
-                placeholder="Enter dev password"
-                className="w-full px-4 py-3 bg-gray-700 border border-gray-600 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:border-transparent transition-all duration-200"                    
-                onFocus={(e) => {
-                  e.target.style.borderColor = 'rgba(255, 107, 53, 0.3)';
-                }}
-                onBlur={(e) => {
-                  e.target.style.borderColor = '#4B5563';
-                }}
-                required
-                autoFocus
-              />
-            </div>
+            <WagmiInput
+              variant="password"
+              label="Dev Password"
+              placeholder="Enter dev password"
+              value={devPassword}
+              onChange={(e) => setDevPassword(e.target.value)}
+              theme="orange"
+              size="md"
+              showPasswordToggle
+              required
+              autoFocus
+            />
             
             {devError && (
               <div className="text-red-400 text-sm bg-red-900/20 border border-red-800 p-3 rounded-lg">
