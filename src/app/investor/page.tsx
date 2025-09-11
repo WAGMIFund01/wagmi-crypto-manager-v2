@@ -543,7 +543,7 @@ export default function InvestorPage() {
                       <span 
                         className="font-semibold text-sm"
                         style={{ 
-                          color: transaction.amount >= 0 ? '#00FF95' : '#FF4444' 
+                          color: privacyMode ? '#FFFFFF' : (transaction.amount >= 0 ? '#00FF95' : '#FF4444')
                         }}
                       >
                           {privacyMode ? '•••••' : 

@@ -9,15 +9,8 @@ export function maskSensitiveData(value: string | number, isEnabled: boolean): s
     return String(value);
   }
   
-  // For numbers, show bullets based on length
-  if (typeof value === 'number') {
-    const length = String(value).length;
-    return '•'.repeat(Math.max(3, Math.min(length, 8)));
-  }
-  
-  // For strings, show bullets based on length
-  const length = value.length;
-  return '•'.repeat(Math.max(3, Math.min(length, 8)));
+  // Standardized masking: always use exactly 5 white dots
+  return '•••••';
 }
 
 /**
