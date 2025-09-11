@@ -23,6 +23,12 @@ export default function StandardNavbar({
   const router = useRouter();
   const [isPrivacyMode, setIsPrivacyMode] = useState(false);
   const [isRetrying, setIsRetrying] = useState(false);
+  const [isClient, setIsClient] = useState(false);
+
+  // Ensure we're on the client side
+  useEffect(() => {
+    setIsClient(true);
+  }, []);
 
   // Handle tab navigation
   const handleTabClick = (tabId: string) => {
@@ -115,6 +121,43 @@ export default function StandardNavbar({
     cumulativeReturn: isPrivacyMode ? '•••' : kpiData.cumulativeReturn,
     monthOnMonth: isPrivacyMode ? '•••' : kpiData.monthOnMonth
   } : null;
+
+  // Show loading state during hydration
+  if (!isClient) {
+    return (
+      <header style={{ backgroundColor: '#1A1A1A' }}>
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex justify-between items-center h-18 py-4">
+            <div className="flex items-center">
+              <h1 
+                className="font-bold"
+                style={{ 
+                  color: '#00FF95',
+                  fontSize: '36px',
+                  lineHeight: '1.2',
+                  textShadow: '0 0 25px rgba(0, 255, 149, 0.6), 0 0 50px rgba(0, 255, 149, 0.4), 0 0 75px rgba(0, 255, 149, 0.2)',
+                  letterSpacing: '0.05em'
+                }}
+              >
+                WAGMI
+              </h1>
+            </div>
+            <div className="flex items-center space-x-4">
+              <div style={{ color: '#A0A0A0', fontSize: '12px' }}>Loading...</div>
+            </div>
+          </div>
+          <div className="flex items-center justify-between h-16 py-3" style={{ borderBottom: '1px solid #333' }}>
+            <nav className="flex space-x-8">
+              <div style={{ color: '#A0A0A0', fontSize: '14px' }}>Loading navigation...</div>
+            </nav>
+            <div className="flex items-center space-x-6">
+              <div style={{ color: '#A0A0A0', fontSize: '12px' }}>Loading KPI data...</div>
+            </div>
+          </div>
+        </div>
+      </header>
+    );
+  }
 
   return (
     <header style={{ backgroundColor: '#1A1A1A' }}>
@@ -222,9 +265,11 @@ export default function StandardNavbar({
             {/* Exit Dev Mode Button - Icon Only */}
             <button
               onClick={() => {
-                // Clear dev session
-                sessionStorage.removeItem('devSession');
-                sessionStorage.removeItem('isDevMode');
+                // Clear dev session (only on client side)
+                if (typeof window !== 'undefined') {
+                  sessionStorage.removeItem('devSession');
+                  sessionStorage.removeItem('isDevMode');
+                }
                 router.push('/');
               }}
               className="p-1.5 rounded-lg transition-all duration-200 flex items-center justify-center"
