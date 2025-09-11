@@ -235,10 +235,10 @@ export default function Investors({ isPrivacyMode = false }: InvestorsProps) {
     <div className="space-y-4">
       {/* Unified Search and Filter Row */}
       <div className="max-w-full overflow-hidden">
-        {/* Desktop: Single horizontal row with proper alignment */}
-        <div className="hidden lg:flex lg:items-center lg:space-x-3 lg:max-w-full">
-          {/* Search Bar - 1/5 */}
-          <div className="flex-1 min-w-0">
+        {/* Desktop: Natural content-based layout */}
+        <div className="hidden lg:flex lg:items-end lg:space-x-4 lg:max-w-full">
+          {/* Search Bar - natural width */}
+          <div className="w-64 flex-shrink-0">
             <WagmiInput
               variant="search"
               placeholder="Search investors..."
@@ -249,8 +249,8 @@ export default function Investors({ isPrivacyMode = false }: InvestorsProps) {
             />
           </div>
 
-          {/* Filter Groups - 3/5 combined */}
-          <div className="flex-3 flex space-x-4 min-w-0">
+          {/* Filter Groups - flexible space */}
+          <div className="flex-1 flex space-x-6 min-w-0">
             <FilterGroup
               title="Returns"
               options={filterOptions.returns}
@@ -271,8 +271,8 @@ export default function Investors({ isPrivacyMode = false }: InvestorsProps) {
             />
           </div>
 
-          {/* Clear All - 1/5 */}
-          <div className="flex-1 min-w-0 flex justify-center">
+          {/* Clear All - natural width */}
+          <div className="w-20 flex-shrink-0 flex justify-center">
             <FilterChip
               label="Clear All"
               isActive={false}
