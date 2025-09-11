@@ -188,7 +188,7 @@ export default function Investors({ isPrivacyMode = false }: InvestorsProps) {
     // Share % filter
     if (filters.share.length > 0) {
       filtered = filtered.filter(investor => {
-        const sharePct = investor.sharePercentage;
+        const sharePct = investor.sharePercentage * 100; // Convert decimal to percentage
         return filters.share.some(filter => {
           switch (filter) {
             case 'minor': return sharePct < 5;
@@ -236,7 +236,7 @@ export default function Investors({ isPrivacyMode = false }: InvestorsProps) {
       {/* Unified Search and Filter Row */}
       <div className="max-w-full overflow-hidden">
         {/* Desktop: Single horizontal row with equal distribution */}
-        <div className="hidden lg:flex lg:items-end lg:space-x-3 lg:max-w-full">
+        <div className="hidden lg:flex lg:items-end lg:space-x-2 lg:max-w-full">
           {/* Search Bar - 1/5 */}
           <div className="flex-1 min-w-0">
             <WagmiInput

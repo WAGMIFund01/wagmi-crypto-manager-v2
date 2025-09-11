@@ -33,7 +33,7 @@ export default function FilterGroup({
       </div>
       
       {/* Filter Chips */}
-      <div className="flex flex-wrap gap-1">
+      <div className="flex gap-1 overflow-hidden">
         {options.map((option) => (
           <FilterChip
             key={option.value}
