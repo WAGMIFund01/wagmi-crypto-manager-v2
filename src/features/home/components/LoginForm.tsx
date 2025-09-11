@@ -36,7 +36,7 @@ export function LoginForm() {
               )}
             </p>
             <Button
-              onClick={() => window.location.href = session.user?.role === 'manager' ? '/dashboard' : '/investor'}
+              onClick={() => window.location.href = session.user?.role === 'manager' ? '/portfoliooverview' : '/investor'}
               className="w-full"
             >
               Go to Dashboard

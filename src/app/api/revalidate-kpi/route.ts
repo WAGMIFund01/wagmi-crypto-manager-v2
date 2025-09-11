@@ -4,7 +4,7 @@ import { NextResponse } from 'next/server';
 export async function POST() {
   try {
     // Revalidate the dashboard page to force fresh data fetch
-    revalidatePath('/dashboard');
+    revalidatePath('/portfoliooverview');
     
     console.log('Dashboard page revalidated - fresh KPI data will be fetched');
     
