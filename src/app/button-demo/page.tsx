@@ -94,7 +94,7 @@ export default function ButtonDemo() {
 
         {/* Icon-Only Buttons */}
         <section className="mb-12">
-          <h2 className="text-xl font-semibold text-white mb-4">Icon-Only Buttons (size="icon")</h2>
+          <h2 className="text-xl font-semibold text-white mb-4">Icon-Only Buttons (size=&quot;icon&quot;)</h2>
           <div className="flex flex-wrap gap-4">
             <WagmiButton variant="outline" theme="green" size="icon" icon={<RefreshIcon className="w-3 h-3" />} />
             <WagmiButton variant="primary" theme="green" size="icon" icon={<EyeIcon className="w-3 h-3" />} />
@@ -164,9 +164,9 @@ export default function ButtonDemo() {
             <WagmiButton variant="outline" theme="green" icon={<ManagerIcon />} size="lg">
               Manager Access
             </WagmiButton>
-            <WagmiButton variant="icon" theme="green" icon={<RefreshIcon />} size="sm" />
-            <WagmiButton variant="icon" theme="blue" icon={<EyeIcon />} size="sm" />
-            <WagmiButton variant="icon" theme="red" icon={<SignOutIcon />} size="sm" />
+            <WagmiButton variant="outline" theme="green" icon={<RefreshIcon className="w-3 h-3" />} size="icon" />
+            <WagmiButton variant="outline" theme="blue" icon={<EyeIcon className="w-3 h-3" />} size="icon" />
+            <WagmiButton variant="outline" theme="red" icon={<SignOutIcon className="w-3 h-3" />} size="icon" />
           </div>
         </section>
       </div>
