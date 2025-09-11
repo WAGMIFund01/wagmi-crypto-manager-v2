@@ -199,7 +199,7 @@ export default function UniversalNavbar({
               variant="outline"
               theme="green"
               size="icon"
-              icon={<RefreshIcon />}
+              icon={<RefreshIcon className="w-3 h-3" />}
               loading={isRetrying}
               title="Manual refresh"
             />
