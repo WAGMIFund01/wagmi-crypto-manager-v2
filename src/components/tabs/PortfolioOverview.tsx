@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { PortfolioAsset } from '@/app/api/get-portfolio-data/route';
-import { StackedBarChart, WagmiCard } from '@/components/ui';
+import { StackedBarChart, WagmiCard, WagmiSpinner } from '@/components/ui';
 
 interface PortfolioOverviewProps {
   className?: string;
@@ -100,10 +100,13 @@ export default function PortfolioOverview({ className }: PortfolioOverviewProps)
   if (loading) {
     return (
       <div className={`${className} flex items-center justify-center min-h-96`}>
-        <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#00FF95] mx-auto mb-4"></div>
-          <p className="text-gray-400">Loading portfolio data...</p>
-        </div>
+        <WagmiSpinner 
+          size="lg" 
+          theme="green" 
+          text="Loading portfolio data..." 
+          showText={true} 
+          centered={true}
+        />
       </div>
     );
   }
