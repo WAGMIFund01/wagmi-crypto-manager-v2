@@ -67,7 +67,7 @@ export function InvestorLoginForm() {
     try {
       // Trigger Google OAuth sign-in
       await signIn('google', { 
-        callbackUrl: '/dashboard',
+        callbackUrl: '/portfoliooverview',
         redirect: true 
       });
     } catch (error) {
@@ -104,7 +104,7 @@ export function InvestorLoginForm() {
       sessionStorage.setItem('isDevMode', 'true');
       
       // Redirect to dashboard
-      router.push('/dashboard');
+      router.push('/portfoliooverview');
     } else {
       setDevError('Invalid dev password. Please try again.');
     }
