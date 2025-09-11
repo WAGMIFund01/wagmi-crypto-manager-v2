@@ -120,7 +120,7 @@ const WagmiInput = forwardRef<HTMLInputElement, WagmiInputProps>(
       backgroundColor: colors.bg,
       color: colors.text,
       borderColor: hasError ? colors.error : colors.border,
-      paddingLeft: icon && iconPosition === 'left' ? '2.75rem' : undefined,
+      paddingLeft: (icon && iconPosition === 'left') || variant === 'search' ? '2.75rem' : undefined,
       paddingRight: (icon && iconPosition === 'right') || showPasswordToggle ? '2.75rem' : undefined
     };
     

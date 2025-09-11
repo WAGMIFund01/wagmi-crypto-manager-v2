@@ -287,13 +287,13 @@ export default function InputDemo() {
           {/* Search and Filter */}
           <div>
             <h3 className="text-lg font-semibold text-white mb-4">Investor Table Search</h3>
-            <div className="flex gap-4 max-w-2xl">
+            <div className="flex flex-col sm:flex-row gap-4 max-w-2xl">
               <WagmiInput
                 variant="search"
                 placeholder="Search investors by name or ID..."
                 value={formData.search}
                 onChange={(e) => handleInputChange('search', e.target.value)}
-                className="flex-1"
+                className="flex-1 min-w-0"
               />
               
               <WagmiInput
@@ -301,7 +301,7 @@ export default function InputDemo() {
                 placeholder="Min Investment"
                 value={formData.amount}
                 onChange={(e) => handleInputChange('amount', e.target.value)}
-                className="w-32"
+                className="w-full sm:w-32"
               />
             </div>
           </div>
