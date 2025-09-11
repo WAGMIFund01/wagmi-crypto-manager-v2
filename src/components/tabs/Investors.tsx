@@ -1,7 +1,8 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import TransactionModal from '@/components/TransactionModal';
+import { WagmiInput, FilterGroup, FilterChip } from '@/components/ui';
 
 interface Investor {
   id: string;
@@ -24,6 +25,14 @@ export default function Investors({ isPrivacyMode = false }: InvestorsProps) {
   const [error, setError] = useState<string | null>(null);
   const [selectedInvestor, setSelectedInvestor] = useState<Investor | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  
+  // Search and filter state
+  const [searchQuery, setSearchQuery] = useState('');
+  const [filters, setFilters] = useState({
+    returns: [] as string[],
+    size: [] as string[],
+    aum: [] as string[]
+  });
 
   // Fetch investor data on component mount
   useEffect(() => {
@@ -93,6 +102,113 @@ export default function Investors({ isPrivacyMode = false }: InvestorsProps) {
     return '•••••';
   };
 
+  // Filter options
+  const filterOptions = {
+    returns: [
+      { value: 'positive', label: 'Positive' },
+      { value: 'negative', label: 'Negative' },
+      { value: 'high', label: 'High (>10%)' },
+      { value: 'low', label: 'Low (<5%)' }
+    ],
+    size: [
+      { value: 'small', label: 'Small (<$1K)' },
+      { value: 'medium', label: 'Medium ($1K-$5K)' },
+      { value: 'large', label: 'Large (>$5K)' },
+      { value: 'whale', label: 'Whale (>$10K)' }
+    ],
+    aum: [
+      { value: 'low', label: 'Low (<1%)' },
+      { value: 'medium', label: 'Medium (1-5%)' },
+      { value: 'high', label: 'High (>5%)' },
+      { value: 'major', label: 'Major (>10%)' }
+    ]
+  };
+
+  // Filter toggle function
+  const toggleFilter = (category: keyof typeof filters, value: string) => {
+    setFilters(prev => ({
+      ...prev,
+      [category]: prev[category].includes(value)
+        ? prev[category].filter(v => v !== value)
+        : [...prev[category], value]
+    }));
+  };
+
+  // Clear all filters
+  const clearAllFilters = () => {
+    setFilters({
+      returns: [],
+      size: [],
+      aum: []
+    });
+    setSearchQuery('');
+  };
+
+  // Filtered investors based on search and filters
+  const filteredInvestors = useMemo(() => {
+    let filtered = investors;
+
+    // Search filter
+    if (searchQuery.trim()) {
+      const query = searchQuery.toLowerCase();
+      filtered = filtered.filter(investor =>
+        investor.name.toLowerCase().includes(query) ||
+        investor.id.toLowerCase().includes(query) ||
+        investor.investmentValue.toString().includes(query)
+      );
+    }
+
+    // Returns filter
+    if (filters.returns.length > 0) {
+      filtered = filtered.filter(investor => {
+        const returnPct = investor.returnPercentage;
+        return filters.returns.some(filter => {
+          switch (filter) {
+            case 'positive': return returnPct > 0;
+            case 'negative': return returnPct < 0;
+            case 'high': return returnPct > 10;
+            case 'low': return returnPct < 5;
+            default: return false;
+          }
+        });
+      });
+    }
+
+    // Size filter
+    if (filters.size.length > 0) {
+      filtered = filtered.filter(investor => {
+        const investment = investor.investmentValue;
+        return filters.size.some(filter => {
+          switch (filter) {
+            case 'small': return investment < 1000;
+            case 'medium': return investment >= 1000 && investment <= 5000;
+            case 'large': return investment > 5000;
+            case 'whale': return investment > 10000;
+            default: return false;
+          }
+        });
+      });
+    }
+
+    // AUM filter
+    if (filters.aum.length > 0) {
+      filtered = filtered.filter(investor => {
+        const sharePct = investor.sharePercentage;
+        return filters.aum.some(filter => {
+          switch (filter) {
+            case 'low': return sharePct < 1;
+            case 'medium': return sharePct >= 1 && sharePct <= 5;
+            case 'high': return sharePct > 5;
+            case 'major': return sharePct > 10;
+            default: return false;
+          }
+        });
+      });
+    }
+
+    return filtered;
+  }, [investors, searchQuery, filters]);
+
   // Handle row click to open transaction modal
   const handleRowClick = (investor: Investor) => {
     setSelectedInvestor(investor);
@@ -123,6 +239,128 @@ export default function Investors({ isPrivacyMode = false }: InvestorsProps) {
 
   return (
     <div className="space-y-6">
+      {/* Search Bar */}
+      <div className="w-full max-w-md">
+        <WagmiInput
+          variant="search"
+          placeholder="Search investors by name, ID, or amount..."
+          value={searchQuery}
+          onChange={(e) => setSearchQuery(e.target.value)}
+          theme="green"
+          size="md"
+        />
+      </div>
+
+      {/* Filter Bar */}
+      <div className="space-y-4">
+        {/* Desktop: Three groups side-by-side */}
+        <div className="hidden lg:flex lg:space-x-8">
+          <FilterGroup
+            title="Returns"
+            options={filterOptions.returns}
+            selectedValues={filters.returns}
+            onToggle={(value) => toggleFilter('returns', value)}
+            className="flex-1"
+          />
+          <FilterGroup
+            title="Size"
+            options={filterOptions.size}
+            selectedValues={filters.size}
+            onToggle={(value) => toggleFilter('size', value)}
+            className="flex-1"
+          />
+          <FilterGroup
+            title="AUM %"
+            options={filterOptions.aum}
+            selectedValues={filters.aum}
+            onToggle={(value) => toggleFilter('aum', value)}
+            className="flex-1"
+          />
+        </div>
+
+        {/* Tablet: Two groups per line */}
+        <div className="hidden md:flex md:flex-col lg:hidden space-y-4">
+          <div className="flex space-x-6">
+            <FilterGroup
+              title="Returns"
+              options={filterOptions.returns}
+              selectedValues={filters.returns}
+              onToggle={(value) => toggleFilter('returns', value)}
+              className="flex-1"
+            />
+            <FilterGroup
+              title="Size"
+              options={filterOptions.size}
+              selectedValues={filters.size}
+              onToggle={(value) => toggleFilter('size', value)}
+              className="flex-1"
+            />
+          </div>
+          <div className="flex space-x-6">
+            <FilterGroup
+              title="AUM %"
+              options={filterOptions.aum}
+              selectedValues={filters.aum}
+              onToggle={(value) => toggleFilter('aum', value)}
+              className="flex-1"
+            />
+            <div className="flex-1 flex items-end">
+              <FilterChip
+                label="Clear All"
+                isActive={false}
+                onClick={clearAllFilters}
+                className="bg-gray-700 border-gray-600 text-gray-300 hover:bg-gray-600 hover:text-white"
+              />
+            </div>
+          </div>
+        </div>
+
+        {/* Mobile: Single column */}
+        <div className="flex flex-col md:hidden space-y-4">
+          <FilterGroup
+            title="Returns"
+            options={filterOptions.returns}
+            selectedValues={filters.returns}
+            onToggle={(value) => toggleFilter('returns', value)}
+          />
+          <FilterGroup
+            title="Size"
+            options={filterOptions.size}
+            selectedValues={filters.size}
+            onToggle={(value) => toggleFilter('size', value)}
+          />
+          <FilterGroup
+            title="AUM %"
+            options={filterOptions.aum}
+            selectedValues={filters.aum}
+            onToggle={(value) => toggleFilter('aum', value)}
+          />
+          <div className="pt-2">
+            <FilterChip
+              label="Clear All"
+              isActive={false}
+              onClick={clearAllFilters}
+              className="bg-gray-700 border-gray-600 text-gray-300 hover:bg-gray-600 hover:text-white"
+            />
+          </div>
+        </div>
+
+        {/* Clear All button for desktop */}
+        <div className="hidden lg:flex lg:justify-end lg:pt-2">
+          <FilterChip
+            label="Clear All"
+            isActive={false}
+            onClick={clearAllFilters}
+            className="bg-gray-700 border-gray-600 text-gray-300 hover:bg-gray-600 hover:text-white"
+          />
+        </div>
+      </div>
+
+      {/* Results Count */}
+      <div className="text-sm text-gray-400">
+        {filteredInvestors.length} of {investors.length} investors
+      </div>
+
       {/* Investor Table */}
       <div className="rounded-lg overflow-hidden" style={{ backgroundColor: '#1A1F1A' }}>
         <div className="overflow-x-auto">
@@ -153,7 +391,7 @@ export default function Investors({ isPrivacyMode = false }: InvestorsProps) {
               </tr>
             </thead>
             <tbody>
-              {investors.map((investor, index) => (
+              {filteredInvestors.map((investor, index) => (
                 <tr
                   key={investor.id}
                   onClick={() => handleRowClick(investor)}
