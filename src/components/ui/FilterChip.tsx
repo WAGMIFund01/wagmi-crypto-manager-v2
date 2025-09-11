@@ -18,15 +18,15 @@ export default function FilterChip({ label, isActive, onClick, className }: Filt
         // Base styles - 5% size reduction
         'px-2.5 py-0.5 rounded-full text-xs font-medium transition-all duration-150',
         'whitespace-nowrap', // Prevent text wrapping
-        'focus:outline-none focus:ring-1 focus:ring-green-400/50 focus:ring-offset-1 focus:ring-offset-gray-900',
-        // Default state - outline with transparent fill
-        'border border-green-400 bg-transparent text-green-400',
-        // Hover state - subtle green glow
-        'hover:shadow-[0_0_4px_rgba(0,255,149,0.3)]',
-        // Active state - filled with green, dark text
-        isActive && 'bg-green-400 text-gray-900 border-green-400',
-        // Focus state - outer glow for accessibility
-        'focus:shadow-[0_0_6px_rgba(0,255,149,0.4)]',
+        'focus:outline-none focus:ring-1 focus:ring-[#00FF95]/50 focus:ring-offset-1 focus:ring-offset-gray-900',
+        // Default state - outline with transparent fill (using brand green #00FF95)
+        'border border-[#00FF95] bg-transparent text-[#00FF95]',
+        // Hover state - subtle green glow (matching WagmiButton)
+        'hover:shadow-[0_0_10px_rgba(0,255,149,0.3)]',
+        // Active state - filled with brand green, dark text (matching WagmiButton)
+        isActive && 'bg-[#00FF95] text-black border-[#00FF95]',
+        // Focus state - outer glow for accessibility (matching WagmiButton)
+        'focus:shadow-[0_0_0_2px_rgba(0,255,149,0.3)]',
         className
       )}
     >
