@@ -220,7 +220,7 @@ export function InvestorLoginForm() {
             onClick={handleManagerLogin}
             variant="outline"
             theme="green"
-            size="md"
+            size="lg"
           >
             Manager Access
           </WagmiButton>
