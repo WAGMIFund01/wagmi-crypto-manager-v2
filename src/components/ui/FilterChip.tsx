@@ -15,8 +15,8 @@ export default function FilterChip({ label, isActive, onClick, className }: Filt
     <button
       onClick={onClick}
       className={cn(
-        // Base styles - 75% size pill shape with compact padding
-        'px-1.5 py-0.5 rounded-full text-[10px] font-medium transition-all duration-150',
+        // Base styles - increased by 25% from previous size
+        'px-2 py-1 rounded-full text-xs font-medium transition-all duration-150',
         'focus:outline-none focus:ring-1 focus:ring-green-400/50 focus:ring-offset-1 focus:ring-offset-gray-900',
         // Default state - outline with transparent fill
         'border border-green-400 bg-transparent text-green-400',
