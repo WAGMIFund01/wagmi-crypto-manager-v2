@@ -454,25 +454,25 @@ export default function InvestorPage() {
         ) : (
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
             <StackedBarChart
-              title="Breakdown by Asset"
+              title="Portfolio Breakdown by Asset"
               data={assetDistribution}
               colors={assetColors}
               formatValue={(value) => privacyMode ? '•••••' : formatCurrency(value, false)}
             />
             <StackedBarChart
-              title="Breakdown by Risk"
+              title="Portfolio Breakdown by Risk"
               data={riskDistribution}
               colors={riskColors}
               formatValue={(value) => privacyMode ? '•••••' : formatCurrency(value, false)}
             />
             <StackedBarChart
-              title="Breakdown by Location"
+              title="Portfolio Breakdown by Location"
               data={locationDistribution}
               colors={locationColors}
               formatValue={(value) => privacyMode ? '•••••' : formatCurrency(value, false)}
             />
             <StackedBarChart
-              title="Breakdown by Type"
+              title="Portfolio Breakdown by Type"
               data={typeDistribution}
               colors={typeColors}
               formatValue={(value) => privacyMode ? '•••••' : formatCurrency(value, false)}
