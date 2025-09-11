@@ -10,6 +10,7 @@ interface StackedBarChartProps {
   maxItems?: number;
   className?: string;
   formatValue?: (value: number) => string;
+  showTooltips?: boolean;
 }
 
 export default function StackedBarChart({
@@ -23,7 +24,8 @@ export default function StackedBarChart({
     currency: 'USD',
     minimumFractionDigits: 2,
     maximumFractionDigits: 2,
-  }).format(value)
+  }).format(value),
+  showTooltips = true
 }: StackedBarChartProps) {
   const sortedEntries = Object.entries(data)
     .sort(([,a], [,b]) => b - a)
@@ -53,7 +55,7 @@ export default function StackedBarChart({
                   width: `${percentage}%`,
                   backgroundColor: color,
                 }}
-                title={`${key}: ${formatValue(value)} (${percentage.toFixed(1)}%)`}
+                title={showTooltips ? `${key}: ${formatValue(value)} (${percentage.toFixed(1)}%)` : undefined}
               />
             );
           })}

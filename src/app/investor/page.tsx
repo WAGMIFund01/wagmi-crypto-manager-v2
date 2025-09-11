@@ -458,24 +458,28 @@ export default function InvestorPage() {
               data={assetDistribution}
               colors={assetColors}
               formatValue={(value) => privacyMode ? '•••••' : formatCurrency(value, false)}
+              showTooltips={false}
             />
             <StackedBarChart
               title="Portfolio Breakdown by Risk"
               data={riskDistribution}
               colors={riskColors}
               formatValue={(value) => privacyMode ? '•••••' : formatCurrency(value, false)}
+              showTooltips={false}
             />
             <StackedBarChart
               title="Portfolio Breakdown by Location"
               data={locationDistribution}
               colors={locationColors}
               formatValue={(value) => privacyMode ? '•••••' : formatCurrency(value, false)}
+              showTooltips={false}
             />
             <StackedBarChart
               title="Portfolio Breakdown by Type"
               data={typeDistribution}
               colors={typeColors}
               formatValue={(value) => privacyMode ? '•••••' : formatCurrency(value, false)}
+              showTooltips={false}
             />
           </div>
         )}
