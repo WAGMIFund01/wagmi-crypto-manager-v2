@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect, useCallback } from 'react';
+import StandardModal from './ui/StandardModal';
 
 interface Transaction {
   transactionId: string;
@@ -67,77 +68,24 @@ export default function TransactionModal({ isOpen, onClose, investorId, investor
     }).format(amount);
   };
 
-  if (!isOpen) return null;
-
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 animate-in fade-in duration-300">
-      {/* Frosted Glass Backdrop */}
-      <div 
-        className="absolute inset-0 transition-all duration-300 animate-in fade-in"
-        style={{
-          background: 'rgba(0, 0, 0, 0.5)',
-          backdropFilter: 'blur(8px)',
-          WebkitBackdropFilter: 'blur(8px)'
-        }}
-        onClick={onClose}
-      />
-      
-      {/* Modal Content */}
-      <div 
-        className="relative w-full max-w-4xl max-h-[90vh] overflow-hidden rounded-2xl transition-all duration-300 animate-in zoom-in-95 slide-in-from-bottom-4"
-        style={{
-          backgroundColor: '#1A1F1A',
-          borderRadius: '16px',
-          boxShadow: '0 8px 32px rgba(0, 0, 0, 0.4), 0 0 0 1px rgba(255, 255, 255, 0.05), 0 0 15px rgba(0, 255, 149, 0.1), 0 0 30px rgba(0, 255, 149, 0.05), 0 0 50px rgba(0, 255, 149, 0.02)',
-          border: '1px solid rgba(0, 255, 149, 0.1)'
-        }}
-      >
-        {/* Header */}
-        <div className="flex items-center justify-between p-6 border-b" style={{ borderColor: '#333' }}>
-          <div>
-            <h2 
-              className="text-xl font-semibold"
-              style={{ 
-                color: '#00FF95',
-                textShadow: '0 0 20px rgba(0, 255, 149, 0.5), 0 0 40px rgba(0, 255, 149, 0.3)'
-              }}
-            >
-              Transaction History
-            </h2>
-            <p style={{ color: '#A0A0A0', fontSize: '14px', margin: '4px 0 0 0' }}>
-              {investorName} (ID: {investorId})
-            </p>
-          </div>
-          
-          {/* Close Button */}
-          <button
-            onClick={onClose}
-            className="p-2 rounded-lg transition-all duration-200 flex items-center justify-center"
-            style={{
-              backgroundColor: 'transparent',
-              border: '1px solid #333',
-              color: '#A0A0A0'
-            }}
-            onMouseEnter={(e) => {
-              e.currentTarget.style.backgroundColor = 'rgba(255, 255, 255, 0.1)';
-              e.currentTarget.style.borderColor = '#00FF95';
-              e.currentTarget.style.color = '#00FF95';
-            }}
-            onMouseLeave={(e) => {
-              e.currentTarget.style.backgroundColor = 'transparent';
-              e.currentTarget.style.borderColor = '#333';
-              e.currentTarget.style.color = '#A0A0A0';
-            }}
-            title="Close"
-          >
-            <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
-              <path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/>
-            </svg>
-          </button>
+    <StandardModal
+      isOpen={isOpen}
+      onClose={onClose}
+      title="Transaction History"
+      size="2xl"
+      theme="green"
+    >
+      <div className="space-y-4">
+        {/* Investor Info */}
+        <div className="text-center mb-6">
+          <p style={{ color: '#A0A0A0', fontSize: '14px' }}>
+            {investorName} (ID: {investorId})
+          </p>
         </div>
 
         {/* Content */}
-        <div className="p-6 overflow-y-auto max-h-[calc(90vh-120px)]">
+        <div className="overflow-y-auto max-h-[calc(90vh-200px)]">
           {loading ? (
             <div className="flex items-center justify-center py-12">
               <div className="text-center">
@@ -249,6 +197,6 @@ export default function TransactionModal({ isOpen, onClose, investorId, investor
           )}
         </div>
       </div>
-    </div>
+    </StandardModal>
   );
 }

@@ -2,6 +2,7 @@
 
 import React, { useState } from 'react';
 import { useRouter } from 'next/navigation';
+import StandardModal from '@/components/ui/StandardModal';
 import { signIn } from 'next-auth/react';
 // import { Button, Card, CardContent, CardHeader, CardTitle } from '@/shared/components';
 
@@ -280,54 +281,20 @@ export function InvestorLoginForm() {
     </div>
 
     {/* Dev Access Modal */}
-    {showDevModal && (
-      <div className="fixed inset-0 flex items-center justify-center z-50 p-4 animate-in fade-in duration-300">
-        {/* Frosted Glass Backdrop */}
-        <div 
-          className="absolute inset-0 transition-all duration-300 animate-in fade-in"
-          style={{
-            background: 'rgba(0, 0, 0, 0.5)',
-            backdropFilter: 'blur(8px)',
-            WebkitBackdropFilter: 'blur(8px)'
-          }}
-          onClick={closeDevModal}
-        />
-        <div 
-          className="w-full max-w-md rounded-xl p-6 relative transition-all duration-300 animate-in zoom-in-95 slide-in-from-bottom-4"
-          style={{ 
-            backgroundColor: '#1A1F1A',
-            boxShadow: '0 8px 32px rgba(0, 0, 0, 0.4), 0 0 0 1px rgba(255, 255, 255, 0.05), 0 0 15px rgba(255, 107, 53, 0.1), 0 0 30px rgba(255, 107, 53, 0.05), 0 0 50px rgba(255, 107, 53, 0.02)',
-            border: '1px solid rgba(255, 107, 53, 0.1)'
-          }}
-        >
-          {/* Close Button */}
-          <button
-            onClick={closeDevModal}
-            className="absolute top-4 right-4 text-gray-400 hover:text-white transition-colors"
-          >
-            <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-            </svg>
-          </button>
+    <StandardModal
+      isOpen={showDevModal}
+      onClose={closeDevModal}
+      title="Dev Access"
+      size="md"
+      theme="orange"
+    >
+      <div className="space-y-4">
+        <p style={{ color: '#A0A0A0', textAlign: 'center' }}>
+          Enter dev password to bypass OAuth
+        </p>
 
-          {/* Modal Header */}
-          <div className="text-center mb-6">
-            <h2 
-              className="text-2xl font-bold mb-2"
-              style={{ 
-                color: '#FF6B35',
-                textShadow: '0 0 10px rgba(255, 107, 53, 0.3)'
-              }}
-            >
-              Dev Access
-            </h2>
-            <p style={{ color: '#A0A0A0' }}>
-              Enter dev password to bypass OAuth
-            </p>
-          </div>
-
-          {/* Dev Login Form */}
-          <form onSubmit={handleDevLogin} className="space-y-4">
+        {/* Dev Login Form */}
+        <form onSubmit={handleDevLogin} className="space-y-4">
             <div>
               <label htmlFor="devPassword" className="block text-white text-sm font-medium mb-2">
                 Dev Password
@@ -402,10 +369,8 @@ export function InvestorLoginForm() {
               </button>
             </div>
           </form>
-
         </div>
-      </div>
-    )}
+      </StandardModal>
     </div>
     </div>
   );
