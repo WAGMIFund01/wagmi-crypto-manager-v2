@@ -238,7 +238,7 @@ export default function Investors({ isPrivacyMode = false }: InvestorsProps) {
         {/* Desktop: Natural content-based layout */}
         <div className="hidden lg:flex lg:items-end lg:space-x-4">
           {/* Search Bar - natural width */}
-          <div className="w-64 flex-shrink-0">
+          <div className="w-52 flex-shrink-0">
             <WagmiInput
               variant="search"
               placeholder="Search investors..."
@@ -285,7 +285,7 @@ export default function Investors({ isPrivacyMode = false }: InvestorsProps) {
         {/* Tablet: Search + Wrapping chips */}
         <div className="hidden md:flex md:flex-col lg:hidden space-y-4">
           {/* Search Bar */}
-          <div className="w-full max-w-md">
+          <div className="w-full max-w-sm">
             <WagmiInput
               variant="search"
               placeholder="Search investors..."
