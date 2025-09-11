@@ -271,49 +271,27 @@ export function InvestorLoginForm() {
             )}
             
             <div className="flex gap-3">
-              <button
+              <WagmiButton
                 type="button"
                 onClick={closeDevModal}
-                className="flex-1 font-semibold py-3 px-4 rounded-lg transition-all duration-200"
-                style={{
-                  backgroundColor: 'transparent',
-                  border: '1px solid #666',
-                  color: '#A0A0A0'
-                }}
-                onMouseEnter={(e) => {
-                  e.currentTarget.style.backgroundColor = 'rgba(160, 160, 160, 0.1)';
-                }}
-                onMouseLeave={(e) => {
-                  e.currentTarget.style.backgroundColor = 'transparent';
-                }}
+                variant="outline"
+                theme="gray"
+                size="lg"
+                className="flex-1"
               >
                 Cancel
-              </button>
+              </WagmiButton>
               
-              <button
+              <WagmiButton
                 type="submit"
                 disabled={!devPassword.trim()}
-                className="flex-1 disabled:bg-gray-600 disabled:cursor-not-allowed font-semibold py-3 px-4 rounded-lg transition-all duration-200"
-                style={{
-                  backgroundColor: '#FF6B35',
-                  color: '#FFFFFF',
-                  border: 'none'
-                }}
-                onMouseEnter={(e) => {
-                  if (!e.currentTarget.disabled) {
-                    e.currentTarget.style.backgroundColor = '#E55A2B';
-                    e.currentTarget.style.boxShadow = '0px 0px 8px rgba(255, 107, 53, 0.4)';
-                  }
-                }}
-                onMouseLeave={(e) => {
-                  if (!e.currentTarget.disabled) {
-                    e.currentTarget.style.backgroundColor = '#FF6B35';
-                    e.currentTarget.style.boxShadow = 'none';
-                  }
-                }}
+                variant="primary"
+                theme="orange"
+                size="lg"
+                className="flex-1"
               >
                 Access Dashboard
-              </button>
+              </WagmiButton>
             </div>
           </form>
         </div>

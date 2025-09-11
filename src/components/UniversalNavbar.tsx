@@ -2,6 +2,8 @@
 
 import { useRouter } from 'next/navigation';
 import { useState, useEffect } from 'react';
+import WagmiButton from './ui/WagmiButton';
+import { RefreshIcon } from './ui/icons/WagmiIcons';
 
 interface UniversalNavbarProps {
   activeTab: string;
@@ -191,108 +193,60 @@ export default function UniversalNavbar({
             </p>
             
             {/* Refresh Icon */}
-            <button
+            <WagmiButton
               onClick={handleRetryKPI}
               disabled={isRetrying}
-              className="p-1.5 rounded-lg transition-all duration-200 flex items-center justify-center"
-              style={{
-                backgroundColor: isRetrying ? 'rgba(0, 255, 149, 0.3)' : 'transparent',
-                border: '1px solid #00FF95',
-                color: '#00FF95',
-                width: '28px',
-                height: '28px',
-                opacity: isRetrying ? 0.7 : 1
-              }}
-              onMouseEnter={(e) => {
-                if (!isRetrying) {
-                  e.currentTarget.style.backgroundColor = 'rgba(0, 255, 149, 0.1)';
-                  e.currentTarget.style.boxShadow = '0px 0px 8px rgba(0, 255, 149, 0.3)';
-                }
-              }}
-              onMouseLeave={(e) => {
-                if (!isRetrying) {
-                  e.currentTarget.style.backgroundColor = 'transparent';
-                  e.currentTarget.style.boxShadow = 'none';
-                }
-              }}
+              variant="outline"
+              theme="green"
+              size="sm"
+              icon={<RefreshIcon className="w-3 h-3" />}
+              loading={isRetrying}
+              className="w-7 h-7 p-1.5"
               title="Manual refresh"
-            >
-              {isRetrying ? (
-                <div className="animate-spin rounded-full h-3 w-3 border-b-2" style={{ borderColor: '#00FF95' }}></div>
-              ) : (
-                <svg className="w-3 h-3" fill="currentColor" viewBox="0 0 24 24">
-                  <path d="M17.65 6.35C16.2 4.9 14.21 4 12 4c-4.42 0-7.99 3.58-7.99 8s3.57 8 7.99 8c3.73 0 6.84-2.55 7.73-6h-2.08c-.82 2.33-3.04 4-5.65 4-3.31 0-6-2.69-6-6s2.69-6 6-6c1.66 0 3.14.69 4.22 1.78L13 11h7V4l-2.35 2.35z"/>
-                </svg>
-              )}
-            </button>
+            />
 
             {/* Privacy Toggle - Eye Icon with Rounded Square */}
-            <button
+            <WagmiButton
               onClick={() => {
                 const newPrivacyMode = !isPrivacyMode;
                 setIsPrivacyMode(newPrivacyMode);
                 onPrivacyModeChange?.(newPrivacyMode);
               }}
-              className="p-1.5 rounded-md transition-all duration-200 flex items-center justify-center"
-              style={{
-                backgroundColor: isPrivacyMode ? '#00FF95' : 'transparent',
-                border: '1px solid #00FF95',
-                color: isPrivacyMode ? '#1A1A1A' : '#00FF95',
-                width: '28px',
-                height: '28px'
-              }}
-              onMouseEnter={(e) => {
-                if (!isPrivacyMode) {
-                  e.currentTarget.style.backgroundColor = 'rgba(0, 255, 149, 0.1)';
-                  e.currentTarget.style.boxShadow = '0px 0px 8px rgba(0, 255, 149, 0.3)';
-                }
-              }}
-              onMouseLeave={(e) => {
-                if (!isPrivacyMode) {
-                  e.currentTarget.style.backgroundColor = 'transparent';
-                  e.currentTarget.style.boxShadow = 'none';
-                }
-              }}
-            >
-              {isPrivacyMode ? (
-                // Eye with slash icon (privacy ON)
-                <svg className="w-3 h-3" fill="currentColor" viewBox="0 0 24 24">
-                  <path d="M12 4.5C7 4.5 2.73 7.61 1 12c1.73 4.39 6 7.5 11 7.5s9.27-3.11 11-7.5c-1.73-4.39-6-7.5-11-7.5zM12 17c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5-5 5zm0-8c-1.66 0-3 1.34-3 3s1.34 3 3 3 3-1.34 3-3-1.34-3-3-3z"/>
-                  <path d="M2 2l20 20" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/>
-                </svg>
-              ) : (
-                // Open eye icon (privacy OFF)
-                <svg className="w-3 h-3" fill="currentColor" viewBox="0 0 24 24">
-                  <path d="M12 4.5C7 4.5 2.73 7.61 1 12c1.73 4.39 6 7.5 11 7.5s9.27-3.11 11-7.5c-1.73-4.39-6-7.5-11-7.5zM12 17c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5-5 5zm0-8c-1.66 0-3 1.34-3 3s1.34 3 3 3 3-1.34 3-3-1.34-3-3-3z"/>
-                </svg>
-              )}
-            </button>
+              variant={isPrivacyMode ? "primary" : "outline"}
+              theme="green"
+              size="sm"
+              className="w-7 h-7 p-1.5"
+              icon={
+                isPrivacyMode ? (
+                  // Eye with slash icon (privacy ON)
+                  <svg className="w-3 h-3" fill="currentColor" viewBox="0 0 24 24">
+                    <path d="M12 4.5C7 4.5 2.73 7.61 1 12c1.73 4.39 6 7.5 11 7.5s9.27-3.11 11-7.5c-1.73-4.39-6-7.5-11-7.5zM12 17c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5-5 5zm0-8c-1.66 0-3 1.34-3 3s1.34 3 3 3 3-1.34 3-3-1.34-3-3-3z"/>
+                    <path d="M2 2l20 20" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/>
+                  </svg>
+                ) : (
+                  // Open eye icon (privacy OFF)
+                  <svg className="w-3 h-3" fill="currentColor" viewBox="0 0 24 24">
+                    <path d="M12 4.5C7 4.5 2.73 7.61 1 12c1.73 4.39 6 7.5 11 7.5s9.27-3.11 11-7.5c-1.73-4.39-6-7.5-11-7.5zM12 17c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5-5 5zm0-8c-1.66 0-3 1.34-3 3s1.34 3 3 3 3-1.34 3-3-1.34-3-3-3z"/>
+                  </svg>
+                )
+              }
+              title={isPrivacyMode ? 'Show Data' : 'Privacy Mode'}
+            />
 
             {/* Exit Dev Mode Button - Icon Only */}
-            <button
+            <WagmiButton
               onClick={handleSignOut}
-              className="p-1.5 rounded-lg transition-all duration-200 flex items-center justify-center"
-              style={{
-                backgroundColor: 'transparent',
-                border: '1px solid #00FF95',
-                color: '#00FF95',
-                width: '28px',
-                height: '28px'
-              }}
-              onMouseEnter={(e) => {
-                e.currentTarget.style.backgroundColor = 'rgba(0, 255, 149, 0.1)';
-                e.currentTarget.style.boxShadow = '0px 0px 8px rgba(0, 255, 149, 0.3)';
-              }}
-              onMouseLeave={(e) => {
-                e.currentTarget.style.backgroundColor = 'transparent';
-                e.currentTarget.style.boxShadow = 'none';
-              }}
+              variant="outline"
+              theme="green"
+              size="sm"
+              className="w-7 h-7 p-1.5"
+              icon={
+                <svg className="w-3 h-3" fill="currentColor" viewBox="0 0 24 24">
+                  <path d="M17 7l-1.41 1.41L18.17 11H8v2h10.17l-2.58 2.58L17 17l5-5zM4 5h8V3H4c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h8v-2H4V5z"/>
+                </svg>
+              }
               title="Exit Dev Mode"
-            >
-              <svg className="w-3 h-3" fill="currentColor" viewBox="0 0 24 24">
-                <path d="M17 7l-1.41 1.41L18.17 11H8v2h10.17l-2.58 2.58L17 17l5-5zM4 5h8V3H4c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h8v-2H4V5z"/>
-              </svg>
-            </button>
+            />
           </div>
         </div>
 
