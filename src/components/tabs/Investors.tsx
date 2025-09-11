@@ -232,13 +232,13 @@ export default function Investors({ isPrivacyMode = false }: InvestorsProps) {
   }
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-4">
       {/* Unified Search and Filter Row */}
-      <div className="space-y-4 max-w-full overflow-hidden">
-        {/* Desktop: Single horizontal row */}
-        <div className="hidden lg:flex lg:items-end lg:space-x-4 lg:max-w-full">
-          {/* Search Bar */}
-          <div className="flex-shrink-0">
+      <div className="max-w-full overflow-hidden">
+        {/* Desktop: Single horizontal row with equal distribution */}
+        <div className="hidden lg:flex lg:items-end lg:space-x-3 lg:max-w-full">
+          {/* Search Bar - 1/5 */}
+          <div className="flex-1 min-w-0">
             <WagmiInput
               variant="search"
               placeholder="Search investors..."
@@ -246,37 +246,41 @@ export default function Investors({ isPrivacyMode = false }: InvestorsProps) {
               onChange={(e) => setSearchQuery(e.target.value)}
               theme="green"
               size="md"
-              className="w-72"
             />
           </div>
 
-          {/* Filter Groups */}
-          <div className="flex-1 flex space-x-5 min-w-0">
+          {/* Returns Group - 1/5 */}
+          <div className="flex-1 min-w-0">
             <FilterGroup
               title="Returns"
               options={filterOptions.returns}
               selectedValues={filters.returns}
               onToggle={(value) => toggleFilter('returns', value)}
-              className="flex-shrink-0"
             />
+          </div>
+
+          {/* Size Group - 1/5 */}
+          <div className="flex-1 min-w-0">
             <FilterGroup
               title="Size"
               options={filterOptions.size}
               selectedValues={filters.size}
               onToggle={(value) => toggleFilter('size', value)}
-              className="flex-shrink-0"
             />
+          </div>
+
+          {/* Share % Group - 1/5 */}
+          <div className="flex-1 min-w-0">
             <FilterGroup
               title="Share %"
               options={filterOptions.share}
               selectedValues={filters.share}
               onToggle={(value) => toggleFilter('share', value)}
-              className="flex-shrink-0"
             />
           </div>
 
-          {/* Clear All */}
-          <div className="flex-shrink-0">
+          {/* Clear All - 1/5 */}
+          <div className="flex-1 min-w-0 flex justify-center">
             <FilterChip
               label="Clear All"
               isActive={false}
@@ -380,10 +384,6 @@ export default function Investors({ isPrivacyMode = false }: InvestorsProps) {
         </div>
       </div>
 
-      {/* Results Count */}
-      <div className="text-sm text-gray-400">
-        {filteredInvestors.length} of {investors.length} investors
-      </div>
 
       {/* Investor Table */}
       <div className="rounded-lg overflow-hidden" style={{ backgroundColor: '#1A1F1A' }}>
