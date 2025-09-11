@@ -250,7 +250,7 @@ export default function Investors({ isPrivacyMode = false }: InvestorsProps) {
           </div>
 
           {/* Filter Groups - flexible space */}
-          <div className="flex-1 flex space-x-6 min-w-0">
+          <div className="flex-1 flex space-x-4">
             <FilterGroup
               title="Returns"
               options={filterOptions.returns}
