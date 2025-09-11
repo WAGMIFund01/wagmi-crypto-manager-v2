@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation';
 import StandardModal from '@/components/ui/StandardModal';
 import WagmiButton from '@/components/ui/WagmiButton';
 import WagmiInput from '@/components/ui/WagmiInput';
+import WagmiAlert from '@/components/ui/WagmiAlert';
 import { DevIcon } from '@/components/ui/icons/WagmiIcons';
 import { signIn } from 'next-auth/react';
 // import { Button, Card, CardContent, CardHeader, CardTitle } from '@/shared/components';
@@ -169,9 +170,9 @@ export function InvestorLoginForm() {
           />
               
               {error && (
-                <div className="text-red-400 text-sm bg-red-900/20 border border-red-800 p-3 rounded-lg">
+                <WagmiAlert variant="error" size="md">
                   {error}
-            </div>
+                </WagmiAlert>
               )}
               
               <WagmiButton
@@ -245,9 +246,9 @@ export function InvestorLoginForm() {
             />
             
             {devError && (
-              <div className="text-red-400 text-sm bg-red-900/20 border border-red-800 p-3 rounded-lg">
+              <WagmiAlert variant="error" size="md">
                 {devError}
-              </div>
+              </WagmiAlert>
             )}
             
             <div className="flex gap-3">
