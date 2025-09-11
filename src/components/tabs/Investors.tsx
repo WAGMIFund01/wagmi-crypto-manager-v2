@@ -233,72 +233,97 @@ export default function Investors({ isPrivacyMode = false }: InvestorsProps) {
 
   return (
     <div className="space-y-6">
-      {/* Search Bar */}
-      <div className="w-full max-w-md">
-        <WagmiInput
-          variant="search"
-          placeholder="Search investors by name, ID, or amount..."
-          value={searchQuery}
-          onChange={(e) => setSearchQuery(e.target.value)}
-          theme="green"
-          size="md"
-        />
-      </div>
-
-      {/* Filter Bar */}
+      {/* Unified Search and Filter Row */}
       <div className="space-y-4">
-        {/* Desktop: Three groups side-by-side */}
-        <div className="hidden lg:flex lg:space-x-8">
-          <FilterGroup
-            title="Returns"
-            options={filterOptions.returns}
-            selectedValues={filters.returns}
-            onToggle={(value) => toggleFilter('returns', value)}
-            className="flex-1"
-          />
-          <FilterGroup
-            title="Size"
-            options={filterOptions.size}
-            selectedValues={filters.size}
-            onToggle={(value) => toggleFilter('size', value)}
-            className="flex-1"
-          />
-          <FilterGroup
-            title="Share %"
-            options={filterOptions.share}
-            selectedValues={filters.share}
-            onToggle={(value) => toggleFilter('share', value)}
-            className="flex-1"
-          />
-        </div>
+        {/* Desktop: Single horizontal row */}
+        <div className="hidden lg:flex lg:items-start lg:space-x-6">
+          {/* Search Bar */}
+          <div className="flex-shrink-0">
+            <WagmiInput
+              variant="search"
+              placeholder="Search investors..."
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              theme="green"
+              size="md"
+              className="w-80"
+            />
+          </div>
 
-        {/* Tablet: Two groups per line */}
-        <div className="hidden md:flex md:flex-col lg:hidden space-y-4">
-          <div className="flex space-x-6">
+          {/* Filter Groups */}
+          <div className="flex-1 flex space-x-8">
             <FilterGroup
               title="Returns"
               options={filterOptions.returns}
               selectedValues={filters.returns}
               onToggle={(value) => toggleFilter('returns', value)}
-              className="flex-1"
+              className="flex-shrink-0"
             />
             <FilterGroup
               title="Size"
               options={filterOptions.size}
               selectedValues={filters.size}
               onToggle={(value) => toggleFilter('size', value)}
-              className="flex-1"
+              className="flex-shrink-0"
             />
-          </div>
-          <div className="flex space-x-6">
             <FilterGroup
               title="Share %"
               options={filterOptions.share}
               selectedValues={filters.share}
               onToggle={(value) => toggleFilter('share', value)}
-              className="flex-1"
+              className="flex-shrink-0"
             />
-            <div className="flex-1 flex items-end">
+          </div>
+
+          {/* Clear All */}
+          <div className="flex-shrink-0 flex items-end">
+            <FilterChip
+              label="Clear All"
+              isActive={false}
+              onClick={clearAllFilters}
+              className="bg-gray-700 border-gray-600 text-gray-300 hover:bg-gray-600 hover:text-white"
+            />
+          </div>
+        </div>
+
+        {/* Tablet: Search + Wrapping chips */}
+        <div className="hidden md:flex md:flex-col lg:hidden space-y-4">
+          {/* Search Bar */}
+          <div className="w-full max-w-md">
+            <WagmiInput
+              variant="search"
+              placeholder="Search investors..."
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              theme="green"
+              size="md"
+            />
+          </div>
+
+          {/* Filter Groups with wrapping */}
+          <div className="flex flex-wrap items-start gap-x-8 gap-y-4">
+            <FilterGroup
+              title="Returns"
+              options={filterOptions.returns}
+              selectedValues={filters.returns}
+              onToggle={(value) => toggleFilter('returns', value)}
+              className="flex-shrink-0"
+            />
+            <FilterGroup
+              title="Size"
+              options={filterOptions.size}
+              selectedValues={filters.size}
+              onToggle={(value) => toggleFilter('size', value)}
+              className="flex-shrink-0"
+            />
+            <FilterGroup
+              title="Share %"
+              options={filterOptions.share}
+              selectedValues={filters.share}
+              onToggle={(value) => toggleFilter('share', value)}
+              className="flex-shrink-0"
+            />
+            <div className="flex-shrink-0 flex items-end">
               <FilterChip
                 label="Clear All"
                 isActive={false}
@@ -309,44 +334,49 @@ export default function Investors({ isPrivacyMode = false }: InvestorsProps) {
           </div>
         </div>
 
-        {/* Mobile: Single column */}
+        {/* Mobile: Stacked layout */}
         <div className="flex flex-col md:hidden space-y-4">
-          <FilterGroup
-            title="Returns"
-            options={filterOptions.returns}
-            selectedValues={filters.returns}
-            onToggle={(value) => toggleFilter('returns', value)}
-          />
-          <FilterGroup
-            title="Size"
-            options={filterOptions.size}
-            selectedValues={filters.size}
-            onToggle={(value) => toggleFilter('size', value)}
-          />
-          <FilterGroup
-            title="Share %"
-            options={filterOptions.share}
-            selectedValues={filters.share}
-            onToggle={(value) => toggleFilter('share', value)}
-          />
-          <div className="pt-2">
-            <FilterChip
-              label="Clear All"
-              isActive={false}
-              onClick={clearAllFilters}
-              className="bg-gray-700 border-gray-600 text-gray-300 hover:bg-gray-600 hover:text-white"
+          {/* Search Bar */}
+          <div className="w-full">
+            <WagmiInput
+              variant="search"
+              placeholder="Search investors..."
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              theme="green"
+              size="md"
             />
           </div>
-        </div>
 
-        {/* Clear All button for desktop */}
-        <div className="hidden lg:flex lg:justify-end lg:pt-2">
-          <FilterChip
-            label="Clear All"
-            isActive={false}
-            onClick={clearAllFilters}
-            className="bg-gray-700 border-gray-600 text-gray-300 hover:bg-gray-600 hover:text-white"
-          />
+          {/* Filter Groups */}
+          <div className="space-y-4">
+            <FilterGroup
+              title="Returns"
+              options={filterOptions.returns}
+              selectedValues={filters.returns}
+              onToggle={(value) => toggleFilter('returns', value)}
+            />
+            <FilterGroup
+              title="Size"
+              options={filterOptions.size}
+              selectedValues={filters.size}
+              onToggle={(value) => toggleFilter('size', value)}
+            />
+            <FilterGroup
+              title="Share %"
+              options={filterOptions.share}
+              selectedValues={filters.share}
+              onToggle={(value) => toggleFilter('share', value)}
+            />
+            <div className="pt-2">
+              <FilterChip
+                label="Clear All"
+                isActive={false}
+                onClick={clearAllFilters}
+                className="bg-gray-700 border-gray-600 text-gray-300 hover:bg-gray-600 hover:text-white"
+              />
+            </div>
+          </div>
         </div>
       </div>
 

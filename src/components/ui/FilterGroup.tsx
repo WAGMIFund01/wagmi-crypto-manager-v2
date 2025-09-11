@@ -26,7 +26,7 @@ export default function FilterGroup({
   return (
     <div className={className}>
       {/* Group Label */}
-      <div className="mb-3">
+      <div className="mb-2">
         <h3 className="text-xs font-medium uppercase tracking-wider text-gray-400">
           {title}
         </h3>
