@@ -288,8 +288,8 @@ export default function InvestorPage() {
                   WAGMI
                 </h1>
               </div>
-            </div>
-            
+              </div>
+              
             <div className="flex items-center gap-4">
               {/* Investor Info */}
               <div className="text-right mr-4">
@@ -299,8 +299,8 @@ export default function InvestorPage() {
                 <p style={{ color: '#E0E0E0', fontSize: '14px', margin: 0 }}>
                   ID: {investorId}
                 </p>
-              </div>
-              
+            </div>
+            
               <button
                 onClick={() => setPrivacyMode(!privacyMode)}
                 className="p-1.5 rounded-md transition-all duration-200 flex items-center justify-center"
@@ -330,12 +330,12 @@ export default function InvestorPage() {
                   <svg className="w-3 h-3" fill="currentColor" viewBox="0 0 24 24">
                     <path d="M12 4.5C7 4.5 2.73 7.61 1 12c1.73 4.39 6 7.5 11 7.5s9.27-3.11 11-7.5c-1.73-4.39-6-7.5-11-7.5zM12 17c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5-5 5zm0-8c-1.66 0-3 1.34-3 3s1.34 3 3 3 3-1.34 3-3-1.34-3-3-3z"/>
                     <path d="M2 2l20 20" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/>
-                  </svg>
+                    </svg>
                 ) : (
                   // Open eye icon (privacy OFF)
                   <svg className="w-3 h-3" fill="currentColor" viewBox="0 0 24 24">
                     <path d="M12 4.5C7 4.5 2.73 7.61 1 12c1.73 4.39 6 7.5 11 7.5s9.27-3.11 11-7.5c-1.73-4.39-6-7.5-11-7.5zM12 17c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5-5 5zm0-8c-1.66 0-3 1.34-3 3s1.34 3 3 3 3-1.34 3-3-1.34-3-3-3z"/>
-                  </svg>
+                    </svg>
                 )}
               </button>
               <button
@@ -390,7 +390,7 @@ export default function InvestorPage() {
           >
             <div className="space-y-1 md:space-y-2">
               <h3 className="text-xs md:text-sm font-normal text-gray-400 leading-none">
-                Initial Investment
+                Total Invested
               </h3>
               <p className="text-lg md:text-2xl font-bold text-white leading-tight">
                 {formatCurrency(portfolioData.initialInvestment, privacyMode)}
@@ -499,7 +499,7 @@ export default function InvestorPage() {
               </div>
             ) : transactions.length > 0 ? (
               <div className="space-y-4">
-                {transactions.map((transaction, index) => (
+                    {transactions.map((transaction, index) => (
                   <div 
                     key={transaction.transactionId || index}
                     className="p-4 rounded-lg border"
@@ -522,9 +522,9 @@ export default function InvestorPage() {
                         </span>
                         
                         {/* Type Tag */}
-                        <span 
+                          <span 
                           className="px-3 py-1 rounded-full text-xs font-medium whitespace-nowrap inline-block"
-                          style={{
+                            style={{
                             backgroundColor: '#00FF95',
                             color: '#1A1A1A',
                             minWidth: 'fit-content',
@@ -533,10 +533,10 @@ export default function InvestorPage() {
                             padding: '6px 12px',
                             borderRadius: '9999px',
                             lineHeight: '1.2'
-                          }}
-                        >
-                          {transaction.type}
-                        </span>
+                            }}
+                          >
+                            {transaction.type}
+                          </span>
                       </div>
                       
                       {/* Amount */}
@@ -546,8 +546,8 @@ export default function InvestorPage() {
                           color: transaction.amount >= 0 ? '#00FF95' : '#FF4444' 
                         }}
                       >
-                        {privacyMode ? '•••••' : 
-                         (transaction.amount >= 0 ? '+' : '') + formatCurrency(transaction.amount, false)}
+                          {privacyMode ? '•••••' : 
+                           (transaction.amount >= 0 ? '+' : '') + formatCurrency(transaction.amount, false)}
                       </span>
                     </div>
                     
@@ -557,11 +557,11 @@ export default function InvestorPage() {
                         className="text-sm leading-relaxed"
                         style={{ color: '#A0A0A0', margin: 0 }}
                       >
-                        {transaction.note}
+                          {transaction.note}
                       </p>
                     )}
                   </div>
-                ))}
+                    ))}
               </div>
             ) : (
               <div className="text-center py-12">

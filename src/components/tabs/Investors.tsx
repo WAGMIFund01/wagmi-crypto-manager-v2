@@ -99,15 +99,6 @@ export default function Investors() {
   if (loading) {
     return (
       <div className="space-y-6">
-        <h2 
-          className="text-2xl font-bold"
-          style={{ 
-            color: '#00FF95',
-            textShadow: '0 0 10px rgba(0, 255, 149, 0.3)'
-          }}
-        >
-          Investor Management
-        </h2>
         <div style={{ color: '#00FF95', fontSize: '18px' }}>Loading investors...</div>
       </div>
     );
@@ -116,15 +107,6 @@ export default function Investors() {
   if (error) {
     return (
       <div className="space-y-6">
-        <h2 
-          className="text-2xl font-bold"
-          style={{ 
-            color: '#00FF95',
-            textShadow: '0 0 10px rgba(0, 255, 149, 0.3)'
-          }}
-        >
-          Investor Management
-        </h2>
         <div style={{ color: '#FF4D4D', fontSize: '18px' }}>Error: {error}</div>
       </div>
     );
@@ -132,16 +114,6 @@ export default function Investors() {
 
   return (
     <div className="space-y-6">
-      <h2 
-        className="text-2xl font-bold"
-        style={{ 
-          color: '#00FF95',
-          textShadow: '0 0 10px rgba(0, 255, 149, 0.3)'
-        }}
-      >
-        Investor Management
-      </h2>
-
       {/* Investor Table */}
       <div className="rounded-lg overflow-hidden" style={{ backgroundColor: '#1A1F1A' }}>
         <div className="overflow-x-auto">
