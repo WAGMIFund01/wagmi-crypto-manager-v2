@@ -391,10 +391,10 @@ export default function UniversalNavbar({
                   </p>
                 </div>
 
-                {/* Month-on-Month */}
+                {/* MoM Return */}
                 <div className="text-center" style={{ minWidth: '80px' }}>
                   <p style={{ color: '#A0A0A0', fontSize: '9px', margin: 0, textTransform: 'uppercase', letterSpacing: '0.05em', fontWeight: '500' }}>
-                    Month-on-Month
+                    MoM Return
                   </p>
                   <p style={{ 
                     color: formattedKpiData?.monthOnMonth?.startsWith('+') ? '#00FF95' : '#FF4D4D', 
