@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { PortfolioAsset } from '@/app/api/get-portfolio-data/route';
-import { StackedBarChart, WagmiCard, WagmiSpinner } from '@/components/ui';
+import { StackedBarChart, WagmiCard, WagmiSpinner, WagmiText } from '@/components/ui';
 
 interface PortfolioOverviewProps {
   className?: string;
@@ -200,36 +200,36 @@ export default function PortfolioOverview({ className }: PortfolioOverviewProps)
       {/* Assets Table */}
       <WagmiCard variant="container" theme="green" size="lg" className="overflow-hidden">
         <div className="px-6 py-4 border-b border-gray-700">
-          <h2 className="text-xl font-semibold text-white">Portfolio Assets</h2>
+          <WagmiText variant="h4" weight="semibold" color="primary">Portfolio Assets</WagmiText>
         </div>
         
         <div className="overflow-x-auto">
           <table className="w-full">
             <thead className="bg-gray-900/50">
               <tr>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">
-                  Asset
+                <th className="px-6 py-3 text-left">
+                  <WagmiText variant="label" color="muted">Asset</WagmiText>
                 </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">
-                  Chain
+                <th className="px-6 py-3 text-left">
+                  <WagmiText variant="label" color="muted">Chain</WagmiText>
                 </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">
-                  Risk
+                <th className="px-6 py-3 text-left">
+                  <WagmiText variant="label" color="muted">Risk</WagmiText>
                 </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">
-                  Location
+                <th className="px-6 py-3 text-left">
+                  <WagmiText variant="label" color="muted">Location</WagmiText>
                 </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">
-                  Type
+                <th className="px-6 py-3 text-left">
+                  <WagmiText variant="label" color="muted">Type</WagmiText>
                 </th>
-                <th className="px-6 py-3 text-right text-xs font-medium text-gray-400 uppercase tracking-wider">
-                  Quantity
+                <th className="px-6 py-3 text-right">
+                  <WagmiText variant="label" color="muted">Quantity</WagmiText>
                 </th>
-                <th className="px-6 py-3 text-right text-xs font-medium text-gray-400 uppercase tracking-wider">
-                  Price
+                <th className="px-6 py-3 text-right">
+                  <WagmiText variant="label" color="muted">Price</WagmiText>
                 </th>
-                <th className="px-6 py-3 text-right text-xs font-medium text-gray-400 uppercase tracking-wider">
-                  Value
+                <th className="px-6 py-3 text-right">
+                  <WagmiText variant="label" color="muted">Value</WagmiText>
                 </th>
               </tr>
             </thead>
