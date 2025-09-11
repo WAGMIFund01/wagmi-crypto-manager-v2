@@ -1,6 +1,7 @@
 'use client';
 
 import React from 'react';
+import WagmiCard from './WagmiCard';
 
 interface StackedBarChartProps {
   title: string;
@@ -31,7 +32,12 @@ export default function StackedBarChart({
   const total = sortedEntries.reduce((sum, [, value]) => sum + value, 0);
   
   return (
-    <div className={`bg-gray-800/50 border border-gray-700 rounded-lg p-6 ${className}`}>
+    <WagmiCard 
+      variant="kpi" 
+      theme="green" 
+      size="md" 
+      className={className}
+    >
       <h3 className="text-lg font-semibold text-white mb-4">{title}</h3>
       <div className="space-y-3">
         {/* Stacked Bar */}
@@ -73,6 +79,6 @@ export default function StackedBarChart({
           })}
         </div>
       </div>
-    </div>
+    </WagmiCard>
   );
 }
