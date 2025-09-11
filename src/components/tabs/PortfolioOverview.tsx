@@ -121,27 +121,114 @@ export default function PortfolioOverview({ className }: PortfolioOverviewProps)
 
   const totalPortfolioValue = assets.reduce((sum, asset) => sum + asset.totalValue, 0);
 
-  return (
-    <div className={`${className} space-y-6`}>
-      {/* Portfolio Summary */}
+  // Calculate distributions for charts
+  const calculateDistribution = (groupBy: keyof PortfolioAsset) => {
+    const groups: { [key: string]: number } = {};
+    assets.forEach(asset => {
+      const key = asset[groupBy].toString();
+      groups[key] = (groups[key] || 0) + asset.totalValue;
+    });
+    return groups;
+  };
+
+  const assetDistribution = calculateDistribution('assetName');
+  const riskDistribution = calculateDistribution('riskLevel');
+  const locationDistribution = calculateDistribution('location');
+  const typeDistribution = calculateDistribution('coinType');
+
+  // Color palettes for different chart types
+  const assetColors = [
+    '#00FF95', '#FF6B35', '#3B82F6', '#8B5CF6', '#F59E0B', 
+    '#EF4444', '#10B981', '#F97316', '#6366F1', '#EC4899'
+  ];
+  
+  const riskColors = {
+    'High': '#EF4444',
+    'Medium': '#F59E0B', 
+    'Low': '#10B981',
+    'Degen': '#8B5CF6',
+    'None': '#6B7280'
+  };
+
+  const locationColors = [
+    '#00FF95', '#FF6B35', '#3B82F6', '#8B5CF6', '#F59E0B',
+    '#EF4444', '#10B981', '#F97316', '#6366F1', '#EC4899'
+  ];
+
+  const typeColors = {
+    'Memecoin': '#8B5CF6',
+    'Major': '#00FF95',
+    'Altcoin': '#3B82F6',
+    'Stablecoin': '#6B7280'
+  };
+
+  const renderStackedBarChart = (
+    title: string,
+    data: { [key: string]: number },
+    colors: { [key: string]: string } | string[],
+    maxItems: number = 10
+  ) => {
+    const sortedEntries = Object.entries(data)
+      .sort(([,a], [,b]) => b - a)
+      .slice(0, maxItems);
+    
+    const total = sortedEntries.reduce((sum, [, value]) => sum + value, 0);
+    
+    return (
       <div className="bg-gray-800/50 border border-gray-700 rounded-lg p-6">
-        <h2 className="text-xl font-semibold text-white mb-4">Portfolio Summary</h2>
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-          <div className="text-center">
-            <p className="text-gray-400 text-sm">Total Assets</p>
-            <p className="text-2xl font-bold text-white">{assets.length}</p>
+        <h3 className="text-lg font-semibold text-white mb-4">{title}</h3>
+        <div className="space-y-3">
+          {/* Stacked Bar */}
+          <div className="h-8 bg-gray-700 rounded-lg overflow-hidden flex">
+            {sortedEntries.map(([key, value], index) => {
+              const percentage = (value / total) * 100;
+              const color = Array.isArray(colors) ? colors[index % colors.length] : colors[key];
+              return (
+                <div
+                  key={key}
+                  className="h-full transition-all duration-300 hover:opacity-80"
+                  style={{
+                    width: `${percentage}%`,
+                    backgroundColor: color,
+                  }}
+                  title={`${key}: ${formatCurrency(value)} (${percentage.toFixed(1)}%)`}
+                />
+              );
+            })}
           </div>
-          <div className="text-center">
-            <p className="text-gray-400 text-sm">Total Value</p>
-            <p className="text-2xl font-bold text-[#00FF95]">{formatCurrency(totalPortfolioValue)}</p>
-          </div>
-          <div className="text-center">
-            <p className="text-gray-400 text-sm">Last Updated</p>
-            <p className="text-sm text-gray-300">
-              {assets.length > 0 ? formatDate(assets[0].lastPriceUpdate) : 'N/A'}
-            </p>
+          
+          {/* Legend */}
+          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-2 text-xs">
+            {sortedEntries.map(([key, value], index) => {
+              const percentage = (value / total) * 100;
+              const color = Array.isArray(colors) ? colors[index % colors.length] : colors[key];
+              return (
+                <div key={key} className="flex items-center space-x-2">
+                  <div 
+                    className="w-3 h-3 rounded-sm flex-shrink-0"
+                    style={{ backgroundColor: color }}
+                  />
+                  <div className="min-w-0">
+                    <div className="text-gray-300 truncate" title={key}>{key}</div>
+                    <div className="text-gray-400">{percentage.toFixed(1)}%</div>
+                  </div>
+                </div>
+              );
+            })}
           </div>
         </div>
+      </div>
+    );
+  };
+
+  return (
+    <div className={`${className} space-y-6`}>
+      {/* Portfolio Distribution Charts */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        {renderStackedBarChart('Distribution by Asset', assetDistribution, assetColors)}
+        {renderStackedBarChart('Distribution by Risk', riskDistribution, riskColors)}
+        {renderStackedBarChart('Distribution by Location', locationDistribution, locationColors)}
+        {renderStackedBarChart('Distribution by Type', typeDistribution, typeColors)}
       </div>
 
       {/* Assets Table */}
