@@ -193,32 +193,25 @@ export default function InvestorPage() {
               
               {/* Buttons - Right Aligned */}
               <div className="flex items-center gap-3">
-                {/* Privacy Mode Button */}
+                {/* Privacy Mode Button - Standardized Design */}
                 <button
                   onClick={() => setPrivacyMode(!privacyMode)}
-                  className="p-3 rounded-lg transition-all duration-200 flex items-center justify-center"
+                  className="p-1.5 rounded-md transition-all duration-200 flex items-center justify-center"
                   style={{
                     backgroundColor: privacyMode ? '#00FF95' : 'transparent',
                     border: '1px solid #00FF95',
-                    color: privacyMode ? 'white' : '#00FF95',
-                    boxShadow: 'none',
-                    width: '44px',
-                    height: '44px'
+                    color: privacyMode ? '#1A1A1A' : '#00FF95',
+                    width: '28px',
+                    height: '28px'
                   }}
                   onMouseEnter={(e) => {
-                    if (privacyMode) {
-                      e.currentTarget.style.backgroundColor = '#00B863';
-                      e.currentTarget.style.boxShadow = '0px 0px 8px rgba(0, 255, 149, 0.4)';
-                    } else {
+                    if (!privacyMode) {
                       e.currentTarget.style.backgroundColor = 'rgba(0, 255, 149, 0.1)';
-                      e.currentTarget.style.boxShadow = '0px 0px 10px rgba(0, 255, 149, 0.3)';
+                      e.currentTarget.style.boxShadow = '0px 0px 8px rgba(0, 255, 149, 0.3)';
                     }
                   }}
                   onMouseLeave={(e) => {
-                    if (privacyMode) {
-                      e.currentTarget.style.backgroundColor = '#00FF95';
-                      e.currentTarget.style.boxShadow = 'none';
-                    } else {
+                    if (!privacyMode) {
                       e.currentTarget.style.backgroundColor = 'transparent';
                       e.currentTarget.style.boxShadow = 'none';
                     }
@@ -226,45 +219,52 @@ export default function InvestorPage() {
                   title={privacyMode ? 'Show Data' : 'Privacy Mode'}
                 >
                   {privacyMode ? (
-                    // Eye with slash (Privacy Mode ON)
-                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.878 9.878L3 3m6.878 6.878L21 21" />
+                    // Eye with slash icon (privacy ON)
+                    <svg className="w-3 h-3" fill="currentColor" viewBox="0 0 24 24">
+                      <path d="M12 4.5C7 4.5 2.73 7.61 1 12c1.73 4.39 6 7.5 11 7.5s9.27-3.11 11-7.5c-1.73-4.39-6-7.5-11-7.5zM12 17c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5-5 5zm0-8c-1.66 0-3 1.34-3 3s1.34 3 3 3 3-1.34 3-3-1.34-3-3-3z"/>
+                      <path d="M2 2l20 20" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/>
                     </svg>
                   ) : (
-                    // Open eye (Privacy Mode OFF)
-                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                    // Open eye icon (privacy OFF)
+                    <svg className="w-3 h-3" fill="currentColor" viewBox="0 0 24 24">
+                      <path d="M12 4.5C7 4.5 2.73 7.61 1 12c1.73 4.39 6 7.5 11 7.5s9.27-3.11 11-7.5c-1.73-4.39-6-7.5-11-7.5zM12 17c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5-5 5zm0-8c-1.66 0-3 1.34-3 3s1.34 3 3 3 3-1.34 3-3-1.34-3-3-3z"/>
                     </svg>
                   )}
                 </button>
                 
-                {/* Sign Out Button - Compact */}
+                {/* Sign Out Button - Icon Only (Standardized Design) */}
                 <button
                   onClick={() => {
                     sessionStorage.removeItem('investorId');
                     sessionStorage.removeItem('investorData');
                     router.push('/');
                   }}
-                  className="font-semibold py-2 px-4 rounded-lg transition-all duration-200 text-sm"
+                  className="p-1.5 rounded-lg transition-all duration-200 flex items-center justify-center"
                   style={{
                     backgroundColor: 'transparent',
                     border: '1px solid #00FF95',
                     color: '#00FF95',
-                    boxShadow: 'none',
-                    minWidth: '60px',
-                    height: '44px'
+                    width: '28px',
+                    height: '28px'
                   }}
                   onMouseEnter={(e) => {
                     e.currentTarget.style.backgroundColor = 'rgba(0, 255, 149, 0.1)';
-                    e.currentTarget.style.boxShadow = '0px 0px 10px rgba(0, 255, 149, 0.3)';
+                    e.currentTarget.style.boxShadow = '0px 0px 8px rgba(0, 255, 149, 0.3)';
                   }}
                   onMouseLeave={(e) => {
                     e.currentTarget.style.backgroundColor = 'transparent';
                     e.currentTarget.style.boxShadow = 'none';
                   }}
+                  title="Sign Out"
                 >
-                  Sign Out
+                  <svg 
+                    className="w-3 h-3" 
+                    fill="currentColor" 
+                    viewBox="0 0 24 24"
+                    style={{ width: '28px', height: '28px' }}
+                  >
+                    <path d="M17 7l-1.41 1.41L18.17 11H8v2h10.17l-2.58 2.58L17 17l5-5zM4 5h8V3H4c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h8v-2H4V5z"/>
+                  </svg>
                 </button>
               </div>
             </div>
@@ -303,29 +303,22 @@ export default function InvestorPage() {
               
               <button
                 onClick={() => setPrivacyMode(!privacyMode)}
-                className="p-2 rounded-lg transition-all duration-200 flex items-center justify-center"
+                className="p-1.5 rounded-md transition-all duration-200 flex items-center justify-center"
                 style={{
                   backgroundColor: privacyMode ? '#00FF95' : 'transparent',
                   border: '1px solid #00FF95',
-                  color: privacyMode ? 'white' : '#00FF95',
-                  boxShadow: 'none',
-                  width: '40px',
-                  height: '40px'
+                  color: privacyMode ? '#1A1A1A' : '#00FF95',
+                  width: '28px',
+                  height: '28px'
                 }}
                 onMouseEnter={(e) => {
-                  if (privacyMode) {
-                    e.currentTarget.style.backgroundColor = '#00B863';
-                    e.currentTarget.style.boxShadow = '0px 0px 8px rgba(0, 255, 149, 0.4)';
-                  } else {
+                  if (!privacyMode) {
                     e.currentTarget.style.backgroundColor = 'rgba(0, 255, 149, 0.1)';
-                    e.currentTarget.style.boxShadow = '0px 0px 10px rgba(0, 255, 149, 0.3)';
+                    e.currentTarget.style.boxShadow = '0px 0px 8px rgba(0, 255, 149, 0.3)';
                   }
                 }}
                 onMouseLeave={(e) => {
-                  if (privacyMode) {
-                    e.currentTarget.style.backgroundColor = '#00FF95';
-                    e.currentTarget.style.boxShadow = 'none';
-                  } else {
+                  if (!privacyMode) {
                     e.currentTarget.style.backgroundColor = 'transparent';
                     e.currentTarget.style.boxShadow = 'none';
                   }
@@ -333,15 +326,15 @@ export default function InvestorPage() {
                 title={privacyMode ? 'Show Data' : 'Privacy Mode'}
               >
                 {privacyMode ? (
-                  // Eye with slash (Privacy Mode ON)
-                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.878 9.878L3 3m6.878 6.878L21 21" />
+                  // Eye with slash icon (privacy ON)
+                  <svg className="w-3 h-3" fill="currentColor" viewBox="0 0 24 24">
+                    <path d="M12 4.5C7 4.5 2.73 7.61 1 12c1.73 4.39 6 7.5 11 7.5s9.27-3.11 11-7.5c-1.73-4.39-6-7.5-11-7.5zM12 17c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5-5 5zm0-8c-1.66 0-3 1.34-3 3s1.34 3 3 3 3-1.34 3-3-1.34-3-3-3z"/>
+                    <path d="M2 2l20 20" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/>
                   </svg>
                 ) : (
-                  // Open eye (Privacy Mode OFF)
-                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                  // Open eye icon (privacy OFF)
+                  <svg className="w-3 h-3" fill="currentColor" viewBox="0 0 24 24">
+                    <path d="M12 4.5C7 4.5 2.73 7.61 1 12c1.73 4.39 6 7.5 11 7.5s9.27-3.11 11-7.5c-1.73-4.39-6-7.5-11-7.5zM12 17c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5-5 5zm0-8c-1.66 0-3 1.34-3 3s1.34 3 3 3 3-1.34 3-3-1.34-3-3-3z"/>
                   </svg>
                 )}
               </button>
@@ -351,23 +344,32 @@ export default function InvestorPage() {
                   sessionStorage.removeItem('investorData');
                   router.push('/');
                 }}
-                className="font-semibold py-2 px-4 rounded-lg transition-all duration-200"
+                className="p-1.5 rounded-lg transition-all duration-200 flex items-center justify-center"
                 style={{
                   backgroundColor: 'transparent',
                   border: '1px solid #00FF95',
                   color: '#00FF95',
-                  boxShadow: 'none'
+                  width: '28px',
+                  height: '28px'
                 }}
                 onMouseEnter={(e) => {
                   e.currentTarget.style.backgroundColor = 'rgba(0, 255, 149, 0.1)';
-                  e.currentTarget.style.boxShadow = '0px 0px 10px rgba(0, 255, 149, 0.3)';
+                  e.currentTarget.style.boxShadow = '0px 0px 8px rgba(0, 255, 149, 0.3)';
                 }}
                 onMouseLeave={(e) => {
                   e.currentTarget.style.backgroundColor = 'transparent';
                   e.currentTarget.style.boxShadow = 'none';
                 }}
+                title="Sign Out"
               >
-                Sign Out
+                <svg 
+                  className="w-3 h-3" 
+                  fill="currentColor" 
+                  viewBox="0 0 24 24"
+                  style={{ width: '28px', height: '28px' }}
+                >
+                  <path d="M17 7l-1.41 1.41L18.17 11H8v2h10.17l-2.58 2.58L17 17l5-5zM4 5h8V3H4c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h8v-2H4V5z"/>
+                </svg>
               </button>
             </div>
           </div>
