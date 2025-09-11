@@ -234,9 +234,9 @@ export default function Investors({ isPrivacyMode = false }: InvestorsProps) {
   return (
     <div className="space-y-4">
       {/* Unified Search and Filter Row */}
-      <div className="max-w-full overflow-hidden">
+      <div>
         {/* Desktop: Natural content-based layout */}
-        <div className="hidden lg:flex lg:items-end lg:space-x-4 lg:max-w-full">
+        <div className="hidden lg:flex lg:items-end lg:space-x-4">
           {/* Search Bar - natural width */}
           <div className="w-64 flex-shrink-0">
             <WagmiInput
@@ -250,7 +250,7 @@ export default function Investors({ isPrivacyMode = false }: InvestorsProps) {
           </div>
 
           {/* Filter Groups - flexible space */}
-          <div className="flex-1 flex space-x-4">
+          <div className="flex space-x-4">
             <FilterGroup
               title="Returns"
               options={filterOptions.returns}
