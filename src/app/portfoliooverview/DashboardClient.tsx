@@ -1,6 +1,6 @@
 'use client';
 
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams, usePathname } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import UniversalNavbar from '@/components/UniversalNavbar';
 import PortfolioOverview from '@/components/tabs/PortfolioOverview';
@@ -31,10 +31,20 @@ interface DashboardClientProps {
 
 export default function DashboardClient({ session, kpiData, hasError }: DashboardClientProps) {
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const pathname = usePathname();
   const [devSession, setDevSession] = useState(null);
   const [isDevMode, setIsDevMode] = useState(false);
   const [activeTab, setActiveTab] = useState('portfolio');
   const [isCheckingAuth, setIsCheckingAuth] = useState(true);
+
+  // Initialize active tab from URL parameters
+  useEffect(() => {
+    const tab = searchParams.get('tab');
+    if (tab && ['portfolio', 'analytics', 'investors'].includes(tab)) {
+      setActiveTab(tab);
+    }
+  }, [searchParams]);
 
   useEffect(() => {
     // Check for dev mode session
@@ -80,6 +90,10 @@ export default function DashboardClient({ session, kpiData, hasError }: Dashboar
   // Handle tab change
   const handleTabChange = (tabId: string) => {
     setActiveTab(tabId);
+    // Update URL with tab parameter
+    const params = new URLSearchParams(searchParams.toString());
+    params.set('tab', tabId);
+    router.replace(`${pathname}?${params.toString()}`);
   };
 
   // Use dev session if in dev mode, otherwise use OAuth session
