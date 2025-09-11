@@ -6,7 +6,7 @@ import { cn } from '@/shared/utils';
 interface WagmiButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
   variant?: 'primary' | 'outline' | 'ghost' | 'icon';
   theme?: 'green' | 'orange' | 'blue' | 'red' | 'gray';
-  size?: 'sm' | 'md' | 'lg';
+  size?: 'sm' | 'md' | 'lg' | 'icon';
   loading?: boolean;
   icon?: React.ReactNode;
   iconPosition?: 'left' | 'right';
@@ -33,14 +33,16 @@ const WagmiButton = forwardRef<HTMLButtonElement, WagmiButtonProps>(
     const sizeClasses = {
       sm: 'h-8 px-3 text-sm rounded-md',
       md: 'h-10 px-4 text-sm rounded-lg',
-      lg: 'h-12 px-6 text-base rounded-lg'
+      lg: 'h-12 px-6 text-base rounded-lg',
+      icon: 'w-7 h-7 p-0 rounded-md' // Special size for icon-only buttons
     };
     
     // Icon size variants
     const iconSizeClasses = {
       sm: 'w-4 h-4',
       md: 'w-5 h-5',
-      lg: 'w-6 h-6'
+      lg: 'w-6 h-6',
+      icon: 'w-3 h-3' // Special size for icon-only buttons
     };
     
     // Theme colors
@@ -175,7 +177,8 @@ const WagmiButton = forwardRef<HTMLButtonElement, WagmiButtonProps>(
     const iconOnlySizes = {
       sm: 'h-8 w-8 p-0 rounded-md',
       md: 'h-10 w-10 p-0 rounded-lg',
-      lg: 'h-12 w-12 p-0 rounded-lg'
+      lg: 'h-12 w-12 p-0 rounded-lg',
+      icon: 'w-7 h-7 p-0 rounded-md'
     };
 
     const isIconOnly = variant === 'icon' || (!children && icon);
@@ -272,7 +275,7 @@ const WagmiButton = forwardRef<HTMLButtonElement, WagmiButtonProps>(
         
         {/* Icon-only button - render icon directly without margin */}
         {!loading && icon && !children && (
-          <span className={iconSizeClass}>
+          <span className={iconSizeClasses.icon}>
             {icon}
           </span>
         )}
