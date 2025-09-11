@@ -2,7 +2,6 @@
 
 import { useState, useMemo, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import { signOut } from 'next-auth/react';
 
 // Mock data - replace with actual data fetching
 const mockInvestors = [
@@ -75,6 +74,14 @@ interface Investor {
   return: number;
 }
 
+interface KPIData {
+  totalInvestors: number;
+  totalAUM: number;
+  cumulativeReturn: number;
+  monthlyReturn: number;
+  lastUpdated: string;
+}
+
 export default function InvestorsPage() {
   const router = useRouter();
   const [searchTerm, setSearchTerm] = useState('');
@@ -91,7 +98,7 @@ export default function InvestorsPage() {
   const [isDevMode, setIsDevMode] = useState(false);
   const [isPrivacyMode, setIsPrivacyMode] = useState(false);
   const [isRetrying, setIsRetrying] = useState(false);
-  const [kpiData, setKpiData] = useState<any>(null);
+  const [kpiData, setKpiData] = useState<KPIData | null>(null);
   const [hasError, setHasError] = useState(false);
 
   // Check for dev mode session on mount
