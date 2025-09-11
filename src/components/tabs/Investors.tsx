@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import TransactionModal from '@/components/TransactionModal';
 
 interface Investor {
   id: string;
@@ -17,6 +18,8 @@ export default function Investors() {
   const [investors, setInvestors] = useState<Investor[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [selectedInvestor, setSelectedInvestor] = useState<Investor | null>(null);
+  const [isModalOpen, setIsModalOpen] = useState(false);
 
   // Fetch investor data on component mount
   useEffect(() => {
@@ -79,6 +82,18 @@ export default function Investors() {
     } catch (err) {
       return dateStr;
     }
+  };
+
+  // Handle row click to open transaction modal
+  const handleRowClick = (investor: Investor) => {
+    setSelectedInvestor(investor);
+    setIsModalOpen(true);
+  };
+
+  // Handle modal close
+  const handleModalClose = () => {
+    setIsModalOpen(false);
+    setSelectedInvestor(null);
   };
 
   if (loading) {
@@ -160,9 +175,17 @@ export default function Investors() {
               {investors.map((investor, index) => (
                 <tr
                   key={investor.id}
+                  onClick={() => handleRowClick(investor)}
+                  className="cursor-pointer transition-all duration-200 hover:bg-opacity-10"
                   style={{
                     backgroundColor: index % 2 === 0 ? 'transparent' : 'rgba(255, 255, 255, 0.02)',
                     borderBottom: '1px solid #333'
+                  }}
+                  onMouseEnter={(e) => {
+                    e.currentTarget.style.backgroundColor = 'rgba(0, 255, 149, 0.05)';
+                  }}
+                  onMouseLeave={(e) => {
+                    e.currentTarget.style.backgroundColor = index % 2 === 0 ? 'transparent' : 'rgba(255, 255, 255, 0.02)';
                   }}
                 >
                   <td className="px-4 py-3 text-sm font-medium" style={{ color: '#FFFFFF' }}>
@@ -192,6 +215,16 @@ export default function Investors() {
           </table>
         </div>
       </div>
+
+      {/* Transaction Modal */}
+      {selectedInvestor && (
+        <TransactionModal
+          isOpen={isModalOpen}
+          onClose={handleModalClose}
+          investorId={selectedInvestor.id}
+          investorName={selectedInvestor.name}
+        />
+      )}
     </div>
   );
 }
