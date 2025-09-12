@@ -108,8 +108,9 @@ export default function UniversalNavbar({
       console.log('Timestamp update result:', timestampUpdateResult);
       
       // Immediately set the timestamp to "Just now" since we just updated it
+      // Use UTC time to match our timestamp parsing logic
       const now = new Date();
-      const currentTimestamp = `${String(now.getMonth() + 1).padStart(2, '0')}/${String(now.getDate()).padStart(2, '0')}/${now.getFullYear()}, ${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}:${String(now.getSeconds()).padStart(2, '0')}`;
+      const currentTimestamp = `${String(now.getUTCMonth() + 1).padStart(2, '0')}/${String(now.getUTCDate()).padStart(2, '0')}/${now.getUTCFullYear()}, ${String(now.getUTCHours()).padStart(2, '0')}:${String(now.getUTCMinutes()).padStart(2, '0')}:${String(now.getUTCSeconds()).padStart(2, '0')}`;
       setLastUpdatedTimestamp(currentTimestamp);
       
       // Step 2: Update prices from CoinGecko
