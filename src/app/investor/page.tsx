@@ -8,6 +8,7 @@ import { StackedBarChart } from '@/components/ui';
 import { Card, CardContent, Button } from '@/shared/components';
 import { formatCurrency, formatPercentage } from '@/shared/utils';
 import { PortfolioAsset } from '@/app/api/get-portfolio-data/route';
+import { formatTimestampForDisplay } from '@/lib/timestamp-utils';
 
 interface InvestorData {
   name: string;
@@ -37,6 +38,8 @@ export default function InvestorPage() {
   const [transactionsLoading, setTransactionsLoading] = useState(false);
   const [portfolioLoading, setPortfolioLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [lastUpdatedTimestamp, setLastUpdatedTimestamp] = useState<string>('');
+  const [refreshTrigger, setRefreshTrigger] = useState(0);
 
   useEffect(() => {
     // Check if investor ID is stored in session storage
@@ -68,6 +71,7 @@ export default function InvestorPage() {
     // Fetch transactions and portfolio data for this investor
     fetchTransactions(storedInvestorId);
     fetchPortfolioData();
+    fetchLastUpdatedTimestamp();
     
     setLoading(false);
   }, [router]);
@@ -118,6 +122,30 @@ export default function InvestorPage() {
       setPortfolioLoading(false);
     }
   };
+
+  const fetchLastUpdatedTimestamp = async () => {
+    try {
+      const response = await fetch('/api/get-last-updated-timestamp');
+      if (response.ok) {
+        const data = await response.json();
+        if (data.success && data.timestamp) {
+          setLastUpdatedTimestamp(data.timestamp);
+        }
+      }
+    } catch (error) {
+      console.error('Error fetching timestamp:', error);
+    }
+  };
+
+  // Update timestamp display every minute to show updated relative time
+  useEffect(() => {
+    const interval = setInterval(() => {
+      // Force re-render by incrementing refresh trigger
+      setRefreshTrigger(prev => prev + 1);
+    }, 60000);
+
+    return () => clearInterval(interval);
+  }, []);
 
   // Calculate distributions for charts from real portfolio data
   const calculateDistribution = (groupBy: keyof PortfolioAsset) => {
@@ -257,6 +285,12 @@ export default function InvestorPage() {
                 <p style={{ color: '#E0E0E0', fontSize: '14px', margin: 0, lineHeight: '1.3' }}>
                   ID: {privacyMode ? '•••••' : investorId}
                 </p>
+                {/* Last Updated Timestamp */}
+                <p style={{ color: '#A0A0A0', fontSize: '12px', margin: 0, lineHeight: '1.3' }}>
+                  Last updated: {lastUpdatedTimestamp ? formatTimestampForDisplay(lastUpdatedTimestamp) : 'Unknown'}
+                  {/* Force re-render by including refreshTrigger */}
+                  <span style={{ display: 'none' }}>{refreshTrigger}</span>
+                </p>
               </div>
               
               {/* Buttons - Right Aligned */}
@@ -333,6 +367,12 @@ export default function InvestorPage() {
                 </h2>
                 <p style={{ color: '#E0E0E0', fontSize: '14px', margin: 0 }}>
                   ID: {privacyMode ? '•••••' : investorId}
+                </p>
+                {/* Last Updated Timestamp */}
+                <p style={{ color: '#A0A0A0', fontSize: '12px', margin: 0 }}>
+                  Last updated: {lastUpdatedTimestamp ? formatTimestampForDisplay(lastUpdatedTimestamp) : 'Unknown'}
+                  {/* Force re-render by including refreshTrigger */}
+                  <span style={{ display: 'none' }}>{refreshTrigger}</span>
                 </p>
             </div>
             
