@@ -1,49 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { google } from 'googleapis';
 
-// Complete mapping for all supported assets
-const SYMBOL_TO_COINGECKO_ID: Record<string, string> = {
-  'AURA': 'aura-network',
-  'ETH': 'ethereum',
-  'JITOSOL': 'jito-staked-sol',
-  'SOL': 'solana',
-  'JUP': 'jupiter-exchange-solana',
-  'USDC': 'usd-coin',
-  'USDT': 'tether',
-  'BTC': 'bitcoin',
-  'MATIC': 'matic-network',
-  'AVAX': 'avalanche-2',
-  'ATOM': 'cosmos',
-  'DOT': 'polkadot',
-  'LINK': 'chainlink',
-  'UNI': 'uniswap',
-  'AAVE': 'aave',
-  'CRV': 'curve-dao-token',
-  'COMP': 'compound-governance-token',
-  'MKR': 'maker',
-  'SNX': 'havven',
-  'YFI': 'yearn-finance',
-  'SUSHI': 'sushi',
-  '1INCH': '1inch',
-  'BAL': 'balancer',
-  'LDO': 'lido-dao',
-  'RPL': 'rocket-pool',
-  'FXS': 'frax-share',
-  'CVX': 'convex-finance',
-  'FRAX': 'frax',
-  'LUSD': 'liquity-usd',
-  'GUSD': 'gemini-dollar',
-  'SUSD': 'nusd',
-  'DAI': 'dai',
-  'BUSD': 'binance-usd',
-  'TUSD': 'true-usd',
-  'USDP': 'paxos-standard',
-  'HUSD': 'husd',
-  'USDN': 'neutrino-usd',
-  'USDK': 'usdk',
-  'USDS': 'stableusd'
-};
-
 export async function POST(request: NextRequest) {
   try {
     const serviceAccountEmail = process.env.GOOGLE_SERVICE_ACCOUNT_EMAIL;
@@ -68,10 +25,10 @@ export async function POST(request: NextRequest) {
 
     const sheets = google.sheets({ version: 'v4', auth });
 
-    // Step 1: Read current portfolio data
+    // Step 1: Read current portfolio data including CoinGecko ID column
     const portfolioResponse = await sheets.spreadsheets.values.get({
       spreadsheetId: sheetId,
-      range: 'Portfolio Overview!A:J',
+      range: 'Portfolio Overview!A:K', // Extended to include column K for CoinGecko ID
     });
 
     const rows = portfolioResponse.data.values;
@@ -82,100 +39,154 @@ export async function POST(request: NextRequest) {
       }, { status: 404 });
     }
 
-    // Step 2: Extract unique symbols that have quantity > 0 and are supported
-    const symbolsToUpdate = new Set<string>();
-    const assetRows: { symbol: string; rowIndex: number; quantity: number }[] = [];
+    // Step 2: Process each asset and collect detailed information
+    const assetDetails: {
+      symbol: string;
+      rowIndex: number;
+      quantity: number;
+      coinGeckoId: string | null;
+      status: 'success' | 'no_quantity' | 'no_coinGecko_id' | 'invalid_coinGecko_id' | 'coinGecko_error';
+      error?: string;
+      newPrice?: number;
+    }[] = [];
+
+    const coinGeckoIdsToFetch = new Set<string>();
 
     for (let i = 1; i < rows.length; i++) {
       const row = rows[i];
       const symbol = row[1]?.toString().toUpperCase();
       const quantity = parseFloat(row[6]?.toString()) || 0;
+      const coinGeckoId = row[10]?.toString()?.trim(); // Column K (0-indexed = 10)
 
-      if (symbol && quantity > 0 && SYMBOL_TO_COINGECKO_ID[symbol]) {
-        symbolsToUpdate.add(symbol);
-        assetRows.push({ symbol, rowIndex: i, quantity });
+      const assetDetail = {
+        symbol: symbol || 'UNKNOWN',
+        rowIndex: i,
+        quantity,
+        coinGeckoId: coinGeckoId || null,
+        status: 'success' as const
+      };
+
+      // Check if asset has quantity > 0
+      if (!symbol || quantity <= 0) {
+        assetDetail.status = 'no_quantity';
+        assetDetail.error = `No quantity (${quantity}) or invalid symbol (${symbol})`;
+        assetDetails.push(assetDetail);
+        continue;
       }
-    }
 
-    if (symbolsToUpdate.size === 0) {
-      return NextResponse.json({
-        success: true,
-        message: 'No assets found with quantity > 0 and supported symbols',
-        updatedCount: 0
-      });
+      // Check if CoinGecko ID is provided
+      if (!coinGeckoId) {
+        assetDetail.status = 'no_coinGecko_id';
+        assetDetail.error = 'No CoinGecko ID provided in column K';
+        assetDetails.push(assetDetail);
+        continue;
+      }
+
+      // Validate CoinGecko ID format (basic check)
+      if (coinGeckoId.length < 2 || coinGeckoId.includes(' ')) {
+        assetDetail.status = 'invalid_coinGecko_id';
+        assetDetail.error = `Invalid CoinGecko ID format: "${coinGeckoId}"`;
+        assetDetails.push(assetDetail);
+        continue;
+      }
+
+      // Add to fetch list
+      coinGeckoIdsToFetch.add(coinGeckoId);
+      assetDetails.push(assetDetail);
     }
 
     // Step 3: Fetch prices from CoinGecko
-    const coinGeckoIds = Array.from(symbolsToUpdate)
-      .map(symbol => SYMBOL_TO_COINGECKO_ID[symbol])
-      .join(',');
+    let priceData: Record<string, { usd: number }> = {};
+    let coinGeckoError: string | null = null;
 
-    const priceResponse = await fetch(
-      `https://api.coingecko.com/api/v3/simple/price?ids=${coinGeckoIds}&vs_currencies=usd`,
-      {
-        headers: {
-          'Accept': 'application/json',
-        },
+    if (coinGeckoIdsToFetch.size > 0) {
+      const coinGeckoIds = Array.from(coinGeckoIdsToFetch).join(',');
+      
+      try {
+        const priceResponse = await fetch(
+          `https://api.coingecko.com/api/v3/simple/price?ids=${coinGeckoIds}&vs_currencies=usd`,
+          {
+            headers: {
+              'Accept': 'application/json',
+            },
+          }
+        );
+
+        if (!priceResponse.ok) {
+          throw new Error(`CoinGecko API error: ${priceResponse.status} ${priceResponse.statusText}`);
+        }
+
+        priceData = await priceResponse.json();
+      } catch (error) {
+        coinGeckoError = error instanceof Error ? error.message : 'Unknown CoinGecko API error';
       }
-    );
-
-    if (!priceResponse.ok) {
-      throw new Error(`CoinGecko API error: ${priceResponse.status}`);
     }
 
-    const priceData = await priceResponse.json();
+    // Step 4: Update asset details with price information
     const currentTimestamp = new Date().toISOString();
-
-    // Step 4: Prepare batch updates
     const updates: { range: string; values: (string | number)[][] }[] = [];
     let updatedCount = 0;
 
-    for (const asset of assetRows) {
-      const coinGeckoId = SYMBOL_TO_COINGECKO_ID[asset.symbol];
-      const newPrice = priceData[coinGeckoId]?.usd;
+    for (const asset of assetDetails) {
+      if (asset.status === 'success' && asset.coinGeckoId) {
+        const newPrice = priceData[asset.coinGeckoId]?.usd;
 
-      if (newPrice !== undefined) {
-        const rowNum = asset.rowIndex + 1; // Google Sheets is 1-indexed
-        const currentPriceRange = `Portfolio Overview!H${rowNum}`;
-        const lastUpdateRange = `Portfolio Overview!J${rowNum}`;
+        if (newPrice !== undefined) {
+          asset.newPrice = newPrice;
+          const rowNum = asset.rowIndex + 1; // Google Sheets is 1-indexed
+          const currentPriceRange = `Portfolio Overview!H${rowNum}`;
+          const lastUpdateRange = `Portfolio Overview!J${rowNum}`;
 
-        updates.push({
-          range: currentPriceRange,
-          values: [[newPrice]]
-        });
-        updates.push({
-          range: lastUpdateRange,
-          values: [[currentTimestamp]]
-        });
-        updatedCount++;
+          updates.push({
+            range: currentPriceRange,
+            values: [[newPrice]]
+          });
+          updates.push({
+            range: lastUpdateRange,
+            values: [[currentTimestamp]]
+          });
+          updatedCount++;
+        } else {
+          asset.status = 'coinGecko_error';
+          asset.error = `No price data returned from CoinGecko for ID: ${asset.coinGeckoId}`;
+        }
       }
     }
 
-    if (updates.length === 0) {
-      return NextResponse.json({
-        success: true,
-        message: 'No prices to update',
-        updatedCount: 0
+    // Step 5: Execute batch update if there are updates to make
+    if (updates.length > 0) {
+      await sheets.spreadsheets.values.batchUpdate({
+        spreadsheetId: sheetId,
+        requestBody: {
+          valueInputOption: 'RAW',
+          data: updates
+        }
       });
     }
 
-    // Step 5: Execute batch update
-    await sheets.spreadsheets.values.batchUpdate({
-      spreadsheetId: sheetId,
-      requestBody: {
-        valueInputOption: 'RAW',
-        data: updates
-      }
-    });
+    // Step 6: Return detailed results
+    const summary = {
+      totalAssets: assetDetails.length,
+      updatedAssets: updatedCount,
+      noQuantity: assetDetails.filter(a => a.status === 'no_quantity').length,
+      noCoinGeckoId: assetDetails.filter(a => a.status === 'no_coinGecko_id').length,
+      invalidCoinGeckoId: assetDetails.filter(a => a.status === 'invalid_coinGecko_id').length,
+      coinGeckoErrors: assetDetails.filter(a => a.status === 'coinGecko_error').length,
+    };
 
     return NextResponse.json({
       success: true,
-      message: `Successfully updated ${updatedCount} assets`,
-      updatedCount,
+      message: `Processed ${summary.totalAssets} assets, updated ${summary.updatedAssets}`,
+      summary,
+      coinGeckoApiError: coinGeckoError,
       timestamp: currentTimestamp,
-      updatedAssets: assetRows.map(asset => ({
+      assetDetails: assetDetails.map(asset => ({
         symbol: asset.symbol,
-        newPrice: priceData[SYMBOL_TO_COINGECKO_ID[asset.symbol]]?.usd
+        quantity: asset.quantity,
+        coinGeckoId: asset.coinGeckoId,
+        status: asset.status,
+        error: asset.error,
+        newPrice: asset.newPrice
       }))
     });
 
@@ -193,6 +204,12 @@ export async function GET() {
   return NextResponse.json({
     message: 'Full price update endpoint - use POST to update all asset prices',
     usage: 'POST to this endpoint to update all supported asset prices from CoinGecko',
-    supportedAssets: Object.keys(SYMBOL_TO_COINGECKO_ID)
+    note: 'This endpoint reads CoinGecko IDs from column K in your Google Sheet',
+    features: [
+      'Reads CoinGecko IDs from column K',
+      'Provides detailed error reporting for each asset',
+      'Updates prices in column H and timestamps in column J',
+      'Supports any cryptocurrency with valid CoinGecko ID'
+    ]
   });
 }
