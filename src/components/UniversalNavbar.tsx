@@ -18,6 +18,7 @@ interface UniversalNavbarProps {
     lastUpdated: string;
   } | null;
   hasError?: boolean;
+  onKpiRefresh?: () => Promise<void>;
 }
 
 export default function UniversalNavbar({ 
@@ -25,7 +26,8 @@ export default function UniversalNavbar({
   onTabChange, 
   onPrivacyModeChange,
   kpiData = null, 
-  hasError = false 
+  hasError = false,
+  onKpiRefresh
 }: UniversalNavbarProps) {
   const router = useRouter();
   const [isPrivacyMode, setIsPrivacyMode] = useState(false);
@@ -66,9 +68,14 @@ export default function UniversalNavbar({
       });
       
       if (revalidationResponse.ok) {
-        // Reload page after successful price update and revalidation
-        console.log('Refreshing page with updated data...');
-        window.location.reload();
+        // Refresh KPI data using callback if available, otherwise reload page
+        if (onKpiRefresh) {
+          console.log('Refreshing KPI data...');
+          await onKpiRefresh();
+        } else {
+          console.log('No KPI refresh callback, reloading page...');
+          window.location.reload();
+        }
       } else {
         throw new Error('Failed to revalidate dashboard');
       }

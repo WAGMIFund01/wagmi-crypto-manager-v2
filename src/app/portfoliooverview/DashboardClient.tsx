@@ -29,7 +29,7 @@ interface DashboardClientProps {
   hasError: boolean;
 }
 
-export default function DashboardClient({ session, kpiData, hasError }: DashboardClientProps) {
+export default function DashboardClient({ session, kpiData: initialKpiData, hasError }: DashboardClientProps) {
   const router = useRouter();
   const searchParams = useSearchParams();
   const pathname = usePathname();
@@ -38,6 +38,7 @@ export default function DashboardClient({ session, kpiData, hasError }: Dashboar
   const [activeTab, setActiveTab] = useState('portfolio');
   const [isCheckingAuth, setIsCheckingAuth] = useState(true);
   const [isPrivacyMode, setIsPrivacyMode] = useState(false);
+  const [kpiData, setKpiData] = useState(initialKpiData);
 
   // Initialize active tab from URL parameters
   useEffect(() => {
@@ -102,6 +103,39 @@ export default function DashboardClient({ session, kpiData, hasError }: Dashboar
     setIsPrivacyMode(privacyMode);
   };
 
+  // Handle KPI data refresh
+  const handleKpiRefresh = async () => {
+    try {
+      // Fetch fresh KPI data from the API
+      const response = await fetch('/api/kpi-data', {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      });
+
+      if (response.ok) {
+        const freshKpiData = await response.json();
+        
+        // Transform the data to match the expected format
+        const transformedKpiData = {
+          activeInvestors: freshKpiData.totalInvestors.toString(),
+          totalAUM: `$${freshKpiData.totalAUM.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`,
+          cumulativeReturn: `+${freshKpiData.cumulativeReturn.toFixed(1)}%`,
+          monthOnMonth: `${freshKpiData.monthlyReturn >= 0 ? '+' : ''}${freshKpiData.monthlyReturn.toFixed(1)}%`,
+          lastUpdated: freshKpiData.lastUpdated
+        };
+        
+        setKpiData(transformedKpiData);
+        console.log('KPI data refreshed successfully');
+      } else {
+        console.error('Failed to fetch fresh KPI data');
+      }
+    } catch (error) {
+      console.error('Error refreshing KPI data:', error);
+    }
+  };
+
   // Use dev session if in dev mode, otherwise use OAuth session
   const currentSession = isDevMode ? devSession : session;
 
@@ -144,6 +178,7 @@ export default function DashboardClient({ session, kpiData, hasError }: Dashboar
         onPrivacyModeChange={handlePrivacyModeChange}
         kpiData={kpiData}
         hasError={hasError}
+        onKpiRefresh={handleKpiRefresh}
       />
 
       {/* Main Content */}
