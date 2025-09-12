@@ -58,12 +58,20 @@ export async function POST(request: NextRequest) {
       const quantity = parseFloat(row[6]?.toString()) || 0;
       const coinGeckoId = row[10]?.toString()?.trim(); // Column K (0-indexed = 10)
 
-      const assetDetail = {
+      const assetDetail: {
+        symbol: string;
+        rowIndex: number;
+        quantity: number;
+        coinGeckoId: string | null;
+        status: 'success' | 'no_quantity' | 'no_coinGecko_id' | 'invalid_coinGecko_id' | 'coinGecko_error';
+        error?: string;
+        newPrice?: number;
+      } = {
         symbol: symbol || 'UNKNOWN',
         rowIndex: i,
         quantity,
         coinGeckoId: coinGeckoId || null,
-        status: 'success' as const
+        status: 'success'
       };
 
       // Check if asset has quantity > 0
