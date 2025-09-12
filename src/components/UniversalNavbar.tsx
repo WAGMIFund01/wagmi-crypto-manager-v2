@@ -35,8 +35,6 @@ export default function UniversalNavbar({
   const [isRetrying, setIsRetrying] = useState(false);
   const [isClient, setIsClient] = useState(false);
   const [lastUpdatedTimestamp, setLastUpdatedTimestamp] = useState<string>('');
-  const [refreshTrigger, setRefreshTrigger] = useState(0);
-
   // Ensure we're on the client side
   useEffect(() => {
     setIsClient(true);
@@ -50,7 +48,6 @@ export default function UniversalNavbar({
         if (response.ok) {
           const data = await response.json();
           if (data.success && data.timestamp) {
-            // Use timestamp as-is (2025 is correct)
             setLastUpdatedTimestamp(data.timestamp);
           }
         }
@@ -62,14 +59,12 @@ export default function UniversalNavbar({
     fetchInitialTimestamp();
   }, []);
 
-  // Update timestamp display every minute to show relative time
+  // Update timestamp display every minute to show updated relative time
   useEffect(() => {
     const interval = setInterval(() => {
-      // Force re-render by updating the refresh trigger
-      // This will cause the component to re-render and recalculate relative time
-      console.log('Timer tick - updating refresh trigger');
-      setRefreshTrigger(prev => prev + 1);
-    }, 60000); // Update every minute
+      // Force re-render to update relative time display
+      setLastUpdatedTimestamp(prev => prev);
+    }, 60000);
 
     return () => clearInterval(interval);
   }, []);
@@ -297,8 +292,6 @@ export default function UniversalNavbar({
             {/* Last Updated Timestamp */}
             <p className="mr-8" style={{ color: '#A0A0A0', fontSize: '12px' }}>
               Last updated: {lastUpdatedTimestamp ? formatTimestampForDisplay(lastUpdatedTimestamp) : 'Unknown'}
-              {/* Force re-render by including refreshTrigger in the display */}
-              {refreshTrigger > 0 && <span style={{ display: 'none' }}>{refreshTrigger}</span>}
             </p>
             
             {/* Refresh Icon */}

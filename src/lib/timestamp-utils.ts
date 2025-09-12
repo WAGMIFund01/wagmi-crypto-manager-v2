@@ -1,25 +1,15 @@
 /**
- * Utility functions for timestamp formatting and calculations
+ * Simple timestamp utilities - just compare database time to current time
  */
-
-export interface TimestampInfo {
-  timestamp: string;
-  minutesAgo: number;
-  displayText: string;
-}
 
 /**
- * Parse a timestamp string and calculate how many minutes ago it was
- * @param timestampString - The timestamp string from Google Sheets (e.g., "09/12/2025, 16:38:18")
- * @returns TimestampInfo object with parsed data and display text
+ * Format a timestamp for display - shows relative time like "5 minutes ago"
+ * @param timestampString - Timestamp from Google Sheets (e.g., "09/12/2025, 21:21:50")
+ * @returns Relative time string
  */
-export function calculateMinutesAgo(timestampString: string): TimestampInfo {
+export function formatTimestampForDisplay(timestampString: string): string {
   if (!timestampString || timestampString.trim() === '') {
-    return {
-      timestamp: '',
-      minutesAgo: 0,
-      displayText: 'Unknown'
-    };
+    return 'Unknown';
   }
 
   try {
@@ -28,7 +18,7 @@ export function calculateMinutesAgo(timestampString: string): TimestampInfo {
     const [month, day, year] = datePart.split('/');
     const [hours, minutes, seconds] = timePart.split(':');
 
-    // Create a Date object
+    // Create Date object from the timestamp
     const timestampDate = new Date(
       parseInt(year),
       parseInt(month) - 1, // Month is 0-indexed
@@ -38,76 +28,46 @@ export function calculateMinutesAgo(timestampString: string): TimestampInfo {
       parseInt(seconds)
     );
 
-    // Calculate the difference in minutes
+    // Get current time
     const now = new Date();
-    const diffInMs = now.getTime() - timestampDate.getTime();
-    const diffInMinutes = Math.floor(diffInMs / (1000 * 60));
-
-    // Generate display text
-    let displayText: string;
     
-    // Handle future timestamps (negative minutes) - treat as "Just now" if close
-    if (diffInMinutes < 0) {
-      // If it's less than 5 minutes in the future, treat as "Just now" (timezone/sync issue)
-      if (Math.abs(diffInMinutes) <= 5) {
-        displayText = 'Just now';
-      } else {
-        // Otherwise show absolute timestamp
-        displayText = timestampDate.toLocaleString('en-US', {
-          month: 'short',
-          day: 'numeric',
-          hour: 'numeric',
-          minute: '2-digit',
-          hour12: true
-        });
-      }
-    } else if (diffInMinutes < 1) {
-      displayText = 'Just now';
-    } else if (diffInMinutes === 1) {
-      displayText = '1 minute ago';
-    } else if (diffInMinutes < 60) {
-      displayText = `${diffInMinutes} minutes ago`;
-    } else if (diffInMinutes < 1440) { // Less than 24 hours
-      const hours = Math.floor(diffInMinutes / 60);
-      const remainingMinutes = diffInMinutes % 60;
-      if (hours === 1) {
-        displayText = remainingMinutes > 0 ? `1 hour ${remainingMinutes} minutes ago` : '1 hour ago';
-      } else {
-        displayText = remainingMinutes > 0 ? `${hours} hours ${remainingMinutes} minutes ago` : `${hours} hours ago`;
-      }
-    } else {
-      // More than 24 hours - show the actual timestamp
-      displayText = timestampDate.toLocaleString('en-US', {
-        month: 'short',
-        day: 'numeric',
-        hour: 'numeric',
-        minute: '2-digit',
-        hour12: true
-      });
-    }
+    // Calculate difference in milliseconds
+    const diffMs = now.getTime() - timestampDate.getTime();
+    const diffMinutes = Math.floor(diffMs / (1000 * 60));
 
-    return {
-      timestamp: timestampString,
-      minutesAgo: diffInMinutes,
-      displayText: displayText
-    };
+    // Return relative time based on difference
+    if (diffMinutes < 1) {
+      return 'Just now';
+    } else if (diffMinutes === 1) {
+      return '1 minute ago';
+    } else if (diffMinutes < 60) {
+      return `${diffMinutes} minutes ago`;
+    } else if (diffMinutes < 1440) { // Less than 24 hours
+      const hours = Math.floor(diffMinutes / 60);
+      return hours === 1 ? '1 hour ago' : `${hours} hours ago`;
+    } else { // 24+ hours
+      const days = Math.floor(diffMinutes / 1440);
+      return days === 1 ? '1 day ago' : `${days} days ago`;
+    }
 
   } catch (error) {
     console.error('Error parsing timestamp:', error);
-    return {
-      timestamp: timestampString,
-      minutesAgo: 0,
-      displayText: 'Invalid timestamp'
-    };
+    return 'Unknown';
   }
 }
 
-/**
- * Format a timestamp for display in the navbar
- * @param timestampString - The timestamp string from Google Sheets
- * @returns Formatted display text
- */
-export function formatTimestampForDisplay(timestampString: string): string {
-  const timestampInfo = calculateMinutesAgo(timestampString);
-  return timestampInfo.displayText;
+// Legacy export for compatibility
+export interface TimestampInfo {
+  timestamp: string;
+  minutesAgo: number;
+  displayText: string;
+}
+
+export function calculateMinutesAgo(timestampString: string): TimestampInfo {
+  const displayText = formatTimestampForDisplay(timestampString);
+  return {
+    timestamp: timestampString,
+    minutesAgo: 0, // Not needed for simple display
+    displayText: displayText
+  };
 }
