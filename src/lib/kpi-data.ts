@@ -71,9 +71,38 @@ export async function fetchKPIData(): Promise<KPIData | null> {
         
         console.log(`🔍 DEBUG - Row ${i}: metricName="${metricName}", value="${value}", type=${typeof value}`);
         
+        // Special handling for "Last Updated" - check if this is the metric name row
+        if (metricName && metricName.toString().toLowerCase().trim() === 'last updated') {
+          console.log('🔍 DEBUG - Found "Last Updated" metric name row!');
+          
+          // Check if the value is in the next row (common pattern in this sheet)
+          if (i + 1 < rows.length) {
+            const nextRow = rows[i + 1];
+            const nextRowValue = nextRow.c && nextRow.c.length >= 2 ? nextRow.c[1]?.v : null;
+            console.log(`🔍 DEBUG - Next row value: "${nextRowValue}", type: ${typeof nextRowValue}`);
+            
+            if (nextRowValue !== undefined && nextRowValue !== null && nextRowValue !== '') {
+              kpiData.lastUpdated = nextRowValue.toString();
+              console.log('🔍 DEBUG - Using next row value for lastUpdated:', kpiData.lastUpdated);
+              i++; // Skip the next row since we've processed it
+              continue;
+            }
+          }
+          
+          // Fallback to current row value if next row doesn't have it
+          if (value !== undefined && value !== null && value !== '') {
+            kpiData.lastUpdated = value.toString();
+            console.log('🔍 DEBUG - Using current row value for lastUpdated:', kpiData.lastUpdated);
+          }
+          continue;
+        }
+        
         if (metricName && value !== undefined && value !== '') {
           // Map the metric names to our expected format
-          switch (metricName.toString().toLowerCase().trim()) {
+          const cleanMetricName = metricName.toString().toLowerCase().trim();
+          console.log(`🔍 DEBUG - Processing metric: "${cleanMetricName}" with value: "${value}"`);
+          
+          switch (cleanMetricName) {
             case 'total investors':
               kpiData.totalInvestors = parseFloat(value) || 0;
               break;
@@ -89,12 +118,6 @@ export async function fetchKPIData(): Promise<KPIData | null> {
               break;
             case 'monthly return':
               kpiData.monthlyReturn = parseFloat(value) || 0;
-              break;
-            case 'last updated':
-              console.log('🔍 DEBUG - Found "Last Updated" row!');
-              console.log('🔍 DEBUG - Raw timestamp from Google Sheets:', value, 'Type:', typeof value);
-              kpiData.lastUpdated = value.toString();
-              console.log('🔍 DEBUG - Parsed lastUpdated:', kpiData.lastUpdated);
               break;
           }
         }
