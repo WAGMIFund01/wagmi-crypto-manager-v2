@@ -45,12 +45,17 @@ export default function UniversalNavbar({
   useEffect(() => {
     const fetchInitialTimestamp = async () => {
       try {
+        console.log('Fetching initial timestamp...');
         const response = await fetch('/api/get-last-updated-timestamp');
         if (response.ok) {
           const data = await response.json();
+          console.log('Initial timestamp response:', data);
           if (data.success && data.timestamp) {
             setLastUpdatedTimestamp(data.timestamp);
+            console.log('Set initial timestamp:', data.timestamp);
           }
+        } else {
+          console.error('Failed to fetch initial timestamp:', response.status);
         }
       } catch (error) {
         console.error('Error fetching initial timestamp:', error);
@@ -59,6 +64,26 @@ export default function UniversalNavbar({
 
     fetchInitialTimestamp();
   }, []);
+
+  // Function to fetch updated timestamp (can be called after updates)
+  const fetchLastUpdatedTimestamp = async () => {
+    try {
+      console.log('Fetching updated timestamp...');
+      const response = await fetch('/api/get-last-updated-timestamp');
+      if (response.ok) {
+        const data = await response.json();
+        console.log('Updated timestamp response:', data);
+        if (data.success && data.timestamp) {
+          setLastUpdatedTimestamp(data.timestamp);
+          console.log('Set updated timestamp:', data.timestamp);
+        }
+      } else {
+        console.error('Failed to fetch updated timestamp:', response.status);
+      }
+    } catch (error) {
+      console.error('Error fetching updated timestamp:', error);
+    }
+  };
 
   const handleRetryKPI = async () => {
     setIsRetrying(true);
@@ -96,21 +121,7 @@ export default function UniversalNavbar({
       console.log('Price update result:', priceUpdateResult);
       
       // Step 3: Get the updated timestamp from Google Sheets
-      console.log('Fetching updated timestamp...');
-      const timestampResponse = await fetch('/api/get-last-updated-timestamp', {
-        method: 'GET',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-      });
-      
-      if (timestampResponse.ok) {
-        const timestampData = await timestampResponse.json();
-        if (timestampData.success && timestampData.timestamp) {
-          setLastUpdatedTimestamp(timestampData.timestamp);
-          console.log('Updated timestamp:', timestampData.timestamp);
-        }
-      }
+      await fetchLastUpdatedTimestamp();
 
       // Step 4: Call revalidation API to clear cache
       console.log('Revalidating KPI data...');
