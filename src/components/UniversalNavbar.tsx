@@ -35,6 +35,7 @@ export default function UniversalNavbar({
   const [isRetrying, setIsRetrying] = useState(false);
   const [isClient, setIsClient] = useState(false);
   const [lastUpdatedTimestamp, setLastUpdatedTimestamp] = useState<string>('');
+  const [refreshTrigger, setRefreshTrigger] = useState(0);
 
   // Ensure we're on the client side
   useEffect(() => {
@@ -63,9 +64,10 @@ export default function UniversalNavbar({
   // Update timestamp display every minute to show relative time
   useEffect(() => {
     const interval = setInterval(() => {
-      // Force re-render to update relative time display
-      setLastUpdatedTimestamp(prev => prev);
-    }, 60000); // Update every minute
+      // Force re-render by updating the refresh trigger
+      // This will cause the component to re-render and recalculate relative time
+      setRefreshTrigger(prev => prev + 1);
+    }, 10000); // Update every 10 seconds for testing
 
     return () => clearInterval(interval);
   }, []);
@@ -294,6 +296,12 @@ export default function UniversalNavbar({
             <p className="mr-8" style={{ color: '#A0A0A0', fontSize: '12px' }}>
               Last updated: {lastUpdatedTimestamp ? formatTimestampForDisplay(lastUpdatedTimestamp) : 'Unknown'}
             </p>
+            {/* Debug info - remove after testing */}
+            {process.env.NODE_ENV === 'development' && (
+              <p style={{ color: '#FF0000', fontSize: '10px' }}>
+                DEBUG: refreshTrigger = {refreshTrigger}
+              </p>
+            )}
             
             {/* Refresh Icon */}
             <WagmiButton
