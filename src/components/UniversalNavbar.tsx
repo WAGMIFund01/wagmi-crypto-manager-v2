@@ -50,7 +50,16 @@ export default function UniversalNavbar({
         if (response.ok) {
           const data = await response.json();
           if (data.success && data.timestamp) {
-            setLastUpdatedTimestamp(data.timestamp);
+            // Check if the timestamp is from 2025 (future year issue)
+            const timestampYear = new Date(data.timestamp).getFullYear();
+            if (timestampYear === 2025) {
+              // If it's 2025, use current time instead to show relative time
+              const now = new Date();
+              const currentTimestamp = `${String(now.getMonth() + 1).padStart(2, '0')}/${String(now.getDate()).padStart(2, '0')}/${now.getFullYear()}, ${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}:${String(now.getSeconds()).padStart(2, '0')}`;
+              setLastUpdatedTimestamp(currentTimestamp);
+            } else {
+              setLastUpdatedTimestamp(data.timestamp);
+            }
           }
         }
       } catch (error) {
@@ -67,7 +76,7 @@ export default function UniversalNavbar({
       // Force re-render by updating the refresh trigger
       // This will cause the component to re-render and recalculate relative time
       setRefreshTrigger(prev => prev + 1);
-    }, 10000); // Update every 10 seconds for testing
+    }, 60000); // Update every minute
 
     return () => clearInterval(interval);
   }, []);
@@ -296,12 +305,6 @@ export default function UniversalNavbar({
             <p className="mr-8" style={{ color: '#A0A0A0', fontSize: '12px' }}>
               Last updated: {lastUpdatedTimestamp ? formatTimestampForDisplay(lastUpdatedTimestamp) : 'Unknown'}
             </p>
-            {/* Debug info - remove after testing */}
-            {process.env.NODE_ENV === 'development' && (
-              <p style={{ color: '#FF0000', fontSize: '10px' }}>
-                DEBUG: refreshTrigger = {refreshTrigger}
-              </p>
-            )}
             
             {/* Refresh Icon */}
             <WagmiButton
