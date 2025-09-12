@@ -63,10 +63,13 @@ export async function fetchKPIData(): Promise<KPIData | null> {
     
     const rows = data.table.rows;
     
-    for (const row of rows) {
+    for (let i = 0; i < rows.length; i++) {
+      const row = rows[i];
       if (row.c && row.c.length >= 2) {
         const metricName = row.c[0]?.v; // Column A - Metric Name
         const value = row.c[1]?.v; // Column B - Value
+        
+        console.log(`🔍 DEBUG - Row ${i}: metricName="${metricName}", value="${value}", type=${typeof value}`);
         
         if (metricName && value !== undefined && value !== '') {
           // Map the metric names to our expected format
@@ -88,8 +91,9 @@ export async function fetchKPIData(): Promise<KPIData | null> {
               kpiData.monthlyReturn = parseFloat(value) || 0;
               break;
             case 'last updated':
-              kpiData.lastUpdated = value.toString();
+              console.log('🔍 DEBUG - Found "Last Updated" row!');
               console.log('🔍 DEBUG - Raw timestamp from Google Sheets:', value, 'Type:', typeof value);
+              kpiData.lastUpdated = value.toString();
               console.log('🔍 DEBUG - Parsed lastUpdated:', kpiData.lastUpdated);
               break;
           }
