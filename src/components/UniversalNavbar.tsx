@@ -244,7 +244,7 @@ export default function UniversalNavbar({
             {/* Debug info - remove after fixing */}
             {process.env.NODE_ENV === 'development' && (
               <p style={{ color: '#FF0000', fontSize: '10px' }}>
-                DEBUG: kpiData?.lastUpdated = "{kpiData?.lastUpdated}"
+                DEBUG: kpiData?.lastUpdated = &quot;{kpiData?.lastUpdated}&quot;
               </p>
             )}
             
