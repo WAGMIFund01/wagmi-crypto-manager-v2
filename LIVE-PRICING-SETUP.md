@@ -1,6 +1,6 @@
-# 🚀 Live Pricing Setup Guide
+# 🚀 Live Pricing Setup Guide (Direct Google Sheets API)
 
-This guide will help you set up automatic price updates for your WAGMI Investment Manager database using CoinGecko API.
+This guide will help you set up automatic price updates for your WAGMI Investment Manager database using CoinGecko API and Google Sheets API directly.
 
 ## 📋 Overview
 
@@ -10,30 +10,55 @@ The live pricing system will:
 - ✅ Let Google Sheets formulas handle **Column I (Total Value)** recalculation
 - ✅ Support 30+ cryptocurrency symbols
 - ✅ Run automatically via Vercel cron jobs
+- ✅ Use Google Sheets API directly (no Google Apps Script needed)
 
 ## 🔧 Setup Steps
 
-### Step 1: Deploy Google Apps Script
+### Step 1: Enable Google Sheets API
 
-1. **Open Google Apps Script**: Go to [script.google.com](https://script.google.com)
-2. **Create New Project**: Click "New Project"
-3. **Copy the Script**: Copy the contents from `google-sheets-price-update.gs`
-4. **Paste and Save**: Paste the code and save the project
-5. **Deploy as Web App**:
-   - Click "Deploy" → "New deployment"
-   - Choose "Web app" as type
-   - Set execute as "Me"
-   - Set access to "Anyone"
-   - Click "Deploy"
-6. **Copy the Web App URL**: This will be your `GOOGLE_SHEETS_ENDPOINT`
+1. **Go to Google Cloud Console**: [console.cloud.google.com](https://console.cloud.google.com)
+2. **Select or Create Project**: Choose your project or create a new one
+3. **Enable Google Sheets API**:
+   - Go to "APIs & Services" → "Library"
+   - Search for "Google Sheets API"
+   - Click "Enable"
 
-### Step 2: Configure Environment Variables
+### Step 2: Create Service Account
+
+1. **Go to Credentials**: "APIs & Services" → "Credentials"
+2. **Create Credentials**: Click "Create Credentials" → "Service Account"
+3. **Fill Details**:
+   - Service account name: `wagmi-pricing-updater`
+   - Description: `Service account for updating portfolio prices`
+   - Click "Create and Continue"
+4. **Skip Role Assignment**: Click "Continue" (we'll handle permissions manually)
+5. **Click "Done"**
+
+### Step 3: Generate Service Account Key
+
+1. **Find Your Service Account**: In the credentials list, click on your service account
+2. **Go to Keys Tab**: Click "Keys" tab
+3. **Add Key**: Click "Add Key" → "Create new key"
+4. **Choose JSON**: Select "JSON" format and click "Create"
+5. **Download Key**: Save the JSON file securely
+
+### Step 4: Share Google Sheet with Service Account
+
+1. **Open Your Google Sheet**: The WAGMI Investment Manager Database
+2. **Click Share**: Click the "Share" button (top right)
+3. **Add Service Account**: 
+   - Add the service account email (from the JSON file: `client_email`)
+   - Set permission to "Editor"
+   - Click "Send"
+
+### Step 5: Configure Environment Variables
 
 1. **Copy the template**: `cp .env.example .env.local`
 2. **Update the values**:
    ```bash
-   # Google Sheets Configuration
-   GOOGLE_SHEETS_ENDPOINT=https://script.google.com/macros/s/YOUR_SCRIPT_ID/exec
+   # Google Sheets API Configuration
+   GOOGLE_SERVICE_ACCOUNT_EMAIL=your-service-account@your-project.iam.gserviceaccount.com
+   GOOGLE_PRIVATE_KEY="-----BEGIN PRIVATE KEY-----\nYOUR_PRIVATE_KEY_HERE\n-----END PRIVATE KEY-----\n"
    
    # Optional: CoinGecko API key (free tier doesn't require it)
    COINGECKO_API_KEY=your_coinGecko_api_key_here
@@ -48,7 +73,11 @@ The live pricing system will:
    CRON_SECRET=your_random_secret_string_here
    ```
 
-### Step 3: Test the System
+3. **Extract from JSON**: From your downloaded service account JSON:
+   - `client_email` → `GOOGLE_SERVICE_ACCOUNT_EMAIL`
+   - `private_key` → `GOOGLE_PRIVATE_KEY` (keep the quotes and \n characters)
+
+### Step 6: Test the System
 
 1. **Test the price update API**:
    ```bash
@@ -62,7 +91,7 @@ The live pricing system will:
 
 3. **Check your Google Sheet**: Verify that prices and timestamps are updated
 
-### Step 4: Deploy to Vercel
+### Step 7: Deploy to Vercel
 
 1. **Push to GitHub**: The cron job will automatically start
 2. **Check Vercel Dashboard**: Verify the cron job is running
@@ -109,8 +138,8 @@ The system supports these symbols (automatically mapped to CoinGecko IDs):
 - Fetches current prices for all identified assets
 - Uses the `/simple/price` endpoint (free tier: 30 calls/minute)
 
-### 4. **Google Sheets Update**
-- Calls your Google Apps Script for each asset
+### 4. **Google Sheets API Update**
+- Uses Google Sheets API to batch update prices
 - Updates only Current price (H) and Last Price Update (J)
 - Google Sheets formulas automatically recalculate Total Value (I)
 
@@ -118,58 +147,65 @@ The system supports these symbols (automatically mapped to CoinGecko IDs):
 
 ### Common Issues:
 
-1. **"Service not configured" error**:
-   - Check that `GOOGLE_SHEETS_ENDPOINT` is set correctly
-   - Verify the Google Apps Script is deployed and accessible
+1. **"Credentials not configured" error**:
+   - Check that `GOOGLE_SERVICE_ACCOUNT_EMAIL` and `GOOGLE_PRIVATE_KEY` are set
+   - Verify the private key includes the full key with \n characters
 
-2. **"Symbol not found" error**:
+2. **"Permission denied" error**:
+   - Ensure the service account email has Editor access to your Google Sheet
+   - Check that the Google Sheets API is enabled in your project
+
+3. **"Symbol not found" error**:
    - Check if the symbol exists in `SYMBOL_TO_COINGECKO_ID` mapping
    - Verify the symbol case matches exactly
 
-3. **CoinGecko API errors**:
+4. **CoinGecko API errors**:
    - Check if you're hitting rate limits (30 calls/minute for free tier)
    - Verify the CoinGecko API is accessible
 
-4. **Google Sheets update failures**:
-   - Check Google Apps Script logs
-   - Verify the script has proper permissions
+5. **Google Sheets API errors**:
+   - Check Google Cloud Console for API quotas
+   - Verify the service account has proper permissions
    - Ensure the sheet name is exactly "Portfolio Overview"
 
 ### Monitoring:
 
 1. **Check Vercel Function Logs**: Monitor for errors
-2. **Google Apps Script Logs**: Check execution logs
+2. **Google Cloud Console**: Check API usage and quotas
 3. **Google Sheet**: Verify timestamps are updating
 4. **API Response**: Check the JSON response for success/failure details
 
 ## 📈 Performance
 
 - **Update Frequency**: Every 30 minutes
-- **API Calls**: ~1-2 calls per update (depending on portfolio size)
-- **Rate Limits**: Well within CoinGecko free tier limits
-- **Update Speed**: Typically completes in 2-5 seconds
+- **API Calls**: ~2-3 calls per update (1 CoinGecko + 1 Google Sheets batch update)
+- **Rate Limits**: Well within both CoinGecko and Google Sheets API limits
+- **Update Speed**: Typically completes in 3-8 seconds
 
 ## 🔒 Security
 
-- **Google Apps Script**: Runs with your Google account permissions
+- **Service Account**: Limited permissions (only to your specific sheet)
 - **Environment Variables**: All sensitive data stored securely
+- **API Keys**: Stored in Vercel environment variables
 - **Cron Security**: Optional `CRON_SECRET` for additional security
-- **API Keys**: CoinGecko API key optional (free tier works without it)
 
-## 🎯 Next Steps
+## 🎯 Advantages of Direct API Approach
 
-1. **Deploy the system** following the steps above
-2. **Monitor the first few runs** to ensure everything works
-3. **Add more symbols** to `SYMBOL_TO_COINGECKO_ID` as needed
-4. **Set up monitoring** to get notified of any failures
-5. **Consider upgrading** to CoinGecko Pro if you need higher rate limits
+- ✅ **Full Control**: All logic in your Next.js app
+- ✅ **Better Logging**: Full visibility into what's happening
+- ✅ **Easier Debugging**: Use your existing debugging tools
+- ✅ **Version Control**: Changes tracked with your code
+- ✅ **No External Dependencies**: No Google Apps Script to maintain
+- ✅ **Better Error Handling**: Sophisticated retry logic possible
+- ✅ **Integrated**: Part of your main application
 
 ## 📞 Support
 
 If you encounter any issues:
 1. Check the troubleshooting section above
 2. Review Vercel function logs
-3. Check Google Apps Script execution logs
+3. Check Google Cloud Console for API usage
 4. Verify all environment variables are set correctly
+5. Ensure the service account has proper permissions
 
 The system is designed to be robust and self-healing, but monitoring the first few runs is recommended to ensure everything works smoothly!
