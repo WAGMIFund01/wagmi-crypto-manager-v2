@@ -14,8 +14,12 @@
 # Test files
 test-*
 temp-*
-*update*
 *landing*
+
+# Ignore specific update files (but not API routes)
+*update*.js
+*update*.ts
+*update*.json
 
 # OS files
 .DS_Store
