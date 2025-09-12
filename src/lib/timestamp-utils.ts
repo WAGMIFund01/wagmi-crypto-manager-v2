@@ -14,7 +14,10 @@ export interface TimestampInfo {
  * @returns TimestampInfo object with parsed data and display text
  */
 export function calculateMinutesAgo(timestampString: string): TimestampInfo {
+  console.log('🔍 calculateMinutesAgo called with:', timestampString);
+  
   if (!timestampString || timestampString.trim() === '') {
+    console.log('🔍 Empty timestamp string, returning Unknown');
     return {
       timestamp: '',
       minutesAgo: 0,
@@ -24,9 +27,13 @@ export function calculateMinutesAgo(timestampString: string): TimestampInfo {
 
   try {
     // Parse the timestamp string (format: "MM/DD/YYYY, HH:MM:SS")
+    console.log('🔍 Parsing timestamp:', timestampString);
     const [datePart, timePart] = timestampString.split(', ');
+    console.log('🔍 Date part:', datePart, 'Time part:', timePart);
+    
     const [month, day, year] = datePart.split('/');
     const [hours, minutes, seconds] = timePart.split(':');
+    console.log('🔍 Parsed parts - Month:', month, 'Day:', day, 'Year:', year, 'Hours:', hours, 'Minutes:', minutes, 'Seconds:', seconds);
 
     // Create a Date object
     const timestampDate = new Date(
@@ -70,6 +77,8 @@ export function calculateMinutesAgo(timestampString: string): TimestampInfo {
       });
     }
 
+    console.log('🔍 Final result - Minutes ago:', diffInMinutes, 'Display text:', displayText);
+    
     return {
       timestamp: timestampString,
       minutesAgo: diffInMinutes,
