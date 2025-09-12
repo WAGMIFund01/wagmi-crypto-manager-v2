@@ -53,11 +53,15 @@ export default function UniversalNavbar({
             // Check if the timestamp is from 2025 (future year issue)
             const timestampYear = new Date(data.timestamp).getFullYear();
             if (timestampYear === 2025) {
-              // If it's 2025, use current time instead to show relative time
-              const now = new Date();
-              const currentTimestamp = `${String(now.getMonth() + 1).padStart(2, '0')}/${String(now.getDate()).padStart(2, '0')}/${now.getFullYear()}, ${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}:${String(now.getSeconds()).padStart(2, '0')}`;
-              setLastUpdatedTimestamp(currentTimestamp);
+              // If it's 2025, we need to estimate the actual time based on the timestamp
+              // Parse the 2025 timestamp and convert it to 2024
+              const [datePart, timePart] = data.timestamp.split(', ');
+              const [month, day, year] = datePart.split('/');
+              const correctedTimestamp = `${month}/${day}/2024, ${timePart}`;
+              console.log('Corrected 2025 timestamp:', data.timestamp, 'to:', correctedTimestamp);
+              setLastUpdatedTimestamp(correctedTimestamp);
             } else {
+              console.log('Using original timestamp:', data.timestamp);
               setLastUpdatedTimestamp(data.timestamp);
             }
           }
@@ -75,6 +79,7 @@ export default function UniversalNavbar({
     const interval = setInterval(() => {
       // Force re-render by updating the refresh trigger
       // This will cause the component to re-render and recalculate relative time
+      console.log('Timer tick - updating refresh trigger');
       setRefreshTrigger(prev => prev + 1);
     }, 60000); // Update every minute
 
