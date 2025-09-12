@@ -42,7 +42,23 @@ export default function UniversalNavbar({
   const handleRetryKPI = async () => {
     setIsRetrying(true);
     try {
-      // Step 1: Update prices from CoinGecko
+      // Step 1: Update KPI timestamp
+      console.log('Updating KPI timestamp...');
+      const timestampUpdateResponse = await fetch('/api/update-kpi-timestamp', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      });
+      
+      if (!timestampUpdateResponse.ok) {
+        throw new Error('Failed to update KPI timestamp');
+      }
+      
+      const timestampUpdateResult = await timestampUpdateResponse.json();
+      console.log('Timestamp update result:', timestampUpdateResult);
+      
+      // Step 2: Update prices from CoinGecko
       console.log('Updating prices from CoinGecko...');
       const priceUpdateResponse = await fetch('/api/update-all-prices', {
         method: 'POST',
@@ -58,7 +74,7 @@ export default function UniversalNavbar({
       const priceUpdateResult = await priceUpdateResponse.json();
       console.log('Price update result:', priceUpdateResult);
       
-      // Step 2: Call revalidation API to clear cache
+      // Step 3: Call revalidation API to clear cache
       console.log('Revalidating KPI data...');
       const revalidationResponse = await fetch('/api/revalidate-kpi', {
         method: 'POST',
