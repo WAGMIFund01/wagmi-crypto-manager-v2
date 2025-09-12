@@ -123,6 +123,8 @@ export default function DashboardClient({ session, kpiData: initialKpiData, hasE
 
       if (response.ok) {
         const freshKpiData = await response.json();
+        console.log('🔍 DEBUG - Fresh KPI data received:', freshKpiData);
+        console.log('🔍 DEBUG - lastUpdated from API:', freshKpiData.lastUpdated);
         
         // Transform the data to match the expected format
         const transformedKpiData = {
@@ -133,6 +135,7 @@ export default function DashboardClient({ session, kpiData: initialKpiData, hasE
           lastUpdated: freshKpiData.lastUpdated
         };
         
+        console.log('🔍 DEBUG - Transformed KPI data:', transformedKpiData);
         setKpiData(transformedKpiData);
         console.log('KPI data refreshed successfully');
         
