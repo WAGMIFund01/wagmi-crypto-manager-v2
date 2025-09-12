@@ -81,9 +81,11 @@ export default function UniversalNavbar({
       }
     } catch (error) {
       console.error('Error during refresh:', error);
-      setIsRetrying(false);
       // Show user-friendly error message
       alert('Failed to refresh data. Please try again.');
+    } finally {
+      // Always reset the loading state, regardless of success or failure
+      setIsRetrying(false);
     }
   };
 
