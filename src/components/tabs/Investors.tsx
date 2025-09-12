@@ -17,7 +17,7 @@ interface Investor {
 
 interface InvestorsProps {
   isPrivacyMode?: boolean;
-  onRefresh?: number;
+  onRefresh?: () => void; // Changed from number to () => void
 }
 
 export default function Investors({ isPrivacyMode = false, onRefresh }: InvestorsProps) {
@@ -61,9 +61,9 @@ export default function Investors({ isPrivacyMode = false, onRefresh }: Investor
     fetchInvestors();
   }, []);
 
-  // Refresh when onRefresh trigger changes
+  // Refresh when onRefresh callback changes (triggered by parent)
   useEffect(() => {
-    if (onRefresh !== undefined) {
+    if (onRefresh) { // Changed condition to handle function properly
       fetchInvestors();
     }
   }, [onRefresh]);

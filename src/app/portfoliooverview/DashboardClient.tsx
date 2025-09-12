@@ -104,6 +104,12 @@ export default function DashboardClient({ session, kpiData: initialKpiData, hasE
     setIsPrivacyMode(privacyMode);
   };
 
+  // Create refresh function that triggers all data refreshes
+  const triggerDataRefresh = () => {
+    setRefreshTrigger(prev => prev + 1);
+    console.log('Data refresh triggered');
+  };
+
   // Handle comprehensive data refresh
   const handleKpiRefresh = async () => {
     try {
@@ -131,8 +137,7 @@ export default function DashboardClient({ session, kpiData: initialKpiData, hasE
         console.log('KPI data refreshed successfully');
         
         // Trigger portfolio data refresh
-        setRefreshTrigger(prev => prev + 1);
-        console.log('Portfolio data refresh triggered');
+        triggerDataRefresh();
       } else {
         console.error('Failed to fetch fresh KPI data');
       }
@@ -164,13 +169,13 @@ export default function DashboardClient({ session, kpiData: initialKpiData, hasE
   const renderTabContent = () => {
     switch (activeTab) {
       case 'portfolio':
-        return <PortfolioOverview onRefresh={refreshTrigger} />;
+        return <PortfolioOverview onRefresh={triggerDataRefresh} />;
       case 'analytics':
         return <Analytics />;
       case 'investors':
-        return <Investors isPrivacyMode={isPrivacyMode} onRefresh={refreshTrigger} />;
+        return <Investors isPrivacyMode={isPrivacyMode} onRefresh={triggerDataRefresh} />;
       default:
-        return <PortfolioOverview onRefresh={refreshTrigger} />;
+        return <PortfolioOverview onRefresh={triggerDataRefresh} />;
     }
   };
 
