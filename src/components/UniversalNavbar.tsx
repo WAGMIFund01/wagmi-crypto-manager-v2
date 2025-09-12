@@ -40,23 +40,43 @@ export default function UniversalNavbar({
   const handleRetryKPI = async () => {
     setIsRetrying(true);
     try {
-      // Call revalidation API to clear cache
-      const response = await fetch('/api/revalidate-kpi', {
+      // Step 1: Update prices from CoinGecko
+      console.log('Updating prices from CoinGecko...');
+      const priceUpdateResponse = await fetch('/api/update-all-prices', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
       });
       
-      if (response.ok) {
-        // Reload page after successful revalidation
+      if (!priceUpdateResponse.ok) {
+        throw new Error('Failed to update prices');
+      }
+      
+      const priceUpdateResult = await priceUpdateResponse.json();
+      console.log('Price update result:', priceUpdateResult);
+      
+      // Step 2: Call revalidation API to clear cache
+      console.log('Revalidating KPI data...');
+      const revalidationResponse = await fetch('/api/revalidate-kpi', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      });
+      
+      if (revalidationResponse.ok) {
+        // Reload page after successful price update and revalidation
+        console.log('Refreshing page with updated data...');
         window.location.reload();
       } else {
         throw new Error('Failed to revalidate dashboard');
       }
     } catch (error) {
-      console.error('Error retrying KPI data:', error);
+      console.error('Error during refresh:', error);
       setIsRetrying(false);
+      // Show user-friendly error message
+      alert('Failed to refresh data. Please try again.');
     }
   };
 
@@ -202,7 +222,7 @@ export default function UniversalNavbar({
               size="icon"
               icon={<RefreshIcon className="w-3 h-3" />}
               loading={isRetrying}
-              title="Manual refresh"
+              title="Refresh prices & data"
             />
 
             {/* Privacy Toggle - Eye Icon with Rounded Square */}
