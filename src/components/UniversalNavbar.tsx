@@ -81,7 +81,7 @@ export default function UniversalNavbar({
       // This will cause the component to re-render and recalculate relative time
       console.log('Timer tick - updating refresh trigger');
       setRefreshTrigger(prev => prev + 1);
-    }, 60000); // Update every minute
+    }, 10000); // Update every 10 seconds for testing
 
     return () => clearInterval(interval);
   }, []);
@@ -310,6 +310,12 @@ export default function UniversalNavbar({
             <p className="mr-8" style={{ color: '#A0A0A0', fontSize: '12px' }}>
               Last updated: {lastUpdatedTimestamp ? formatTimestampForDisplay(lastUpdatedTimestamp) : 'Unknown'}
             </p>
+            {/* Debug info - remove after testing */}
+            {process.env.NODE_ENV === 'development' && (
+              <p style={{ color: '#FF0000', fontSize: '10px' }}>
+                DEBUG: refreshTrigger = {refreshTrigger}, timestamp = {lastUpdatedTimestamp}
+              </p>
+            )}
             
             {/* Refresh Icon */}
             <WagmiButton
