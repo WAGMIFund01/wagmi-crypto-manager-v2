@@ -60,6 +60,16 @@ export default function UniversalNavbar({
     fetchInitialTimestamp();
   }, []);
 
+  // Update timestamp display every minute to show relative time
+  useEffect(() => {
+    const interval = setInterval(() => {
+      // Force re-render to update relative time display
+      setLastUpdatedTimestamp(prev => prev);
+    }, 60000); // Update every minute
+
+    return () => clearInterval(interval);
+  }, []);
+
   // Function to fetch updated timestamp (can be called after updates)
   const fetchLastUpdatedTimestamp = async () => {
     try {
@@ -94,6 +104,11 @@ export default function UniversalNavbar({
       const timestampUpdateResult = await timestampUpdateResponse.json();
       console.log('Timestamp update result:', timestampUpdateResult);
       
+      // Immediately set the timestamp to "Just now" since we just updated it
+      const now = new Date();
+      const currentTimestamp = `${String(now.getMonth() + 1).padStart(2, '0')}/${String(now.getDate()).padStart(2, '0')}/${now.getFullYear()}, ${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}:${String(now.getSeconds()).padStart(2, '0')}`;
+      setLastUpdatedTimestamp(currentTimestamp);
+      
       // Step 2: Update prices from CoinGecko
       console.log('Updating prices from CoinGecko...');
       const priceUpdateResponse = await fetch('/api/update-all-prices', {
@@ -110,8 +125,7 @@ export default function UniversalNavbar({
       const priceUpdateResult = await priceUpdateResponse.json();
       console.log('Price update result:', priceUpdateResult);
       
-      // Step 3: Get the updated timestamp from Google Sheets
-      await fetchLastUpdatedTimestamp();
+      // Step 3: Timestamp already set to current time above
 
       // Step 4: Call revalidation API to clear cache
       console.log('Revalidating KPI data...');
