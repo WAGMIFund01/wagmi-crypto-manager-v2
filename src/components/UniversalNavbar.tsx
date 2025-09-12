@@ -50,20 +50,8 @@ export default function UniversalNavbar({
         if (response.ok) {
           const data = await response.json();
           if (data.success && data.timestamp) {
-            // Check if the timestamp is from 2025 (future year issue)
-            const timestampYear = new Date(data.timestamp).getFullYear();
-            if (timestampYear === 2025) {
-              // If it's 2025, we need to estimate the actual time based on the timestamp
-              // Parse the 2025 timestamp and convert it to 2024
-              const [datePart, timePart] = data.timestamp.split(', ');
-              const [month, day, year] = datePart.split('/');
-              const correctedTimestamp = `${month}/${day}/2024, ${timePart}`;
-              console.log('Corrected 2025 timestamp:', data.timestamp, 'to:', correctedTimestamp);
-              setLastUpdatedTimestamp(correctedTimestamp);
-            } else {
-              console.log('Using original timestamp:', data.timestamp);
-              setLastUpdatedTimestamp(data.timestamp);
-            }
+            // Use timestamp as-is (2025 is correct)
+            setLastUpdatedTimestamp(data.timestamp);
           }
         }
       } catch (error) {
@@ -81,7 +69,7 @@ export default function UniversalNavbar({
       // This will cause the component to re-render and recalculate relative time
       console.log('Timer tick - updating refresh trigger');
       setRefreshTrigger(prev => prev + 1);
-    }, 10000); // Update every 10 seconds for testing
+    }, 60000); // Update every minute
 
     return () => clearInterval(interval);
   }, []);
@@ -312,12 +300,6 @@ export default function UniversalNavbar({
               {/* Force re-render by including refreshTrigger in the display */}
               {refreshTrigger > 0 && <span style={{ display: 'none' }}>{refreshTrigger}</span>}
             </p>
-            {/* Debug info - remove after testing */}
-            {process.env.NODE_ENV === 'development' && (
-              <p style={{ color: '#FF0000', fontSize: '10px' }}>
-                DEBUG: refreshTrigger = {refreshTrigger}, timestamp = {lastUpdatedTimestamp}
-              </p>
-            )}
             
             {/* Refresh Icon */}
             <WagmiButton

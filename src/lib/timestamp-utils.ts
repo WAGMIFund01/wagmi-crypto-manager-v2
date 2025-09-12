@@ -46,15 +46,21 @@ export function calculateMinutesAgo(timestampString: string): TimestampInfo {
     // Generate display text
     let displayText: string;
     
-    // Handle future timestamps (negative minutes) - should not happen with correct year
+    // Handle future timestamps (negative minutes) - treat as "Just now" if close
     if (diffInMinutes < 0) {
-      displayText = timestampDate.toLocaleString('en-US', {
-        month: 'short',
-        day: 'numeric',
-        hour: 'numeric',
-        minute: '2-digit',
-        hour12: true
-      });
+      // If it's less than 5 minutes in the future, treat as "Just now" (timezone/sync issue)
+      if (Math.abs(diffInMinutes) <= 5) {
+        displayText = 'Just now';
+      } else {
+        // Otherwise show absolute timestamp
+        displayText = timestampDate.toLocaleString('en-US', {
+          month: 'short',
+          day: 'numeric',
+          hour: 'numeric',
+          minute: '2-digit',
+          hour12: true
+        });
+      }
     } else if (diffInMinutes < 1) {
       displayText = 'Just now';
     } else if (diffInMinutes === 1) {
