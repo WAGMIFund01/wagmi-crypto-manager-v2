@@ -27,15 +27,18 @@ export async function POST(request: NextRequest) {
 
     // Generate current timestamp in a simple format
     const now = new Date();
-    const timestamp = now.toLocaleString('en-US', {
-      year: 'numeric',
-      month: '2-digit',
-      day: '2-digit',
-      hour: '2-digit',
-      minute: '2-digit',
-      second: '2-digit',
-      hour12: false
-    });
+    
+    // Use explicit formatting to ensure correct year
+    const year = now.getFullYear();
+    const month = String(now.getMonth() + 1).padStart(2, '0');
+    const day = String(now.getDate()).padStart(2, '0');
+    const hours = String(now.getHours()).padStart(2, '0');
+    const minutes = String(now.getMinutes()).padStart(2, '0');
+    const seconds = String(now.getSeconds()).padStart(2, '0');
+    
+    const timestamp = `${month}/${day}/${year}, ${hours}:${minutes}:${seconds}`;
+    
+    console.log('Generated timestamp:', timestamp, 'Current year:', year);
 
     // Update the KPI tab timestamp (cell B7)
     await sheets.spreadsheets.values.update({

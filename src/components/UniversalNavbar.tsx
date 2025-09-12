@@ -45,17 +45,12 @@ export default function UniversalNavbar({
   useEffect(() => {
     const fetchInitialTimestamp = async () => {
       try {
-        console.log('Fetching initial timestamp...');
         const response = await fetch('/api/get-last-updated-timestamp');
         if (response.ok) {
           const data = await response.json();
-          console.log('Initial timestamp response:', data);
           if (data.success && data.timestamp) {
             setLastUpdatedTimestamp(data.timestamp);
-            console.log('Set initial timestamp:', data.timestamp);
           }
-        } else {
-          console.error('Failed to fetch initial timestamp:', response.status);
         }
       } catch (error) {
         console.error('Error fetching initial timestamp:', error);
@@ -68,17 +63,12 @@ export default function UniversalNavbar({
   // Function to fetch updated timestamp (can be called after updates)
   const fetchLastUpdatedTimestamp = async () => {
     try {
-      console.log('Fetching updated timestamp...');
       const response = await fetch('/api/get-last-updated-timestamp');
       if (response.ok) {
         const data = await response.json();
-        console.log('Updated timestamp response:', data);
         if (data.success && data.timestamp) {
           setLastUpdatedTimestamp(data.timestamp);
-          console.log('Set updated timestamp:', data.timestamp);
         }
-      } else {
-        console.error('Failed to fetch updated timestamp:', response.status);
       }
     } catch (error) {
       console.error('Error fetching updated timestamp:', error);
@@ -290,24 +280,6 @@ export default function UniversalNavbar({
             <p className="mr-8" style={{ color: '#A0A0A0', fontSize: '12px' }}>
               Last updated: {lastUpdatedTimestamp ? formatTimestampForDisplay(lastUpdatedTimestamp) : 'Unknown'}
             </p>
-            {/* Debug info - remove after fixing */}
-            {process.env.NODE_ENV === 'development' && (
-              <p style={{ color: '#FF0000', fontSize: '10px' }}>
-                DEBUG: formatTimestampForDisplay(&quot;{lastUpdatedTimestamp}&quot;) = &quot;{lastUpdatedTimestamp ? formatTimestampForDisplay(lastUpdatedTimestamp) : 'N/A'}&quot;
-              </p>
-            )}
-            {/* Debug info - remove after fixing */}
-            {process.env.NODE_ENV === 'development' && (
-              <p style={{ color: '#FF0000', fontSize: '10px' }}>
-                DEBUG: lastUpdatedTimestamp = &quot;{lastUpdatedTimestamp}&quot;
-              </p>
-            )}
-            {/* Debug info - remove after fixing */}
-            {process.env.NODE_ENV === 'development' && (
-              <p style={{ color: '#FF0000', fontSize: '10px' }}>
-                DEBUG: kpiData?.lastUpdated = &quot;{kpiData?.lastUpdated}&quot;
-              </p>
-            )}
             
             {/* Refresh Icon */}
             <WagmiButton
