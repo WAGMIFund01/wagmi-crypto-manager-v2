@@ -5,6 +5,7 @@ import { useState, useEffect } from 'react';
 import WagmiButton from './ui/WagmiButton';
 import WagmiCard from './ui/WagmiCard';
 import { RefreshIcon } from './ui/icons/WagmiIcons';
+import { formatTimestampForDisplay } from '@/lib/timestamp-utils';
 
 interface UniversalNavbarProps {
   activeTab: string;
@@ -33,10 +34,30 @@ export default function UniversalNavbar({
   const [isPrivacyMode, setIsPrivacyMode] = useState(false);
   const [isRetrying, setIsRetrying] = useState(false);
   const [isClient, setIsClient] = useState(false);
+  const [lastUpdatedTimestamp, setLastUpdatedTimestamp] = useState<string>('');
 
   // Ensure we're on the client side
   useEffect(() => {
     setIsClient(true);
+  }, []);
+
+  // Fetch the initial timestamp when component mounts
+  useEffect(() => {
+    const fetchInitialTimestamp = async () => {
+      try {
+        const response = await fetch('/api/get-last-updated-timestamp');
+        if (response.ok) {
+          const data = await response.json();
+          if (data.success && data.timestamp) {
+            setLastUpdatedTimestamp(data.timestamp);
+          }
+        }
+      } catch (error) {
+        console.error('Error fetching initial timestamp:', error);
+      }
+    };
+
+    fetchInitialTimestamp();
   }, []);
 
   const handleRetryKPI = async () => {
@@ -74,7 +95,24 @@ export default function UniversalNavbar({
       const priceUpdateResult = await priceUpdateResponse.json();
       console.log('Price update result:', priceUpdateResult);
       
-      // Step 3: Call revalidation API to clear cache
+      // Step 3: Get the updated timestamp from Google Sheets
+      console.log('Fetching updated timestamp...');
+      const timestampResponse = await fetch('/api/get-last-updated-timestamp', {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      });
+      
+      if (timestampResponse.ok) {
+        const timestampData = await timestampResponse.json();
+        if (timestampData.success && timestampData.timestamp) {
+          setLastUpdatedTimestamp(timestampData.timestamp);
+          console.log('Updated timestamp:', timestampData.timestamp);
+        }
+      }
+
+      // Step 4: Call revalidation API to clear cache
       console.log('Revalidating KPI data...');
       const revalidationResponse = await fetch('/api/revalidate-kpi', {
         method: 'POST',
@@ -239,7 +277,7 @@ export default function UniversalNavbar({
           <div className="flex items-center space-x-4">
             {/* Last Updated Timestamp */}
             <p className="mr-8" style={{ color: '#A0A0A0', fontSize: '12px' }}>
-              Last updated: {formatLastRefresh(kpiData?.lastUpdated || '')}
+              Last updated: {lastUpdatedTimestamp ? formatTimestampForDisplay(lastUpdatedTimestamp) : 'Unknown'}
             </p>
             {/* Debug info - remove after fixing */}
             {process.env.NODE_ENV === 'development' && (
