@@ -282,7 +282,7 @@ export default function UniversalNavbar({
             {/* Debug info - remove after fixing */}
             {process.env.NODE_ENV === 'development' && (
               <p style={{ color: '#FF0000', fontSize: '10px' }}>
-                DEBUG: lastUpdatedTimestamp = "{lastUpdatedTimestamp}"
+                DEBUG: lastUpdatedTimestamp = &quot;{lastUpdatedTimestamp}&quot;
               </p>
             )}
             {/* Debug info - remove after fixing */}
