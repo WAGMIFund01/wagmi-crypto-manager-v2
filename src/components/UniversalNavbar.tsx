@@ -309,6 +309,8 @@ export default function UniversalNavbar({
             {/* Last Updated Timestamp */}
             <p className="mr-8" style={{ color: '#A0A0A0', fontSize: '12px' }}>
               Last updated: {lastUpdatedTimestamp ? formatTimestampForDisplay(lastUpdatedTimestamp) : 'Unknown'}
+              {/* Force re-render by including refreshTrigger in the display */}
+              {refreshTrigger > 0 && <span style={{ display: 'none' }}>{refreshTrigger}</span>}
             </p>
             {/* Debug info - remove after testing */}
             {process.env.NODE_ENV === 'development' && (
