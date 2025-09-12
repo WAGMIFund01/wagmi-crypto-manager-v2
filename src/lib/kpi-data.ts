@@ -89,14 +89,16 @@ export async function fetchKPIData(): Promise<KPIData | null> {
               break;
             case 'last updated':
               kpiData.lastUpdated = value.toString();
-              console.log('Timestamp from Google Sheets:', value, 'Type:', typeof value);
+              console.log('🔍 DEBUG - Raw timestamp from Google Sheets:', value, 'Type:', typeof value);
+              console.log('🔍 DEBUG - Parsed lastUpdated:', kpiData.lastUpdated);
               break;
           }
         }
       }
     }
 
-    console.log('Server-side KPI data fetched:', kpiData);
+    console.log('🔍 DEBUG - Final KPI data object:', kpiData);
+    console.log('🔍 DEBUG - lastUpdated value:', kpiData.lastUpdated, 'Type:', typeof kpiData.lastUpdated);
     return kpiData;
 
   } catch (error) {

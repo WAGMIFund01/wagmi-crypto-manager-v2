@@ -116,7 +116,11 @@ export default function UniversalNavbar({
 
   // Format timestamp for display from Google Sheets data
   const formatLastRefresh = (timestamp: string) => {
-    if (!timestamp || timestamp.trim() === '') return 'Unknown';
+    console.log('🔍 DEBUG - formatLastRefresh input:', timestamp, 'Type:', typeof timestamp);
+    if (!timestamp || timestamp.trim() === '') {
+      console.log('🔍 DEBUG - Returning "Unknown" - timestamp is empty or null');
+      return 'Unknown';
+    }
     
     try {
       let date: Date;
@@ -237,6 +241,12 @@ export default function UniversalNavbar({
             <p className="mr-8" style={{ color: '#A0A0A0', fontSize: '12px' }}>
               Last updated: {formatLastRefresh(kpiData?.lastUpdated || '')}
             </p>
+            {/* Debug info - remove after fixing */}
+            {process.env.NODE_ENV === 'development' && (
+              <p style={{ color: '#FF0000', fontSize: '10px' }}>
+                DEBUG: kpiData?.lastUpdated = "{kpiData?.lastUpdated}"
+              </p>
+            )}
             
             {/* Refresh Icon */}
             <WagmiButton
