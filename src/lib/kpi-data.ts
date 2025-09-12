@@ -96,6 +96,57 @@ export async function fetchKPIData(): Promise<KPIData | null> {
       }
     }
 
+    // If we didn't find the timestamp in the "Last Updated" row, try to find it in any row
+    if (!kpiData.lastUpdated) {
+      for (const row of rows) {
+        if (row.c && row.c.length >= 2) {
+          const metricName = row.c[0]?.v;
+          const value = row.c[1]?.v;
+          
+          // Look for any row that contains "last updated" in the metric name
+          if (metricName && metricName.toString().toLowerCase().includes('last updated') && value) {
+            kpiData.lastUpdated = value.toString();
+            console.log('Found timestamp in row with metric:', metricName, 'Value:', value);
+            break;
+          }
+        }
+      }
+    }
+
+    // If still no timestamp found, try to fetch it directly from cell B7
+    if (!kpiData.lastUpdated) {
+      try {
+        const timestampResponse = await fetch(
+          `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?sheet=KPIs&tqx=out:json&range=B7:B7`,
+          {
+            method: 'GET',
+            headers: {
+              'Accept': 'application/json',
+            },
+            next: { revalidate: 60 }
+          }
+        );
+
+        if (timestampResponse.ok) {
+          const timestampText = await timestampResponse.text();
+          const timestampJsonMatch = timestampText.match(/google\.visualization\.Query\.setResponse\((.*)\);/);
+          
+          if (timestampJsonMatch) {
+            const timestampData = JSON.parse(timestampJsonMatch[1]);
+            if (timestampData.table && timestampData.table.rows && timestampData.table.rows.length > 0) {
+              const timestampValue = timestampData.table.rows[0].c?.[0]?.v;
+              if (timestampValue) {
+                kpiData.lastUpdated = timestampValue.toString();
+                console.log('Found timestamp in B7:', timestampValue);
+              }
+            }
+          }
+        }
+      } catch (timestampError) {
+        console.error('Error fetching timestamp from B7:', timestampError);
+      }
+    }
+
     console.log('Server-side KPI data fetched:', kpiData);
     return kpiData;
 

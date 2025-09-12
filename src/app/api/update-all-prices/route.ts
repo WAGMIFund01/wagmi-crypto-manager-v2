@@ -50,13 +50,25 @@ export async function POST(request: NextRequest) {
       newPrice?: number;
     }[] = [];
 
-    const coinGeckoIdsToFetch = new Set<string>();
+    // Generate current timestamp in a Google Sheets-friendly format
+    const now = new Date();
+    const currentTimestamp = now.toISOString(); // Keep ISO format for Portfolio Overview
+    const kpiTimestamp = now.toLocaleString('en-US', {
+      year: 'numeric',
+      month: '2-digit',
+      day: '2-digit',
+      hour: '2-digit',
+      minute: '2-digit',
+      second: '2-digit',
+      hour12: false
+    }); // Use a simpler format for KPI tab
 
+    // Step 3: Process each row (skip header row)
     for (let i = 1; i < rows.length; i++) {
       const row = rows[i];
-      const symbol = row[1]?.toString().toUpperCase();
-      const quantity = parseFloat(row[6]?.toString()) || 0;
-      const coinGeckoId = row[10]?.toString()?.trim(); // Column K (0-indexed = 10)
+      const symbol = row[1]; // Column B - Symbol
+      const quantity = parseFloat(row[6]); // Column G - Quantity
+      const coinGeckoId = row[10]; // Column K - CoinGecko ID
 
       const assetDetail: {
         symbol: string;
@@ -74,92 +86,108 @@ export async function POST(request: NextRequest) {
         status: 'success'
       };
 
-      // Check if asset has quantity > 0
-      if (!symbol || quantity <= 0) {
+      // Validate quantity
+      if (!quantity || isNaN(quantity) || quantity <= 0) {
         assetDetail.status = 'no_quantity';
-        assetDetail.error = `No quantity (${quantity}) or invalid symbol (${symbol})`;
         assetDetails.push(assetDetail);
         continue;
       }
 
-      // Check if CoinGecko ID is provided
-      if (!coinGeckoId) {
+      // Validate CoinGecko ID
+      if (!coinGeckoId || coinGeckoId.trim() === '') {
         assetDetail.status = 'no_coinGecko_id';
-        assetDetail.error = 'No CoinGecko ID provided in column K';
         assetDetails.push(assetDetail);
         continue;
       }
 
-      // Validate CoinGecko ID format (basic check)
-      if (coinGeckoId.length < 2 || coinGeckoId.includes(' ')) {
-        assetDetail.status = 'invalid_coinGecko_id';
-        assetDetail.error = `Invalid CoinGecko ID format: "${coinGeckoId}"`;
-        assetDetails.push(assetDetail);
-        continue;
-      }
-
-      // Add to fetch list
-      coinGeckoIdsToFetch.add(coinGeckoId);
       assetDetails.push(assetDetail);
     }
 
-    // Step 3: Fetch prices from CoinGecko
-    let priceData: Record<string, { usd: number }> = {};
-    let coinGeckoError: string | null = null;
-
-    if (coinGeckoIdsToFetch.size > 0) {
-      const coinGeckoIds = Array.from(coinGeckoIdsToFetch).join(',');
-      
-      try {
-        const priceResponse = await fetch(
-          `https://api.coingecko.com/api/v3/simple/price?ids=${coinGeckoIds}&vs_currencies=usd`,
-          {
-            headers: {
-              'Accept': 'application/json',
-            },
-          }
-        );
-
-        if (!priceResponse.ok) {
-          throw new Error(`CoinGecko API error: ${priceResponse.status} ${priceResponse.statusText}`);
-        }
-
-        priceData = await priceResponse.json();
-      } catch (error) {
-        coinGeckoError = error instanceof Error ? error.message : 'Unknown CoinGecko API error';
-      }
-    }
-
-    // Step 4: Update asset details with price information
-    const currentTimestamp = new Date().toISOString();
-    const updates: { range: string; values: (string | number)[][] }[] = [];
+    // Step 4: Fetch prices from CoinGecko and prepare updates
+    const updates: any[] = [];
     let updatedCount = 0;
+    let coinGeckoError = null;
 
-    for (const asset of assetDetails) {
-      if (asset.status === 'success' && asset.coinGeckoId) {
-        const newPrice = priceData[asset.coinGeckoId]?.usd;
+    // Process assets in batches to avoid rate limits
+    const batchSize = 10;
+    for (let i = 0; i < assetDetails.length; i += batchSize) {
+      const batch = assetDetails.slice(i, i + batchSize);
+      const coinGeckoIds = batch
+        .filter(asset => asset.status === 'success')
+        .map(asset => asset.coinGeckoId)
+        .join(',');
 
-        if (newPrice !== undefined) {
-          asset.newPrice = newPrice;
-          const rowNum = asset.rowIndex + 1; // Google Sheets is 1-indexed
-          const currentPriceRange = `Portfolio Overview!H${rowNum}`;
-          const lastUpdateRange = `Portfolio Overview!J${rowNum}`;
+      if (coinGeckoIds) {
+        try {
+          const coinGeckoResponse = await fetch(
+            `https://api.coingecko.com/api/v3/simple/price?ids=${coinGeckoIds}&vs_currencies=usd`,
+            {
+              headers: {
+                'Accept': 'application/json',
+              },
+            }
+          );
 
-          updates.push({
-            range: currentPriceRange,
-            values: [[newPrice]]
+          if (!coinGeckoResponse.ok) {
+            coinGeckoError = `CoinGecko API error: ${coinGeckoResponse.status}`;
+            // Mark all assets in this batch as having CoinGecko errors
+            batch.forEach(asset => {
+              if (asset.status === 'success') {
+                asset.status = 'coinGecko_error';
+                asset.error = coinGeckoError;
+              }
+            });
+            continue;
+          }
+
+          const priceData = await coinGeckoResponse.json();
+
+          // Process each asset in the batch
+          for (const asset of batch) {
+            if (asset.status !== 'success') continue;
+
+            const price = priceData[asset.coinGeckoId!]?.usd;
+            if (price && typeof price === 'number') {
+              asset.newPrice = price;
+              asset.status = 'success';
+
+              // Prepare update for current price (Column H)
+              const priceRange = `Portfolio Overview!H${asset.rowIndex + 1}`;
+              // Prepare update for last price update timestamp (Column J)
+              const lastUpdateRange = `Portfolio Overview!J${asset.rowIndex + 1}`;
+
+              updates.push({
+                range: priceRange,
+                values: [[price]]
+              });
+              updates.push({
+                range: lastUpdateRange,
+                values: [[currentTimestamp]]
+              });
+              updatedCount++;
+            } else {
+              asset.status = 'coinGecko_error';
+              asset.error = `No price data returned from CoinGecko for ID: ${asset.coinGeckoId}`;
+            }
+          }
+        } catch (error) {
+          coinGeckoError = `CoinGecko API error: ${error}`;
+          // Mark all assets in this batch as having CoinGecko errors
+          batch.forEach(asset => {
+            if (asset.status === 'success') {
+              asset.status = 'coinGecko_error';
+              asset.error = coinGeckoError;
+            }
           });
-          updates.push({
-            range: lastUpdateRange,
-            values: [[currentTimestamp]]
-          });
-          updatedCount++;
-        } else {
-          asset.status = 'coinGecko_error';
-          asset.error = `No price data returned from CoinGecko for ID: ${asset.coinGeckoId}`;
         }
       }
     }
+
+    // Add KPI timestamp update to the batch (using simpler format)
+    updates.push({
+      range: 'KPIs!B7',
+      values: [[kpiTimestamp]]
+    });
 
     // Step 5: Execute batch update if there are updates to make
     if (updates.length > 0) {
@@ -170,6 +198,7 @@ export async function POST(request: NextRequest) {
           data: updates
         }
       });
+      console.log('Updated KPI tab timestamp:', kpiTimestamp);
     }
 
     // Step 6: Return detailed results
@@ -188,6 +217,7 @@ export async function POST(request: NextRequest) {
       summary,
       coinGeckoApiError: coinGeckoError,
       timestamp: currentTimestamp,
+      kpiTimestamp: kpiTimestamp,
       assetDetails: assetDetails.map(asset => ({
         symbol: asset.symbol,
         quantity: asset.quantity,
@@ -199,25 +229,29 @@ export async function POST(request: NextRequest) {
     });
 
   } catch (error) {
-    console.error('Price update error:', error);
+    console.error('Error in update-all-prices:', error);
     return NextResponse.json({
       success: false,
-      error: error instanceof Error ? error.message : 'Unknown error occurred',
-      timestamp: new Date().toISOString()
+      error: error instanceof Error ? error.message : 'Unknown error occurred'
     }, { status: 500 });
   }
 }
 
+// GET endpoint for testing
 export async function GET() {
   return NextResponse.json({
-    message: 'Full price update endpoint - use POST to update all asset prices',
-    usage: 'POST to this endpoint to update all supported asset prices from CoinGecko',
-    note: 'This endpoint reads CoinGecko IDs from column K in your Google Sheet',
+    success: true,
+    message: 'Price update API endpoint',
+    description: 'This endpoint updates cryptocurrency prices in the Portfolio Overview sheet and timestamps in both Portfolio Overview and KPI tabs.',
     features: [
-      'Reads CoinGecko IDs from column K',
+      'Reads CoinGecko IDs from Column K in Portfolio Overview sheet',
+      'Fetches live prices from CoinGecko API',
+      'Updates current prices in Column H',
+      'Updates last price update timestamps in Column J',
+      'Updates KPI tab timestamp in cell B7 with simplified format',
       'Provides detailed error reporting for each asset',
-      'Updates prices in column H and timestamps in column J',
-      'Supports any cryptocurrency with valid CoinGecko ID'
-    ]
+      'Handles missing quantities, CoinGecko IDs, and API errors gracefully'
+    ],
+    usage: 'POST to this endpoint to trigger price updates'
   });
 }
