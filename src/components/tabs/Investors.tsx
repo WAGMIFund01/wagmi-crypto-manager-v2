@@ -17,9 +17,10 @@ interface Investor {
 
 interface InvestorsProps {
   isPrivacyMode?: boolean;
+  onRefresh?: number;
 }
 
-export default function Investors({ isPrivacyMode = false }: InvestorsProps) {
+export default function Investors({ isPrivacyMode = false, onRefresh }: InvestorsProps) {
   const [investors, setInvestors] = useState<Investor[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -34,29 +35,38 @@ export default function Investors({ isPrivacyMode = false }: InvestorsProps) {
     share: [] as string[]
   });
 
+  const fetchInvestors = async () => {
+    try {
+      setLoading(true);
+      setError(null);
+      const response = await fetch('/api/get-investor-data');
+      const data = await response.json();
+      
+      if (data.success && data.investors) {
+        setInvestors(data.investors);
+        setError(null);
+      } else {
+        setError(data.error || 'Failed to fetch investor data');
+      }
+    } catch (err) {
+      console.error('Error fetching investors:', err);
+      setError('Network error while fetching investor data');
+    } finally {
+      setLoading(false);
+    }
+  };
+
   // Fetch investor data on component mount
   useEffect(() => {
-    const fetchInvestors = async () => {
-      try {
-        const response = await fetch('/api/get-investor-data');
-        const data = await response.json();
-        
-        if (data.success && data.investors) {
-          setInvestors(data.investors);
-          setError(null);
-        } else {
-          setError(data.error || 'Failed to fetch investor data');
-        }
-      } catch (err) {
-        console.error('Error fetching investors:', err);
-        setError('Network error while fetching investor data');
-      } finally {
-        setLoading(false);
-      }
-    };
-
     fetchInvestors();
   }, []);
+
+  // Refresh when onRefresh trigger changes
+  useEffect(() => {
+    if (onRefresh !== undefined) {
+      fetchInvestors();
+    }
+  }, [onRefresh]);
 
   // Format currency values
   const formatCurrency = (amount: number) => {

@@ -39,6 +39,7 @@ export default function DashboardClient({ session, kpiData: initialKpiData, hasE
   const [isCheckingAuth, setIsCheckingAuth] = useState(true);
   const [isPrivacyMode, setIsPrivacyMode] = useState(false);
   const [kpiData, setKpiData] = useState(initialKpiData);
+  const [refreshTrigger, setRefreshTrigger] = useState(0);
 
   // Initialize active tab from URL parameters
   useEffect(() => {
@@ -103,7 +104,7 @@ export default function DashboardClient({ session, kpiData: initialKpiData, hasE
     setIsPrivacyMode(privacyMode);
   };
 
-  // Handle KPI data refresh
+  // Handle comprehensive data refresh
   const handleKpiRefresh = async () => {
     try {
       // Fetch fresh KPI data from the API
@@ -128,6 +129,10 @@ export default function DashboardClient({ session, kpiData: initialKpiData, hasE
         
         setKpiData(transformedKpiData);
         console.log('KPI data refreshed successfully');
+        
+        // Trigger portfolio data refresh
+        setRefreshTrigger(prev => prev + 1);
+        console.log('Portfolio data refresh triggered');
       } else {
         console.error('Failed to fetch fresh KPI data');
       }
@@ -159,13 +164,13 @@ export default function DashboardClient({ session, kpiData: initialKpiData, hasE
   const renderTabContent = () => {
     switch (activeTab) {
       case 'portfolio':
-        return <PortfolioOverview />;
+        return <PortfolioOverview onRefresh={refreshTrigger} />;
       case 'analytics':
         return <Analytics />;
       case 'investors':
-        return <Investors isPrivacyMode={isPrivacyMode} />;
+        return <Investors isPrivacyMode={isPrivacyMode} onRefresh={refreshTrigger} />;
       default:
-        return <PortfolioOverview />;
+        return <PortfolioOverview onRefresh={refreshTrigger} />;
     }
   };
 

@@ -6,35 +6,44 @@ import { StackedBarChart, WagmiCard, WagmiSpinner, WagmiText } from '@/component
 
 interface PortfolioOverviewProps {
   className?: string;
+  onRefresh?: () => void;
 }
 
-export default function PortfolioOverview({ className }: PortfolioOverviewProps) {
+export default function PortfolioOverview({ className, onRefresh }: PortfolioOverviewProps) {
   const [assets, setAssets] = useState<PortfolioAsset[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  useEffect(() => {
-    const fetchPortfolioData = async () => {
-      try {
-        setLoading(true);
-        const response = await fetch('/api/get-portfolio-data');
-        const data = await response.json();
+  const fetchPortfolioData = async () => {
+    try {
+      setLoading(true);
+      setError(null);
+      const response = await fetch('/api/get-portfolio-data');
+      const data = await response.json();
 
-        if (data.success) {
-          setAssets(data.assets);
-        } else {
-          setError(data.error || 'Failed to fetch portfolio data');
-        }
-      } catch (err) {
-        console.error('Error fetching portfolio data:', err);
-        setError('Failed to fetch portfolio data');
-      } finally {
-        setLoading(false);
+      if (data.success) {
+        setAssets(data.assets);
+      } else {
+        setError(data.error || 'Failed to fetch portfolio data');
       }
-    };
+    } catch (err) {
+      console.error('Error fetching portfolio data:', err);
+      setError('Failed to fetch portfolio data');
+    } finally {
+      setLoading(false);
+    }
+  };
 
+  useEffect(() => {
     fetchPortfolioData();
   }, []);
+
+  // Refresh when onRefresh callback changes (triggered by parent)
+  useEffect(() => {
+    if (onRefresh) {
+      fetchPortfolioData();
+    }
+  }, [onRefresh]);
 
   const formatCurrency = (value: number) => {
     return new Intl.NumberFormat('en-US', {
