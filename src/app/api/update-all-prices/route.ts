@@ -104,7 +104,7 @@ export async function POST(request: NextRequest) {
     }
 
     // Step 4: Fetch prices from CoinGecko and prepare updates
-    const updates: any[] = [];
+    const updates: { range: string; values: (string | number)[][] }[] = [];
     let updatedCount = 0;
     let coinGeckoError = null;
 
