@@ -19,14 +19,15 @@ export function formatTimestampForDisplay(timestampString: string): string {
     const [hours, minutes, seconds] = timePart.split(':');
 
     // Create Date object from the timestamp
-    const timestampDate = new Date(
+    // Parse as UTC to match server timezone (same as refresh button)
+    const timestampDate = new Date(Date.UTC(
       parseInt(year),
       parseInt(month) - 1, // Month is 0-indexed
       parseInt(day),
       parseInt(hours),
       parseInt(minutes),
       parseInt(seconds)
-    );
+    ));
 
     // Get current time
     const now = new Date();
