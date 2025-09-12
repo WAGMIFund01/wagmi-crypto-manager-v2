@@ -35,6 +35,14 @@ export function formatTimestampForDisplay(timestampString: string): string {
     const diffMs = now.getTime() - timestampDate.getTime();
     const diffMinutes = Math.floor(diffMs / (1000 * 60));
 
+    console.log('Timestamp calculation:', {
+      timestampString,
+      timestampDate: timestampDate.toISOString(),
+      now: now.toISOString(),
+      diffMs,
+      diffMinutes
+    });
+
     // Return relative time based on difference
     if (diffMinutes < 1) {
       return 'Just now';
