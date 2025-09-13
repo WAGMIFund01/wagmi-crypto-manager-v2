@@ -162,14 +162,14 @@ export default function InvestorAssetsPage() {
       <header style={{ backgroundColor: '#0B0B0B', borderColor: '#333' }}>
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           {/* Mobile Layout - Stacked */}
-          <div className="flex flex-col space-y-6 py-6 md:hidden">
+          <div className="flex flex-col space-y-4 py-4 md:hidden">
             {/* Top Row - Centered Logo */}
             <div className="flex justify-center">
               <h1 
                 className="font-bold"
                 style={{ 
                   color: '#00FF95',
-                  fontSize: '28px',
+                  fontSize: '24px',
                   lineHeight: '1.2',
                   textShadow: '0 0 25px rgba(0, 255, 149, 0.6), 0 0 50px rgba(0, 255, 149, 0.4), 0 0 75px rgba(0, 255, 149, 0.2)',
                   letterSpacing: '0.05em'
@@ -180,7 +180,7 @@ export default function InvestorAssetsPage() {
             </div>
             
             {/* Bottom Row - Back Button + Investor Info + Buttons */}
-            <div className="flex items-center justify-between px-2">
+            <div className="flex items-center justify-between px-3">
               {/* Back Button - Left Aligned */}
               <div className="flex-shrink-0">
                 <WagmiButton
@@ -188,21 +188,21 @@ export default function InvestorAssetsPage() {
                   theme="green"
                   size="sm"
                   onClick={() => router.push('/investor')}
-                  className="whitespace-nowrap !px-3 !py-1.5"
+                  className="whitespace-nowrap !px-3 !py-2 !text-sm"
                 >
-                  <span className="text-xs">Back</span>
+                  <span className="text-sm font-medium">Back</span>
                 </WagmiButton>
               </div>
 
               {/* Investor Info - Center */}
-              <div className="text-center flex-1 px-4">
-                <h2 style={{ color: '#FFFFFF', fontSize: '16px', fontWeight: '600', margin: 0, lineHeight: '1.3' }}>
+              <div className="text-center flex-1 px-3">
+                <h2 style={{ color: '#FFFFFF', fontSize: '15px', fontWeight: '600', margin: 0, lineHeight: '1.2' }}>
                   {sessionStorage.getItem('investorData') ? JSON.parse(sessionStorage.getItem('investorData')!).name : 'Investor'}
                 </h2>
-                <p style={{ color: '#E0E0E0', fontSize: '14px', margin: 0, lineHeight: '1.3' }}>
+                <p style={{ color: '#E0E0E0', fontSize: '13px', margin: 0, lineHeight: '1.2' }}>
                   ID: {sessionStorage.getItem('investorId') || 'Unknown'}
                 </p>
-                <p style={{ color: '#A0A0A0', fontSize: '12px', margin: 0, lineHeight: '1.3' }}>
+                <p style={{ color: '#A0A0A0', fontSize: '11px', margin: 0, lineHeight: '1.2' }}>
                   Last updated: {lastUpdatedTimestamp ? formatTimestampForDisplay(lastUpdatedTimestamp) : 'Unknown'}
                   {/* Force re-render by including refreshTrigger */}
                   <span style={{ display: 'none' }}>{refreshTrigger}</span>
@@ -210,7 +210,7 @@ export default function InvestorAssetsPage() {
               </div>
               
               {/* Buttons - Right Aligned */}
-              <div className="flex items-center gap-3 flex-shrink-0">
+              <div className="flex items-center gap-2 flex-shrink-0">
                 {/* Sign Out Button */}
                 <WagmiButton
                   onClick={() => {
@@ -221,8 +221,9 @@ export default function InvestorAssetsPage() {
                   variant="outline"
                   theme="green"
                   size="icon"
+                  className="!w-8 !h-8"
                   icon={
-                    <svg fill="currentColor" viewBox="0 0 24 24">
+                    <svg fill="currentColor" viewBox="0 0 24 24" className="w-4 h-4">
                       <path d="M17 7l-1.41 1.41L18.17 11H8v2h10.17l-2.58 2.58L17 17l5-5zM4 5h8V3H4c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h8v-2H4V5z"/>
                     </svg>
                   }
@@ -302,50 +303,50 @@ export default function InvestorAssetsPage() {
       </header>
 
       {/* Main Content */}
-      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+      <main className="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 py-4 sm:py-8">
         {/* Assets Table */}
         <WagmiCard variant="container" theme="green" size="lg" className="overflow-hidden">
           
           {/* Mobile Layout */}
           <div className="md:hidden">
-            <div className="p-4 space-y-4">
+            <div className="p-3 space-y-3">
               {assets.map((asset, index) => (
-                <div key={`${asset.symbol}-${index}`} className="bg-gray-800/50 rounded-lg p-4 border border-gray-700">
+                <div key={`${asset.symbol}-${index}`} className="bg-gray-800/50 rounded-lg p-4 border border-gray-700 hover:bg-gray-800/70 transition-colors">
                   {/* Asset Header */}
-                  <div className="flex justify-between items-start mb-3">
-                    <div>
-                      <WagmiText variant="h5" weight="semibold" color="primary">
+                  <div className="flex justify-between items-start mb-4">
+                    <div className="flex-1 min-w-0">
+                      <WagmiText variant="h5" weight="semibold" color="primary" className="text-lg leading-tight">
                         {asset.assetName}
                       </WagmiText>
-                      <WagmiText variant="small" color="muted">
+                      <WagmiText variant="small" color="muted" className="text-sm mt-0.5">
                         {asset.symbol}
                       </WagmiText>
                     </div>
-                    <div className="text-right">
-                      <WagmiText variant="body" weight="semibold" color="primary">
+                    <div className="text-right flex-shrink-0 ml-3">
+                      <WagmiText variant="body" weight="bold" color="primary" className="text-base">
                         {formatPercentage((asset.totalValue / totalPortfolioValue) * 100)}
                       </WagmiText>
-                      <div className={`text-sm font-medium ${formatPriceChange(asset.priceChange24h).color}`}>
+                      <div className={`text-sm font-semibold mt-0.5 ${formatPriceChange(asset.priceChange24h).color}`}>
                         {formatPriceChange(asset.priceChange24h).text}
                       </div>
                     </div>
                   </div>
                   
                   {/* Asset Details */}
-                  <div className="grid grid-cols-2 gap-3 text-sm mb-3">
+                  <div className="grid grid-cols-2 gap-4 mb-4">
                     <div>
-                      <WagmiText variant="small" color="muted" className="uppercase tracking-wide">
+                      <WagmiText variant="small" color="muted" className="uppercase tracking-wide text-xs mb-1">
                         Type
                       </WagmiText>
-                      <WagmiText variant="small" className={getTypeColor(asset.coinType)}>
+                      <WagmiText variant="body" className={`text-sm font-medium ${getTypeColor(asset.coinType)}`}>
                         {asset.coinType}
                       </WagmiText>
                     </div>
                     <div>
-                      <WagmiText variant="small" color="muted" className="uppercase tracking-wide">
+                      <WagmiText variant="small" color="muted" className="uppercase tracking-wide text-xs mb-1">
                         Risk
                       </WagmiText>
-                      <WagmiText variant="small" className={getRiskColor(asset.riskLevel)}>
+                      <WagmiText variant="body" className={`text-sm font-medium ${getRiskColor(asset.riskLevel)}`}>
                         {asset.riskLevel}
                       </WagmiText>
                     </div>
@@ -354,10 +355,10 @@ export default function InvestorAssetsPage() {
                   {/* Thesis */}
                   {asset.thesis && (
                     <div className="pt-3 border-t border-gray-700">
-                      <WagmiText variant="small" color="muted" className="uppercase tracking-wide mb-1">
+                      <WagmiText variant="small" color="muted" className="uppercase tracking-wide text-xs mb-2">
                         Investment Thesis
                       </WagmiText>
-                      <WagmiText variant="small" color="secondary">
+                      <WagmiText variant="body" color="secondary" className="text-sm leading-relaxed">
                         {asset.thesis}
                       </WagmiText>
                     </div>
