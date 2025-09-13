@@ -105,7 +105,7 @@ export async function POST(request: NextRequest) {
     }
 
     // Step 3: Fetch prices from CoinGecko
-    let priceData: Record<string, { usd: number }> = {};
+    let priceData: Record<string, { usd: number; usd_24h_change?: number }> = {};
     let coinGeckoError: string | null = null;
 
     if (coinGeckoIdsToFetch.size > 0) {
