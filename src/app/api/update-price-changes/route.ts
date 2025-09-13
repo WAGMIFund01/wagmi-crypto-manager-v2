@@ -1,8 +1,8 @@
-import { NextRequest, NextResponse } from 'next/server';
+import { NextResponse } from 'next/server';
 import { google } from 'googleapis';
 import { config } from '@/lib/config';
 
-export async function POST(request: NextRequest) {
+export async function POST() {
   try {
     const serviceAccountEmail = process.env.GOOGLE_SERVICE_ACCOUNT_EMAIL;
     const privateKey = process.env.GOOGLE_PRIVATE_KEY;
@@ -42,7 +42,6 @@ export async function POST(request: NextRequest) {
     }
 
     // Step 2: Process data and collect CoinGecko IDs
-    const headers = rows[0];
     const dataRows = rows.slice(1);
     
     interface AssetDetail {
@@ -125,7 +124,7 @@ export async function POST(request: NextRequest) {
 
     // Step 4: Update Google Sheets with new price change data
     console.log('Updating Google Sheets with 24hr price changes...');
-    const updatePromises: Promise<any>[] = [];
+    const updatePromises: Promise<unknown>[] = [];
 
     for (const asset of assetDetails) {
       if (asset.status === 'success' && asset.coinGeckoId) {
