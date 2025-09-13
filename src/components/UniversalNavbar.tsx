@@ -406,6 +406,43 @@ export default function UniversalNavbar({
               <div style={{ color: '#A0A0A0', fontSize: '12px' }}>Loading KPI data...</div>
             )}
           </div>
+          
+          {/* Mobile Row 4 - Navigation Tabs */}
+          <div className="flex justify-center items-center py-3" style={{ borderTop: '1px solid #333' }}>
+            <nav className="flex space-x-6">
+              {[
+                { id: 'portfolio', label: 'Portfolio' },
+                { id: 'analytics', label: 'Analytics' },
+                { id: 'investors', label: 'Investors' }
+              ].map((tab) => (
+                <button
+                  key={tab.id}
+                  onClick={() => onTabChange(tab.id)}
+                  className="py-2 px-2 text-sm font-medium transition-all duration-200 relative"
+                  style={{
+                    color: activeTab === tab.id ? '#00FF95' : '#A0A0A0',
+                    borderBottom: activeTab === tab.id ? '2px solid #00FF95' : '2px solid transparent',
+                    textShadow: activeTab === tab.id ? '0 0 10px rgba(0, 255, 149, 0.5)' : 'none',
+                    fontSize: '14px'
+                  }}
+                  onMouseEnter={(e) => {
+                    if (activeTab !== tab.id) {
+                      e.currentTarget.style.color = '#FFFFFF';
+                      e.currentTarget.style.textShadow = '0 0 5px rgba(0, 255, 149, 0.3)';
+                    }
+                  }}
+                  onMouseLeave={(e) => {
+                    if (activeTab !== tab.id) {
+                      e.currentTarget.style.color = '#A0A0A0';
+                      e.currentTarget.style.textShadow = 'none';
+                    }
+                  }}
+                >
+                  {tab.label}
+                </button>
+              ))}
+            </nav>
+          </div>
         </div>
 
         {/* Desktop Layout */}
