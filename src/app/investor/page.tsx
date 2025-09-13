@@ -4,6 +4,7 @@ import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import WagmiButton from '@/components/ui/WagmiButton';
 import WagmiCard from '@/components/ui/WagmiCard';
+import WagmiSpinner from '@/components/ui/WagmiSpinner';
 import { StackedBarChart } from '@/components/ui';
 // Removed Card, CardContent - now using WagmiCard
 import { formatCurrency, formatPercentage } from '@/shared/utils';
@@ -190,11 +191,8 @@ export default function InvestorPage() {
 
   if (loading || !investorId) {
     return (
-      <div className="flex items-center justify-center min-h-screen bg-gray-50">
-        <div className="text-center">
-          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto mb-4"></div>
-          <p className="style={{ color: '#E0E0E0' }}">Loading...</p>
-        </div>
+      <div className="flex items-center justify-center min-h-screen" style={{ backgroundColor: '#0B0B0B' }}>
+        <WagmiSpinner size="lg" theme="green" showText text="Loading..." centered />
       </div>
     );
   }
@@ -488,10 +486,7 @@ export default function InvestorPage() {
         {/* Portfolio Breakdown Charts */}
         {portfolioLoading ? (
           <div className="flex items-center justify-center py-12 mb-8">
-            <div className="text-center">
-              <div className="animate-spin rounded-full h-8 w-8 border-b-2 mx-auto mb-4" style={{ borderColor: '#00FF95' }}></div>
-              <p style={{ color: '#E0E0E0' }}>Loading portfolio breakdown...</p>
-            </div>
+            <WagmiSpinner size="lg" theme="green" showText text="Loading portfolio breakdown..." centered />
           </div>
         ) : (
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
@@ -550,10 +545,7 @@ export default function InvestorPage() {
           <div>
             {transactionsLoading ? (
               <div className="flex items-center justify-center py-12">
-                <div className="text-center">
-                  <div className="animate-spin rounded-full h-8 w-8 border-b-2 mx-auto mb-4" style={{ borderColor: '#00FF95' }}></div>
-                  <p style={{ color: '#E0E0E0' }}>Loading transactions...</p>
-                </div>
+                <WagmiSpinner size="lg" theme="green" showText text="Loading transactions..." centered />
               </div>
             ) : transactions.length > 0 ? (
               <div className="space-y-4">
