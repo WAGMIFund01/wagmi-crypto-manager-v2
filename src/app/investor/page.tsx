@@ -5,7 +5,7 @@ import { useEffect, useState } from 'react';
 import WagmiButton from '@/components/ui/WagmiButton';
 import WagmiCard from '@/components/ui/WagmiCard';
 import { StackedBarChart } from '@/components/ui';
-import { Card, CardContent } from '@/shared/components';
+// Removed Card, CardContent - now using WagmiCard
 import { formatCurrency, formatPercentage } from '@/shared/utils';
 import { PortfolioAsset } from '@/app/api/get-portfolio-data/route';
 import { formatTimestampForDisplay } from '@/lib/timestamp-utils';
@@ -201,9 +201,9 @@ export default function InvestorPage() {
 
   if (error) {
     return (
-      <div className="min-h-screen flex items-center justify-center p-4 bg-gray-50">
-        <Card className="max-w-md w-full">
-          <CardContent className="p-6 text-center">
+      <div className="min-h-screen flex items-center justify-center p-4" style={{ backgroundColor: '#0B0B0B' }}>
+        <WagmiCard variant="default" theme="red" size="lg" className="max-w-md w-full">
+          <div className="text-center space-y-4">
             <div className="mb-4">
               <svg 
                 className="w-12 h-12 mx-auto text-red-500"
@@ -219,10 +219,10 @@ export default function InvestorPage() {
                 />
               </svg>
             </div>
-            <h2 className="text-lg font-semibold mb-2 text-red-600">
+            <h2 className="text-lg font-semibold mb-2 text-red-400">
               Error Loading Data
             </h2>
-            <p className="text-sm mb-4 style={{ color: '#E0E0E0' }}">
+            <p className="text-sm mb-4 text-gray-300">
               {error}
             </p>
             <WagmiButton
@@ -237,8 +237,8 @@ export default function InvestorPage() {
             >
               Return to Login
             </WagmiButton>
-          </CardContent>
-        </Card>
+          </div>
+        </WagmiCard>
       </div>
     );
   }
