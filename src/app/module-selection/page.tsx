@@ -34,7 +34,7 @@ export default function ModuleSelectionPage() {
         <div className="hidden md:flex md:justify-center md:space-x-12">
           <ModuleCard 
             title="WAGMI Fund Module"
-            route="/portfoliooverview"
+            route="/wagmi-fund-module"
             className="flex-1 max-w-sm"
           />
           <ModuleCard 
@@ -56,7 +56,7 @@ export default function ModuleSelectionPage() {
           <div className="flex justify-center space-x-8 mb-8">
             <ModuleCard 
               title="WAGMI Fund Module"
-              route="/portfoliooverview"
+              route="/wagmi-fund-module"
               className="flex-1 max-w-sm"
             />
             <ModuleCard 
@@ -80,7 +80,7 @@ export default function ModuleSelectionPage() {
         <div className="block sm:hidden space-y-6">
           <ModuleCard 
             title="WAGMI Fund Module"
-            route="/portfoliooverview"
+            route="/wagmi-fund-module"
           />
           <ModuleCard 
             title="Personal Portfolio Module"
