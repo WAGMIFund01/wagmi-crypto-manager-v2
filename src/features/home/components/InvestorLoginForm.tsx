@@ -72,7 +72,7 @@ export function InvestorLoginForm() {
     try {
       // Trigger Google OAuth sign-in
       await signIn('google', { 
-        callbackUrl: '/portfoliooverview',
+        callbackUrl: '/module-selection',
         redirect: true 
       });
     } catch (error) {
