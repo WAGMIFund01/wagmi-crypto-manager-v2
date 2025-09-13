@@ -447,6 +447,17 @@ export default function InvestorPage() {
               <p className="text-lg md:text-2xl font-bold text-white leading-tight">
                 {formatCurrency(portfolioData.totalValue, privacyMode)}
               </p>
+              <div className="pt-2">
+                <WagmiButton
+                  size="sm"
+                  variant="outline"
+                  theme="green"
+                  onClick={() => router.push('/investor/assets')}
+                  className="text-xs"
+                >
+                  View Assets
+                </WagmiButton>
+              </div>
             </div>
           </WagmiCard>
 
