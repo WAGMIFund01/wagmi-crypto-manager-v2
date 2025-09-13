@@ -352,6 +352,60 @@ export default function UniversalNavbar({
               title="Exit Dev Mode"
             />
           </div>
+          
+          {/* Mobile Row 3 - KPI Ribbon */}
+          <div className="flex justify-center items-center py-3" style={{ borderTop: '1px solid #333' }}>
+            {hasError ? (
+              <div className="flex items-center space-x-2">
+                <div 
+                  className="w-2 h-2 rounded-full animate-pulse"
+                  style={{ backgroundColor: '#FF6B6B' }}
+                />
+                <span style={{ color: '#FF6B6B', fontSize: '12px' }}>Error loading data</span>
+              </div>
+            ) : formattedKpiData ? (
+              <div className="flex items-center space-x-4 text-center">
+                <div className="text-center">
+                  <div style={{ color: '#A0A0A0', fontSize: '10px' }}>Investors</div>
+                  <div style={{ color: '#FFFFFF', fontSize: '14px', fontWeight: '600' }}>
+                    {formattedKpiData.activeInvestors}
+                  </div>
+                </div>
+                <div className="text-center">
+                  <div style={{ color: '#A0A0A0', fontSize: '10px' }}>AUM</div>
+                  <div style={{ color: '#FFFFFF', fontSize: '14px', fontWeight: '600' }}>
+                    {formattedKpiData.totalAUM}
+                  </div>
+                </div>
+                <div className="text-center">
+                  <div style={{ color: '#A0A0A0', fontSize: '10px' }}>Return</div>
+                  <div 
+                    style={{ 
+                      color: formattedKpiData.cumulativeReturn.startsWith('+') ? '#00FF95' : '#FF6B6B', 
+                      fontSize: '14px', 
+                      fontWeight: '600' 
+                    }}
+                  >
+                    {formattedKpiData.cumulativeReturn}
+                  </div>
+                </div>
+                <div className="text-center">
+                  <div style={{ color: '#A0A0A0', fontSize: '10px' }}>MoM</div>
+                  <div 
+                    style={{ 
+                      color: formattedKpiData.monthOnMonth.startsWith('+') ? '#00FF95' : '#FF6B6B', 
+                      fontSize: '14px', 
+                      fontWeight: '600' 
+                    }}
+                  >
+                    {formattedKpiData.monthOnMonth}
+                  </div>
+                </div>
+              </div>
+            ) : (
+              <div style={{ color: '#A0A0A0', fontSize: '12px' }}>Loading KPI data...</div>
+            )}
+          </div>
         </div>
 
         {/* Desktop Layout */}
