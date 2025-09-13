@@ -159,8 +159,11 @@ export default function PortfolioOverview({ className, onRefresh, isPrivacyMode 
   const calculateDistribution = (groupBy: keyof PortfolioAsset) => {
     const groups: { [key: string]: number } = {};
     assets.forEach(asset => {
-      const key = asset[groupBy].toString();
-      groups[key] = (groups[key] || 0) + asset.totalValue;
+      const value = asset[groupBy];
+      if (value !== undefined && value !== null) {
+        const key = value.toString();
+        groups[key] = (groups[key] || 0) + asset.totalValue;
+      }
     });
     return groups;
   };
