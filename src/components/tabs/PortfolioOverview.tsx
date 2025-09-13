@@ -212,8 +212,57 @@ export default function PortfolioOverview({ className, onRefresh }: PortfolioOve
           <WagmiText variant="h4" weight="semibold" color="primary">Portfolio Assets</WagmiText>
         </div>
         
-        <div className="overflow-x-auto">
-          <table className="w-full">
+        {/* Mobile Layout */}
+        <div className="md:hidden">
+          <div className="p-4 space-y-4">
+            {assets.map((asset, index) => (
+              <div key={`${asset.symbol}-${index}`} className="bg-gray-800/50 rounded-lg p-4 border border-gray-700">
+                {/* Asset Header */}
+                <div className="flex justify-between items-start mb-3">
+                  <div>
+                    <div className="text-base font-medium text-white">{asset.assetName}</div>
+                    <div className="text-sm text-gray-400">{asset.symbol}</div>
+                  </div>
+                  <div className="text-right">
+                    <div className="text-base font-medium text-[#00FF95]">{formatCurrency(asset.totalValue)}</div>
+                    <div className="text-sm text-gray-400">{formatCurrency(asset.currentPrice)}</div>
+                  </div>
+                </div>
+                
+                {/* Asset Details */}
+                <div className="grid grid-cols-2 gap-3 text-sm">
+                  <div>
+                    <div className="text-gray-400 text-xs uppercase tracking-wide">Chain</div>
+                    <div className={`font-medium ${getChainColor(asset.chain)}`}>{asset.chain}</div>
+                  </div>
+                  <div>
+                    <div className="text-gray-400 text-xs uppercase tracking-wide">Risk</div>
+                    <div className={`font-medium ${getRiskColor(asset.riskLevel)}`}>{asset.riskLevel}</div>
+                  </div>
+                  <div>
+                    <div className="text-gray-400 text-xs uppercase tracking-wide">Location</div>
+                    <div className="text-gray-300">{asset.location}</div>
+                  </div>
+                  <div>
+                    <div className="text-gray-400 text-xs uppercase tracking-wide">Type</div>
+                    <div className="text-gray-300">{asset.coinType}</div>
+                  </div>
+                </div>
+                
+                {/* Quantity */}
+                <div className="mt-3 pt-3 border-t border-gray-700">
+                  <div className="text-gray-400 text-xs uppercase tracking-wide mb-1">Quantity</div>
+                  <div className="text-sm text-gray-300">{formatNumber(asset.quantity)}</div>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        {/* Desktop Layout */}
+        <div className="hidden md:block">
+          <div className="overflow-x-auto">
+            <table className="w-full">
             <thead className="bg-gray-900/50">
               <tr>
                 <th className="px-6 py-3 text-left">
@@ -282,6 +331,7 @@ export default function PortfolioOverview({ className, onRefresh }: PortfolioOve
               ))}
             </tbody>
           </table>
+        </div>
         </div>
       </WagmiCard>
     </div>
