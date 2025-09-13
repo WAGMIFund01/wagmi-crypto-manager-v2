@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { google } from 'googleapis';
+import { config } from '@/lib/config';
 
 export async function POST(request: NextRequest) {
   try {
@@ -116,6 +117,7 @@ export async function POST(request: NextRequest) {
           {
             headers: {
               'Accept': 'application/json',
+              ...(config.coinGeckoApiKey && { 'x-cg-demo-api-key': config.coinGeckoApiKey }),
             },
           }
         );

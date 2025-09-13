@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { google } from 'googleapis';
+import { config } from '@/lib/config';
 
 // Simple mapping for testing - we'll start with just AURA
 const SYMBOL_TO_COINGECKO_ID: Record<string, string> = {
@@ -64,6 +65,7 @@ export async function POST(request: NextRequest) {
       {
         headers: {
           'Accept': 'application/json',
+          ...(config.coinGeckoApiKey && { 'x-cg-demo-api-key': config.coinGeckoApiKey }),
         },
       }
     );
