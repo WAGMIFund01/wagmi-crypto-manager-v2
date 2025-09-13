@@ -1,7 +1,7 @@
 'use client';
 
 import React from 'react';
-import { ModuleCard } from '@/components/ui';
+import { ModuleCard, WagmiText } from '@/components/ui';
 
 export default function ModuleSelectionPage() {
   return (
@@ -14,18 +14,19 @@ export default function ModuleSelectionPage() {
     >
       {/* WAGMI Logo */}
       <div className="mb-16">
-        <h1 
-          className="font-bold text-center"
+        <WagmiText 
+          variant="h1" 
+          weight="bold" 
+          color="accent" 
+          align="center"
+          className="leading-tight"
           style={{ 
-            color: '#00FF95',
-            fontSize: '48px',
-            lineHeight: '1.2',
             textShadow: '0 0 25px rgba(0, 255, 149, 0.6), 0 0 50px rgba(0, 255, 149, 0.4), 0 0 75px rgba(0, 255, 149, 0.2)',
             letterSpacing: '0.05em'
           }}
         >
           WAGMI
-        </h1>
+        </WagmiText>
       </div>
 
       {/* Module Cards */}

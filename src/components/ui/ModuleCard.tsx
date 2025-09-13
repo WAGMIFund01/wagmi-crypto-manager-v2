@@ -2,6 +2,7 @@
 
 import React from 'react';
 import { useRouter } from 'next/navigation';
+import { WagmiCard, WagmiText } from '@/components/ui';
 
 interface ModuleCardProps {
   title: string;
@@ -27,55 +28,43 @@ export default function ModuleCard({
   };
 
   return (
-    <div
+    <WagmiCard
+      variant="default"
+      theme="green"
+      size="lg"
+      hover={true}
+      glow={false}
       onClick={handleClick}
       className={`
-        relative w-full max-w-sm mx-auto
-        bg-gray-900/50 rounded-lg p-8
-        border border-[#00FF95]/30
-        cursor-pointer transition-all duration-300
-        hover:scale-105 hover:border-[#00FF95]/60
-        hover:shadow-[0_0_20px_rgba(0,255,149,0.3)]
-        active:scale-95
+        w-full max-w-sm mx-auto cursor-pointer
+        transition-all duration-300 hover:scale-105 active:scale-95
         ${isComingSoon ? 'opacity-60 cursor-not-allowed' : ''}
         ${className}
       `}
-      style={{
-        boxShadow: '0 0 15px rgba(0, 255, 149, 0.1)',
-        backdropFilter: 'blur(8px)',
-      }}
     >
-      {/* Glow effect */}
-      <div 
-        className="absolute inset-0 rounded-lg opacity-0 transition-opacity duration-300 hover:opacity-100"
-        style={{
-          background: 'linear-gradient(135deg, rgba(0,255,149,0.1) 0%, rgba(0,255,149,0.05) 100%)',
-          boxShadow: 'inset 0 0 20px rgba(0,255,149,0.1)',
-        }}
-      />
-      
       {/* Content */}
-      <div className="relative z-10 flex flex-col items-center justify-center h-full min-h-[120px]">
-        <h3 
-          className="text-xl font-bold text-center leading-tight"
-          style={{ 
-            color: '#00FF95',
-            textShadow: '0 0 10px rgba(0, 255, 149, 0.5)',
-            fontSize: '20px'
-          }}
+      <div className="flex flex-col items-center justify-center h-full min-h-[120px]">
+        <WagmiText 
+          variant="h4" 
+          weight="bold" 
+          color="accent" 
+          align="center"
+          className="leading-tight"
         >
           {title}
-        </h3>
+        </WagmiText>
         
         {isComingSoon && (
-          <p 
-            className="mt-2 text-sm opacity-70"
-            style={{ color: '#A0A0A0' }}
+          <WagmiText 
+            variant="small" 
+            color="muted" 
+            align="center"
+            className="mt-2 opacity-70"
           >
             Coming Soon
-          </p>
+          </WagmiText>
         )}
       </div>
-    </div>
+    </WagmiCard>
   );
 }
