@@ -112,6 +112,21 @@ export default function PortfolioOverview({ className, onRefresh, isPrivacyMode 
     return '•••••';
   };
 
+  const formatPriceChange = (change?: number) => {
+    if (change === undefined || change === null) {
+      return { text: 'N/A', color: 'text-gray-400' };
+    }
+    
+    const isPositive = change > 0;
+    const isNegative = change < 0;
+    const sign = isPositive ? '+' : '';
+    
+    return {
+      text: `${sign}${change.toFixed(2)}%`,
+      color: isPositive ? 'text-green-400' : isNegative ? 'text-red-400' : 'text-gray-400'
+    };
+  };
+
   if (loading) {
     return (
       <div className={`${className} flex items-center justify-center min-h-96`}>
@@ -232,6 +247,9 @@ export default function PortfolioOverview({ className, onRefresh, isPrivacyMode 
                   <div className="text-right">
                     <div className="text-base font-medium text-gray-300">{isPrivacyMode ? createMask() : formatCurrency(asset.totalValue)}</div>
                     <div className="text-sm text-gray-400">{formatCurrency(asset.currentPrice)}</div>
+                    <div className={`text-xs font-medium ${formatPriceChange(asset.priceChange24h).color}`}>
+                      {formatPriceChange(asset.priceChange24h).text}
+                    </div>
                   </div>
                 </div>
                 
@@ -293,6 +311,9 @@ export default function PortfolioOverview({ className, onRefresh, isPrivacyMode 
                   <WagmiText variant="label" color="muted">Price</WagmiText>
                 </th>
                 <th className="px-6 py-3 text-right">
+                  <WagmiText variant="label" color="muted">24h Change</WagmiText>
+                </th>
+                <th className="px-6 py-3 text-right">
                   <WagmiText variant="label" color="muted">Value</WagmiText>
                 </th>
               </tr>
@@ -331,6 +352,11 @@ export default function PortfolioOverview({ className, onRefresh, isPrivacyMode 
                     <div className="text-sm text-gray-300">{formatCurrency(asset.currentPrice)}</div>
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-right">
+                    <div className={`text-sm font-medium ${formatPriceChange(asset.priceChange24h).color}`}>
+                      {formatPriceChange(asset.priceChange24h).text}
+                    </div>
+                  </td>
+                  <td className="px-6 py-4 whitespace-nowrap text-right">
                     <div className="text-sm font-medium text-gray-300">{isPrivacyMode ? createMask() : formatCurrency(asset.totalValue)}</div>
                   </td>
                 </tr>
@@ -338,7 +364,7 @@ export default function PortfolioOverview({ className, onRefresh, isPrivacyMode 
             </tbody>
           </table>
         </div>
-        </div>
+      </div>
       </WagmiCard>
     </div>
   );

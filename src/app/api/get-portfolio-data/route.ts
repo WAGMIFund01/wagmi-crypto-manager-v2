@@ -11,6 +11,7 @@ export interface PortfolioAsset {
   currentPrice: number;
   totalValue: number;
   lastPriceUpdate: string;
+  priceChange24h?: number;
 }
 
 export async function GET() {
@@ -68,6 +69,7 @@ export async function GET() {
           const currentPrice = parseFloat(row.c[7]?.v) || 0;
           const totalValue = parseFloat(row.c[8]?.v) || 0;
           const lastPriceUpdate = row.c[9]?.v?.toString() || '';
+          const priceChange24h = row.c[11]?.v ? parseFloat(row.c[11]?.v) : undefined; // Column L (index 11)
 
           // Only add assets that have a name and symbol, and exclude header-like entries
           if (assetName && symbol && 
@@ -84,7 +86,8 @@ export async function GET() {
               quantity,
               currentPrice,
               totalValue,
-              lastPriceUpdate
+              lastPriceUpdate,
+              priceChange24h
             });
           }
         }
