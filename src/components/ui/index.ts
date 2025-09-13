@@ -9,6 +9,7 @@ export { default as WagmiText } from './WagmiText';
 export { default as FilterChip } from './FilterChip';
 export { default as FilterGroup } from './FilterGroup';
 export { default as StackedBarChart } from './StackedBarChart';
+export { default as ModuleCard } from './ModuleCard';
 
 // Icons
 export * from './icons/WagmiIcons';
