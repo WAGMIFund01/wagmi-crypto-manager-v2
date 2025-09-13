@@ -273,8 +273,15 @@ export default function UniversalNavbar({
   return (
     <header style={{ backgroundColor: '#1A1A1A' }}>
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        {/* Row 1 - Brand + Controls */}
-        <div className="flex justify-between items-center h-18 py-4">
+        {/* Mobile Layout */}
+        <div className="md:hidden">
+          {/* Mobile content will go here */}
+        </div>
+
+        {/* Desktop Layout */}
+        <div className="hidden md:block">
+          {/* Row 1 - Brand + Controls */}
+          <div className="flex justify-between items-center h-18 py-4">
           {/* Left - WAGMI Logo */}
           <div className="flex items-center">
             <h1 
@@ -474,6 +481,7 @@ export default function UniversalNavbar({
               </>
             )}
           </div>
+        </div>
         </div>
       </div>
     </header>
