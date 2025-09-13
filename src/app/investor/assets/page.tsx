@@ -5,12 +5,15 @@ import { useEffect, useState } from 'react';
 import { WagmiButton, WagmiCard, WagmiSpinner, WagmiText } from '@/components/ui';
 import { formatPercentage } from '@/shared/utils';
 import { PortfolioAsset } from '@/app/api/get-portfolio-data/route';
+import { formatTimestampForDisplay } from '@/lib/timestamp-utils';
 
 export default function InvestorAssetsPage() {
   const router = useRouter();
   const [assets, setAssets] = useState<PortfolioAsset[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [lastUpdatedTimestamp, setLastUpdatedTimestamp] = useState<string>('');
+  const [refreshTrigger, setRefreshTrigger] = useState(0);
 
   useEffect(() => {
     // Check if investor ID is stored in session storage
@@ -22,6 +25,7 @@ export default function InvestorAssetsPage() {
     }
 
     fetchAssets();
+    fetchLastUpdatedTimestamp();
   }, [router]);
 
   const fetchAssets = async () => {
@@ -42,6 +46,29 @@ export default function InvestorAssetsPage() {
       setLoading(false);
     }
   };
+
+  const fetchLastUpdatedTimestamp = async () => {
+    try {
+      const response = await fetch('/api/get-last-updated-timestamp');
+      if (response.ok) {
+        const data = await response.json();
+        if (data.success && data.timestamp) {
+          setLastUpdatedTimestamp(data.timestamp);
+        }
+      }
+    } catch (error) {
+      console.error('Error fetching timestamp:', error);
+    }
+  };
+
+  // Update timestamp display every minute to show updated relative time
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setRefreshTrigger(prev => prev + 1);
+    }, 60000); // Update every minute
+
+    return () => clearInterval(interval);
+  }, []);
 
   const formatPriceChange = (change?: number) => {
     if (change === undefined || change === null) {
@@ -163,7 +190,9 @@ export default function InvestorAssetsPage() {
                   ID: {sessionStorage.getItem('investorId') || 'Unknown'}
                 </p>
                 <p style={{ color: '#A0A0A0', fontSize: '12px', margin: 0, lineHeight: '1.3' }}>
-                  Asset Details
+                  Last updated: {lastUpdatedTimestamp ? formatTimestampForDisplay(lastUpdatedTimestamp) : 'Unknown'}
+                  {/* Force re-render by including refreshTrigger */}
+                  <span style={{ display: 'none' }}>{refreshTrigger}</span>
                 </p>
               </div>
               
@@ -220,7 +249,9 @@ export default function InvestorAssetsPage() {
                   ID: {sessionStorage.getItem('investorId') || 'Unknown'}
                 </p>
                 <p style={{ color: '#A0A0A0', fontSize: '12px', margin: 0 }}>
-                  Asset Details
+                  Last updated: {lastUpdatedTimestamp ? formatTimestampForDisplay(lastUpdatedTimestamp) : 'Unknown'}
+                  {/* Force re-render by including refreshTrigger */}
+                  <span style={{ display: 'none' }}>{refreshTrigger}</span>
                 </p>
               </div>
               
