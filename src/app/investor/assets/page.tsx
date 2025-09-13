@@ -179,10 +179,26 @@ export default function InvestorAssetsPage() {
               </h1>
             </div>
             
-            {/* Bottom Row - Investor Info + Buttons */}
+            {/* Bottom Row - Back Button + Investor Info + Buttons */}
             <div className="flex items-center justify-between px-2">
-              {/* Investor Info - Left Aligned */}
-              <div className="text-left">
+              {/* Back Button - Left Aligned */}
+              <div className="flex-shrink-0">
+                <WagmiButton
+                  variant="outline"
+                  theme="green"
+                  size="sm"
+                  onClick={() => router.push('/investor')}
+                  className="flex items-center space-x-1 whitespace-nowrap !px-3 !py-1.5"
+                >
+                  <svg className="w-3 h-3 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+                  </svg>
+                  <span className="text-xs">Back</span>
+                </WagmiButton>
+              </div>
+
+              {/* Investor Info - Center */}
+              <div className="text-center flex-1 px-4">
                 <h2 style={{ color: '#FFFFFF', fontSize: '16px', fontWeight: '600', margin: 0, lineHeight: '1.3' }}>
                   {sessionStorage.getItem('investorData') ? JSON.parse(sessionStorage.getItem('investorData')!).name : 'Investor'}
                 </h2>
@@ -197,7 +213,7 @@ export default function InvestorAssetsPage() {
               </div>
               
               {/* Buttons - Right Aligned */}
-              <div className="flex items-center gap-3">
+              <div className="flex items-center gap-3 flex-shrink-0">
                 {/* Sign Out Button */}
                 <WagmiButton
                   onClick={() => {
@@ -221,7 +237,7 @@ export default function InvestorAssetsPage() {
 
           {/* Desktop Layout - Horizontal */}
           <div className="hidden md:flex justify-between items-center h-16">
-            <div className="flex items-center" style={{ paddingLeft: '32px' }}>
+            <div className="flex items-center gap-4" style={{ paddingLeft: '32px' }}>
               {/* WAGMI Logo */}
               <div className="flex items-center">
                 <h1 
@@ -237,6 +253,20 @@ export default function InvestorAssetsPage() {
                   WAGMI
                 </h1>
               </div>
+              
+              {/* Back Button */}
+              <WagmiButton
+                variant="outline"
+                theme="green"
+                size="sm"
+                onClick={() => router.push('/investor')}
+                className="flex items-center space-x-2 whitespace-nowrap !px-3 !py-1.5"
+              >
+                <svg className="w-4 h-4 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+                </svg>
+                <span className="text-sm">Back to Dashboard</span>
+              </WagmiButton>
             </div>
               
             <div className="flex items-center gap-4">
@@ -279,22 +309,6 @@ export default function InvestorAssetsPage() {
 
       {/* Main Content */}
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        {/* Back Button */}
-        <div className="mb-6">
-          <WagmiButton
-            variant="outline"
-            theme="green"
-            size="sm"
-            onClick={() => router.push('/investor')}
-            className="flex items-center space-x-2 whitespace-nowrap"
-          >
-            <svg className="w-4 h-4 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
-            </svg>
-            <span className="text-sm">Back to Dashboard</span>
-          </WagmiButton>
-        </div>
-
         {/* Assets Table */}
         <WagmiCard variant="container" theme="green" size="lg" className="overflow-hidden">
           
