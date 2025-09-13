@@ -275,7 +275,22 @@ export default function UniversalNavbar({
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Mobile Layout */}
         <div className="md:hidden">
-          {/* Mobile content will go here */}
+          {/* Mobile Row 1 - Brand */}
+          <div className="flex justify-center items-center py-4">
+            <h1 
+              className="font-bold cursor-pointer"
+              onClick={() => onTabChange('portfolio')}
+              style={{ 
+                color: '#00FF95',
+                fontSize: '28px',
+                lineHeight: '1.2',
+                textShadow: '0 0 25px rgba(0, 255, 149, 0.6), 0 0 50px rgba(0, 255, 149, 0.4), 0 0 75px rgba(0, 255, 149, 0.2)',
+                letterSpacing: '0.05em'
+              }}
+            >
+              WAGMI
+            </h1>
+          </div>
         </div>
 
         {/* Desktop Layout */}
