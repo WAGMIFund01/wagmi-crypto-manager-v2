@@ -11,7 +11,6 @@ export default function InvestorAssetsPage() {
   const [assets, setAssets] = useState<PortfolioAsset[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [privacyMode, setPrivacyMode] = useState(false);
 
   useEffect(() => {
     // Check if investor ID is stored in session storage
@@ -94,10 +93,6 @@ export default function InvestorAssetsPage() {
   // Calculate total portfolio value for allocation percentage
   const totalPortfolioValue = assets.reduce((sum, asset) => sum + asset.totalValue, 0);
 
-  const createMask = () => {
-    return '••••••';
-  };
-
   if (loading) {
     return (
       <div className="min-h-screen bg-[#0B0B0B] flex items-center justify-center">
@@ -135,57 +130,142 @@ export default function InvestorAssetsPage() {
   }
 
   return (
-    <div className="min-h-screen bg-[#0B0B0B] text-white">
+    <div style={{ backgroundColor: '#0B0B0B' }}>
       {/* Header */}
-      <div className="border-b border-gray-800">
+      <header style={{ backgroundColor: '#0B0B0B', borderColor: '#333' }}>
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex items-center justify-between h-16">
-            {/* Back Button */}
-            <WagmiButton
-              variant="outline"
-              theme="green"
-              size="sm"
-              onClick={() => router.push('/investor')}
-              className="flex items-center space-x-2"
-            >
-              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
-              </svg>
-              <span>Back to Dashboard</span>
-            </WagmiButton>
+          {/* Mobile Layout - Stacked */}
+          <div className="flex flex-col space-y-6 py-6 md:hidden">
+            {/* Top Row - Centered Logo */}
+            <div className="flex justify-center">
+              <h1 
+                className="font-bold"
+                style={{ 
+                  color: '#00FF95',
+                  fontSize: '28px',
+                  lineHeight: '1.2',
+                  textShadow: '0 0 25px rgba(0, 255, 149, 0.6), 0 0 50px rgba(0, 255, 149, 0.4), 0 0 75px rgba(0, 255, 149, 0.2)',
+                  letterSpacing: '0.05em'
+                }}
+              >
+                WAGMI
+              </h1>
+            </div>
+            
+            {/* Bottom Row - Investor Info + Buttons */}
+            <div className="flex items-center justify-between px-2">
+              {/* Investor Info - Left Aligned */}
+              <div className="text-left">
+                <h2 style={{ color: '#FFFFFF', fontSize: '16px', fontWeight: '600', margin: 0, lineHeight: '1.3' }}>
+                  {sessionStorage.getItem('investorData') ? JSON.parse(sessionStorage.getItem('investorData')!).name : 'Investor'}
+                </h2>
+                <p style={{ color: '#E0E0E0', fontSize: '14px', margin: 0, lineHeight: '1.3' }}>
+                  ID: {sessionStorage.getItem('investorId') || 'Unknown'}
+                </p>
+                <p style={{ color: '#A0A0A0', fontSize: '12px', margin: 0, lineHeight: '1.3' }}>
+                  Asset Details
+                </p>
+              </div>
+              
+              {/* Buttons - Right Aligned */}
+              <div className="flex items-center gap-3">
+                {/* Sign Out Button */}
+                <WagmiButton
+                  onClick={() => {
+                    sessionStorage.removeItem('investorId');
+                    sessionStorage.removeItem('investorData');
+                    router.push('/');
+                  }}
+                  variant="outline"
+                  theme="green"
+                  size="icon"
+                  icon={
+                    <svg fill="currentColor" viewBox="0 0 24 24">
+                      <path d="M17 7l-1.41 1.41L18.17 11H8v2h10.17l-2.58 2.58L17 17l5-5zM4 5h8V3H4c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h8v-2H4V5z"/>
+                    </svg>
+                  }
+                  title="Sign Out"
+                />
+              </div>
+            </div>
+          </div>
 
-            {/* Page Title */}
-            <WagmiText variant="h3" weight="bold" color="primary">
-              Fund Assets
-            </WagmiText>
-
-            {/* Privacy Toggle */}
-            <WagmiButton
-              variant="outline"
-              theme="green"
-              size="sm"
-              onClick={() => setPrivacyMode(!privacyMode)}
-              className="flex items-center space-x-2"
-            >
-              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
-              </svg>
-              <span>{privacyMode ? 'Show' : 'Hide'}</span>
-            </WagmiButton>
+          {/* Desktop Layout - Horizontal */}
+          <div className="hidden md:flex justify-between items-center h-16">
+            <div className="flex items-center" style={{ paddingLeft: '32px' }}>
+              {/* WAGMI Logo */}
+              <div className="flex items-center">
+                <h1 
+                  className="font-bold"
+                  style={{ 
+                    color: '#00FF95',
+                    fontSize: '32px',
+                    lineHeight: '1.2',
+                    textShadow: '0 0 25px rgba(0, 255, 149, 0.6), 0 0 50px rgba(0, 255, 149, 0.4), 0 0 75px rgba(0, 255, 149, 0.2)',
+                    letterSpacing: '0.05em'
+                  }}
+                >
+                  WAGMI
+                </h1>
+              </div>
+            </div>
+              
+            <div className="flex items-center gap-4">
+              {/* Investor Info */}
+              <div className="text-right mr-4">
+                <h2 style={{ color: '#FFFFFF', fontSize: '16px', fontWeight: '600', margin: 0 }}>
+                  {sessionStorage.getItem('investorData') ? JSON.parse(sessionStorage.getItem('investorData')!).name : 'Investor'}
+                </h2>
+                <p style={{ color: '#E0E0E0', fontSize: '14px', margin: 0 }}>
+                  ID: {sessionStorage.getItem('investorId') || 'Unknown'}
+                </p>
+                <p style={{ color: '#A0A0A0', fontSize: '12px', margin: 0 }}>
+                  Asset Details
+                </p>
+              </div>
+              
+              <WagmiButton
+                onClick={() => {
+                  sessionStorage.removeItem('investorId');
+                  sessionStorage.removeItem('investorData');
+                  router.push('/');
+                }}
+                variant="outline"
+                theme="green"
+                size="sm"
+                className="!w-7 !h-7 !p-0 !flex !items-center !justify-center"
+                icon={
+                  <svg className="w-3 h-3" fill="currentColor" viewBox="0 0 24 24">
+                    <path d="M17 7l-1.41 1.41L18.17 11H8v2h10.17l-2.58 2.58L17 17l5-5zM4 5h8V3H4c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h8v-2H4V5z"/>
+                  </svg>
+                }
+                title="Sign Out"
+              />
+            </div>
           </div>
         </div>
-      </div>
+      </header>
 
       {/* Main Content */}
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        {/* Back Button */}
+        <div className="mb-6">
+          <WagmiButton
+            variant="outline"
+            theme="green"
+            size="sm"
+            onClick={() => router.push('/investor')}
+            className="flex items-center space-x-2"
+          >
+            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+            </svg>
+            <span>Back to Dashboard</span>
+          </WagmiButton>
+        </div>
+
         {/* Assets Table */}
         <WagmiCard variant="container" theme="green" size="lg" className="overflow-hidden">
-          <div className="px-6 py-4 border-b border-gray-700">
-            <WagmiText variant="h4" weight="semibold" color="primary">
-              Portfolio Assets ({assets.length})
-            </WagmiText>
-          </div>
           
           {/* Mobile Layout */}
           <div className="md:hidden">
@@ -204,7 +284,7 @@ export default function InvestorAssetsPage() {
                     </div>
                     <div className="text-right">
                       <WagmiText variant="body" weight="semibold" color="primary">
-                        {privacyMode ? createMask() : formatPercentage((asset.totalValue / totalPortfolioValue) * 100)}
+                        {formatPercentage((asset.totalValue / totalPortfolioValue) * 100)}
                       </WagmiText>
                       <div className={`text-sm font-medium ${formatPriceChange(asset.priceChange24h).color}`}>
                         {formatPriceChange(asset.priceChange24h).text}
@@ -299,7 +379,7 @@ export default function InvestorAssetsPage() {
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap text-right">
                         <WagmiText variant="body" weight="medium" color="primary">
-                          {privacyMode ? createMask() : formatPercentage((asset.totalValue / totalPortfolioValue) * 100)}
+                          {formatPercentage((asset.totalValue / totalPortfolioValue) * 100)}
                         </WagmiText>
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap text-right">
