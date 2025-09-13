@@ -175,13 +175,13 @@ export default function DashboardClient({ session, kpiData: initialKpiData, hasE
   const renderTabContent = () => {
     switch (activeTab) {
       case 'portfolio':
-        return <PortfolioOverview onRefresh={triggerDataRefresh} />;
+        return <PortfolioOverview onRefresh={triggerDataRefresh} isPrivacyMode={isPrivacyMode} />;
       case 'analytics':
         return <Analytics />;
       case 'investors':
         return <Investors isPrivacyMode={isPrivacyMode} onRefresh={triggerDataRefresh} />;
       default:
-        return <PortfolioOverview onRefresh={triggerDataRefresh} />;
+        return <PortfolioOverview onRefresh={triggerDataRefresh} isPrivacyMode={isPrivacyMode} />;
     }
   };
 

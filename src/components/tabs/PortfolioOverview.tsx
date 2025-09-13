@@ -7,9 +7,10 @@ import { StackedBarChart, WagmiCard, WagmiSpinner, WagmiText } from '@/component
 interface PortfolioOverviewProps {
   className?: string;
   onRefresh?: () => void;
+  isPrivacyMode?: boolean;
 }
 
-export default function PortfolioOverview({ className, onRefresh }: PortfolioOverviewProps) {
+export default function PortfolioOverview({ className, onRefresh, isPrivacyMode = false }: PortfolioOverviewProps) {
   const [assets, setAssets] = useState<PortfolioAsset[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -104,6 +105,11 @@ export default function PortfolioOverview({ className, onRefresh }: PortfolioOve
       default:
         return 'text-gray-400';
     }
+  };
+
+  // Create masking dots for privacy mode
+  const createMask = () => {
+    return '•••••';
   };
 
   if (loading) {
@@ -224,8 +230,8 @@ export default function PortfolioOverview({ className, onRefresh }: PortfolioOve
                     <div className="text-sm text-gray-400">{asset.symbol}</div>
                   </div>
                   <div className="text-right">
-                    <div className="text-base font-medium text-[#00FF95]">{formatCurrency(asset.totalValue)}</div>
-                    <div className="text-sm text-gray-400">{formatCurrency(asset.currentPrice)}</div>
+                    <div className="text-base font-medium text-gray-300">{isPrivacyMode ? createMask() : formatCurrency(asset.totalValue)}</div>
+                    <div className="text-sm text-gray-400">{isPrivacyMode ? createMask() : formatCurrency(asset.currentPrice)}</div>
                   </div>
                 </div>
                 
@@ -252,7 +258,7 @@ export default function PortfolioOverview({ className, onRefresh }: PortfolioOve
                 {/* Quantity */}
                 <div className="mt-3 pt-3 border-t border-gray-700">
                   <div className="text-gray-400 text-xs uppercase tracking-wide mb-1">Quantity</div>
-                  <div className="text-sm text-gray-300">{formatNumber(asset.quantity)}</div>
+                  <div className="text-sm text-gray-300">{isPrivacyMode ? createMask() : formatNumber(asset.quantity)}</div>
                 </div>
               </div>
             ))}
@@ -319,13 +325,13 @@ export default function PortfolioOverview({ className, onRefresh }: PortfolioOve
                     </span>
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-right">
-                    <div className="text-sm text-gray-300">{formatNumber(asset.quantity)}</div>
+                    <div className="text-sm text-gray-300">{isPrivacyMode ? createMask() : formatNumber(asset.quantity)}</div>
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-right">
-                    <div className="text-sm text-gray-300">{formatCurrency(asset.currentPrice)}</div>
+                    <div className="text-sm text-gray-300">{isPrivacyMode ? createMask() : formatCurrency(asset.currentPrice)}</div>
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-right">
-                    <div className="text-sm font-medium text-[#00FF95]">{formatCurrency(asset.totalValue)}</div>
+                    <div className="text-sm font-medium text-gray-300">{isPrivacyMode ? createMask() : formatCurrency(asset.totalValue)}</div>
                   </td>
                 </tr>
               ))}

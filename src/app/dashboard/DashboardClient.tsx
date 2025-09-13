@@ -35,6 +35,7 @@ export default function DashboardClient({ session, kpiData, hasError }: Dashboar
   const [isDevMode, setIsDevMode] = useState(false);
   const [activeTab, setActiveTab] = useState('portfolio');
   const [isCheckingAuth, setIsCheckingAuth] = useState(true);
+  const [isPrivacyMode, setIsPrivacyMode] = useState(false);
 
   useEffect(() => {
     // Check for dev mode session
@@ -82,6 +83,10 @@ export default function DashboardClient({ session, kpiData, hasError }: Dashboar
     setActiveTab(tabId);
   };
 
+  const handlePrivacyModeChange = (privacyMode: boolean) => {
+    setIsPrivacyMode(privacyMode);
+  };
+
   // Use dev session if in dev mode, otherwise use OAuth session
   const currentSession = isDevMode ? devSession : session;
 
@@ -105,13 +110,13 @@ export default function DashboardClient({ session, kpiData, hasError }: Dashboar
   const renderTabContent = () => {
     switch (activeTab) {
       case 'portfolio':
-        return <PortfolioOverview />;
+        return <PortfolioOverview isPrivacyMode={isPrivacyMode} />;
       case 'analytics':
         return <Analytics />;
       case 'investors':
         return <Investors />;
       default:
-        return <PortfolioOverview />;
+        return <PortfolioOverview isPrivacyMode={isPrivacyMode} />;
     }
   };
 
@@ -123,6 +128,7 @@ export default function DashboardClient({ session, kpiData, hasError }: Dashboar
         onTabChange={handleTabChange}
         kpiData={kpiData}
         hasError={hasError}
+        onPrivacyModeChange={handlePrivacyModeChange}
       />
 
       {/* Main Content */}
