@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useMemo } from 'react';
 import TransactionModal from '@/components/TransactionModal';
-import { WagmiInput, FilterGroup, FilterChip } from '@/components/ui';
+import { WagmiInput, FilterGroup, FilterChip, WagmiSpinner } from '@/components/ui';
 
 interface Investor {
   id: string;
@@ -227,8 +227,14 @@ export default function Investors({ isPrivacyMode = false, onRefresh }: Investor
 
   if (loading) {
     return (
-      <div className="space-y-6">
-        <div style={{ color: '#00FF95', fontSize: '18px' }}>Loading investors...</div>
+      <div className="flex items-center justify-center min-h-96">
+        <WagmiSpinner 
+          size="lg" 
+          theme="green" 
+          text="Loading investors..." 
+          showText={true} 
+          centered={true}
+        />
       </div>
     );
   }
