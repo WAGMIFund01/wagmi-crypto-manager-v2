@@ -3,7 +3,7 @@
 import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import { WagmiButton, WagmiCard, WagmiSpinner, WagmiText } from '@/components/ui';
-import { formatCurrency, formatPercentage } from '@/shared/utils';
+import { formatPercentage } from '@/shared/utils';
 import { PortfolioAsset } from '@/app/api/get-portfolio-data/route';
 
 export default function InvestorAssetsPage() {
@@ -36,7 +36,7 @@ export default function InvestorAssetsPage() {
       } else {
         setError(data.error || 'Failed to fetch portfolio data');
       }
-    } catch (err) {
+    } catch {
       setError('Failed to fetch portfolio data');
     } finally {
       setLoading(false);
@@ -399,7 +399,7 @@ export default function InvestorAssetsPage() {
             </div>
           </div>
         </WagmiCard>
-      </div>
+      </main>
     </div>
   );
 }
