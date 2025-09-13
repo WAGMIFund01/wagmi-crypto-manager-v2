@@ -188,11 +188,8 @@ export default function InvestorAssetsPage() {
                   theme="green"
                   size="sm"
                   onClick={() => router.push('/investor')}
-                  className="flex items-center space-x-1 whitespace-nowrap !px-3 !py-1.5"
+                  className="whitespace-nowrap !px-3 !py-1.5"
                 >
-                  <svg className="w-3 h-3 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
-                  </svg>
                   <span className="text-xs">Back</span>
                 </WagmiButton>
               </div>
@@ -260,11 +257,8 @@ export default function InvestorAssetsPage() {
                 theme="green"
                 size="sm"
                 onClick={() => router.push('/investor')}
-                className="flex items-center space-x-2 whitespace-nowrap !px-3 !py-1.5"
+                className="whitespace-nowrap !px-3 !py-1.5"
               >
-                <svg className="w-4 h-4 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
-                </svg>
                 <span className="text-sm">Back to Dashboard</span>
               </WagmiButton>
             </div>
