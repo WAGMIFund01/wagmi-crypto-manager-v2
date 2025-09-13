@@ -5,7 +5,7 @@ import { useEffect, useState } from 'react';
 import WagmiButton from '@/components/ui/WagmiButton';
 import WagmiCard from '@/components/ui/WagmiCard';
 import { StackedBarChart } from '@/components/ui';
-import { Card, CardContent, Button } from '@/shared/components';
+import { Card, CardContent } from '@/shared/components';
 import { formatCurrency, formatPercentage } from '@/shared/utils';
 import { PortfolioAsset } from '@/app/api/get-portfolio-data/route';
 import { formatTimestampForDisplay } from '@/lib/timestamp-utils';
@@ -225,16 +225,18 @@ export default function InvestorPage() {
             <p className="text-sm mb-4 style={{ color: '#E0E0E0' }}">
               {error}
             </p>
-            <Button
+            <WagmiButton
               onClick={() => {
                 sessionStorage.removeItem('investorId');
                 sessionStorage.removeItem('investorData');
                 router.push('/');
               }}
-              variant="outline" style={{ backgroundColor: "transparent", color: "#00FF95", borderColor: "#00FF95", borderWidth: "1px", borderStyle: "solid" }}
+              variant="outline"
+              theme="green"
+              size="md"
             >
               Return to Login
-            </Button>
+            </WagmiButton>
           </CardContent>
         </Card>
       </div>
