@@ -113,7 +113,7 @@ export async function POST(request: NextRequest) {
       
       try {
         const priceResponse = await fetch(
-          `https://api.coingecko.com/api/v3/simple/price?ids=${coinGeckoIds}&vs_currencies=usd`,
+          `https://api.coingecko.com/api/v3/simple/price?ids=${coinGeckoIds}&vs_currencies=usd&include_24hr_change=true`,
           {
             headers: {
               'Accept': 'application/json',
@@ -139,7 +139,9 @@ export async function POST(request: NextRequest) {
 
     for (const asset of assetDetails) {
       if (asset.status === 'success' && asset.coinGeckoId) {
-        const newPrice = priceData[asset.coinGeckoId]?.usd;
+        const priceInfo = priceData[asset.coinGeckoId];
+        const newPrice = priceInfo?.usd;
+        const newPriceChange = priceInfo?.usd_24h_change;
 
         if (newPrice !== undefined) {
           asset.newPrice = newPrice;
@@ -155,6 +157,16 @@ export async function POST(request: NextRequest) {
             range: lastUpdateRange,
             values: [[currentTimestamp]]
           });
+
+          // Add 24hr price change update if available
+          if (newPriceChange !== undefined) {
+            const priceChangeRange = `Portfolio Overview!L${rowNum}`;
+            updates.push({
+              range: priceChangeRange,
+              values: [[newPriceChange]]
+            });
+          }
+
           updatedCount++;
         } else {
           asset.status = 'coinGecko_error';
@@ -186,7 +198,7 @@ export async function POST(request: NextRequest) {
 
     return NextResponse.json({
       success: true,
-      message: `Processed ${summary.totalAssets} assets, updated ${summary.updatedAssets}`,
+      message: `Processed ${summary.totalAssets} assets, updated ${summary.updatedAssets} (prices and 24hr changes)`,
       summary,
       coinGeckoApiError: coinGeckoError,
       timestamp: currentTimestamp,
@@ -196,7 +208,10 @@ export async function POST(request: NextRequest) {
         coinGeckoId: asset.coinGeckoId,
         status: asset.status,
         error: asset.error,
-        newPrice: asset.newPrice
+        newPrice: asset.newPrice,
+        newPriceChange: asset.status === 'success' && asset.coinGeckoId 
+          ? priceData[asset.coinGeckoId]?.usd_24h_change 
+          : null,
       }))
     });
 
