@@ -152,8 +152,11 @@ export default function InvestorPage() {
   const calculateDistribution = (groupBy: keyof PortfolioAsset) => {
     const groups: { [key: string]: number } = {};
     portfolioAssets.forEach(asset => {
-      const key = asset[groupBy].toString();
-      groups[key] = (groups[key] || 0) + asset.totalValue;
+      const value = asset[groupBy];
+      if (value !== undefined && value !== null) {
+        const key = value.toString();
+        groups[key] = (groups[key] || 0) + asset.totalValue;
+      }
     });
     return groups;
   };
