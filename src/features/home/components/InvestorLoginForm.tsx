@@ -108,8 +108,8 @@ export function InvestorLoginForm() {
       sessionStorage.setItem('devSession', JSON.stringify(mockSession));
       sessionStorage.setItem('isDevMode', 'true');
       
-      // Redirect to dashboard
-      router.push('/portfoliooverview');
+      // Redirect to module selection
+      router.push('/module-selection');
     } else {
       setDevError('Invalid dev password. Please try again.');
     }
