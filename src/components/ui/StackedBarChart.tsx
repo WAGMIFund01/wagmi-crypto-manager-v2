@@ -11,6 +11,7 @@ interface StackedBarChartProps {
   className?: string;
   formatValue?: (value: number) => string;
   showTooltips?: boolean;
+  headerButton?: React.ReactNode;
 }
 
 export default function StackedBarChart({
@@ -25,7 +26,8 @@ export default function StackedBarChart({
     minimumFractionDigits: 2,
     maximumFractionDigits: 2,
   }).format(value),
-  showTooltips = true
+  showTooltips = true,
+  headerButton
 }: StackedBarChartProps) {
   const sortedEntries = Object.entries(data)
     .sort(([,a], [,b]) => b - a)
@@ -40,7 +42,14 @@ export default function StackedBarChart({
       size="md" 
       className={className}
     >
-      <h3 className="text-lg font-semibold text-white mb-4">{title}</h3>
+      <div className="flex items-center justify-between mb-4">
+        <h3 className="text-lg font-semibold text-white">{title}</h3>
+        {headerButton && (
+          <div className="flex-shrink-0">
+            {headerButton}
+          </div>
+        )}
+      </div>
       <div className="space-y-3">
         {/* Stacked Bar */}
         <div className="h-8 bg-gray-700 rounded-lg overflow-hidden flex">
