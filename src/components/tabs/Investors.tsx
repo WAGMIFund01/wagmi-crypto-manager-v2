@@ -389,8 +389,63 @@ export default function Investors({ isPrivacyMode = false, onRefresh }: Investor
 
       {/* Investor Table */}
       <div className="rounded-lg overflow-hidden" style={{ backgroundColor: '#1A1F1A' }}>
-        <div className="overflow-x-auto">
-          <table className="w-full">
+        {/* Mobile Layout */}
+        <div className="md:hidden">
+          <div className="p-4 space-y-4">
+            {filteredInvestors.map((investor, index) => (
+              <div 
+                key={investor.id} 
+                onClick={() => handleRowClick(investor)}
+                className="bg-gray-800/50 rounded-lg p-4 border border-gray-700 cursor-pointer transition-all duration-200 hover:bg-gray-700/50"
+              >
+                {/* Investor Header */}
+                <div className="flex justify-between items-start mb-3">
+                  <div>
+                    <div className="text-base font-medium text-white">{investor.id}</div>
+                    <div className="text-sm text-gray-400">{isPrivacyMode ? createMask() : investor.name}</div>
+                  </div>
+                  <div className="text-right">
+                    <div className="text-base font-medium" style={{ color: investor.returnPercentage >= 0 ? '#00FF95' : '#FF4D4D' }}>
+                      {formatPercentage(investor.returnPercentage)}
+                    </div>
+                    <div className="text-sm text-gray-400">Return</div>
+                  </div>
+                </div>
+                
+                {/* Investment Details */}
+                <div className="grid grid-cols-2 gap-3 text-sm mb-3">
+                  <div>
+                    <div className="text-gray-400 text-xs uppercase tracking-wide">Investment</div>
+                    <div className="text-white">{isPrivacyMode ? createMask() : formatCurrency(investor.investmentValue)}</div>
+                  </div>
+                  <div>
+                    <div className="text-gray-400 text-xs uppercase tracking-wide">Current Value</div>
+                    <div className="text-white">{isPrivacyMode ? createMask() : formatCurrency(investor.currentValue)}</div>
+                  </div>
+                </div>
+                
+                {/* Share and Join Date */}
+                <div className="pt-3 border-t border-gray-700">
+                  <div className="grid grid-cols-2 gap-3 text-sm">
+                    <div>
+                      <div className="text-gray-400 text-xs uppercase tracking-wide">Share %</div>
+                      <div className="text-gray-300">{isPrivacyMode ? createMask() : `${(investor.sharePercentage * 100).toFixed(1)}%`}</div>
+                    </div>
+                    <div>
+                      <div className="text-gray-400 text-xs uppercase tracking-wide">Join Date</div>
+                      <div className="text-gray-300">{formatDate(investor.joinDate)}</div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        {/* Desktop Layout */}
+        <div className="hidden md:block">
+          <div className="overflow-x-auto">
+            <table className="w-full">
             <thead>
               <tr style={{ backgroundColor: '#2A2A2A' }}>
                 <th className="px-4 py-3 text-left text-xs font-medium uppercase tracking-wider" style={{ color: '#A0A0A0' }}>
@@ -458,6 +513,7 @@ export default function Investors({ isPrivacyMode = false, onRefresh }: Investor
               ))}
             </tbody>
           </table>
+        </div>
         </div>
       </div>
 
