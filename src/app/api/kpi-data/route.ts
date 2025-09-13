@@ -1,10 +1,13 @@
 import { NextResponse } from 'next/server';
 import { fetchKPIData } from '@/lib/kpi-data';
 
-export async function GET() {
+export async function GET(request: Request) {
   try {
-    console.log('🔍 DEBUG - /api/kpi-data endpoint called');
-    const kpiData = await fetchKPIData();
+    const { searchParams } = new URL(request.url);
+    const forceRefresh = searchParams.get('force') === 'true';
+    
+    console.log('🔍 DEBUG - /api/kpi-data endpoint called, forceRefresh:', forceRefresh);
+    const kpiData = await fetchKPIData(forceRefresh);
     console.log('🔍 DEBUG - fetchKPIData returned:', kpiData);
     
     if (!kpiData) {

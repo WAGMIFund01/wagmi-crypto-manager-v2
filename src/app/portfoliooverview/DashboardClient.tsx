@@ -113,11 +113,14 @@ export default function DashboardClient({ session, kpiData: initialKpiData, hasE
   // Handle comprehensive data refresh
   const handleKpiRefresh = async () => {
     try {
-      // Fetch fresh KPI data from the API
-      const response = await fetch('/api/kpi-data', {
+      // Fetch fresh KPI data from the API with force refresh to bypass caching
+      const response = await fetch('/api/kpi-data?force=true', {
         method: 'GET',
         headers: {
           'Content-Type': 'application/json',
+          'Cache-Control': 'no-cache, no-store, must-revalidate',
+          'Pragma': 'no-cache',
+          'Expires': '0'
         },
       });
 

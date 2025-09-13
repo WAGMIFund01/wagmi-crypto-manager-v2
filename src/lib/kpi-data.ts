@@ -12,23 +12,32 @@ export interface KPIData {
   lastUpdated: string; // Timestamp from Google Sheets
 }
 
-export async function fetchKPIData(): Promise<KPIData | null> {
+export async function fetchKPIData(forceRefresh: boolean = false): Promise<KPIData | null> {
   try {
     // Google Sheet ID for WAGMI Investment Manager Database
     const SHEET_ID = '1h04nkcnQmxaFml8RubIGmPgffMiyoEIg350ryjXK0tM';
 
+    // Add cache-busting parameter when force refresh is requested
+    const cacheBuster = forceRefresh ? `&_t=${Date.now()}` : '';
+    const url = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?sheet=KPIs&tqx=out:json${cacheBuster}`;
+
+    console.log('🔍 DEBUG - fetchKPIData called with forceRefresh:', forceRefresh, 'URL:', url);
+
     // Fetch KPI data directly from Google Sheets using public API
-    const response = await fetch(
-      `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?sheet=KPIs&tqx=out:json`,
-      {
-        method: 'GET',
-        headers: {
-          'Accept': 'application/json',
-        },
-        // Add cache control for better performance
-        next: { revalidate: 60 } // Revalidate every 60 seconds
-      }
-    );
+    const response = await fetch(url, {
+      method: 'GET',
+      headers: {
+        'Accept': 'application/json',
+        // Add cache control headers for force refresh
+        ...(forceRefresh && {
+          'Cache-Control': 'no-cache, no-store, must-revalidate',
+          'Pragma': 'no-cache',
+          'Expires': '0'
+        })
+      },
+      // Only use Next.js cache when not forcing refresh
+      ...(forceRefresh ? {} : { next: { revalidate: 60 } })
+    });
 
     if (!response.ok) {
       console.error('Google Sheets API HTTP error:', response.status, response.statusText);
