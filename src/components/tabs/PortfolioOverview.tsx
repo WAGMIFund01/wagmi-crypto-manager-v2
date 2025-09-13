@@ -231,7 +231,7 @@ export default function PortfolioOverview({ className, onRefresh, isPrivacyMode 
                   </div>
                   <div className="text-right">
                     <div className="text-base font-medium text-gray-300">{isPrivacyMode ? createMask() : formatCurrency(asset.totalValue)}</div>
-                    <div className="text-sm text-gray-400">{isPrivacyMode ? createMask() : formatCurrency(asset.currentPrice)}</div>
+                    <div className="text-sm text-gray-400">{formatCurrency(asset.currentPrice)}</div>
                   </div>
                 </div>
                 
@@ -328,7 +328,7 @@ export default function PortfolioOverview({ className, onRefresh, isPrivacyMode 
                     <div className="text-sm text-gray-300">{isPrivacyMode ? createMask() : formatNumber(asset.quantity)}</div>
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-right">
-                    <div className="text-sm text-gray-300">{isPrivacyMode ? createMask() : formatCurrency(asset.currentPrice)}</div>
+                    <div className="text-sm text-gray-300">{formatCurrency(asset.currentPrice)}</div>
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-right">
                     <div className="text-sm font-medium text-gray-300">{isPrivacyMode ? createMask() : formatCurrency(asset.totalValue)}</div>
