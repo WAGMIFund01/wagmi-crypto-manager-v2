@@ -336,6 +336,94 @@ export class SheetsAdapter {
     }
   }
 
+  async validateInvestor(investorId: string): Promise<{
+    valid: boolean;
+    investor?: {
+      id: string;
+      name: string;
+      email: string;
+      joinDate: string;
+      investmentValue: number;
+      currentValue: number;
+      sharePercentage: number;
+      returnPercentage: number;
+    };
+  }> {
+    try {
+      await this.initializeServiceAccount();
+      
+      if (!this.sheets) {
+        throw new Error('Sheets API not initialized');
+      }
+
+      // Read the Investors sheet to find the investor
+      const response = await this.sheets.spreadsheets.values.get({
+        spreadsheetId: this.sheetId,
+        range: 'Investors!A:H', // A through H columns
+        valueRenderOption: 'UNFORMATTED_VALUE', // Get raw numeric values
+      });
+
+      // Also get formatted values for dates
+      const formattedResponse = await this.sheets.spreadsheets.values.get({
+        spreadsheetId: this.sheetId,
+        range: 'Investors!A:H', // A through H columns
+        valueRenderOption: 'FORMATTED_VALUE', // Get formatted values for dates
+      });
+
+      if (!response.data.values || response.data.values.length === 0) {
+        throw new Error('No data found in Investors sheet');
+      }
+
+      if (!formattedResponse.data.values) {
+        throw new Error('No formatted data found in Investors sheet');
+      }
+
+      const rows = response.data.values;
+      const formattedRows = formattedResponse.data.values;
+      const normalizedInvestorId = investorId.toUpperCase().trim();
+
+      // Search for the investor ID in the sheet
+      for (let i = 1; i < rows.length; i++) { // Skip header row
+        const row = rows[i];
+        const formattedRow = formattedRows[i];
+        
+        if (row && row.length >= 8) {
+          const rowInvestorId = row[0]?.toString().toUpperCase().trim();
+          
+          if (rowInvestorId === normalizedInvestorId) {
+            // Found the investor, return their data
+            const investor = {
+              id: row[0]?.toString() || '',
+              name: row[1]?.toString() || '',
+              email: row[2]?.toString() || '',
+              joinDate: formattedRow[3]?.toString() || '',
+              investmentValue: parseFloat(row[4]) || 0,
+              currentValue: parseFloat(row[5]) || 0,
+              sharePercentage: parseFloat(row[6]) || 0,
+              returnPercentage: parseFloat(row[7]) || 0,
+            };
+
+            console.log(`Investor validation successful: ${normalizedInvestorId}`);
+            return {
+              valid: true,
+              investor: investor
+            };
+          }
+        }
+      }
+
+      // Investor not found
+      console.log(`Investor validation failed: ${normalizedInvestorId} not found`);
+      return {
+        valid: false
+      };
+
+    } catch (error) {
+      console.error('Error validating investor:', error);
+      throw new Error('Failed to validate investor');
+    }
+  }
+
   async getInvestorData(): Promise<Array<{
     id: string;
     name: string;
