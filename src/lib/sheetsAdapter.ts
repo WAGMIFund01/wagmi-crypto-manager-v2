@@ -258,6 +258,84 @@ export class SheetsAdapter {
   /**
    * Get all investors from the Investors sheet
    */
+  async getKpiData(): Promise<{
+    totalInvestors: number;
+    totalInvested: number;
+    totalAUM: number;
+    cumulativeReturn: number;
+    monthlyReturn: number;
+  }> {
+    try {
+      await this.initializeServiceAccount();
+      
+      if (!this.sheets) {
+        throw new Error('Sheets API not initialized');
+      }
+
+      // Read the KPIs sheet with raw values (not formatted)
+      const response = await this.sheets.spreadsheets.values.get({
+        spreadsheetId: this.sheetId,
+        range: 'KPIs!A:B', // A and B columns (metric name and value)
+        valueRenderOption: 'UNFORMATTED_VALUE', // Get raw numeric values
+      });
+
+      if (!response.data.values || response.data.values.length === 0) {
+        throw new Error('No data found in KPIs sheet');
+      }
+
+      const rows = response.data.values;
+      const kpiData: {
+        totalInvestors: number;
+        totalInvested: number;
+        totalAUM: number;
+        cumulativeReturn: number;
+        monthlyReturn: number;
+      } = {
+        totalInvestors: 0,
+        totalInvested: 0,
+        totalAUM: 0,
+        cumulativeReturn: 0,
+        monthlyReturn: 0,
+      };
+
+      // Process all rows (Google Sheets data doesn't include header in rows)
+      for (const row of rows) {
+        if (row && row.length >= 2) {
+          const metricName = row[0]?.toString() || '';
+          const value = row[1];
+          
+          if (metricName && value !== undefined && value !== '') {
+            // Map the metric names to our expected format
+            switch (metricName.toLowerCase().trim()) {
+              case 'total investors':
+                kpiData.totalInvestors = parseFloat(value) || 0;
+                break;
+              case 'total invested':
+                kpiData.totalInvested = parseFloat(value) || 0;
+                break;
+              case 'total aum':
+                kpiData.totalAUM = parseFloat(value) || 0;
+                break;
+              case 'cumulative retur':
+              case 'cumulative return':
+                kpiData.cumulativeReturn = parseFloat(value) || 0;
+                break;
+              case 'monthly return':
+                kpiData.monthlyReturn = parseFloat(value) || 0;
+                break;
+            }
+          }
+        }
+      }
+
+      console.log('Google Sheets KPI data extracted:', kpiData);
+      return kpiData;
+    } catch (error) {
+      console.error('Error fetching KPI data:', error);
+      throw new Error('Failed to fetch KPI data');
+    }
+  }
+
   async getInvestorData(): Promise<Array<{
     id: string;
     name: string;
