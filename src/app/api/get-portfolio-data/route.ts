@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server';
-import { sheetsAdapter, PortfolioAsset } from '@/lib/sheetsAdapter';
+import { sheetsAdapter } from '@/lib/sheetsAdapter';
 
 export async function GET() {
   try {

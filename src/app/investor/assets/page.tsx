@@ -4,7 +4,7 @@ import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import { WagmiButton, WagmiCard, WagmiSpinner, WagmiText } from '@/components/ui';
 import { formatPercentage } from '@/shared/utils';
-import { PortfolioAsset } from '@/app/api/get-portfolio-data/route';
+import { PortfolioAsset } from '@/lib/sheetsAdapter';
 import { formatTimestampForDisplay } from '@/lib/timestamp-utils';
 
 export default function InvestorAssetsPage() {

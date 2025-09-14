@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import { PortfolioAsset } from '@/app/api/get-portfolio-data/route';
+import { PortfolioAsset } from '@/lib/sheetsAdapter';
 import { StackedBarChart, WagmiCard, WagmiSpinner, WagmiText } from '@/components/ui';
 
 interface PortfolioOverviewProps {
