@@ -254,6 +254,82 @@ export class SheetsAdapter {
       throw new Error('Failed to fetch portfolio data');
     }
   }
+
+  /**
+   * Get all investors from the Investors sheet
+   */
+  async getInvestorData(): Promise<Array<{
+    id: string;
+    name: string;
+    email: string;
+    joinDate: string;
+    investmentValue: number;
+    currentValue: number;
+    sharePercentage: number;
+    returnPercentage: number;
+  }>> {
+    try {
+      await this.initializeServiceAccount();
+      
+      if (!this.sheets) {
+        throw new Error('Sheets API not initialized');
+      }
+
+      // Read the entire Investors sheet
+      const response = await this.sheets.spreadsheets.values.get({
+        spreadsheetId: this.sheetId,
+        range: 'Investors!A:H', // A through H columns
+      });
+
+      if (!response.data.values || response.data.values.length === 0) {
+        throw new Error('No data found in Investors sheet');
+      }
+
+      const rows = response.data.values;
+      const investors: Array<{
+        id: string;
+        name: string;
+        email: string;
+        joinDate: string;
+        investmentValue: number;
+        currentValue: number;
+        sharePercentage: number;
+        returnPercentage: number;
+      }> = [];
+
+      // Process all rows starting from index 1 (skip header row)
+      for (let i = 1; i < rows.length; i++) {
+        const row = rows[i];
+        
+        // Ensure we have enough columns (at least 8 required columns)
+        if (row && row.length >= 8) {
+          const investor = {
+            id: row[0]?.toString() || '', // investor_id
+            name: row[1]?.toString() || '', // name
+            email: row[2]?.toString() || '', // email
+            joinDate: row[3]?.toString() || '', // join_date
+            investmentValue: parseFloat(row[4]) || 0, // investment_value
+            currentValue: parseFloat(row[5]) || 0, // current_value
+            sharePercentage: parseFloat(row[6]) || 0, // share_percentage
+            returnPercentage: parseFloat(row[7]) || 0, // return_percentage
+          };
+          
+          // Only add if we have essential data (ID and name)
+          if (investor.id && investor.name) {
+            investors.push(investor);
+          }
+        }
+      }
+
+      console.log(`Successfully fetched ${investors.length} investors from Google Sheets`);
+      console.log('Investor data:', investors);
+      return investors;
+
+    } catch (error) {
+      console.error('Error fetching investor data:', error);
+      throw new Error('Failed to fetch investor data');
+    }
+  }
 }
 
 // Export a singleton instance
