@@ -374,19 +374,19 @@ export default function InvestorAssetsPage() {
               <table className="w-full">
                 <thead className="bg-gray-900/50">
                   <tr>
-                    <th className="px-6 py-3 text-left">
+                    <th className="px-6 py-3 text-left whitespace-nowrap">
                       <WagmiText variant="label" color="muted">Asset</WagmiText>
                     </th>
-                    <th className="px-6 py-3 text-left">
+                    <th className="px-6 py-3 text-left whitespace-nowrap">
                       <WagmiText variant="label" color="muted">Type</WagmiText>
                     </th>
-                    <th className="px-6 py-3 text-left">
+                    <th className="px-6 py-3 text-left whitespace-nowrap">
                       <WagmiText variant="label" color="muted">Risk</WagmiText>
                     </th>
-                    <th className="px-6 py-3 text-right">
-                      <WagmiText variant="label" color="muted">Allocation %</WagmiText>
+                    <th className="px-6 py-3 text-right whitespace-nowrap">
+                      <WagmiText variant="label" color="muted">Allocation</WagmiText>
                     </th>
-                    <th className="px-6 py-3 text-right">
+                    <th className="px-6 py-3 text-right whitespace-nowrap">
                       <WagmiText variant="label" color="muted">24h Change</WagmiText>
                     </th>
                     <th className="px-6 py-3 text-left">
