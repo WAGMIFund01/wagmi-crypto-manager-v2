@@ -18,6 +18,21 @@ export interface GoogleSheetsResponse {
   error?: string;
 }
 
+export interface PortfolioAsset {
+  assetName: string;
+  symbol: string;
+  chain: string;
+  riskLevel: string;
+  location: string;
+  coinType: string;
+  quantity: number;
+  currentPrice: number;
+  totalValue: number;
+  lastPriceUpdate: string;
+  priceChange24h?: number;
+  thesis?: string;
+}
+
 export class SheetsAdapter {
   private baseUrl: string;
   private sheets: ReturnType<typeof google.sheets> | null = null;
@@ -162,6 +177,81 @@ export class SheetsAdapter {
     } catch (error) {
       console.error('Error fetching investor portfolio:', error);
       return null;
+    }
+  }
+
+  /**
+   * Get all portfolio assets from the Portfolio Overview sheet
+   */
+  async getPortfolioData(): Promise<PortfolioAsset[]> {
+    try {
+      await this.initializeServiceAccount();
+      
+      if (!this.sheets) {
+        throw new Error('Sheets API not initialized');
+      }
+
+      // Read the entire Portfolio Overview sheet
+      const response = await this.sheets.spreadsheets.values.get({
+        spreadsheetId: this.sheetId,
+        range: 'Portfolio Overview!A:M', // A through M columns
+      });
+
+      if (!response.data.values || response.data.values.length === 0) {
+        throw new Error('No data found in Portfolio Overview sheet');
+      }
+
+      const rows = response.data.values;
+      const portfolioAssets: PortfolioAsset[] = [];
+
+      // Process all rows starting from index 1 (skip header row)
+      for (let i = 1; i < rows.length; i++) {
+        const row = rows[i];
+        
+        // Ensure we have enough columns (at least 10 required columns)
+        if (row && row.length >= 10) {
+          const assetName = row[0]?.toString() || '';
+          const symbol = row[1]?.toString() || '';
+          const chain = row[2]?.toString() || '';
+          const riskLevel = row[3]?.toString() || '';
+          const location = row[4]?.toString() || '';
+          const coinType = row[5]?.toString() || '';
+          const quantity = parseFloat(row[6]) || 0;
+          const currentPrice = parseFloat(row[7]) || 0;
+          const totalValue = parseFloat(row[8]) || 0;
+          const lastPriceUpdate = row[9]?.toString() || '';
+          const priceChange24h = row[11] ? parseFloat(row[11]) : undefined; // Column L (index 11)
+          const thesis = row[12]?.toString() || ''; // Column M (index 12)
+
+          // Only add assets that have a name and symbol, and exclude header-like entries
+          if (assetName && symbol && 
+              assetName.toLowerCase() !== 'asset name' && 
+              symbol.toLowerCase() !== 'symbol' &&
+              !isNaN(quantity) && !isNaN(currentPrice) && !isNaN(totalValue)) {
+            portfolioAssets.push({
+              assetName,
+              symbol,
+              chain,
+              riskLevel,
+              location,
+              coinType,
+              quantity,
+              currentPrice,
+              totalValue,
+              lastPriceUpdate,
+              priceChange24h,
+              thesis
+            });
+          }
+        }
+      }
+
+      console.log(`Google Sheets portfolio data extracted: ${portfolioAssets.length} assets`);
+      return portfolioAssets;
+
+    } catch (error) {
+      console.error('Error fetching portfolio data:', error);
+      throw new Error('Failed to fetch portfolio data');
     }
   }
 }
