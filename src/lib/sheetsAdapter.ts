@@ -102,39 +102,6 @@ export class SheetsAdapter {
     }
   }
 
-  /**
-   * Validate an investor ID against the Google Sheets database
-   */
-  async validateInvestor(investorId: string): Promise<{ valid: boolean; investor?: Investor }> {
-    try {
-      const url = `${this.baseUrl}?action=getInvestor&investorId=${encodeURIComponent(investorId)}`;
-      
-      const response = await fetch(url, {
-        method: 'GET',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-      });
-
-      if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
-      }
-
-      const data: GoogleSheetsResponse = await response.json();
-
-      if (data.success && data.data && data.data.length > 0) {
-        return {
-          valid: true,
-          investor: data.data[0]
-        };
-      }
-
-      return { valid: false };
-    } catch (error) {
-      console.error('Error validating investor:', error);
-      throw new Error('Failed to validate investor ID');
-    }
-  }
 
   /**
    * Get all investors (for manager dashboard)
@@ -173,7 +140,20 @@ export class SheetsAdapter {
   async getInvestorPortfolio(investorId: string): Promise<Investor | null> {
     try {
       const result = await this.validateInvestor(investorId);
-      return result.valid ? result.investor || null : null;
+      if (result.valid && result.investor) {
+        // Convert camelCase to snake_case to match the Investor interface
+        return {
+          investor_id: result.investor.id,
+          name: result.investor.name,
+          email: result.investor.email,
+          join_date: result.investor.joinDate,
+          investment_value: result.investor.investmentValue,
+          current_value: result.investor.currentValue,
+          share_percentage: result.investor.sharePercentage,
+          return_percentage: result.investor.returnPercentage,
+        };
+      }
+      return null;
     } catch (error) {
       console.error('Error fetching investor portfolio:', error);
       return null;
