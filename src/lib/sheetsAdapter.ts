@@ -30,6 +30,7 @@ export interface PortfolioAsset {
   totalValue: number;
   lastPriceUpdate: string;
   priceChange24h?: number;
+  coinGeckoId?: string; // CoinGecko ID for price fetching
   thesis?: string;
 }
 
@@ -200,6 +201,7 @@ export class SheetsAdapter {
           const currentPrice = parseFloat(row[7]) || 0;
           const totalValue = parseFloat(row[8]) || 0;
           const lastPriceUpdate = row[9]?.toString() || '';
+          const coinGeckoId = row[10]?.toString()?.trim() || undefined; // Column K (index 10)
           const priceChange24h = row[11] ? parseFloat(row[11]) : undefined; // Column L (index 11)
           const thesis = row[12]?.toString() || ''; // Column M (index 12)
 
@@ -219,6 +221,7 @@ export class SheetsAdapter {
               currentPrice,
               totalValue,
               lastPriceUpdate,
+              coinGeckoId,
               priceChange24h,
               thesis
             });
