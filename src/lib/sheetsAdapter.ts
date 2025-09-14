@@ -295,6 +295,10 @@ export class SheetsAdapter {
 
       const rows = response.data.values;
       const formattedRows = formattedResponse.data.values;
+      
+      if (!formattedRows) {
+        throw new Error('No formatted data found in Investors sheet');
+      }
       const investors: Array<{
         id: string;
         name: string;

@@ -1,5 +1,4 @@
 import { NextResponse } from 'next/server';
-import { sheetsAdapter } from '@/lib/sheetsAdapter';
 
 export async function POST(request: Request) {
   try {
