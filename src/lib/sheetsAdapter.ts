@@ -275,10 +275,18 @@ export class SheetsAdapter {
         throw new Error('Sheets API not initialized');
       }
 
-      // Read the entire Investors sheet
+      // Read the entire Investors sheet with raw values (not formatted)
       const response = await this.sheets.spreadsheets.values.get({
         spreadsheetId: this.sheetId,
         range: 'Investors!A:H', // A through H columns
+        valueRenderOption: 'UNFORMATTED_VALUE', // Get raw numeric values instead of formatted
+      });
+
+      // Also get formatted values for dates
+      const formattedResponse = await this.sheets.spreadsheets.values.get({
+        spreadsheetId: this.sheetId,
+        range: 'Investors!A:H', // A through H columns
+        valueRenderOption: 'FORMATTED_VALUE', // Get formatted values for dates
       });
 
       if (!response.data.values || response.data.values.length === 0) {
@@ -286,6 +294,7 @@ export class SheetsAdapter {
       }
 
       const rows = response.data.values;
+      const formattedRows = formattedResponse.data.values;
       const investors: Array<{
         id: string;
         name: string;
@@ -300,18 +309,19 @@ export class SheetsAdapter {
       // Process all rows starting from index 1 (skip header row)
       for (let i = 1; i < rows.length; i++) {
         const row = rows[i];
+        const formattedRow = formattedRows[i];
         
         // Ensure we have enough columns (at least 8 required columns)
         if (row && row.length >= 8) {
           const investor = {
-            id: row[0]?.toString() || '', // investor_id
-            name: row[1]?.toString() || '', // name
-            email: row[2]?.toString() || '', // email
-            joinDate: row[3]?.toString() || '', // join_date
-            investmentValue: parseFloat(row[4]) || 0, // investment_value
-            currentValue: parseFloat(row[5]) || 0, // current_value
-            sharePercentage: parseFloat(row[6]) || 0, // share_percentage
-            returnPercentage: parseFloat(row[7]) || 0, // return_percentage
+            id: row[0]?.toString() || '', // investor_id (raw)
+            name: row[1]?.toString() || '', // name (raw)
+            email: row[2]?.toString() || '', // email (raw)
+            joinDate: formattedRow[3]?.toString() || '', // join_date (formatted)
+            investmentValue: parseFloat(row[4]) || 0, // investment_value (raw)
+            currentValue: parseFloat(row[5]) || 0, // current_value (raw)
+            sharePercentage: parseFloat(row[6]) || 0, // share_percentage (raw)
+            returnPercentage: parseFloat(row[7]) || 0, // return_percentage (raw)
           };
           
           // Only add if we have essential data (ID and name)
