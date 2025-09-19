@@ -24,7 +24,7 @@ const sizeClasses = {
 
 const themeColors = {
   green: {
-    accent: '#00FF95',
+    accent: '#FF6600',
     border: 'rgba(0, 255, 149, 0.1)',
     shadow: 'rgba(0, 255, 149, 0.1)',
     glow: 'rgba(0, 255, 149, 0.05)',

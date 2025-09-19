@@ -4,7 +4,7 @@ export default function Analytics() {
       <h2 
         className="text-2xl font-bold"
         style={{ 
-          color: '#00FF95',
+          color: '#FF6600',
           textShadow: '0 0 10px rgba(0, 255, 149, 0.3)'
         }}
       >
@@ -24,7 +24,7 @@ export default function Analytics() {
             <h3 
               className="text-lg font-semibold"
               style={{ 
-                color: '#00FF95',
+                color: '#FF6600',
                 textShadow: '0 0 10px rgba(0, 255, 149, 0.3)'
               }}
             >

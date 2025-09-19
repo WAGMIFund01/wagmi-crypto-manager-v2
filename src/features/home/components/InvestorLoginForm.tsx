@@ -137,7 +137,7 @@ export function InvestorLoginForm() {
             <h1 
               className="text-5xl font-bold mb-2"
               style={{ 
-                color: '#00FF95',
+                color: '#FF6600',
                 textShadow: '0 0 20px rgba(0, 255, 149, 0.5), 0 0 40px rgba(0, 255, 149, 0.3)'
               }}
             >

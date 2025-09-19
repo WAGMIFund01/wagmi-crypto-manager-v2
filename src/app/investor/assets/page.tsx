@@ -168,10 +168,10 @@ export default function InvestorAssetsPage() {
               <h1 
                 className="font-bold"
                 style={{ 
-                  color: '#00FF95',
+                  color: '#FF6600',
                   fontSize: '24px',
                   lineHeight: '1.2',
-                  textShadow: '0 0 25px rgba(0, 255, 149, 0.6), 0 0 50px rgba(0, 255, 149, 0.4), 0 0 75px rgba(0, 255, 149, 0.2)',
+                  textShadow: '0 0 25px rgba(255, 102, 0, 0.6), 0 0 50px rgba(255, 102, 0, 0.4), 0 0 75px rgba(255, 102, 0, 0.2)',
                   letterSpacing: '0.05em'
                 }}
               >
@@ -241,10 +241,10 @@ export default function InvestorAssetsPage() {
                 <h1 
                   className="font-bold"
                   style={{ 
-                    color: '#00FF95',
+                    color: '#FF6600',
                     fontSize: '32px',
                     lineHeight: '1.2',
-                    textShadow: '0 0 25px rgba(0, 255, 149, 0.6), 0 0 50px rgba(0, 255, 149, 0.4), 0 0 75px rgba(0, 255, 149, 0.2)',
+                    textShadow: '0 0 25px rgba(255, 102, 0, 0.6), 0 0 50px rgba(255, 102, 0, 0.4), 0 0 75px rgba(255, 102, 0, 0.2)',
                     letterSpacing: '0.05em'
                   }}
                 >

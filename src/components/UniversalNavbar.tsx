@@ -243,10 +243,10 @@ export default function UniversalNavbar({
               <h1 
                 className="font-bold"
                 style={{ 
-                  color: '#00FF95',
-                  fontSize: '36px',
-                  lineHeight: '1.2',
-                  textShadow: '0 0 25px rgba(0, 255, 149, 0.6), 0 0 50px rgba(0, 255, 149, 0.4), 0 0 75px rgba(0, 255, 149, 0.2)',
+                color: '#FF6600',
+                fontSize: '36px',
+                lineHeight: '1.2',
+                textShadow: '0 0 25px rgba(255, 102, 0, 0.6), 0 0 50px rgba(255, 102, 0, 0.4), 0 0 75px rgba(255, 102, 0, 0.2)',
                   letterSpacing: '0.05em'
                 }}
               >
@@ -281,10 +281,10 @@ export default function UniversalNavbar({
               className="font-bold cursor-pointer"
               onClick={() => onTabChange('portfolio')}
               style={{ 
-                color: '#00FF95',
+                color: '#FF6600',
                 fontSize: '28px',
                 lineHeight: '1.2',
-                textShadow: '0 0 25px rgba(0, 255, 149, 0.6), 0 0 50px rgba(0, 255, 149, 0.4), 0 0 75px rgba(0, 255, 149, 0.2)',
+                textShadow: '0 0 25px rgba(255, 102, 0, 0.6), 0 0 50px rgba(255, 102, 0, 0.4), 0 0 75px rgba(255, 102, 0, 0.2)',
                 letterSpacing: '0.05em'
               }}
             >
@@ -381,7 +381,7 @@ export default function UniversalNavbar({
                   <div style={{ color: '#A0A0A0', fontSize: '10px' }}>Return</div>
                   <div 
                     style={{ 
-                      color: formattedKpiData.cumulativeReturn.startsWith('+') ? '#00FF95' : '#FF6B6B', 
+                      color: formattedKpiData.cumulativeReturn.startsWith('+') ? '#FF6600' : '#FF6B6B', 
                       fontSize: '14px', 
                       fontWeight: '600' 
                     }}
@@ -393,7 +393,7 @@ export default function UniversalNavbar({
                   <div style={{ color: '#A0A0A0', fontSize: '10px' }}>MoM</div>
                   <div 
                     style={{ 
-                      color: formattedKpiData.monthOnMonth.startsWith('+') ? '#00FF95' : '#FF6B6B', 
+                      color: formattedKpiData.monthOnMonth.startsWith('+') ? '#FF6600' : '#FF6B6B', 
                       fontSize: '14px', 
                       fontWeight: '600' 
                     }}
@@ -420,15 +420,15 @@ export default function UniversalNavbar({
                   onClick={() => onTabChange(tab.id)}
                   className="py-2 px-2 text-sm font-medium transition-all duration-200 relative"
                   style={{
-                    color: activeTab === tab.id ? '#00FF95' : '#A0A0A0',
-                    borderBottom: activeTab === tab.id ? '2px solid #00FF95' : '2px solid transparent',
-                    textShadow: activeTab === tab.id ? '0 0 10px rgba(0, 255, 149, 0.5)' : 'none',
+                    color: activeTab === tab.id ? '#FF6600' : '#A0A0A0',
+                    borderBottom: activeTab === tab.id ? '2px solid #FF6600' : '2px solid transparent',
+                    textShadow: activeTab === tab.id ? '0 0 10px rgba(255, 102, 0, 0.5)' : 'none',
                     fontSize: '14px'
                   }}
                   onMouseEnter={(e) => {
                     if (activeTab !== tab.id) {
                       e.currentTarget.style.color = '#FFFFFF';
-                      e.currentTarget.style.textShadow = '0 0 5px rgba(0, 255, 149, 0.3)';
+                      e.currentTarget.style.textShadow = '0 0 5px rgba(255, 102, 0, 0.3)';
                     }
                   }}
                   onMouseLeave={(e) => {
@@ -455,10 +455,10 @@ export default function UniversalNavbar({
               className="font-bold cursor-pointer"
               onClick={() => onTabChange('portfolio')}
               style={{ 
-                color: '#00FF95',
+                color: '#FF6600',
                 fontSize: '36px',
                 lineHeight: '1.2',
-                textShadow: '0 0 25px rgba(0, 255, 149, 0.6), 0 0 50px rgba(0, 255, 149, 0.4), 0 0 75px rgba(0, 255, 149, 0.2)',
+                textShadow: '0 0 25px rgba(255, 102, 0, 0.6), 0 0 50px rgba(255, 102, 0, 0.4), 0 0 75px rgba(255, 102, 0, 0.2)',
                 letterSpacing: '0.05em'
               }}
             >
@@ -544,14 +544,14 @@ export default function UniversalNavbar({
                 onClick={() => onTabChange(tab.id)}
                 className="py-2 px-1 text-sm font-medium transition-all duration-200 relative"
                 style={{
-                  color: activeTab === tab.id ? '#00FF95' : '#A0A0A0',
-                  borderBottom: activeTab === tab.id ? '2px solid #00FF95' : '2px solid transparent',
-                  textShadow: activeTab === tab.id ? '0 0 10px rgba(0, 255, 149, 0.5)' : 'none'
+                  color: activeTab === tab.id ? '#FF6600' : '#A0A0A0',
+                  borderBottom: activeTab === tab.id ? '2px solid #FF6600' : '2px solid transparent',
+                  textShadow: activeTab === tab.id ? '0 0 10px rgba(255, 102, 0, 0.5)' : 'none'
                 }}
                 onMouseEnter={(e) => {
                   if (activeTab !== tab.id) {
                     e.currentTarget.style.color = '#FFFFFF';
-                    e.currentTarget.style.textShadow = '0 0 5px rgba(0, 255, 149, 0.3)';
+                    e.currentTarget.style.textShadow = '0 0 5px rgba(255, 102, 0, 0.3)';
                   }
                 }}
                 onMouseLeave={(e) => {
@@ -624,7 +624,7 @@ export default function UniversalNavbar({
                   <p 
                     className="text-sm font-semibold"
                     style={{ 
-                      color: formattedKpiData?.cumulativeReturn?.startsWith('+') ? '#00FF95' : '#FF4D4D'
+                      color: formattedKpiData?.cumulativeReturn?.startsWith('+') ? '#FF6600' : '#FF4D4D'
                     }}
                   >
                     {formattedKpiData?.cumulativeReturn || '--'}
@@ -639,7 +639,7 @@ export default function UniversalNavbar({
                   <p 
                     className="text-sm font-semibold"
                     style={{ 
-                      color: formattedKpiData?.monthOnMonth?.startsWith('+') ? '#00FF95' : '#FF4D4D'
+                      color: formattedKpiData?.monthOnMonth?.startsWith('+') ? '#FF6600' : '#FF4D4D'
                     }}
                   >
                     {formattedKpiData?.monthOnMonth || '--'}

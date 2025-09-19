@@ -1,7 +1,6 @@
 import { 
   CoinGeckoSimplePriceRequest, 
   CoinGeckoSimplePriceResponse, 
-  CoinGeckoError,
   CoinGeckoApiConfig 
 } from '../types/coinGecko';
 
@@ -13,10 +12,10 @@ export class CoinGeckoService {
 
   constructor(config: CoinGeckoApiConfig) {
     this.config = {
-      baseUrl: 'https://api.coingecko.com/api/v3',
       rateLimitDelay: 1000,
       maxRetries: 3,
-      ...config
+      ...config,
+      baseUrl: config.baseUrl || 'https://api.coingecko.com/api/v3'
     };
   }
 
@@ -125,10 +124,12 @@ export class CoinGeckoService {
   /**
    * Check if error is retryable
    */
-  private isRetryableError(error: any): boolean {
-    if (error.name === 'AbortError') return false;
-    if (error.message?.includes('Rate limit')) return true;
-    if (error.message?.includes('timeout')) return true;
+  private isRetryableError(error: unknown): boolean {
+    if (error instanceof Error) {
+      if (error.name === 'AbortError') return false;
+      if (error.message?.includes('Rate limit')) return true;
+      if (error.message?.includes('timeout')) return true;
+    }
     return false;
   }
 

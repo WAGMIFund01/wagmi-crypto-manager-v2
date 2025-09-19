@@ -168,7 +168,7 @@ export default function InvestorPage() {
 
   // Color palettes for different chart types
   const assetColors = [
-    '#00FF95', '#FF6B35', '#3B82F6', '#8B5CF6', '#F59E0B', 
+    '#FF6600', '#FF6B35', '#3B82F6', '#8B5CF6', '#F59E0B', 
     '#EF4444', '#10B981', '#F97316', '#6366F1', '#EC4899'
   ];
   
@@ -181,13 +181,13 @@ export default function InvestorPage() {
   };
 
   const locationColors = [
-    '#00FF95', '#FF6B35', '#3B82F6', '#8B5CF6', '#F59E0B',
+    '#FF6600', '#FF6B35', '#3B82F6', '#8B5CF6', '#F59E0B',
     '#EF4444', '#10B981', '#F97316', '#6366F1', '#EC4899'
   ];
 
   const typeColors = {
     'Memecoin': '#8B5CF6',
-    'Major': '#00FF95',
+    'Major': '#FF6600',
     'Altcoin': '#3B82F6',
     'Stablecoin': '#6B7280'
   };
@@ -267,10 +267,10 @@ export default function InvestorPage() {
               <h1 
                 className="font-bold"
                 style={{ 
-                  color: '#00FF95',
+                  color: '#FF6600',
                   fontSize: '28px',
                   lineHeight: '1.2',
-                  textShadow: '0 0 25px rgba(0, 255, 149, 0.6), 0 0 50px rgba(0, 255, 149, 0.4), 0 0 75px rgba(0, 255, 149, 0.2)',
+                  textShadow: '0 0 25px rgba(255, 102, 0, 0.6), 0 0 50px rgba(255, 102, 0, 0.4), 0 0 75px rgba(255, 102, 0, 0.2)',
                   letterSpacing: '0.05em'
                 }}
               >
@@ -350,10 +350,10 @@ export default function InvestorPage() {
                 <h1 
                   className="font-bold"
                   style={{ 
-                    color: '#00FF95',
+                    color: '#FF6600',
                     fontSize: '32px',
                     lineHeight: '1.2',
-                    textShadow: '0 0 25px rgba(0, 255, 149, 0.6), 0 0 50px rgba(0, 255, 149, 0.4), 0 0 75px rgba(0, 255, 149, 0.2)',
+                    textShadow: '0 0 25px rgba(255, 102, 0, 0.6), 0 0 50px rgba(255, 102, 0, 0.4), 0 0 75px rgba(255, 102, 0, 0.2)',
                     letterSpacing: '0.05em'
                   }}
                 >
@@ -459,7 +459,7 @@ export default function InvestorPage() {
               <p 
                 className="text-lg md:text-2xl font-bold leading-tight"
                 style={{ 
-                  color: privacyMode ? '#FFFFFF' : (portfolioData.totalPnl >= 0 ? '#00FF95' : '#FF4444')
+                  color: privacyMode ? '#FFFFFF' : (portfolioData.totalPnl >= 0 ? '#FF6600' : '#FF4444')
                 }}
               >
                 {privacyMode ? formatCurrency(portfolioData.totalPnl, privacyMode) : 
@@ -477,7 +477,7 @@ export default function InvestorPage() {
               <p 
                 className="text-lg md:text-2xl font-bold leading-tight"
                 style={{ 
-                  color: portfolioData.totalPnlPercentage >= 0 ? '#00FF95' : '#FF4444'
+                  color: portfolioData.totalPnlPercentage >= 0 ? '#FF6600' : '#FF4444'
                 }}
               >
                 {formatPercentage(portfolioData.totalPnlPercentage, false, true)}
@@ -549,7 +549,7 @@ export default function InvestorPage() {
             <h2 
               className="text-lg font-semibold"
               style={{ 
-                color: '#00FF95',
+                color: '#FF6600',
                 textShadow: '0 0 20px rgba(0, 255, 149, 0.5), 0 0 40px rgba(0, 255, 149, 0.3)'
               }}
             >
@@ -589,7 +589,7 @@ export default function InvestorPage() {
                           <span 
                           className="px-3 py-1 rounded-full text-xs font-medium whitespace-nowrap inline-block"
                             style={{
-                            backgroundColor: '#00FF95',
+                            backgroundColor: '#FF6600',
                             color: '#1A1A1A',
                             minWidth: 'fit-content',
                             fontSize: '12px',
@@ -607,7 +607,7 @@ export default function InvestorPage() {
                       <span 
                         className="font-semibold text-sm"
                         style={{ 
-                          color: privacyMode ? '#FFFFFF' : (transaction.amount >= 0 ? '#00FF95' : '#FF4444')
+                          color: privacyMode ? '#FFFFFF' : (transaction.amount >= 0 ? '#FF6600' : '#FF4444')
                         }}
                       >
                           {privacyMode ? '•••••' : 

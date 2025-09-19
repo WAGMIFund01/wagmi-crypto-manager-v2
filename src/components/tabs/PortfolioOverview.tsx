@@ -175,7 +175,7 @@ export default function PortfolioOverview({ className, onRefresh, isPrivacyMode 
 
   // Color palettes for different chart types
   const assetColors = [
-    '#00FF95', '#FF6B35', '#3B82F6', '#8B5CF6', '#F59E0B', 
+    '#FF6600', '#FF6B35', '#3B82F6', '#8B5CF6', '#F59E0B', 
     '#EF4444', '#10B981', '#F97316', '#6366F1', '#EC4899'
   ];
   
@@ -188,13 +188,13 @@ export default function PortfolioOverview({ className, onRefresh, isPrivacyMode 
   };
 
   const locationColors = [
-    '#00FF95', '#FF6B35', '#3B82F6', '#8B5CF6', '#F59E0B',
+    '#FF6600', '#FF6B35', '#3B82F6', '#8B5CF6', '#F59E0B',
     '#EF4444', '#10B981', '#F97316', '#6366F1', '#EC4899'
   ];
 
   const typeColors = {
     'Memecoin': '#8B5CF6',
-    'Major': '#00FF95',
+    'Major': '#FF6600',
     'Altcoin': '#3B82F6',
     'Stablecoin': '#6B7280'
   };

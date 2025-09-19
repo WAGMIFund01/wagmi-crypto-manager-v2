@@ -89,7 +89,7 @@ export default function TransactionModal({ isOpen, onClose, investorId, investor
           {loading ? (
             <div className="flex items-center justify-center py-12">
               <div className="text-center">
-                <div className="animate-spin rounded-full h-8 w-8 border-b-2 mx-auto mb-4" style={{ borderColor: '#00FF95' }}></div>
+                <div className="animate-spin rounded-full h-8 w-8 border-b-2 mx-auto mb-4" style={{ borderColor: '#FF6600' }}></div>
                 <p style={{ color: '#E0E0E0' }}>Loading transactions...</p>
               </div>
             </div>
@@ -139,7 +139,7 @@ export default function TransactionModal({ isOpen, onClose, investorId, investor
                       <span 
                         className="px-3 py-1 rounded-full text-xs font-medium whitespace-nowrap inline-block"
                         style={{
-                          backgroundColor: '#00FF95',
+                          backgroundColor: '#FF6600',
                           color: '#1A1A1A',
                           minWidth: 'fit-content',
                           fontSize: '12px',
@@ -157,7 +157,7 @@ export default function TransactionModal({ isOpen, onClose, investorId, investor
                     <span 
                       className="font-semibold text-sm"
                       style={{ 
-                        color: transaction.amount >= 0 ? '#00FF95' : '#FF4444' 
+                        color: transaction.amount >= 0 ? '#FF6600' : '#FF4444' 
                       }}
                     >
                       {(transaction.amount >= 0 ? '+' : '') + formatCurrency(transaction.amount)}

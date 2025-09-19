@@ -51,7 +51,7 @@ const WagmiText = forwardRef<HTMLElement, WagmiTextProps>(
       primary: 'text-white',
       secondary: 'text-gray-300',
       muted: 'text-gray-400',
-      accent: 'text-[#00FF95]',
+      accent: 'text-[#FF6600]',
       success: 'text-green-400',
       warning: 'text-yellow-400',
       error: 'text-red-400',

@@ -1,12 +1,11 @@
-import { sheetsAdapter } from '@/lib/sheetsAdapter';
+import { sheetsAdapter, PortfolioAsset } from '@/lib/sheetsAdapter';
 import { CoinGeckoService } from './CoinGeckoService';
 import { 
   PriceUpdateResult, 
   PriceUpdateError, 
   BatchPriceUpdate, 
   PriceUpdateSummary,
-  PriceServiceConfig,
-  AssetPriceInfo
+  PriceServiceConfig
 } from '../types/pricing';
 import { CoinGeckoService as CoinGeckoServiceType } from './CoinGeckoService';
 
@@ -20,6 +19,7 @@ export class PriceService {
   constructor(config: PriceServiceConfig) {
     this.config = config;
     this.coinGeckoService = new CoinGeckoService({
+      baseUrl: 'https://api.coingecko.com/api/v3',
       apiKey: config.coinGeckoApiKey
     });
   }
@@ -47,7 +47,7 @@ export class PriceService {
       }
 
       // Step 3: Fetch prices from CoinGecko
-      const coinGeckoIds = validAssets.map(asset => asset.coinGeckoId);
+      const coinGeckoIds = validAssets.map(asset => asset.coinGeckoId).filter((id): id is string => id !== undefined);
       const priceData = await this.coinGeckoService.getPrices(coinGeckoIds, true);
 
       // Step 4: Prepare batch updates
@@ -192,13 +192,13 @@ export class PriceService {
   /**
    * Process portfolio assets and validate them
    */
-  private processAssets(portfolioData: any[]): { validAssets: any[], errors: PriceUpdateError[] } {
-    const validAssets: any[] = [];
+  private processAssets(portfolioData: PortfolioAsset[]): { validAssets: (PortfolioAsset & { rowIndex: number })[], errors: PriceUpdateError[] } {
+    const validAssets: (PortfolioAsset & { rowIndex: number })[] = [];
     const errors: PriceUpdateError[] = [];
 
     portfolioData.forEach((asset, index) => {
       const symbol = asset.symbol?.toString().toUpperCase();
-      const quantity = parseFloat(asset.quantity?.toString()) || 0;
+      const quantity = asset.quantity || 0;
       const coinGeckoId = asset.coinGeckoId?.toString()?.trim();
 
       // Check if asset has quantity > 0
@@ -234,11 +234,8 @@ export class PriceService {
 
       validAssets.push({
         ...asset,
-        symbol,
-        quantity,
-        coinGeckoId,
         rowIndex: index + 2 // +2 for header and 1-indexed
-      });
+      } as PortfolioAsset & { rowIndex: number });
     });
 
     return { validAssets, errors };
@@ -247,16 +244,16 @@ export class PriceService {
   /**
    * Prepare batch updates for Google Sheets
    */
-  private prepareBatchUpdates(validAssets: any[], priceData: any): BatchPriceUpdate[] {
+  private prepareBatchUpdates(validAssets: (PortfolioAsset & { rowIndex: number })[], priceData: Record<string, { usd: number; usd_24h_change?: number }>): BatchPriceUpdate[] {
     const batchUpdates: BatchPriceUpdate[] = [];
 
     validAssets.forEach(asset => {
-      const priceInfo = priceData[asset.coinGeckoId];
+      const priceInfo = priceData[asset.coinGeckoId || ''];
       
       if (priceInfo && priceInfo.usd !== undefined) {
         batchUpdates.push({
           symbol: asset.symbol,
-          coinGeckoId: asset.coinGeckoId,
+          coinGeckoId: asset.coinGeckoId || '',
           newPrice: priceInfo.usd,
           priceChange24h: priceInfo.usd_24h_change,
           rowIndex: asset.rowIndex

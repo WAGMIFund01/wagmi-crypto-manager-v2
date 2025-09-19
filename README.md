@@ -220,7 +220,7 @@ Make sure to set all required environment variables in your deployment platform:
 - `WagmiAlert` - Alert messages
 
 ### Color Scheme
-- **Primary Green**: #00FF95 (WAGMI brand color)
+- **Primary Orange**: #FF6600 (WAGMI brand color)
 - **Background**: Dark theme (#1A1F1A, #2A1F1A)
 - **Text**: White (#FFFFFF) with muted variants
 - **Accents**: Orange (#FF6B35), Blue (#3B82F6), Red (#EF4444)

@@ -49,7 +49,7 @@ const WagmiButton = forwardRef<HTMLButtonElement, WagmiButtonProps>(
     const themeColors = {
       green: {
         primary: {
-          bg: '#00FF95',
+          bg: '#FF6600',
           hover: '#00E085',
           text: '#000000',
           shadow: '0 0 20px rgba(0, 255, 149, 0.3)',
@@ -58,15 +58,15 @@ const WagmiButton = forwardRef<HTMLButtonElement, WagmiButtonProps>(
         outline: {
           bg: 'transparent',
           hover: 'rgba(0, 255, 149, 0.1)',
-          text: '#00FF95',
-          border: '#00FF95',
+          text: '#FF6600',
+          border: '#FF6600',
           shadow: '0 0 10px rgba(0, 255, 149, 0.3)',
           focus: 'rgba(0, 255, 149, 0.3)'
         },
         ghost: {
           bg: 'transparent',
           hover: 'rgba(0, 255, 149, 0.1)',
-          text: '#00FF95',
+          text: '#FF6600',
           shadow: '0 0 8px rgba(0, 255, 149, 0.2)',
           focus: 'rgba(0, 255, 149, 0.3)'
         }

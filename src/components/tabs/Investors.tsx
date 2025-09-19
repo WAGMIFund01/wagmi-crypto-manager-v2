@@ -411,7 +411,7 @@ export default function Investors({ isPrivacyMode = false, onRefresh }: Investor
                     <div className="text-sm text-gray-400">{isPrivacyMode ? createMask() : investor.name}</div>
                   </div>
                   <div className="text-right">
-                    <div className="text-base font-medium" style={{ color: investor.returnPercentage >= 0 ? '#00FF95' : '#FF4D4D' }}>
+                    <div className="text-base font-medium" style={{ color: investor.returnPercentage >= 0 ? '#FF6600' : '#FF4D4D' }}>
                       {formatPercentage(investor.returnPercentage)}
                     </div>
                     <div className="text-sm text-gray-400">Return</div>
@@ -512,7 +512,7 @@ export default function Investors({ isPrivacyMode = false, onRefresh }: Investor
                   <td className="px-4 py-3 text-sm" style={{ color: isPrivacyMode ? '#FFFFFF' : '#A0A0A0' }}>
                     {isPrivacyMode ? createMask() : `${(investor.sharePercentage * 100).toFixed(1)}%`}
                   </td>
-                  <td className="px-4 py-3 text-sm font-medium" style={{ color: investor.returnPercentage >= 0 ? '#00FF95' : '#FF4D4D' }}>
+                  <td className="px-4 py-3 text-sm font-medium" style={{ color: investor.returnPercentage >= 0 ? '#FF6600' : '#FF4D4D' }}>
                     {formatPercentage(investor.returnPercentage)}
                   </td>
                 </tr>

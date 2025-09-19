@@ -55,7 +55,7 @@ function MyComponent() {
 
 ## Themes
 
-- **Green**: `#00FF95` - Default WAGMI theme
+- **Orange**: `#FF6600` - Default WAGMI theme
 - **Orange**: `#FF6B35` - Dev Access theme
 - **Blue**: `#3B82F6` - Info/neutral theme
 - **Purple**: `#8B5CF6` - Premium theme

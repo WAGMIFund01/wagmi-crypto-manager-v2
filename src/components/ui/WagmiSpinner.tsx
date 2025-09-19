@@ -32,7 +32,7 @@ const WagmiSpinner = forwardRef<HTMLDivElement, WagmiSpinnerProps>(
     
     // Theme colors
     const themeColors = {
-      green: '#00FF95',
+      green: '#FF6600',
       orange: '#FF6B35',
       blue: '#3B82F6',
       red: '#EF4444',

@@ -160,7 +160,7 @@ export default function DashboardClient({ session, kpiData: initialKpiData, hasE
     return (
       <div className="flex items-center justify-center min-h-screen" style={{ backgroundColor: '#0B0B0B' }}>
         <div className="text-center">
-          <div className="animate-spin rounded-full h-8 w-8 border-b-2 mx-auto mb-4" style={{ borderColor: '#00FF95' }}></div>
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 mx-auto mb-4" style={{ borderColor: '#FF6600' }}></div>
           <p style={{ color: '#E0E0E0' }}>Loading...</p>
         </div>
       </div>
