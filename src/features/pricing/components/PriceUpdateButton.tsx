@@ -1,6 +1,6 @@
 import React from 'react';
-import { WagmiButton } from '@/components/ui/WagmiButton';
-import { WagmiSpinner } from '@/components/ui/WagmiSpinner';
+import WagmiButton from '@/components/ui/WagmiButton';
+import WagmiSpinner from '@/components/ui/WagmiSpinner';
 
 export interface PriceUpdateButtonProps {
   isUpdating: boolean;
