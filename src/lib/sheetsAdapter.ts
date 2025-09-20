@@ -540,11 +540,8 @@ export class SheetsAdapter {
   async removePortfolioAsset(symbol: string): Promise<void> {
     try {
       if (!this.sheets) {
-        console.error('Sheets API not initialized - attempting to initialize...');
-        await this.initialize();
-        if (!this.sheets) {
-          throw new Error('Failed to initialize Sheets API');
-        }
+        console.error('Sheets API not initialized');
+        throw new Error('Sheets API not initialized');
       }
 
       console.log('Removing asset from portfolio:', symbol);
