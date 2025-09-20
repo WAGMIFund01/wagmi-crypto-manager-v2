@@ -11,7 +11,7 @@ import {
 export class CoinGeckoService {
   private config: CoinGeckoApiConfig;
 
-  constructor(config: CoinGeckoApiConfig) {
+  constructor(config: Partial<CoinGeckoApiConfig> = {}) {
     this.config = {
       baseUrl: 'https://api.coingecko.com/api/v3',
       rateLimitDelay: 1000,
