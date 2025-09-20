@@ -59,10 +59,31 @@ export default function AssetSearchModal({ isOpen, onClose, onAssetSelect }: Ass
     setSelectedAsset(asset);
   };
 
-  const handleConfirmSelection = () => {
+  const handleConfirmSelection = async () => {
     if (selectedAsset) {
-      onAssetSelect(selectedAsset);
-      onClose();
+      setLoading(true);
+      try {
+        // Fetch detailed asset information including current price
+        const response = await fetch(`/api/get-asset-details?id=${encodeURIComponent(selectedAsset.id)}`);
+        const data = await response.json();
+        
+        if (data.success && data.asset) {
+          // Use the detailed asset information with current price
+          onAssetSelect(data.asset);
+          onClose();
+        } else {
+          // Fallback to selected asset without price (will be handled in form)
+          onAssetSelect(selectedAsset);
+          onClose();
+        }
+      } catch (error) {
+        console.error('Error fetching asset details:', error);
+        // Fallback to selected asset without price
+        onAssetSelect(selectedAsset);
+        onClose();
+      } finally {
+        setLoading(false);
+      }
     }
   };
 

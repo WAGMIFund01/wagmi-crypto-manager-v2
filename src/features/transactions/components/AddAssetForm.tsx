@@ -60,13 +60,37 @@ export default function AddAssetForm({ isOpen, onClose, onAssetAdded, selectedAs
     setLoading(true);
     setError(null);
 
+    // If current_price is missing, try to fetch it
+    let assetToUse = selectedAsset;
+    if (!selectedAsset.current_price || selectedAsset.current_price <= 0) {
+      try {
+        console.log('Fetching current price for asset:', selectedAsset.id);
+        const response = await fetch(`/api/get-asset-details?id=${encodeURIComponent(selectedAsset.id)}`);
+        const data = await response.json();
+        
+        if (data.success && data.asset && data.asset.current_price > 0) {
+          assetToUse = data.asset;
+          console.log('Updated asset with current price:', assetToUse.current_price);
+        } else {
+          setError('Unable to fetch current price for this asset. Please try again.');
+          setLoading(false);
+          return;
+        }
+      } catch (error) {
+        console.error('Error fetching current price:', error);
+        setError('Unable to fetch current price for this asset. Please try again.');
+        setLoading(false);
+        return;
+      }
+    }
+
     try {
       const requestData = {
-        coinGeckoId: selectedAsset.id,
-        symbol: selectedAsset.symbol,
-        name: selectedAsset.name,
+        coinGeckoId: assetToUse.id,
+        symbol: assetToUse.symbol,
+        name: assetToUse.name,
         quantity: parseFloat(quantity),
-        currentPrice: selectedAsset.current_price || 0,
+        currentPrice: assetToUse.current_price || 0,
         chain: chain.trim(),
         riskLevel: riskLevel,
         location: location.trim(),
