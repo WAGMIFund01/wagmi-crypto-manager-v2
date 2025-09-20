@@ -50,7 +50,9 @@ export async function POST(request: Request) {
     }
 
     // Add the asset
+    console.log('Calling assetManagementService.addAsset with:', assetData);
     const result = await assetManagementService.addAsset(assetData);
+    console.log('AssetManagementService result:', result);
 
     if (result.success) {
       return NextResponse.json({
@@ -65,6 +67,7 @@ export async function POST(request: Request) {
         }
       });
     } else {
+      console.log('Asset addition failed:', result.error || result.message);
       return NextResponse.json({
         success: false,
         error: result.error || result.message,

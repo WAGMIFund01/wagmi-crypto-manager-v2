@@ -525,7 +525,12 @@ export class SheetsAdapter {
       console.log('Asset added successfully:', response.data);
     } catch (error) {
       console.error('Error adding asset to portfolio:', error);
-      throw new Error('Failed to add asset to portfolio');
+      console.error('Error details:', {
+        message: error instanceof Error ? error.message : 'Unknown error',
+        stack: error instanceof Error ? error.stack : undefined,
+        assetRow: assetRow
+      });
+      throw new Error(`Failed to add asset to portfolio: ${error instanceof Error ? error.message : 'Unknown error'}`);
     }
   }
 
