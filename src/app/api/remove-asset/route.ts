@@ -6,6 +6,8 @@ export async function DELETE(request: Request) {
     const { searchParams } = new URL(request.url);
     const symbol = searchParams.get('symbol');
 
+    console.log('Remove asset request for symbol:', symbol);
+
     if (!symbol || symbol.trim().length === 0) {
       return NextResponse.json({
         success: false,
@@ -15,7 +17,9 @@ export async function DELETE(request: Request) {
     }
 
     // Remove the asset
+    console.log('Calling assetManagementService.removeAsset with:', symbol.trim());
     const result = await assetManagementService.removeAsset(symbol.trim());
+    console.log('AssetManagementService result:', result);
 
     if (result.success) {
       return NextResponse.json({

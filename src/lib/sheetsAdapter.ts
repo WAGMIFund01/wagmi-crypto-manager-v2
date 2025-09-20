@@ -555,15 +555,23 @@ export class SheetsAdapter {
       
       // Find the row index of the asset to remove (skip header row)
       let rowIndexToRemove = -1;
+      console.log(`Looking for asset with symbol: ${symbol.toUpperCase()}`);
+      console.log(`Total rows in sheet: ${rows.length}`);
+      
       for (let i = 1; i < rows.length; i++) {
         const row = rows[i];
-        if (row && row.length > 1 && row[1]?.toString().toUpperCase() === symbol.toUpperCase()) {
+        const rowSymbol = row && row.length > 1 ? row[1]?.toString().toUpperCase() : '';
+        console.log(`Row ${i}: Symbol = "${rowSymbol}", Asset = "${row[0]}"`);
+        
+        if (row && row.length > 1 && rowSymbol === symbol.toUpperCase()) {
           rowIndexToRemove = i + 1; // +1 because Google Sheets uses 1-based indexing
+          console.log(`Found matching asset at row ${rowIndexToRemove}`);
           break;
         }
       }
 
       if (rowIndexToRemove === -1) {
+        console.log(`No asset found with symbol: ${symbol}`);
         throw new Error(`Asset with symbol ${symbol} not found`);
       }
 
