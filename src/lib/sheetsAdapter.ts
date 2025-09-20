@@ -540,16 +540,22 @@ export class SheetsAdapter {
   async removePortfolioAsset(symbol: string): Promise<void> {
     try {
       if (!this.sheets) {
-        throw new Error('Sheets API not initialized');
+        console.error('Sheets API not initialized - attempting to initialize...');
+        await this.initialize();
+        if (!this.sheets) {
+          throw new Error('Failed to initialize Sheets API');
+        }
       }
 
       console.log('Removing asset from portfolio:', symbol);
 
       // First, get all portfolio data to find the row index
+      console.log('Fetching portfolio data to find asset row...');
       const response = await this.sheets.spreadsheets.values.get({
         spreadsheetId: this.sheetId,
         range: 'Portfolio Overview!A:M'
       });
+      console.log('Portfolio data fetched successfully');
 
       const rows = response.data.values || [];
       
@@ -576,7 +582,8 @@ export class SheetsAdapter {
       }
 
       // Delete the row
-      await this.sheets.spreadsheets.batchUpdate({
+      console.log(`Attempting to delete row ${rowIndexToRemove}...`);
+      const deleteResponse = await this.sheets.spreadsheets.batchUpdate({
         spreadsheetId: this.sheetId,
         requestBody: {
           requests: [{
@@ -592,6 +599,7 @@ export class SheetsAdapter {
         }
       });
 
+      console.log('Delete operation response:', deleteResponse.data);
       console.log(`Asset ${symbol} removed successfully from row ${rowIndexToRemove}`);
     } catch (error) {
       console.error('Error removing asset from portfolio:', error);
