@@ -4,6 +4,7 @@ import React, { useState, useEffect } from 'react';
 import StandardModal from '@/components/ui/StandardModal';
 import { WagmiInput, WagmiButton, WagmiSpinner } from '@/components/ui';
 import { AssetSearchResult } from '../services/AssetSearchService';
+import { detectChain } from '../utils/chainDetection';
 
 interface AddAssetFormProps {
   isOpen: boolean;
@@ -23,9 +24,15 @@ export default function AddAssetForm({ isOpen, onClose, onAssetAdded, selectedAs
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  // Sync with prop changes
+  // Sync with prop changes and auto-detect chain
   useEffect(() => {
     setSelectedAsset(propSelectedAsset || null);
+    
+    // Auto-detect chain when asset is selected
+    if (propSelectedAsset) {
+      const detectedChain = detectChain(propSelectedAsset.id, propSelectedAsset.symbol);
+      setChain(detectedChain.displayName);
+    }
   }, [propSelectedAsset]);
 
   const handleQuantityChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -223,6 +230,11 @@ export default function AddAssetForm({ isOpen, onClose, onAssetAdded, selectedAs
           <div>
             <label className="block text-sm font-medium text-gray-300 mb-2">
               Chain
+              {selectedAsset && chain && (
+                <span className="ml-2 text-xs text-green-400 bg-green-400/10 px-2 py-1 rounded">
+                  Auto-detected
+                </span>
+              )}
             </label>
             <WagmiInput
               type="text"
