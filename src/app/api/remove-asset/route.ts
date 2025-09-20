@@ -29,7 +29,7 @@ export async function DELETE(request: Request) {
       const connectionTest = await sheetsAdapter.testConnection();
       console.log('Connection test result:', connectionTest);
       
-      if (!connectionTest.success) {
+      if (!connectionTest) {
         console.log('ERROR: SheetsAdapter connection failed');
         return NextResponse.json({
           success: false,
