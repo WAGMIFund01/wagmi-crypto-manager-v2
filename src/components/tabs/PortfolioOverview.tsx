@@ -2,7 +2,10 @@
 
 import React, { useState, useEffect } from 'react';
 import { PortfolioAsset } from '@/lib/sheetsAdapter';
-import { StackedBarChart, WagmiCard, WagmiSpinner, WagmiText } from '@/components/ui';
+import { StackedBarChart, WagmiCard, WagmiSpinner, WagmiText, WagmiButton } from '@/components/ui';
+import AssetSearchModal from '@/features/transactions/components/AssetSearchModal';
+import AddAssetForm from '@/features/transactions/components/AddAssetForm';
+import { AssetSearchResult } from '@/features/transactions/services/AssetSearchService';
 
 interface PortfolioOverviewProps {
   className?: string;
@@ -14,6 +17,12 @@ export default function PortfolioOverview({ className, onRefresh, isPrivacyMode 
   const [assets, setAssets] = useState<PortfolioAsset[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  
+  // Asset management state
+  const [showSearchModal, setShowSearchModal] = useState(false);
+  const [showAddForm, setShowAddForm] = useState(false);
+  const [selectedAsset, setSelectedAsset] = useState<AssetSearchResult | null>(null);
+  const [removingAsset, setRemovingAsset] = useState<string | null>(null);
 
   const fetchPortfolioData = async () => {
     try {
@@ -45,6 +54,45 @@ export default function PortfolioOverview({ className, onRefresh, isPrivacyMode 
       fetchPortfolioData();
     }
   }, [onRefresh]);
+
+  // Asset management functions
+  const handleAssetSelect = (asset: AssetSearchResult) => {
+    setSelectedAsset(asset);
+    setShowSearchModal(false);
+    setShowAddForm(true);
+  };
+
+  const handleAssetAdded = () => {
+    setSelectedAsset(null);
+    setShowAddForm(false);
+    fetchPortfolioData(); // Refresh the portfolio data
+  };
+
+  const handleRemoveAsset = async (symbol: string) => {
+    if (!confirm(`Are you sure you want to remove ${symbol} from the portfolio?`)) {
+      return;
+    }
+
+    setRemovingAsset(symbol);
+    try {
+      const response = await fetch(`/api/remove-asset?symbol=${encodeURIComponent(symbol)}`, {
+        method: 'DELETE',
+      });
+
+      const data = await response.json();
+
+      if (data.success) {
+        fetchPortfolioData(); // Refresh the portfolio data
+      } else {
+        alert(`Failed to remove asset: ${data.error}`);
+      }
+    } catch (err) {
+      console.error('Error removing asset:', err);
+      alert('Failed to remove asset');
+    } finally {
+      setRemovingAsset(null);
+    }
+  };
 
   const formatCurrency = (value: number) => {
     return new Intl.NumberFormat('en-US', {
@@ -202,6 +250,21 @@ export default function PortfolioOverview({ className, onRefresh, isPrivacyMode 
 
   return (
     <div className={`${className} space-y-6`}>
+      {/* Add Asset Button */}
+      <div className="flex justify-between items-center">
+        <h2 className="text-2xl font-bold text-white">Portfolio Overview</h2>
+        <WagmiButton
+          variant="primary"
+          onClick={() => setShowSearchModal(true)}
+          className="flex items-center space-x-2"
+        >
+          <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
+          </svg>
+          <span>Add Asset</span>
+        </WagmiButton>
+      </div>
+
       {/* Portfolio Breakdown Charts */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         <StackedBarChart
@@ -247,12 +310,28 @@ export default function PortfolioOverview({ className, onRefresh, isPrivacyMode 
                     <div className="text-base font-medium text-white">{asset.assetName}</div>
                     <div className="text-sm text-gray-400">{asset.symbol}</div>
                   </div>
-                  <div className="text-right">
-                    <div className="text-base font-medium text-gray-300">{isPrivacyMode ? createMask() : formatCurrency(asset.totalValue)}</div>
-                    <div className="text-sm text-gray-400">{formatCurrency(asset.currentPrice)}</div>
-                    <div className={`text-xs font-medium ${formatPriceChange(asset.priceChange24h).color}`}>
-                      {formatPriceChange(asset.priceChange24h).text}
+                  <div className="flex items-center space-x-2">
+                    <div className="text-right">
+                      <div className="text-base font-medium text-gray-300">{isPrivacyMode ? createMask() : formatCurrency(asset.totalValue)}</div>
+                      <div className="text-sm text-gray-400">{formatCurrency(asset.currentPrice)}</div>
+                      <div className={`text-xs font-medium ${formatPriceChange(asset.priceChange24h).color}`}>
+                        {formatPriceChange(asset.priceChange24h).text}
+                      </div>
                     </div>
+                    <button
+                      onClick={() => handleRemoveAsset(asset.symbol)}
+                      disabled={removingAsset === asset.symbol}
+                      className="p-2 text-red-400 hover:text-red-300 hover:bg-red-900/20 rounded-lg transition-colors disabled:opacity-50"
+                      title="Remove asset"
+                    >
+                      {removingAsset === asset.symbol ? (
+                        <WagmiSpinner size="sm" />
+                      ) : (
+                        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                        </svg>
+                      )}
+                    </button>
                   </div>
                 </div>
                 
@@ -319,6 +398,9 @@ export default function PortfolioOverview({ className, onRefresh, isPrivacyMode 
                 <th className="px-6 py-3 text-right">
                   <WagmiText variant="label" color="muted">Value</WagmiText>
                 </th>
+                <th className="px-6 py-3 text-center">
+                  <WagmiText variant="label" color="muted">Actions</WagmiText>
+                </th>
               </tr>
             </thead>
             <tbody className="divide-y divide-gray-700">
@@ -362,6 +444,22 @@ export default function PortfolioOverview({ className, onRefresh, isPrivacyMode 
                   <td className="px-6 py-4 whitespace-nowrap text-right">
                     <div className="text-sm font-medium text-gray-300">{isPrivacyMode ? createMask() : formatCurrency(asset.totalValue)}</div>
                   </td>
+                  <td className="px-6 py-4 whitespace-nowrap text-center">
+                    <button
+                      onClick={() => handleRemoveAsset(asset.symbol)}
+                      disabled={removingAsset === asset.symbol}
+                      className="p-2 text-red-400 hover:text-red-300 hover:bg-red-900/20 rounded-lg transition-colors disabled:opacity-50"
+                      title="Remove asset"
+                    >
+                      {removingAsset === asset.symbol ? (
+                        <WagmiSpinner size="sm" />
+                      ) : (
+                        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                        </svg>
+                      )}
+                    </button>
+                  </td>
                 </tr>
               ))}
             </tbody>
@@ -369,6 +467,20 @@ export default function PortfolioOverview({ className, onRefresh, isPrivacyMode 
         </div>
       </div>
       </WagmiCard>
+
+      {/* Asset Management Modals */}
+      <AssetSearchModal
+        isOpen={showSearchModal}
+        onClose={() => setShowSearchModal(false)}
+        onAssetSelect={handleAssetSelect}
+      />
+
+      <AddAssetForm
+        isOpen={showAddForm}
+        onClose={() => setShowAddForm(false)}
+        onAssetAdded={handleAssetAdded}
+        selectedAsset={selectedAsset}
+      />
     </div>
   );
 }

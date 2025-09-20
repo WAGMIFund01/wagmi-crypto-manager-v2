@@ -13,6 +13,8 @@ interface Investor {
   currentValue: number;
   sharePercentage: number;
   returnPercentage: number;
+  investorType: string;
+  fees: number;
 }
 
 interface InvestorsProps {
@@ -430,7 +432,7 @@ export default function Investors({ isPrivacyMode = false, onRefresh }: Investor
                   </div>
                 </div>
                 
-                {/* Share and Join Date */}
+                {/* Share, Join Date, Type, and Fees */}
                 <div className="pt-3 border-t border-gray-700">
                   <div className="grid grid-cols-2 gap-3 text-sm">
                     <div>
@@ -440,6 +442,14 @@ export default function Investors({ isPrivacyMode = false, onRefresh }: Investor
                     <div>
                       <div className="text-gray-400 text-xs uppercase tracking-wide">Join Date</div>
                       <div className="text-gray-300">{formatDate(investor.joinDate)}</div>
+                    </div>
+                    <div>
+                      <div className="text-gray-400 text-xs uppercase tracking-wide">Type</div>
+                      <div className="text-gray-300">{investor.investorType || 'N/A'}</div>
+                    </div>
+                    <div>
+                      <div className="text-gray-400 text-xs uppercase tracking-wide">Fees</div>
+                      <div className="text-gray-300">{isPrivacyMode ? createMask() : formatCurrency(investor.fees)}</div>
                     </div>
                   </div>
                 </div>
@@ -474,6 +484,12 @@ export default function Investors({ isPrivacyMode = false, onRefresh }: Investor
                 </th>
                 <th className="px-4 py-3 text-left text-xs font-medium uppercase tracking-wider" style={{ color: '#A0A0A0' }}>
                   Return %
+                </th>
+                <th className="px-4 py-3 text-left text-xs font-medium uppercase tracking-wider" style={{ color: '#A0A0A0' }}>
+                  Type
+                </th>
+                <th className="px-4 py-3 text-left text-xs font-medium uppercase tracking-wider" style={{ color: '#A0A0A0' }}>
+                  Fees
                 </th>
               </tr>
             </thead>
@@ -514,6 +530,12 @@ export default function Investors({ isPrivacyMode = false, onRefresh }: Investor
                   </td>
                   <td className="px-4 py-3 text-sm font-medium" style={{ color: investor.returnPercentage >= 0 ? '#00FF95' : '#FF4D4D' }}>
                     {formatPercentage(investor.returnPercentage)}
+                  </td>
+                  <td className="px-4 py-3 text-sm" style={{ color: '#FFFFFF' }}>
+                    {investor.investorType || 'N/A'}
+                  </td>
+                  <td className="px-4 py-3 text-sm" style={{ color: '#FFFFFF' }}>
+                    {isPrivacyMode ? createMask() : formatCurrency(investor.fees)}
                   </td>
                 </tr>
               ))}

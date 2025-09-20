@@ -427,14 +427,14 @@ export class SheetsAdapter {
       // Read the entire Investors sheet with raw values (not formatted)
       const response = await this.sheets.spreadsheets.values.get({
         spreadsheetId: this.sheetId,
-        range: 'Investors!A:H', // A through H columns
+        range: 'Investors!A:J', // A through J columns (added I and J for investor type and fees)
         valueRenderOption: 'UNFORMATTED_VALUE', // Get raw numeric values instead of formatted
       });
 
       // Also get formatted values for dates
       const formattedResponse = await this.sheets.spreadsheets.values.get({
         spreadsheetId: this.sheetId,
-        range: 'Investors!A:H', // A through H columns
+        range: 'Investors!A:J', // A through J columns (added I and J for investor type and fees)
         valueRenderOption: 'FORMATTED_VALUE', // Get formatted values for dates
       });
 
@@ -457,6 +457,8 @@ export class SheetsAdapter {
         currentValue: number;
         sharePercentage: number;
         returnPercentage: number;
+        investorType: string;
+        fees: number;
       }> = [];
 
       // Process all rows starting from index 1 (skip header row)
@@ -475,6 +477,8 @@ export class SheetsAdapter {
             currentValue: parseFloat(row[5]) || 0, // current_value (raw)
             sharePercentage: parseFloat(row[6]) || 0, // share_percentage (raw)
             returnPercentage: parseFloat(row[7]) || 0, // return_percentage (raw)
+            investorType: row[8]?.toString() || 'N/A', // investor_type (raw) - column I
+            fees: parseFloat(row[9]) || 0, // fees (raw) - column J
           };
           
           // Only add if we have essential data (ID and name)
@@ -491,6 +495,86 @@ export class SheetsAdapter {
     } catch (error) {
       console.error('Error fetching investor data:', error);
       throw new Error('Failed to fetch investor data');
+    }
+  }
+
+  /**
+   * Add a new asset to the Portfolio Overview sheet
+   */
+  async addPortfolioAsset(assetRow: any[]): Promise<void> {
+    try {
+      console.log('Adding new asset to portfolio:', assetRow);
+
+      const range = 'Portfolio Overview!A:M'; // All columns from A to M
+      
+      // Append the new row to the sheet
+      const response = await this.sheets.spreadsheets.values.append({
+        spreadsheetId: this.sheetId,
+        range,
+        valueInputOption: 'RAW',
+        insertDataOption: 'INSERT_ROWS',
+        resource: {
+          values: [assetRow]
+        }
+      });
+
+      console.log('Asset added successfully:', response.data);
+    } catch (error) {
+      console.error('Error adding asset to portfolio:', error);
+      throw new Error('Failed to add asset to portfolio');
+    }
+  }
+
+  /**
+   * Remove an asset from the Portfolio Overview sheet by symbol
+   */
+  async removePortfolioAsset(symbol: string): Promise<void> {
+    try {
+      console.log('Removing asset from portfolio:', symbol);
+
+      // First, get all portfolio data to find the row index
+      const response = await this.sheets.spreadsheets.values.get({
+        spreadsheetId: this.sheetId,
+        range: 'Portfolio Overview!A:M'
+      });
+
+      const rows = response.data.values || [];
+      
+      // Find the row index of the asset to remove (skip header row)
+      let rowIndexToRemove = -1;
+      for (let i = 1; i < rows.length; i++) {
+        const row = rows[i];
+        if (row && row.length > 1 && row[1]?.toString().toUpperCase() === symbol.toUpperCase()) {
+          rowIndexToRemove = i + 1; // +1 because Google Sheets uses 1-based indexing
+          break;
+        }
+      }
+
+      if (rowIndexToRemove === -1) {
+        throw new Error(`Asset with symbol ${symbol} not found`);
+      }
+
+      // Delete the row
+      await this.sheets.spreadsheets.batchUpdate({
+        spreadsheetId: this.sheetId,
+        resource: {
+          requests: [{
+            deleteDimension: {
+              range: {
+                sheetId: 0, // Portfolio Overview is the first sheet
+                dimension: 'ROWS',
+                startIndex: rowIndexToRemove - 1, // Convert to 0-based index
+                endIndex: rowIndexToRemove
+              }
+            }
+          }]
+        }
+      });
+
+      console.log(`Asset ${symbol} removed successfully from row ${rowIndexToRemove}`);
+    } catch (error) {
+      console.error('Error removing asset from portfolio:', error);
+      throw new Error('Failed to remove asset from portfolio');
     }
   }
 }
