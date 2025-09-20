@@ -88,8 +88,8 @@ export function usePriceHistory(
       
       // Merge market cap and volume data
       const enrichedPrices = prices.map(pricePoint => {
-        const marketCapPoint = marketCaps.find(mc => mc.timestamp === pricePoint.timestamp);
-        const volumePoint = volumes.find(v => v.timestamp === pricePoint.timestamp);
+        const marketCapPoint = marketCaps.find((mc: any) => mc.timestamp === pricePoint.timestamp);
+        const volumePoint = volumes.find((v: any) => v.timestamp === pricePoint.timestamp);
         
         return {
           ...pricePoint,
