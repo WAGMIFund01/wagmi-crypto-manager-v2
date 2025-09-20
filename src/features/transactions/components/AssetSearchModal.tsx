@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect } from 'react';
 import StandardModal from '@/components/ui/StandardModal';
 import { WagmiInput, WagmiButton, WagmiSpinner } from '@/components/ui';
 import { AssetSearchResult } from '../services/AssetSearchService';
@@ -158,7 +158,7 @@ export default function AssetSearchModal({ isOpen, onClose, onAssetSelect }: Ass
             </div>
           ) : searchQuery.length >= 2 ? (
             <div className="text-center py-8">
-              <p className="text-gray-400">No assets found for "{searchQuery}"</p>
+              <p className="text-gray-400">No assets found for &quot;{searchQuery}&quot;</p>
             </div>
           ) : (
             <div className="text-center py-8">

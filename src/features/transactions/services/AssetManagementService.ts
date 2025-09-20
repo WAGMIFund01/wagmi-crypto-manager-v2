@@ -3,7 +3,7 @@
  */
 
 import { sheetsAdapter } from '@/lib/sheetsAdapter';
-import { AssetSearchResult } from './AssetSearchService';
+// import { AssetSearchResult } from './AssetSearchService';
 
 export interface NewAssetData {
   coinGeckoId: string;
