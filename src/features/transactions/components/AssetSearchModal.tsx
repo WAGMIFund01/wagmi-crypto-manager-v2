@@ -170,7 +170,7 @@ export default function AssetSearchModal({ isOpen, onClose, onAssetSelect }: Ass
         {/* Action Buttons */}
         <div className="flex justify-end space-x-3 pt-4 border-t border-gray-600">
           <WagmiButton
-            variant="secondary"
+            variant="outline"
             onClick={handleClose}
           >
             Cancel

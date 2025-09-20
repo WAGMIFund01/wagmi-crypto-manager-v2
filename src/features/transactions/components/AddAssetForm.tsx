@@ -268,7 +268,7 @@ export default function AddAssetForm({ isOpen, onClose, onAssetAdded, selectedAs
         <div className="flex justify-end space-x-3 pt-4 border-t border-gray-600">
           <WagmiButton
             type="button"
-            variant="secondary"
+            variant="outline"
             onClick={handleClose}
             disabled={loading}
           >
