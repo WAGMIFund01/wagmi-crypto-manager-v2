@@ -126,14 +126,14 @@ export function PriceCard({
         {marketCap && (
           <div className="text-sm text-gray-600">
             <span className="font-medium">Market Cap:</span>{' '}
-            {formatPrice(marketCap, 0)}
+            {formatPrice(marketCap, { decimals: 0 })}
           </div>
         )}
         
         {volume24h && (
           <div className="text-sm text-gray-600">
             <span className="font-medium">24h Volume:</span>{' '}
-            {formatPrice(volume24h, 0)}
+            {formatPrice(volume24h, { decimals: 0 })}
           </div>
         )}
         
