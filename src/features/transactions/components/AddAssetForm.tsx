@@ -39,6 +39,8 @@ export default function AddAssetForm({ isOpen, onClose, onAssetAdded, selectedAs
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
+    console.log('Form submitted:', { selectedAsset, quantity, loading });
+    
     if (!selectedAsset) {
       setError('Please select an asset');
       return;
@@ -278,6 +280,7 @@ export default function AddAssetForm({ isOpen, onClose, onAssetAdded, selectedAs
             type="submit"
             variant="primary"
             disabled={!selectedAsset || !quantity || loading}
+            onClick={() => console.log('Add Asset button clicked:', { selectedAsset, quantity, loading })}
           >
             {loading ? (
               <>

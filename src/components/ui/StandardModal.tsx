@@ -96,7 +96,7 @@ export default function StandardModal({
       
       {/* Modal Content */}
       <div 
-        className={`relative w-full ${sizeClasses[size]} max-h-[90vh] overflow-hidden rounded-2xl transition-all duration-300 animate-in zoom-in-95 slide-in-from-bottom-4 ${className}`}
+        className={`relative w-full ${sizeClasses[size]} max-h-[90vh] flex flex-col rounded-2xl transition-all duration-300 animate-in zoom-in-95 slide-in-from-bottom-4 ${className}`}
         style={{
           backgroundColor: '#1A1F1A',
           borderRadius: '16px',
@@ -105,7 +105,7 @@ export default function StandardModal({
         }}
       >
         {/* Header */}
-        <div className="flex items-center justify-between p-6 border-b" style={{ borderColor: '#333' }}>
+        <div className="flex items-center justify-between p-6 border-b flex-shrink-0" style={{ borderColor: '#333' }}>
           <h2 
             className="text-xl font-semibold"
             style={{ 
@@ -128,8 +128,8 @@ export default function StandardModal({
           )}
         </div>
 
-        {/* Content */}
-        <div className="p-6">
+        {/* Content - Scrollable */}
+        <div className="flex-1 overflow-y-auto p-6">
           {children}
         </div>
       </div>
