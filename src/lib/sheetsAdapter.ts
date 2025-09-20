@@ -565,7 +565,7 @@ export class SheetsAdapter {
       // Delete the row
       await this.sheets.spreadsheets.batchUpdate({
         spreadsheetId: this.sheetId,
-        resource: {
+        requestBody: {
           requests: [{
             deleteDimension: {
               range: {
