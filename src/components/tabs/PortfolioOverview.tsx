@@ -69,21 +69,30 @@ export default function PortfolioOverview({ className, onRefresh, isPrivacyMode 
   };
 
   const handleRemoveAsset = async (symbol: string) => {
+    console.log('Delete button clicked for symbol:', symbol);
+    
     if (!confirm(`Are you sure you want to remove ${symbol} from the portfolio?`)) {
+      console.log('User cancelled deletion');
       return;
     }
 
+    console.log('User confirmed deletion, starting removal process...');
     setRemovingAsset(symbol);
     try {
+      console.log('Making API call to remove asset:', symbol);
       const response = await fetch(`/api/remove-asset?symbol=${encodeURIComponent(symbol)}`, {
         method: 'DELETE',
       });
 
+      console.log('API response status:', response.status);
       const data = await response.json();
+      console.log('API response data:', data);
 
       if (data.success) {
+        console.log('Asset removal successful, refreshing portfolio data');
         fetchPortfolioData(); // Refresh the portfolio data
       } else {
+        console.log('Asset removal failed:', data.error);
         alert(`Failed to remove asset: ${data.error}`);
       }
     } catch (err) {
