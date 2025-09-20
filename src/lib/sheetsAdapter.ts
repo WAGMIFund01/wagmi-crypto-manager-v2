@@ -517,7 +517,7 @@ export class SheetsAdapter {
         range,
         valueInputOption: 'RAW',
         insertDataOption: 'INSERT_ROWS',
-        resource: {
+        requestBody: {
           values: [assetRow]
         }
       });
