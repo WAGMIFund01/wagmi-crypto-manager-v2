@@ -471,6 +471,9 @@ export default function Investors({ isPrivacyMode = false, onRefresh }: Investor
                   Name
                 </th>
                 <th className="px-4 py-3 text-left text-xs font-medium uppercase tracking-wider" style={{ color: '#A0A0A0' }}>
+                  Type
+                </th>
+                <th className="px-4 py-3 text-left text-xs font-medium uppercase tracking-wider" style={{ color: '#A0A0A0' }}>
                   Join Date
                 </th>
                 <th className="px-4 py-3 text-left text-xs font-medium uppercase tracking-wider" style={{ color: '#A0A0A0' }}>
@@ -484,9 +487,6 @@ export default function Investors({ isPrivacyMode = false, onRefresh }: Investor
                 </th>
                 <th className="px-4 py-3 text-left text-xs font-medium uppercase tracking-wider" style={{ color: '#A0A0A0' }}>
                   Return %
-                </th>
-                <th className="px-4 py-3 text-left text-xs font-medium uppercase tracking-wider" style={{ color: '#A0A0A0' }}>
-                  Type
                 </th>
                 <th className="px-4 py-3 text-left text-xs font-medium uppercase tracking-wider" style={{ color: '#A0A0A0' }}>
                   Fees
@@ -516,7 +516,10 @@ export default function Investors({ isPrivacyMode = false, onRefresh }: Investor
                   <td className="px-4 py-3 text-sm" style={{ color: '#FFFFFF' }}>
                     {isPrivacyMode ? createMask() : investor.name}
                   </td>
-                  <td className="px-4 py-3 text-sm" style={{ color: '#A0A0A0' }}>
+                  <td className="px-4 py-3 text-sm" style={{ color: '#FFFFFF' }}>
+                    {investor.investorType || 'N/A'}
+                  </td>
+                  <td className="px-4 py-3 text-sm" style={{ color: '#FFFFFF' }}>
                     {formatDate(investor.joinDate)}
                   </td>
                   <td className="px-4 py-3 text-sm" style={{ color: '#FFFFFF' }}>
@@ -525,14 +528,11 @@ export default function Investors({ isPrivacyMode = false, onRefresh }: Investor
                   <td className="px-4 py-3 text-sm" style={{ color: '#FFFFFF' }}>
                     {isPrivacyMode ? createMask() : formatCurrency(investor.currentValue)}
                   </td>
-                  <td className="px-4 py-3 text-sm" style={{ color: isPrivacyMode ? '#FFFFFF' : '#A0A0A0' }}>
+                  <td className="px-4 py-3 text-sm" style={{ color: '#FFFFFF' }}>
                     {isPrivacyMode ? createMask() : `${(investor.sharePercentage * 100).toFixed(1)}%`}
                   </td>
                   <td className="px-4 py-3 text-sm font-medium" style={{ color: investor.returnPercentage >= 0 ? '#00FF95' : '#FF4D4D' }}>
                     {formatPercentage(investor.returnPercentage)}
-                  </td>
-                  <td className="px-4 py-3 text-sm" style={{ color: '#FFFFFF' }}>
-                    {investor.investorType || 'N/A'}
                   </td>
                   <td className="px-4 py-3 text-sm" style={{ color: '#FFFFFF' }}>
                     {isPrivacyMode ? createMask() : formatCurrency(investor.fees)}
