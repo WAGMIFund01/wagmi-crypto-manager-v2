@@ -4,6 +4,7 @@ import { assetManagementService } from '@/features/transactions/services/AssetMa
 export async function POST(request: Request) {
   try {
     const body = await request.json();
+    console.log('Received request body:', body);
     const { coinGeckoId, symbol, name, quantity, currentPrice, chain, riskLevel, location, coinType, thesis } = body;
 
     // Validate required fields

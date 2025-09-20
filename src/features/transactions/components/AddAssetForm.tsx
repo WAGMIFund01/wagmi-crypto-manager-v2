@@ -40,6 +40,12 @@ export default function AddAssetForm({ isOpen, onClose, onAssetAdded, selectedAs
     e.preventDefault();
     
     console.log('Form submitted:', { selectedAsset, quantity, loading });
+    console.log('Selected asset details:', selectedAsset ? {
+      id: selectedAsset.id,
+      symbol: selectedAsset.symbol,
+      name: selectedAsset.name,
+      current_price: selectedAsset.current_price
+    } : 'No selected asset');
     
     if (!selectedAsset) {
       setError('Please select an asset');
@@ -55,23 +61,27 @@ export default function AddAssetForm({ isOpen, onClose, onAssetAdded, selectedAs
     setError(null);
 
     try {
+      const requestData = {
+        coinGeckoId: selectedAsset.id,
+        symbol: selectedAsset.symbol,
+        name: selectedAsset.name,
+        quantity: parseFloat(quantity),
+        currentPrice: selectedAsset.current_price || 0,
+        chain: chain.trim(),
+        riskLevel: riskLevel,
+        location: location.trim(),
+        coinType: coinType,
+        thesis: thesis.trim()
+      };
+      
+      console.log('Sending request data:', requestData);
+      
       const response = await fetch('/api/add-asset', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({
-          coinGeckoId: selectedAsset.id,
-          symbol: selectedAsset.symbol,
-          name: selectedAsset.name,
-          quantity: parseFloat(quantity),
-          currentPrice: selectedAsset.current_price || 0,
-          chain: chain.trim(),
-          riskLevel: riskLevel,
-          location: location.trim(),
-          coinType: coinType,
-          thesis: thesis.trim()
-        }),
+        body: JSON.stringify(requestData),
       });
 
       const data = await response.json();
