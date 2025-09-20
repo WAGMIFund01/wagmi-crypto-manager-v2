@@ -503,6 +503,10 @@ export class SheetsAdapter {
    */
   async addPortfolioAsset(assetRow: any[]): Promise<void> {
     try {
+      if (!this.sheets) {
+        throw new Error('Sheets API not initialized');
+      }
+
       console.log('Adding new asset to portfolio:', assetRow);
 
       const range = 'Portfolio Overview!A:M'; // All columns from A to M
@@ -530,6 +534,10 @@ export class SheetsAdapter {
    */
   async removePortfolioAsset(symbol: string): Promise<void> {
     try {
+      if (!this.sheets) {
+        throw new Error('Sheets API not initialized');
+      }
+
       console.log('Removing asset from portfolio:', symbol);
 
       // First, get all portfolio data to find the row index
