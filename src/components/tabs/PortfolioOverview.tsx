@@ -1,12 +1,14 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { PortfolioAsset } from '@/lib/sheetsAdapter';
 import { StackedBarChart, WagmiCard, WagmiSpinner, WagmiText, WagmiButton } from '@/components/ui';
+import SortableHeader from '@/components/ui/SortableHeader';
 import AssetSearchModal from '@/features/transactions/components/AssetSearchModal';
 import AddAssetForm from '@/features/transactions/components/AddAssetForm';
 import EditAssetForm from '@/features/transactions/components/EditAssetForm';
 import { AssetSearchResult } from '@/features/transactions/services/AssetSearchService';
+import { sortData, createSortHandler, SortConfig } from '@/shared/utils/sorting';
 
 interface PortfolioOverviewProps {
   className?: string;
@@ -26,6 +28,16 @@ export default function PortfolioOverview({ className, onRefresh, isPrivacyMode 
   const [removingAsset, setRemovingAsset] = useState<string | null>(null);
   const [editingAsset, setEditingAsset] = useState<PortfolioAsset | null>(null);
   const [showEditForm, setShowEditForm] = useState(false);
+  
+  // Sorting state
+  const [sortConfig, setSortConfig] = useState<SortConfig>({ key: '', direction: null });
+  
+  // Sorting logic
+  const sortedAssets = useMemo(() => {
+    return sortData(assets, sortConfig);
+  }, [assets, sortConfig]);
+  
+  const handleSort = createSortHandler(sortConfig, setSortConfig);
 
   const fetchPortfolioData = async () => {
     try {
@@ -397,7 +409,7 @@ export default function PortfolioOverview({ className, onRefresh, isPrivacyMode 
         {/* Mobile Layout */}
         <div className="md:hidden">
           <div className="p-4 space-y-4">
-            {assets.map((asset, index) => (
+            {sortedAssets.map((asset, index) => (
               <div key={`${asset.symbol}-${index}`} className="bg-gray-800/50 rounded-lg p-4 border border-gray-700">
                 {/* Asset Header */}
                 <div className="flex justify-between items-start mb-3">
@@ -477,40 +489,40 @@ export default function PortfolioOverview({ className, onRefresh, isPrivacyMode 
             <table className="w-full">
             <thead className="bg-gray-900/50">
               <tr>
-                <th className="px-6 py-3 text-left">
-                  <WagmiText variant="label" color="muted">Asset</WagmiText>
-                </th>
-                <th className="px-6 py-3 text-left">
-                  <WagmiText variant="label" color="muted">Chain</WagmiText>
-                </th>
-                <th className="px-6 py-3 text-left">
-                  <WagmiText variant="label" color="muted">Risk</WagmiText>
-                </th>
-                <th className="px-6 py-3 text-left">
-                  <WagmiText variant="label" color="muted">Location</WagmiText>
-                </th>
-                <th className="px-6 py-3 text-left">
-                  <WagmiText variant="label" color="muted">Type</WagmiText>
-                </th>
-                <th className="px-6 py-3 text-right">
-                  <WagmiText variant="label" color="muted">Quantity</WagmiText>
-                </th>
-                <th className="px-6 py-3 text-right">
-                  <WagmiText variant="label" color="muted">Price</WagmiText>
-                </th>
-                <th className="px-6 py-3 text-right">
-                  <WagmiText variant="label" color="muted">24h Change</WagmiText>
-                </th>
-                <th className="px-6 py-3 text-right">
-                  <WagmiText variant="label" color="muted">Value</WagmiText>
-                </th>
+                <SortableHeader sortKey="assetName" currentSort={sortConfig} onSort={handleSort} align="left">
+                  Asset
+                </SortableHeader>
+                <SortableHeader sortKey="chain" currentSort={sortConfig} onSort={handleSort} align="left">
+                  Chain
+                </SortableHeader>
+                <SortableHeader sortKey="riskLevel" currentSort={sortConfig} onSort={handleSort} align="left">
+                  Risk
+                </SortableHeader>
+                <SortableHeader sortKey="location" currentSort={sortConfig} onSort={handleSort} align="left">
+                  Location
+                </SortableHeader>
+                <SortableHeader sortKey="coinType" currentSort={sortConfig} onSort={handleSort} align="left">
+                  Type
+                </SortableHeader>
+                <SortableHeader sortKey="quantity" currentSort={sortConfig} onSort={handleSort} align="right">
+                  Quantity
+                </SortableHeader>
+                <SortableHeader sortKey="currentPrice" currentSort={sortConfig} onSort={handleSort} align="right">
+                  Price
+                </SortableHeader>
+                <SortableHeader sortKey="priceChange24h" currentSort={sortConfig} onSort={handleSort} align="right">
+                  24h Change
+                </SortableHeader>
+                <SortableHeader sortKey="totalValue" currentSort={sortConfig} onSort={handleSort} align="right">
+                  Value
+                </SortableHeader>
                 <th className="px-6 py-3 text-center">
                   <WagmiText variant="label" color="muted">Actions</WagmiText>
                 </th>
               </tr>
             </thead>
             <tbody className="divide-y divide-gray-700">
-              {assets.map((asset, index) => (
+              {sortedAssets.map((asset, index) => (
                 <tr key={`${asset.symbol}-${index}`} className="hover:bg-gray-800/30 transition-colors">
                   <td className="px-6 py-4 whitespace-nowrap">
                     <div>

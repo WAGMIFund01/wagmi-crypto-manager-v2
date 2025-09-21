@@ -3,6 +3,8 @@
 import { useState, useEffect, useMemo } from 'react';
 import TransactionModal from '@/components/TransactionModal';
 import { WagmiInput, FilterGroup, FilterChip, WagmiSpinner } from '@/components/ui';
+import SortableHeader from '@/components/ui/SortableHeader';
+import { sortData, createSortHandler, SortConfig } from '@/shared/utils/sorting';
 
 interface Investor {
   id: string;
@@ -36,6 +38,9 @@ export default function Investors({ isPrivacyMode = false, onRefresh }: Investor
     size: [] as string[],
     share: [] as string[]
   });
+  
+  // Sorting state
+  const [sortConfig, setSortConfig] = useState<SortConfig>({ key: '', direction: null });
 
   const fetchInvestors = async () => {
     try {
@@ -214,6 +219,13 @@ export default function Investors({ isPrivacyMode = false, onRefresh }: Investor
 
     return filtered;
   }, [investors, searchQuery, filters]);
+  
+  // Sort the filtered investors
+  const sortedInvestors = useMemo(() => {
+    return sortData(filteredInvestors, sortConfig);
+  }, [filteredInvestors, sortConfig]);
+  
+  const handleSort = createSortHandler(sortConfig, setSortConfig);
 
   // Handle row click to open transaction modal
   const handleRowClick = (investor: Investor) => {
@@ -400,7 +412,7 @@ export default function Investors({ isPrivacyMode = false, onRefresh }: Investor
         {/* Mobile Layout */}
         <div className="md:hidden">
           <div className="p-4 space-y-4">
-            {filteredInvestors.map((investor, index) => (
+            {sortedInvestors.map((investor, index) => (
               <div 
                 key={investor.id} 
                 onClick={() => handleRowClick(investor)}
@@ -464,37 +476,37 @@ export default function Investors({ isPrivacyMode = false, onRefresh }: Investor
             <table className="w-full">
             <thead>
               <tr style={{ backgroundColor: '#2A2A2A' }}>
-                <th className="px-4 py-3 text-left text-xs font-medium uppercase tracking-wider" style={{ color: '#A0A0A0' }}>
+                <SortableHeader sortKey="id" currentSort={sortConfig} onSort={handleSort} align="left">
                   ID
-                </th>
-                <th className="px-4 py-3 text-left text-xs font-medium uppercase tracking-wider" style={{ color: '#A0A0A0' }}>
+                </SortableHeader>
+                <SortableHeader sortKey="name" currentSort={sortConfig} onSort={handleSort} align="left">
                   Name
-                </th>
-                <th className="px-4 py-3 text-left text-xs font-medium uppercase tracking-wider" style={{ color: '#A0A0A0' }}>
+                </SortableHeader>
+                <SortableHeader sortKey="investorType" currentSort={sortConfig} onSort={handleSort} align="left">
                   Type
-                </th>
-                <th className="px-4 py-3 text-left text-xs font-medium uppercase tracking-wider" style={{ color: '#A0A0A0' }}>
+                </SortableHeader>
+                <SortableHeader sortKey="joinDate" currentSort={sortConfig} onSort={handleSort} align="left">
                   Join Date
-                </th>
-                <th className="px-4 py-3 text-left text-xs font-medium uppercase tracking-wider" style={{ color: '#A0A0A0' }}>
+                </SortableHeader>
+                <SortableHeader sortKey="investmentValue" currentSort={sortConfig} onSort={handleSort} align="left">
                   Investment
-                </th>
-                <th className="px-4 py-3 text-left text-xs font-medium uppercase tracking-wider" style={{ color: '#A0A0A0' }}>
+                </SortableHeader>
+                <SortableHeader sortKey="currentValue" currentSort={sortConfig} onSort={handleSort} align="left">
                   Current Value
-                </th>
-                <th className="px-4 py-3 text-left text-xs font-medium uppercase tracking-wider" style={{ color: '#A0A0A0' }}>
+                </SortableHeader>
+                <SortableHeader sortKey="sharePercentage" currentSort={sortConfig} onSort={handleSort} align="left">
                   Share %
-                </th>
-                <th className="px-4 py-3 text-left text-xs font-medium uppercase tracking-wider" style={{ color: '#A0A0A0' }}>
+                </SortableHeader>
+                <SortableHeader sortKey="returnPercentage" currentSort={sortConfig} onSort={handleSort} align="left">
                   Return %
-                </th>
-                <th className="px-4 py-3 text-left text-xs font-medium uppercase tracking-wider" style={{ color: '#A0A0A0' }}>
+                </SortableHeader>
+                <SortableHeader sortKey="fees" currentSort={sortConfig} onSort={handleSort} align="left">
                   Fees
-                </th>
+                </SortableHeader>
               </tr>
             </thead>
             <tbody>
-              {filteredInvestors.map((investor, index) => (
+              {sortedInvestors.map((investor, index) => (
                 <tr
                   key={investor.id}
                   onClick={() => handleRowClick(investor)}
