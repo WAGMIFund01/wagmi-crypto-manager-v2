@@ -1,10 +1,10 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { WagmiButton } from '@/components/ui/WagmiButton';
-import { WagmiInput } from '@/components/ui/WagmiInput';
-import { WagmiCard } from '@/components/ui/WagmiCard';
-import { WagmiSpinner } from '@/components/ui/WagmiSpinner';
+import WagmiButton from '@/components/ui/WagmiButton';
+import WagmiInput from '@/components/ui/WagmiInput';
+import WagmiCard from '@/components/ui/WagmiCard';
+import WagmiSpinner from '@/components/ui/WagmiSpinner';
 import { PortfolioAsset } from '@/lib/sheetsAdapter';
 
 interface EditAssetFormProps {
