@@ -137,13 +137,16 @@ export async function POST(request: NextRequest) {
           throw new Error(`CoinGecko API error: ${priceResponse.status} ${priceResponse.statusText}`);
         }
 
-        priceData = await priceResponse.json();
-        console.log('CoinGecko API response data:', priceData);
+        const responseData = await priceResponse.json();
+        console.log('CoinGecko API response data:', responseData);
         
         // Check for rate limit error in response body
-        if (priceData.status && priceData.status.error_code === 429) {
-          throw new Error(`CoinGecko API rate limit exceeded: ${priceData.status.error_message}`);
+        if (responseData.status && responseData.status.error_code === 429) {
+          throw new Error(`CoinGecko API rate limit exceeded: ${responseData.status.error_message}`);
         }
+        
+        // If no error, use the response data as price data
+        priceData = responseData;
       } catch (error) {
         coinGeckoError = error instanceof Error ? error.message : 'Unknown CoinGecko API error';
         console.error('CoinGecko API error:', error);
