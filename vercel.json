@@ -1,6 +1,6 @@
 {
   "framework": "nextjs",
-  "buildCommand": "npm run test:run && npm run build",
+  "buildCommand": "NODE_ENV=test npm run test:run && npm run build",
   "devCommand": "npm run dev",
   "installCommand": "npm install",
   "functions": {

@@ -14,7 +14,23 @@ global.React = React
 if (React.act) {
   global.React.act = React.act
 } else {
-  // Fallback for environments where React.act is not available
+  // Fallback for production builds where React.act is not available
+  global.React.act = ((callback: () => any) => {
+    const result = callback()
+    return result instanceof Promise ? result : Promise.resolve(result)
+  }) as typeof React.act
+}
+
+// Mock React.act for production builds
+if (typeof global.React.act === 'undefined') {
+  global.React.act = ((callback: () => any) => {
+    const result = callback()
+    return result instanceof Promise ? result : Promise.resolve(result)
+  }) as typeof React.act
+}
+
+// Additional fallback for production builds
+if (!global.React.act) {
   global.React.act = ((callback: () => any) => {
     const result = callback()
     return result instanceof Promise ? result : Promise.resolve(result)

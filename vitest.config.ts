@@ -21,6 +21,10 @@ export default defineConfig({
     // Add test timeout and retry configuration
     testTimeout: 10000,
     hookTimeout: 10000,
+    // Force development mode for testing
+    env: {
+      NODE_ENV: 'test'
+    },
     coverage: {
       provider: 'v8',
       reporter: ['text', 'json', 'html'],
