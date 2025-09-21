@@ -18,7 +18,7 @@ export default async function DashboardPage() {
   const transformedKpiData = kpiData ? {
     activeInvestors: kpiData.totalInvestors.toString(),
     totalAUM: `$${kpiData.totalAUM.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`,
-    cumulativeReturn: `+${kpiData.cumulativeReturn.toFixed(1)}%`,
+    cumulativeReturn: `${kpiData.cumulativeReturn >= 0 ? '+' : ''}${kpiData.cumulativeReturn.toFixed(1)}%`,
     monthOnMonth: `${kpiData.monthlyReturn >= 0 ? '+' : ''}${kpiData.monthlyReturn.toFixed(1)}%`,
     lastUpdated: kpiData.lastUpdated
   } : null;

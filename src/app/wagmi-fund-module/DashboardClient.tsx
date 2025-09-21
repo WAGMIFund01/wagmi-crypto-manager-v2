@@ -135,7 +135,7 @@ export default function DashboardClient({ session, kpiData: initialKpiData, hasE
         const transformedKpiData = {
           activeInvestors: freshKpiData.totalInvestors.toString(),
           totalAUM: `$${freshKpiData.totalAUM.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`,
-          cumulativeReturn: `+${freshKpiData.cumulativeReturn.toFixed(1)}%`,
+          cumulativeReturn: `${freshKpiData.cumulativeReturn >= 0 ? '+' : ''}${freshKpiData.cumulativeReturn.toFixed(1)}%`,
           monthOnMonth: `${freshKpiData.monthlyReturn >= 0 ? '+' : ''}${freshKpiData.monthlyReturn.toFixed(1)}%`,
           lastUpdated: freshKpiData.lastUpdated
         };
