@@ -232,36 +232,30 @@ export default function AddAssetForm({ isOpen, onClose, onAssetAdded, selectedAs
         {/* Optional Fields */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div>
-            <label className="block text-sm font-medium text-gray-300 mb-2">
-              Chain
-              {selectedAsset && chain && (
-                <span className="ml-2 text-xs text-green-400 bg-green-400/10 px-2 py-1 rounded">
-                  Auto-detected
-                </span>
-              )}
-            </label>
-            <WagmiInput
-              type="text"
-              placeholder="e.g., Ethereum, Solana"
+            <SmartDropdown
+              label="Chain"
               value={chain}
-              onChange={(e) => setChain(e.target.value)}
+              onChange={setChain}
+              placeholder="e.g., Ethereum, Solana"
+              options={fieldOptions.chains}
               className="w-full"
             />
+            {selectedAsset && chain && (
+              <span className="text-xs text-green-400 bg-green-400/10 px-2 py-1 rounded mt-1 inline-block">
+                Auto-detected
+              </span>
+            )}
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-300 mb-2">
-              Risk Level
-            </label>
-            <select
+            <SmartDropdown
+              label="Risk Level"
               value={riskLevel}
-              onChange={(e) => setRiskLevel(e.target.value)}
-              className="w-full px-3 py-2 bg-gray-800 border border-gray-600 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent"
-            >
-              <option value="Low">Low</option>
-              <option value="Medium">Medium</option>
-              <option value="High">High</option>
-            </select>
+              onChange={setRiskLevel}
+              placeholder="Select risk level"
+              options={fieldOptions.riskLevels}
+              className="w-full"
+            />
           </div>
 
           <div>

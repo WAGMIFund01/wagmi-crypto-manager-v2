@@ -22,8 +22,6 @@ interface EditAssetFormProps {
   onClose: () => void;
 }
 
-const RISK_LEVELS = ['Low', 'Medium', 'High'];
-
 export default function EditAssetForm({ isOpen, asset, onSave, onClose }: EditAssetFormProps) {
   const [formData, setFormData] = useState({
     symbol: asset.symbol,
@@ -114,19 +112,15 @@ export default function EditAssetForm({ isOpen, asset, onSave, onClose }: EditAs
 
             {/* Risk Level */}
             <div>
-              <label className="block text-sm font-medium text-gray-300 mb-2">
-                Risk Level
-              </label>
-              <select
+              <SmartDropdown
+                label="Risk Level"
                 value={formData.riskLevel}
-                onChange={(e) => handleInputChange('riskLevel', e.target.value)}
-                className="w-full px-3 py-2 bg-gray-800 border border-gray-600 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent disabled:opacity-50"
+                onChange={(value) => handleInputChange('riskLevel', value)}
+                placeholder="Select risk level"
+                options={fieldOptions.riskLevels}
                 disabled={isSubmitting}
-              >
-                {RISK_LEVELS.map(level => (
-                  <option key={level} value={level}>{level}</option>
-                ))}
-              </select>
+                className="w-full"
+              />
             </div>
 
             {/* Location */}
