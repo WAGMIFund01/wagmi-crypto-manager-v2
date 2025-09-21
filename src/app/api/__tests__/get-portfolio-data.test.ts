@@ -44,7 +44,7 @@ describe('/api/get-portfolio-data', () => {
     expect(response.status).toBe(200)
     expect(result).toEqual({
       success: true,
-      portfolio: mockData
+      assets: mockData
     })
     expect(sheetsAdapter.getPortfolioData).toHaveBeenCalledOnce()
   })
@@ -64,7 +64,7 @@ describe('/api/get-portfolio-data', () => {
     expect(response.status).toBe(200)
     expect(result).toEqual({
       success: true,
-      portfolio: mockError
+      assets: mockError
     })
   })
 
