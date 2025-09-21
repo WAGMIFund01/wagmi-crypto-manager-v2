@@ -4,9 +4,11 @@ import { useState } from 'react';
 import WagmiButton from '@/components/ui/WagmiButton';
 import WagmiInput from '@/components/ui/WagmiInput';
 import WagmiCard from '@/components/ui/WagmiCard';
+import StandardModal from '@/components/ui/StandardModal';
 import { PortfolioAsset } from '@/lib/sheetsAdapter';
 
 interface EditAssetFormProps {
+  isOpen: boolean;
   asset: PortfolioAsset;
   onSave: (data: {
     symbol: string;
@@ -16,12 +18,12 @@ interface EditAssetFormProps {
     coinType: string;
     thesis: string;
   }) => Promise<void>;
-  onCancel: () => void;
+  onClose: () => void;
 }
 
 const RISK_LEVELS = ['Low', 'Medium', 'High'];
 
-export default function EditAssetForm({ asset, onSave, onCancel }: EditAssetFormProps) {
+export default function EditAssetForm({ isOpen, asset, onSave, onClose }: EditAssetFormProps) {
   const [formData, setFormData] = useState({
     symbol: asset.symbol,
     quantity: asset.quantity.toString(),
@@ -76,20 +78,20 @@ export default function EditAssetForm({ asset, onSave, onCancel }: EditAssetForm
   };
 
   return (
-    <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-      <WagmiCard className="w-full max-w-md">
-        <div className="p-6">
-          <h2 className="text-xl font-semibold text-white mb-6">
-            Edit {asset.assetName} ({asset.symbol})
-          </h2>
+    <StandardModal
+      isOpen={isOpen}
+      onClose={onClose}
+      title={`Edit ${asset.assetName} (${asset.symbol})`}
+      size="lg"
+      theme="green"
+    >
+      {error && (
+        <div className="mb-4 p-3 bg-red-900/20 border border-red-500/30 rounded-lg">
+          <p className="text-red-400 text-sm">{error}</p>
+        </div>
+      )}
 
-          {error && (
-            <div className="mb-4 p-3 bg-red-900/20 border border-red-500/30 rounded-lg">
-              <p className="text-red-400 text-sm">{error}</p>
-            </div>
-          )}
-
-          <form onSubmit={handleSubmit} className="space-y-4">
+      <form onSubmit={handleSubmit} className="space-y-4">
             {/* Quantity */}
             <div>
               <label className="block text-sm font-medium text-gray-300 mb-2">
@@ -195,29 +197,27 @@ export default function EditAssetForm({ asset, onSave, onCancel }: EditAssetForm
               </div>
             </div>
 
-            {/* Action Buttons */}
-            <div className="flex gap-3 pt-4">
-              <WagmiButton
-                type="button"
-                theme="gray"
-                onClick={onCancel}
-                disabled={isSubmitting}
-                className="flex-1"
-              >
-                Cancel
-              </WagmiButton>
-              <WagmiButton
-                type="submit"
-                theme="green"
-                disabled={isSubmitting}
-                className="flex-1"
-              >
-                {isSubmitting ? "Updating..." : "Update Asset"}
-              </WagmiButton>
-            </div>
-          </form>
+        {/* Action Buttons */}
+        <div className="flex gap-3 pt-4">
+          <WagmiButton
+            type="button"
+            theme="gray"
+            onClick={onClose}
+            disabled={isSubmitting}
+            className="flex-1"
+          >
+            Cancel
+          </WagmiButton>
+          <WagmiButton
+            type="submit"
+            theme="green"
+            disabled={isSubmitting}
+            className="flex-1"
+          >
+            {isSubmitting ? "Updating..." : "Update Asset"}
+          </WagmiButton>
         </div>
-      </WagmiCard>
-    </div>
+      </form>
+    </StandardModal>
   );
 }

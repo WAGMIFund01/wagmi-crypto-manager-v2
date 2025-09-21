@@ -336,9 +336,27 @@ export default function PortfolioOverview({ className, onRefresh, isPrivacyMode 
   // Color palettes for different chart types
   // Use centralized chart colors
   const assetColors = Object.values(COLORS.chart);
-  const riskColors = COLORS.risk;
+  
+  // Risk colors - map to proper case
+  const riskColors = {
+    'High': COLORS.risk.high,
+    'Medium': COLORS.risk.medium,
+    'Low': COLORS.risk.low,
+    'Degen': COLORS.risk.degen,
+    'None': COLORS.risk.none
+  };
+  
   const locationColors = Object.values(COLORS.chart);
-  const typeColors = COLORS.assetType;
+  
+  // Asset type colors - map to proper case
+  const typeColors = {
+    'Memecoin': COLORS.assetType.memecoin,
+    'Major': COLORS.assetType.major,
+    'Altcoin': COLORS.assetType.altcoin,
+    'Stablecoin': COLORS.assetType.stablecoin,
+    'DeFi': '#FF6B35', // Add DeFi color
+    'NFT': '#EC4899'   // Add NFT color
+  };
 
 
   return (
@@ -602,9 +620,10 @@ export default function PortfolioOverview({ className, onRefresh, isPrivacyMode 
 
       {editingAsset && (
         <EditAssetForm
+          isOpen={!!editingAsset}
           asset={editingAsset}
           onSave={handleEditAssetSave}
-          onCancel={() => {
+          onClose={() => {
             setEditingAsset(null);
             setShowEditForm(false);
           }}
