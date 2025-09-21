@@ -32,10 +32,13 @@ export default function AddAssetForm({ isOpen, onClose, onAssetAdded, selectedAs
   useEffect(() => {
     setSelectedAsset(propSelectedAsset || null);
     
-    // Auto-detect chain when asset is selected
+    // Auto-detect chain when asset is selected (only if we find a valid match)
     if (propSelectedAsset) {
       const detectedChain = detectChain(propSelectedAsset.id, propSelectedAsset.symbol);
-      setChain(detectedChain.displayName);
+      // Only set chain if we found a valid match (not the default "Unknown Chain")
+      if (detectedChain.name !== 'Unknown') {
+        setChain(detectedChain.displayName);
+      }
     }
   }, [propSelectedAsset]);
 
