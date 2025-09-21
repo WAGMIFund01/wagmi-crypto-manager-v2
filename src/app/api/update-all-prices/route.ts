@@ -117,6 +117,9 @@ export async function POST(request: NextRequest) {
       
       console.log('CoinGecko API URL:', apiUrl);
       
+      // Add a small delay to avoid hitting rate limits
+      await new Promise(resolve => setTimeout(resolve, 1000));
+      
       try {
         const priceResponse = await fetch(apiUrl, {
           headers: {
@@ -128,14 +131,33 @@ export async function POST(request: NextRequest) {
         console.log('CoinGecko API response status:', priceResponse.status, priceResponse.statusText);
 
         if (!priceResponse.ok) {
+          if (priceResponse.status === 429) {
+            throw new Error('CoinGecko API rate limit exceeded. Please wait before trying again.');
+          }
           throw new Error(`CoinGecko API error: ${priceResponse.status} ${priceResponse.statusText}`);
         }
 
         priceData = await priceResponse.json();
         console.log('CoinGecko API response data:', priceData);
+        
+        // Check for rate limit error in response body
+        if (priceData.status && priceData.status.error_code === 429) {
+          throw new Error(`CoinGecko API rate limit exceeded: ${priceData.status.error_message}`);
+        }
       } catch (error) {
         coinGeckoError = error instanceof Error ? error.message : 'Unknown CoinGecko API error';
         console.error('CoinGecko API error:', error);
+        
+        // If rate limited, return early with error
+        if (coinGeckoError.includes('rate limit')) {
+          return NextResponse.json({
+            success: false,
+            error: 'CoinGecko API rate limit exceeded',
+            message: 'Price updates are temporarily unavailable due to API rate limits. Please try again later.',
+            coinGeckoApiError: coinGeckoError,
+            timestamp: new Date().toISOString()
+          }, { status: 429 });
+        }
       }
     } else {
       console.log('No CoinGecko IDs to fetch - all assets missing valid CoinGecko IDs');
