@@ -463,7 +463,7 @@ export default function InvestorPage() {
                 }}
               >
                 {privacyMode ? formatCurrency(portfolioData.totalPnl, privacyMode) : 
-                 (portfolioData.totalPnl >= 0 ? '+' : '') + formatCurrency(portfolioData.totalPnl, privacyMode)}
+                 (portfolioData.totalPnl >= 0 ? '+' : '') + formatCurrency(Math.abs(portfolioData.totalPnl), privacyMode)}
               </p>
             </div>
           </WagmiCard>
@@ -611,7 +611,7 @@ export default function InvestorPage() {
                         }}
                       >
                           {privacyMode ? '•••••' : 
-                           (transaction.amount >= 0 ? '+' : '') + formatCurrency(transaction.amount, false)}
+                           (transaction.amount >= 0 ? '+' : '') + formatCurrency(Math.abs(transaction.amount), false)}
                       </span>
                     </div>
                     
