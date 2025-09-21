@@ -8,7 +8,7 @@ interface StandardModalProps {
   onClose: () => void;
   title: string;
   children: ReactNode;
-  size?: 'sm' | 'md' | 'lg' | 'xl' | '2xl';
+  size?: 'sm' | 'md' | 'lg' | 'xl' | '2xl' | '3xl' | '4xl' | '5xl' | '6xl' | '7xl';
   theme?: 'green' | 'orange' | 'blue' | 'purple' | 'red';
   showCloseButton?: boolean;
   closeOnBackdropClick?: boolean;
@@ -20,7 +20,12 @@ const sizeClasses = {
   md: 'max-w-md',
   lg: 'max-w-lg',
   xl: 'max-w-xl',
-  '2xl': 'max-w-2xl'
+  '2xl': 'max-w-2xl',
+  '3xl': 'max-w-3xl',
+  '4xl': 'max-w-4xl',
+  '5xl': 'max-w-5xl',
+  '6xl': 'max-w-6xl',
+  '7xl': 'max-w-7xl'
 };
 
 const themeColors = {
@@ -83,30 +88,44 @@ export default function StandardModal({
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 animate-in fade-in duration-300">
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-2 sm:p-4 animate-in fade-in duration-300">
       {/* Frosted Glass Backdrop */}
       <div 
         className="absolute inset-0 transition-all duration-300 animate-in fade-in"
         style={{
-          background: 'rgba(0, 0, 0, 0.5)',
+          background: 'rgba(0, 0, 0, 0.6)',
           backdropFilter: 'blur(8px)',
-          WebkitBackdropFilter: 'blur(8px)'
+          WebkitBackdropFilter: 'blur(8px)',
+          // Enhanced frosted glass effect
+          backgroundImage: 'linear-gradient(135deg, rgba(255, 255, 255, 0.1) 0%, rgba(255, 255, 255, 0.05) 100%)',
         }}
         onClick={handleBackdropClick}
       />
       
       {/* Modal Content */}
       <div 
-        className={`relative w-full ${sizeClasses[size]} max-h-[90vh] flex flex-col rounded-2xl transition-all duration-300 animate-in zoom-in-95 slide-in-from-bottom-4 ${className}`}
+        className={`relative w-full ${sizeClasses[size]} max-h-[95vh] sm:max-h-[90vh] flex flex-col rounded-xl sm:rounded-2xl transition-all duration-300 animate-in zoom-in-95 slide-in-from-bottom-4 ${className}`}
         style={{
-          backgroundColor: '#1A1F1A',
+          backgroundColor: 'rgba(26, 31, 26, 0.95)',
           borderRadius: '16px',
-          boxShadow: `0 8px 32px rgba(0, 0, 0, 0.4), 0 0 0 1px rgba(255, 255, 255, 0.05), 0 0 15px ${colors.shadow}, 0 0 30px ${colors.glow}, 0 0 50px ${colors.outerGlow}`,
-          border: `1px solid ${colors.border}`
+          backdropFilter: 'blur(20px)',
+          WebkitBackdropFilter: 'blur(20px)',
+          boxShadow: `0 8px 32px rgba(0, 0, 0, 0.4), 0 0 0 1px rgba(255, 255, 255, 0.1), 0 0 15px ${colors.shadow}, 0 0 30px ${colors.glow}, 0 0 50px ${colors.outerGlow}`,
+          border: `1px solid ${colors.border}`,
+          // Enhanced frosted glass effect for modal content
+          backgroundImage: 'linear-gradient(135deg, rgba(255, 255, 255, 0.1) 0%, rgba(255, 255, 255, 0.05) 100%)',
         }}
       >
         {/* Header */}
-        <div className="flex items-center justify-between p-6 border-b flex-shrink-0" style={{ borderColor: '#333' }}>
+        <div 
+          className="flex items-center justify-between p-4 sm:p-6 border-b flex-shrink-0" 
+          style={{ 
+            borderColor: 'rgba(255, 255, 255, 0.1)',
+            backgroundImage: 'linear-gradient(135deg, rgba(255, 255, 255, 0.05) 0%, rgba(255, 255, 255, 0.02) 100%)',
+            backdropFilter: 'blur(10px)',
+            WebkitBackdropFilter: 'blur(10px)',
+          }}
+        >
           <h2 
             className="text-xl font-semibold"
             style={{ 
@@ -134,7 +153,7 @@ export default function StandardModal({
         </div>
 
         {/* Content - Scrollable */}
-        <div className="flex-1 overflow-y-auto p-6">
+        <div className="flex-1 overflow-y-auto p-4 sm:p-6">
           {children}
         </div>
       </div>
