@@ -144,8 +144,8 @@ export default function DashboardClient({ session, kpiData: initialKpiData, hasE
         setKpiData(transformedKpiData);
         console.log('KPI data refreshed successfully');
         
-        // Trigger portfolio data refresh
-        triggerDataRefresh();
+        // Don't trigger portfolio refresh here to avoid infinite loop
+        // Portfolio refresh is handled by the refreshTrigger state
       } else {
         console.error('Failed to fetch fresh KPI data');
       }
