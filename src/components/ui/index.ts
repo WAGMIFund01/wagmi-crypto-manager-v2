@@ -11,6 +11,7 @@ export { default as FilterGroup } from './FilterGroup';
 export { default as StackedBarChart } from './StackedBarChart';
 export { default as ModuleCard } from './ModuleCard';
 export { default as SmartDropdown } from './SmartDropdown';
+export { default as FormError, FieldError, FormErrorDisplay } from './FormError';
 
 // Icons
 export * from './icons/WagmiIcons';

@@ -15,6 +15,8 @@ interface WagmiInputProps extends Omit<React.InputHTMLAttributes<HTMLInputElemen
   iconPosition?: 'left' | 'right';
   showPasswordToggle?: boolean;
   children?: React.ReactNode;
+  validateOnBlur?: boolean;
+  onValidationChange?: (isValid: boolean, error?: string) => void;
 }
 
 const WagmiInput = forwardRef<HTMLInputElement, WagmiInputProps>(
@@ -28,6 +30,8 @@ const WagmiInput = forwardRef<HTMLInputElement, WagmiInputProps>(
     icon,
     iconPosition = 'left',
     showPasswordToggle = false,
+    validateOnBlur = false,
+    onValidationChange,
     className,
     type,
     ...props
@@ -192,6 +196,10 @@ const WagmiInput = forwardRef<HTMLInputElement, WagmiInputProps>(
             }}
             onBlur={(e) => {
               Object.assign(e.target.style, inputStyles);
+              if (validateOnBlur && onValidationChange) {
+                const isValid = !error;
+                onValidationChange(isValid, error || undefined);
+              }
             }}
             {...props}
           />

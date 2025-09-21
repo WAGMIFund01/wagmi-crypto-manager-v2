@@ -2,10 +2,12 @@
 
 import React, { useState, useEffect } from 'react';
 import StandardModal from '@/components/ui/StandardModal';
-import { WagmiInput, WagmiButton, WagmiSpinner, SmartDropdown } from '@/components/ui';
+import { WagmiInput, WagmiButton, WagmiSpinner, SmartDropdown, FormError, FormErrorDisplay } from '@/components/ui';
 import { AssetSearchResult } from '../services/AssetSearchService';
 import { detectChain } from '../utils/chainDetection';
 import { usePortfolioFieldOptions } from '@/hooks/usePortfolioFieldOptions';
+import { useFormValidation } from '@/hooks/useFormValidation';
+import { getFormRules } from '@/shared/utils/validation';
 
 interface AddAssetFormProps {
   isOpen: boolean;
@@ -16,17 +18,32 @@ interface AddAssetFormProps {
 
 export default function AddAssetForm({ isOpen, onClose, onAssetAdded, selectedAsset: propSelectedAsset }: AddAssetFormProps) {
   const [selectedAsset, setSelectedAsset] = useState<AssetSearchResult | null>(propSelectedAsset || null);
-  const [quantity, setQuantity] = useState('');
-  const [chain, setChain] = useState('');
-  const [riskLevel, setRiskLevel] = useState('');
-  const [location, setLocation] = useState('');
-  const [coinType, setCoinType] = useState('');
-  const [thesis, setThesis] = useState('');
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
+  const [submitError, setSubmitError] = useState<string | null>(null);
   
   // Fetch portfolio field options for smart dropdowns
   const { options: fieldOptions, loading: optionsLoading } = usePortfolioFieldOptions();
+  
+  // Form validation
+  const {
+    data: formData,
+    errors,
+    isValid,
+    setFieldValue,
+    validateForm,
+    resetForm,
+    clearErrors
+  } = useFormValidation({
+    rules: getFormRules('addAsset'),
+    initialData: {
+      quantity: '',
+      chain: '',
+      riskLevel: '',
+      location: '',
+      coinType: '',
+      thesis: ''
+    }
+  });
 
   // Sync with prop changes and auto-detect chain
   useEffect(() => {
@@ -37,23 +54,23 @@ export default function AddAssetForm({ isOpen, onClose, onAssetAdded, selectedAs
       const detectedChain = detectChain(propSelectedAsset.id, propSelectedAsset.symbol);
       // Only set chain if we found a valid match (not the default "Unknown Chain")
       if (detectedChain.name !== 'Unknown') {
-        setChain(detectedChain.displayName);
+        setFieldValue('chain', detectedChain.displayName);
       }
     }
-  }, [propSelectedAsset]);
+  }, [propSelectedAsset, setFieldValue]);
 
   const handleQuantityChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value;
     // Allow only positive numbers with up to 8 decimal places
     if (value === '' || /^\d*\.?\d{0,8}$/.test(value)) {
-      setQuantity(value);
+      setFieldValue('quantity', value);
     }
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
-    console.log('Form submitted:', { selectedAsset, quantity, loading });
+    console.log('Form submitted:', { selectedAsset, formData, loading });
     console.log('Selected asset details:', selectedAsset ? {
       id: selectedAsset.id,
       symbol: selectedAsset.symbol,
@@ -61,18 +78,21 @@ export default function AddAssetForm({ isOpen, onClose, onAssetAdded, selectedAs
       current_price: selectedAsset.current_price
     } : 'No selected asset');
     
-    if (!selectedAsset) {
-      setError('Please select an asset');
+    // Validate form
+    const validation = validateForm();
+    if (!validation.isValid) {
+      console.log('Form validation failed:', validation.errors);
       return;
     }
-
-    if (!quantity || parseFloat(quantity) <= 0) {
-      setError('Please enter a valid quantity');
+    
+    if (!selectedAsset) {
+      setSubmitError('Please select an asset');
       return;
     }
 
     setLoading(true);
-    setError(null);
+    setSubmitError(null);
+    clearErrors();
 
     // If current_price is missing, try to fetch it
     let assetToUse = selectedAsset;
@@ -86,13 +106,13 @@ export default function AddAssetForm({ isOpen, onClose, onAssetAdded, selectedAs
           assetToUse = data.asset;
           console.log('Updated asset with current price:', assetToUse.current_price);
         } else {
-          setError('Unable to fetch current price for this asset. Please try again.');
+          setSubmitError('Unable to fetch current price for this asset. Please try again.');
           setLoading(false);
           return;
         }
       } catch (error) {
         console.error('Error fetching current price:', error);
-        setError('Unable to fetch current price for this asset. Please try again.');
+        setSubmitError('Unable to fetch current price for this asset. Please try again.');
         setLoading(false);
         return;
       }
@@ -103,13 +123,13 @@ export default function AddAssetForm({ isOpen, onClose, onAssetAdded, selectedAs
         coinGeckoId: assetToUse.id,
         symbol: assetToUse.symbol,
         name: assetToUse.name,
-        quantity: parseFloat(quantity),
+        quantity: parseFloat(formData.quantity),
         currentPrice: assetToUse.current_price || 0,
-        chain: chain.trim(),
-        riskLevel: riskLevel,
-        location: location.trim(),
-        coinType: coinType,
-        thesis: thesis.trim()
+        chain: formData.chain.trim(),
+        riskLevel: formData.riskLevel,
+        location: formData.location.trim(),
+        coinType: formData.coinType,
+        thesis: formData.thesis.trim()
       };
       
       console.log('Sending request data:', requestData);
@@ -127,22 +147,17 @@ export default function AddAssetForm({ isOpen, onClose, onAssetAdded, selectedAs
       if (data.success) {
         // Reset form
         setSelectedAsset(null);
-        setQuantity('');
-        setChain('');
-        setRiskLevel('');
-        setLocation('');
-        setCoinType('');
-        setThesis('');
+        resetForm();
         
         // Close modal and refresh data
         onClose();
         onAssetAdded();
       } else {
-        setError(data.error || 'Failed to add asset');
+        setSubmitError(data.error || 'Failed to add asset');
       }
     } catch (err) {
       console.error('Error adding asset:', err);
-      setError('Failed to add asset');
+      setSubmitError('Failed to add asset');
     } finally {
       setLoading(false);
     }
@@ -151,18 +166,13 @@ export default function AddAssetForm({ isOpen, onClose, onAssetAdded, selectedAs
   const handleClose = () => {
     // Reset form state
     setSelectedAsset(null);
-    setQuantity('');
-    setChain('');
-    setRiskLevel('');
-    setLocation('');
-    setCoinType('');
-    setThesis('');
-    setError(null);
+    resetForm();
+    setSubmitError(null);
     onClose();
   };
 
-  const totalValue = selectedAsset && quantity 
-    ? (parseFloat(quantity) * (selectedAsset.current_price || 0))
+  const totalValue = selectedAsset && formData.quantity 
+    ? (parseFloat(formData.quantity) * (selectedAsset.current_price || 0))
     : 0;
 
   return (
@@ -212,15 +222,19 @@ export default function AddAssetForm({ isOpen, onClose, onAssetAdded, selectedAs
           <WagmiInput
             type="text"
             placeholder="Enter quantity"
-            value={quantity}
+            value={formData.quantity}
             onChange={handleQuantityChange}
+            error={errors.quantity}
             required
             className="w-full"
           />
+          {errors.quantity && (
+            <div className="mt-1 text-sm text-red-400">{errors.quantity}</div>
+          )}
         </div>
 
         {/* Total Value Display */}
-        {selectedAsset && quantity && (
+        {selectedAsset && formData.quantity && (
           <div className="p-3 bg-gray-800/30 rounded-lg">
             <div className="text-sm text-gray-400">Total Value</div>
             <div className="text-lg font-semibold text-green-400">
@@ -237,50 +251,62 @@ export default function AddAssetForm({ isOpen, onClose, onAssetAdded, selectedAs
           <div>
             <SmartDropdown
               label="Chain"
-              value={chain}
-              onChange={setChain}
+              value={formData.chain}
+              onChange={(value) => setFieldValue('chain', value)}
               placeholder="Select or type chain (e.g., Ethereum, Solana)"
               options={fieldOptions.chains}
               className="w-full"
             />
-            {selectedAsset && chain && (
+            {selectedAsset && formData.chain && (
               <span className="text-xs text-green-400 bg-green-400/10 px-2 py-1 rounded mt-1 inline-block">
                 Auto-detected
               </span>
+            )}
+            {errors.chain && (
+              <div className="mt-1 text-sm text-red-400">{errors.chain}</div>
             )}
           </div>
 
           <div>
             <SmartDropdown
               label="Risk Level"
-              value={riskLevel}
-              onChange={setRiskLevel}
+              value={formData.riskLevel}
+              onChange={(value) => setFieldValue('riskLevel', value)}
               placeholder="Select or type risk level (e.g., Low, Medium, High)"
               options={fieldOptions.riskLevels}
               className="w-full"
             />
+            {errors.riskLevel && (
+              <div className="mt-1 text-sm text-red-400">{errors.riskLevel}</div>
+            )}
           </div>
 
           <div>
             <SmartDropdown
               label="Location"
-              value={location}
-              onChange={setLocation}
+              value={formData.location}
+              onChange={(value) => setFieldValue('location', value)}
               placeholder="Select or type location (e.g., Phantom, Exchange)"
               options={fieldOptions.locations}
               className="w-full"
             />
+            {errors.location && (
+              <div className="mt-1 text-sm text-red-400">{errors.location}</div>
+            )}
           </div>
 
           <div>
             <SmartDropdown
               label="Coin Type"
-              value={coinType}
-              onChange={setCoinType}
+              value={formData.coinType}
+              onChange={(value) => setFieldValue('coinType', value)}
               placeholder="Select or type coin type (e.g., Altcoin, Memecoin, Major)"
               options={fieldOptions.coinTypes}
               className="w-full"
             />
+            {errors.coinType && (
+              <div className="mt-1 text-sm text-red-400">{errors.coinType}</div>
+            )}
           </div>
         </div>
 
@@ -291,18 +317,19 @@ export default function AddAssetForm({ isOpen, onClose, onAssetAdded, selectedAs
           </label>
           <textarea
             placeholder="Describe the investment rationale..."
-            value={thesis}
-            onChange={(e) => setThesis(e.target.value)}
+            value={formData.thesis}
+            onChange={(e) => setFieldValue('thesis', e.target.value)}
             rows={3}
             className="w-full px-3 py-2 bg-gray-800 border border-gray-600 rounded-lg text-white focus:outline-none focus:border-green-500 resize-none"
           />
+          {errors.thesis && (
+            <div className="mt-1 text-sm text-red-400">{errors.thesis}</div>
+          )}
         </div>
 
         {/* Error Display */}
-        {error && (
-          <div className="p-3 bg-red-900/20 border border-red-500 rounded-lg">
-            <p className="text-red-400 text-sm">{error}</p>
-          </div>
+        {submitError && (
+          <FormError error={submitError} />
         )}
 
         {/* Action Buttons */}
@@ -318,8 +345,8 @@ export default function AddAssetForm({ isOpen, onClose, onAssetAdded, selectedAs
           <WagmiButton
             type="submit"
             variant="primary"
-            disabled={!selectedAsset || !quantity || loading}
-            onClick={() => console.log('Add Asset button clicked:', { selectedAsset, quantity, loading })}
+            disabled={!selectedAsset || !formData.quantity || loading || !isValid}
+            onClick={() => console.log('Add Asset button clicked:', { selectedAsset, formData, loading })}
           >
             {loading ? (
               <>
