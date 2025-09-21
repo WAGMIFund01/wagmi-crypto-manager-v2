@@ -108,6 +108,8 @@ export default function DashboardClient({ session, kpiData: initialKpiData, hasE
   const triggerDataRefresh = () => {
     setRefreshTrigger(prev => prev + 1);
     console.log('Data refresh triggered');
+    // Also trigger KPI data refresh to update AUM ribbon
+    handleKpiRefresh();
   };
 
   // Handle comprehensive data refresh
