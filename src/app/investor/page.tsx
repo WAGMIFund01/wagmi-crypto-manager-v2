@@ -8,6 +8,7 @@ import WagmiSpinner from '@/components/ui/WagmiSpinner';
 import { StackedBarChart } from '@/components/ui';
 // Removed Card, CardContent - now using WagmiCard
 import { formatCurrency, formatPercentage } from '@/shared/utils';
+import { COLORS } from '@/shared/constants/colors';
 import { PortfolioAsset } from '@/lib/sheetsAdapter';
 import { formatTimestampForDisplay } from '@/lib/timestamp-utils';
 
