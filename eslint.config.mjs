@@ -22,6 +22,10 @@ const eslintConfig = [
   },
   {
     rules: {
+      // Critical errors that should fail the build
+      "react/no-unescaped-entities": "error",
+      "@typescript-eslint/no-require-imports": "error",
+      
       // Make unused variables warnings instead of errors
       "@typescript-eslint/no-unused-vars": "warn",
       // Allow any type but warn about it
