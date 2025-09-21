@@ -2,6 +2,7 @@
 
 import React, { forwardRef, useState } from 'react';
 import { cn } from '@/shared/utils';
+import { COLORS } from '@/shared/constants/colors';
 import WagmiButton from './WagmiButton';
 
 interface WagmiInputProps extends Omit<React.InputHTMLAttributes<HTMLInputElement>, 'size'> {
@@ -58,52 +59,52 @@ const WagmiInput = forwardRef<HTMLInputElement, WagmiInputProps>(
       lg: 'px-5 py-4 text-lg rounded-lg'
     };
     
-    // Theme colors
+    // Theme colors from centralized constants
     const themeColors = {
       green: {
-        bg: '#374151',
-        border: '#4B5563',
-        focus: 'rgba(0, 255, 149, 0.3)',
-        text: '#FFFFFF',
-        placeholder: '#9CA3AF',
-        error: '#EF4444',
-        errorFocus: 'rgba(239, 68, 68, 0.3)'
+        bg: COLORS.input.bg,
+        border: COLORS.input.border,
+        focus: COLORS.theme.green.focus,
+        text: COLORS.input.text,
+        placeholder: COLORS.input.placeholder,
+        error: COLORS.input.error,
+        errorFocus: COLORS.input.errorFocus
       },
       orange: {
-        bg: '#374151',
-        border: '#4B5563',
-        focus: 'rgba(255, 107, 53, 0.3)',
-        text: '#FFFFFF',
-        placeholder: '#9CA3AF',
-        error: '#EF4444',
-        errorFocus: 'rgba(239, 68, 68, 0.3)'
+        bg: COLORS.input.bg,
+        border: COLORS.input.border,
+        focus: COLORS.theme.orange.focus,
+        text: COLORS.input.text,
+        placeholder: COLORS.input.placeholder,
+        error: COLORS.input.error,
+        errorFocus: COLORS.input.errorFocus
       },
       blue: {
-        bg: '#374151',
-        border: '#4B5563',
-        focus: 'rgba(59, 130, 246, 0.3)',
-        text: '#FFFFFF',
-        placeholder: '#9CA3AF',
-        error: '#EF4444',
-        errorFocus: 'rgba(239, 68, 68, 0.3)'
+        bg: COLORS.input.bg,
+        border: COLORS.input.border,
+        focus: COLORS.theme.blue.focus,
+        text: COLORS.input.text,
+        placeholder: COLORS.input.placeholder,
+        error: COLORS.input.error,
+        errorFocus: COLORS.input.errorFocus
       },
       red: {
-        bg: '#374151',
-        border: '#4B5563',
-        focus: 'rgba(239, 68, 68, 0.3)',
-        text: '#FFFFFF',
-        placeholder: '#9CA3AF',
-        error: '#EF4444',
-        errorFocus: 'rgba(239, 68, 68, 0.3)'
+        bg: COLORS.input.bg,
+        border: COLORS.input.border,
+        focus: COLORS.theme.red.focus,
+        text: COLORS.input.text,
+        placeholder: COLORS.input.placeholder,
+        error: COLORS.input.error,
+        errorFocus: COLORS.input.errorFocus
       },
       gray: {
-        bg: '#374151',
-        border: '#4B5563',
-        focus: 'rgba(107, 114, 128, 0.3)',
-        text: '#FFFFFF',
-        placeholder: '#9CA3AF',
-        error: '#EF4444',
-        errorFocus: 'rgba(239, 68, 68, 0.3)'
+        bg: COLORS.input.bg,
+        border: COLORS.input.border,
+        focus: COLORS.theme.gray.focus,
+        text: COLORS.input.text,
+        placeholder: COLORS.input.placeholder,
+        error: COLORS.input.error,
+        errorFocus: COLORS.input.errorFocus
       }
     };
     

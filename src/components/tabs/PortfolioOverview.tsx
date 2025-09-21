@@ -354,8 +354,8 @@ export default function PortfolioOverview({ className, onRefresh, isPrivacyMode 
     'Major': COLORS.assetType.major,
     'Altcoin': COLORS.assetType.altcoin,
     'Stablecoin': COLORS.assetType.stablecoin,
-    'DeFi': '#FF6B35', // Add DeFi color
-    'NFT': '#EC4899'   // Add NFT color
+    'DeFi': COLORS.assetType.defi,
+    'NFT': COLORS.assetType.nft
   };
 
 

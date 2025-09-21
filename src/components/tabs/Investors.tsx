@@ -513,14 +513,14 @@ export default function Investors({ isPrivacyMode = false, onRefresh }: Investor
                   onClick={() => handleRowClick(investor)}
                   className="cursor-pointer transition-all duration-200 hover:bg-opacity-10"
                   style={{
-                    backgroundColor: index % 2 === 0 ? 'transparent' : 'rgba(255, 255, 255, 0.02)',
-                    borderBottom: '1px solid #333'
+                    backgroundColor: index % 2 === 0 ? COLORS.table.rowEven : COLORS.table.rowOdd,
+                    borderBottom: `1px solid ${COLORS.table.border}`
                   }}
                   onMouseEnter={(e) => {
-                    e.currentTarget.style.backgroundColor = 'rgba(0, 255, 149, 0.05)';
+                    e.currentTarget.style.backgroundColor = COLORS.table.hover;
                   }}
                   onMouseLeave={(e) => {
-                    e.currentTarget.style.backgroundColor = index % 2 === 0 ? 'transparent' : 'rgba(255, 255, 255, 0.02)';
+                    e.currentTarget.style.backgroundColor = index % 2 === 0 ? COLORS.table.rowEven : COLORS.table.rowOdd;
                   }}
                 >
                   <td className="px-4 py-3 text-sm font-medium" style={{ color: COLORS.text.primary }}>

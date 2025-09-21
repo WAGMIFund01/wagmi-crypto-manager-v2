@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect } from 'react';
 import StandardModal from '@/components/ui/StandardModal';
-import { WagmiInput, WagmiButton, WagmiSpinner, SmartDropdown, FormError, FormErrorDisplay } from '@/components/ui';
+import { WagmiInput, WagmiButton, WagmiSpinner, SmartDropdown, FormError } from '@/components/ui';
 import { AssetSearchResult } from '../services/AssetSearchService';
 import { detectChain } from '../utils/chainDetection';
 import { usePortfolioFieldOptions } from '@/hooks/usePortfolioFieldOptions';
@@ -22,7 +22,7 @@ export default function AddAssetForm({ isOpen, onClose, onAssetAdded, selectedAs
   const [submitError, setSubmitError] = useState<string | null>(null);
   
   // Fetch portfolio field options for smart dropdowns
-  const { options: fieldOptions, loading: optionsLoading } = usePortfolioFieldOptions();
+  const { options: fieldOptions } = usePortfolioFieldOptions();
   
   // Form validation
   const {

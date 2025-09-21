@@ -51,19 +51,19 @@ export function useFormValidation({
     if (!fieldRules) return true;
 
     const fieldValue = data[field];
-    const error = validateField(fieldValue, fieldRules);
+    const fieldError = validateField(fieldValue, fieldRules);
     
     setErrors(prev => {
       const newErrors = { ...prev };
-      if (error) {
-        newErrors[field] = error;
+      if (fieldError) {
+        newErrors[field] = fieldError;
       } else {
         delete newErrors[field];
       }
       return newErrors;
     });
 
-    return !error;
+    return !fieldError;
   }, [data, rules]);
 
   // Validate entire form

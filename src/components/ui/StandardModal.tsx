@@ -1,6 +1,7 @@
 'use client';
 
 import { ReactNode } from 'react';
+import { COLORS } from '@/shared/constants/colors';
 import WagmiButton from './WagmiButton';
 
 interface StandardModalProps {
@@ -29,41 +30,11 @@ const sizeClasses = {
 };
 
 const themeColors = {
-  green: {
-    accent: '#00FF95',
-    border: 'rgba(0, 255, 149, 0.1)',
-    shadow: 'rgba(0, 255, 149, 0.1)',
-    glow: 'rgba(0, 255, 149, 0.05)',
-    outerGlow: 'rgba(0, 255, 149, 0.02)'
-  },
-  orange: {
-    accent: '#FF6B35',
-    border: 'rgba(255, 107, 53, 0.1)',
-    shadow: 'rgba(255, 107, 53, 0.1)',
-    glow: 'rgba(255, 107, 53, 0.05)',
-    outerGlow: 'rgba(255, 107, 53, 0.02)'
-  },
-  blue: {
-    accent: '#3B82F6',
-    border: 'rgba(59, 130, 246, 0.1)',
-    shadow: 'rgba(59, 130, 246, 0.1)',
-    glow: 'rgba(59, 130, 246, 0.05)',
-    outerGlow: 'rgba(59, 130, 246, 0.02)'
-  },
-  purple: {
-    accent: '#8B5CF6',
-    border: 'rgba(139, 92, 246, 0.1)',
-    shadow: 'rgba(139, 92, 246, 0.1)',
-    glow: 'rgba(139, 92, 246, 0.05)',
-    outerGlow: 'rgba(139, 92, 246, 0.02)'
-  },
-  red: {
-    accent: '#EF4444',
-    border: 'rgba(239, 68, 68, 0.1)',
-    shadow: 'rgba(239, 68, 68, 0.1)',
-    glow: 'rgba(239, 68, 68, 0.05)',
-    outerGlow: 'rgba(239, 68, 68, 0.02)'
-  }
+  green: COLORS.theme.green,
+  orange: COLORS.theme.orange,
+  blue: COLORS.theme.blue,
+  purple: COLORS.theme.purple,
+  red: COLORS.theme.red
 };
 
 export default function StandardModal({
@@ -93,11 +64,11 @@ export default function StandardModal({
       <div 
         className="absolute inset-0 transition-all duration-300 animate-in fade-in"
         style={{
-          background: 'rgba(0, 0, 0, 0.6)',
+          background: COLORS.modal.overlay,
           backdropFilter: 'blur(8px)',
           WebkitBackdropFilter: 'blur(8px)',
           // Enhanced frosted glass effect
-          backgroundImage: 'linear-gradient(135deg, rgba(255, 255, 255, 0.1) 0%, rgba(255, 255, 255, 0.05) 100%)',
+          backgroundImage: COLORS.modal.glass,
         }}
         onClick={handleBackdropClick}
       />
@@ -106,22 +77,22 @@ export default function StandardModal({
       <div 
         className={`relative w-full ${sizeClasses[size]} max-h-[95vh] sm:max-h-[90vh] flex flex-col rounded-xl sm:rounded-2xl transition-all duration-300 animate-in zoom-in-95 slide-in-from-bottom-4 ${className}`}
         style={{
-          backgroundColor: 'rgba(26, 31, 26, 0.95)',
+          backgroundColor: COLORS.modal.content,
           borderRadius: '16px',
           backdropFilter: 'blur(20px)',
           WebkitBackdropFilter: 'blur(20px)',
-          boxShadow: `0 8px 32px rgba(0, 0, 0, 0.4), 0 0 0 1px rgba(255, 255, 255, 0.1), 0 0 15px ${colors.shadow}, 0 0 30px ${colors.glow}, 0 0 50px ${colors.outerGlow}`,
+          boxShadow: `0 8px 32px rgba(0, 0, 0, 0.4), 0 0 0 1px ${colors.border}, 0 0 15px ${colors.shadow}, 0 0 30px ${colors.glow}, 0 0 50px ${colors.outerGlow}`,
           border: `1px solid ${colors.border}`,
           // Enhanced frosted glass effect for modal content
-          backgroundImage: 'linear-gradient(135deg, rgba(255, 255, 255, 0.1) 0%, rgba(255, 255, 255, 0.05) 100%)',
+          backgroundImage: COLORS.modal.glass,
         }}
       >
         {/* Header */}
         <div 
           className="flex items-center justify-between p-4 sm:p-6 border-b flex-shrink-0" 
           style={{ 
-            borderColor: 'rgba(255, 255, 255, 0.1)',
-            backgroundImage: 'linear-gradient(135deg, rgba(255, 255, 255, 0.05) 0%, rgba(255, 255, 255, 0.02) 100%)',
+            borderColor: COLORS.modal.border,
+            backgroundImage: COLORS.modal.glass,
             backdropFilter: 'blur(10px)',
             WebkitBackdropFilter: 'blur(10px)',
           }}

@@ -167,34 +167,17 @@ export default function InvestorPage() {
   const typeDistribution = calculateDistribution('coinType');
 
   // Color palettes for different chart types
-  const assetColors = [
-    '#00FF95', '#FF6B35', '#3B82F6', '#8B5CF6', '#F59E0B', 
-    '#EF4444', '#10B981', '#F97316', '#6366F1', '#EC4899'
-  ];
+  const assetColors = Object.values(COLORS.chart);
   
-  const riskColors = {
-    'High': '#EF4444',
-    'Medium': '#F59E0B', 
-    'Low': '#10B981',
-    'Degen': '#8B5CF6',
-    'None': '#6B7280'
-  };
+  const riskColors = COLORS.risk;
 
-  const locationColors = [
-    '#00FF95', '#FF6B35', '#3B82F6', '#8B5CF6', '#F59E0B',
-    '#EF4444', '#10B981', '#F97316', '#6366F1', '#EC4899'
-  ];
+  const locationColors = Object.values(COLORS.chart);
 
-  const typeColors = {
-    'Memecoin': '#8B5CF6',
-    'Major': '#00FF95',
-    'Altcoin': '#3B82F6',
-    'Stablecoin': '#6B7280'
-  };
+  const typeColors = COLORS.assetType;
 
   if (loading || !investorId) {
     return (
-      <div className="flex items-center justify-center min-h-screen" style={{ backgroundColor: '#0B0B0B' }}>
+      <div className="flex items-center justify-center min-h-screen" style={{ backgroundColor: COLORS.background.primary }}>
         <WagmiSpinner size="lg" theme="green" showText text="Loading..." centered />
       </div>
     );
@@ -202,7 +185,7 @@ export default function InvestorPage() {
 
   if (error) {
     return (
-      <div className="min-h-screen flex items-center justify-center p-4" style={{ backgroundColor: '#0B0B0B' }}>
+      <div className="min-h-screen flex items-center justify-center p-4" style={{ backgroundColor: COLORS.background.primary }}>
         <WagmiCard variant="default" theme="red" size="lg" className="max-w-md w-full">
           <div className="text-center space-y-4">
             <div className="mb-4">
@@ -256,9 +239,9 @@ export default function InvestorPage() {
 
 
   return (
-    <div style={{ backgroundColor: '#0B0B0B' }}>
+    <div style={{ backgroundColor: COLORS.background.primary }}>
       {/* Header */}
-      <header style={{ backgroundColor: '#0B0B0B', borderColor: '#333' }}>
+      <header style={{ backgroundColor: COLORS.background.primary, borderColor: COLORS.table.border }}>
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           {/* Mobile Layout - Stacked */}
           <div className="flex flex-col space-y-6 py-6 md:hidden">

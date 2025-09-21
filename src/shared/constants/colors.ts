@@ -71,6 +71,8 @@ export const COLORS = {
     major: '#00FF95',      // Green for major coins
     altcoin: '#3B82F6',    // Blue for altcoins
     stablecoin: '#6B7280', // Gray for stablecoins
+    defi: '#FF6B35',       // Orange for DeFi
+    nft: '#EC4899',        // Pink for NFT
   },
 
   // Chain colors
@@ -85,6 +87,84 @@ export const COLORS = {
     optimism: '#FF0420',
     base: '#0052FF',
     default: '#6B7280',
+  },
+
+  // Component theme colors
+  theme: {
+    green: {
+      accent: '#00FF95',
+      border: 'rgba(0, 255, 149, 0.1)',
+      shadow: 'rgba(0, 255, 149, 0.1)',
+      glow: 'rgba(0, 255, 149, 0.05)',
+      outerGlow: 'rgba(0, 255, 149, 0.02)',
+      focus: 'rgba(0, 255, 149, 0.3)',
+    },
+    orange: {
+      accent: '#FF6B35',
+      border: 'rgba(255, 107, 53, 0.1)',
+      shadow: 'rgba(255, 107, 53, 0.1)',
+      glow: 'rgba(255, 107, 53, 0.05)',
+      outerGlow: 'rgba(255, 107, 53, 0.02)',
+      focus: 'rgba(255, 107, 53, 0.3)',
+    },
+    blue: {
+      accent: '#3B82F6',
+      border: 'rgba(59, 130, 246, 0.1)',
+      shadow: 'rgba(59, 130, 246, 0.1)',
+      glow: 'rgba(59, 130, 246, 0.05)',
+      outerGlow: 'rgba(59, 130, 246, 0.02)',
+      focus: 'rgba(59, 130, 246, 0.3)',
+    },
+    purple: {
+      accent: '#8B5CF6',
+      border: 'rgba(139, 92, 246, 0.1)',
+      shadow: 'rgba(139, 92, 246, 0.1)',
+      glow: 'rgba(139, 92, 246, 0.05)',
+      outerGlow: 'rgba(139, 92, 246, 0.02)',
+      focus: 'rgba(139, 92, 246, 0.3)',
+    },
+    red: {
+      accent: '#EF4444',
+      border: 'rgba(239, 68, 68, 0.1)',
+      shadow: 'rgba(239, 68, 68, 0.1)',
+      glow: 'rgba(239, 68, 68, 0.05)',
+      outerGlow: 'rgba(239, 68, 68, 0.02)',
+      focus: 'rgba(239, 68, 68, 0.3)',
+    },
+    gray: {
+      accent: '#6B7280',
+      border: 'rgba(107, 114, 128, 0.1)',
+      shadow: 'rgba(107, 114, 128, 0.1)',
+      glow: 'rgba(107, 114, 128, 0.05)',
+      outerGlow: 'rgba(107, 114, 128, 0.02)',
+      focus: 'rgba(107, 114, 128, 0.3)',
+    },
+  },
+
+  // Input component colors
+  input: {
+    bg: '#374151',
+    border: '#4B5563',
+    text: '#FFFFFF',
+    placeholder: '#9CA3AF',
+    error: '#EF4444',
+    errorFocus: 'rgba(239, 68, 68, 0.3)',
+  },
+
+  // Modal colors
+  modal: {
+    overlay: 'rgba(0, 0, 0, 0.6)',
+    content: 'rgba(26, 31, 26, 0.95)',
+    border: 'rgba(255, 255, 255, 0.1)',
+    glass: 'linear-gradient(135deg, rgba(255, 255, 255, 0.1) 0%, rgba(255, 255, 255, 0.05) 100%)',
+  },
+
+  // Table colors
+  table: {
+    rowEven: 'transparent',
+    rowOdd: 'rgba(255, 255, 255, 0.02)',
+    hover: 'rgba(0, 255, 149, 0.05)',
+    border: '#333',
   },
 } as const;
 
