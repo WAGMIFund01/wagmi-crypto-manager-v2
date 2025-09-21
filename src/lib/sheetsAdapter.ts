@@ -661,6 +661,115 @@ export class SheetsAdapter {
       throw new Error(`Failed to remove asset from portfolio: ${error instanceof Error ? error.message : 'Unknown error'}`);
     }
   }
+
+  /**
+   * Edit an existing asset in the portfolio
+   */
+  async editPortfolioAsset(editData: {
+    symbol: string;
+    quantity: number;
+    riskLevel: string;
+    location: string;
+    thesis: string;
+  }): Promise<{ success: boolean; data?: any; error?: string }> {
+    try {
+      console.log(`Editing asset ${editData.symbol} in portfolio...`);
+      
+      if (!this.isServiceAccountInitialized) {
+        await this.initializeServiceAccount();
+      }
+
+      // Get the current portfolio data
+      const response = await this.sheets.spreadsheets.values.get({
+        spreadsheetId: this.sheetId,
+        range: 'Portfolio Overview!A:M'
+      });
+      
+      console.log('Portfolio data fetched successfully');
+      const rows = response.data.values || [];
+      
+      // Find the row index of the asset to edit
+      let rowIndexToEdit = -1;
+      console.log(`Looking for asset with symbol: ${editData.symbol.toUpperCase()}`);
+      console.log(`Total rows in sheet: ${rows.length}`);
+      
+      for (let i = 1; i < rows.length; i++) {
+        const row = rows[i];
+        const rowSymbol = row && row.length > 1 ? row[1]?.toString().toUpperCase() : '';
+        console.log(`Row ${i}: Symbol = "${rowSymbol}", Asset = "${row[0]}"`);
+        
+        if (row && row.length > 1 && rowSymbol === editData.symbol.toUpperCase()) {
+          rowIndexToEdit = i + 1; // +1 because Google Sheets uses 1-based indexing
+          console.log(`Found matching asset at row ${rowIndexToEdit}`);
+          break;
+        }
+      }
+      
+      if (rowIndexToEdit === -1) {
+        console.log(`No asset found with symbol: ${editData.symbol}`);
+        return {
+          success: false,
+          error: `Asset with symbol ${editData.symbol} not found`
+        };
+      }
+
+      // Get current asset data to preserve some fields
+      const currentRow = rows[rowIndexToEdit - 1];
+      const currentPrice = currentRow && currentRow.length > 7 ? parseFloat(currentRow[7]) || 0 : 0;
+      const totalValue = editData.quantity * currentPrice;
+
+      // Prepare the updated row data
+      const updatedRow = [
+        currentRow[0] || '', // Asset Name (keep existing)
+        editData.symbol.toUpperCase(), // Symbol
+        currentRow[2] || '', // Chain (keep existing)
+        editData.riskLevel, // Risk Level
+        editData.location, // Location
+        currentRow[5] || '', // Coin Type (keep existing)
+        editData.quantity, // Quantity
+        currentPrice, // Current Price (keep existing)
+        totalValue, // Total Value (recalculated)
+        currentRow[9] || '', // Last Price Update (keep existing)
+        currentRow[10] || '', // Price Change 24h (keep existing)
+        currentRow[11] || '', // CoinGecko ID (keep existing)
+        editData.thesis // Thesis
+      ];
+
+      console.log(`Updating row ${rowIndexToEdit} with data:`, updatedRow);
+
+      // Update the row in Google Sheets
+      const updateResponse = await this.sheets.spreadsheets.values.update({
+        spreadsheetId: this.sheetId,
+        range: `Portfolio Overview!A${rowIndexToEdit}:M${rowIndexToEdit}`,
+        valueInputOption: 'RAW',
+        requestBody: {
+          values: [updatedRow]
+        }
+      });
+
+      console.log('Update operation response:', updateResponse.data);
+      console.log(`Asset ${editData.symbol} updated successfully at row ${rowIndexToEdit}`);
+      
+      return {
+        success: true,
+        data: {
+          symbol: editData.symbol,
+          quantity: editData.quantity,
+          riskLevel: editData.riskLevel,
+          location: editData.location,
+          thesis: editData.thesis,
+          totalValue: totalValue
+        }
+      };
+
+    } catch (error) {
+      console.error('Error editing asset in portfolio:', error);
+      return {
+        success: false,
+        error: `Failed to edit asset in portfolio: ${error instanceof Error ? error.message : 'Unknown error'}`
+      };
+    }
+  }
 }
 
 // Export a singleton instance

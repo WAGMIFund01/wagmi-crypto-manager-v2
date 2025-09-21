@@ -5,6 +5,7 @@ import { PortfolioAsset } from '@/lib/sheetsAdapter';
 import { StackedBarChart, WagmiCard, WagmiSpinner, WagmiText, WagmiButton } from '@/components/ui';
 import AssetSearchModal from '@/features/transactions/components/AssetSearchModal';
 import AddAssetForm from '@/features/transactions/components/AddAssetForm';
+import EditAssetForm from '@/features/transactions/components/EditAssetForm';
 import { AssetSearchResult } from '@/features/transactions/services/AssetSearchService';
 
 interface PortfolioOverviewProps {
@@ -23,6 +24,8 @@ export default function PortfolioOverview({ className, onRefresh, isPrivacyMode 
   const [showAddForm, setShowAddForm] = useState(false);
   const [selectedAsset, setSelectedAsset] = useState<AssetSearchResult | null>(null);
   const [removingAsset, setRemovingAsset] = useState<string | null>(null);
+  const [editingAsset, setEditingAsset] = useState<PortfolioAsset | null>(null);
+  const [showEditForm, setShowEditForm] = useState(false);
 
   const fetchPortfolioData = async () => {
     try {
@@ -79,6 +82,54 @@ export default function PortfolioOverview({ className, onRefresh, isPrivacyMode 
       onRefresh();
     } else {
       fetchPortfolioData(); // Fallback to local refresh
+    }
+  };
+
+  const handleEditAsset = (asset: PortfolioAsset) => {
+    console.log('Edit button clicked for asset:', asset.symbol);
+    setEditingAsset(asset);
+    setShowEditForm(true);
+  };
+
+  const handleAssetEdited = () => {
+    setEditingAsset(null);
+    setShowEditForm(false);
+    // Trigger full refresh including KPI data (AUM ribbon)
+    if (onRefresh) {
+      onRefresh();
+    } else {
+      fetchPortfolioData(); // Fallback to local refresh
+    }
+  };
+
+  const handleEditAssetSave = async (editData: {
+    symbol: string;
+    quantity: number;
+    riskLevel: string;
+    location: string;
+    thesis: string;
+  }) => {
+    try {
+      console.log('Updating asset:', editData);
+      const response = await fetch('/api/edit-asset', {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(editData),
+      });
+
+      const data = await response.json();
+
+      if (data.success) {
+        console.log('Asset updated successfully');
+        handleAssetEdited();
+      } else {
+        throw new Error(data.error || 'Failed to update asset');
+      }
+    } catch (error) {
+      console.error('Error updating asset:', error);
+      throw error;
     }
   };
 
@@ -360,20 +411,31 @@ export default function PortfolioOverview({ className, onRefresh, isPrivacyMode 
                         {formatPriceChange(asset.priceChange24h).text}
                       </div>
                     </div>
-                    <button
-                      onClick={() => handleRemoveAsset(asset.symbol)}
-                      disabled={removingAsset === asset.symbol}
-                      className="p-2 text-red-400 hover:text-red-300 hover:bg-red-900/20 rounded-lg transition-colors disabled:opacity-50"
-                      title="Remove asset"
-                    >
-                      {removingAsset === asset.symbol ? (
-                        <WagmiSpinner size="sm" />
-                      ) : (
+                    <div className="flex gap-1">
+                      <button
+                        onClick={() => handleEditAsset(asset)}
+                        className="p-2 text-blue-400 hover:text-blue-300 hover:bg-blue-900/20 rounded-lg transition-colors"
+                        title="Edit asset"
+                      >
                         <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
                         </svg>
-                      )}
-                    </button>
+                      </button>
+                      <button
+                        onClick={() => handleRemoveAsset(asset.symbol)}
+                        disabled={removingAsset === asset.symbol}
+                        className="p-2 text-red-400 hover:text-red-300 hover:bg-red-900/20 rounded-lg transition-colors disabled:opacity-50"
+                        title="Remove asset"
+                      >
+                        {removingAsset === asset.symbol ? (
+                          <WagmiSpinner size="sm" />
+                        ) : (
+                          <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                          </svg>
+                        )}
+                      </button>
+                    </div>
                   </div>
                 </div>
                 
@@ -487,20 +549,31 @@ export default function PortfolioOverview({ className, onRefresh, isPrivacyMode 
                     <div className="text-sm font-medium text-gray-300">{isPrivacyMode ? createMask() : formatCurrency(asset.totalValue)}</div>
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-center">
-                    <button
-                      onClick={() => handleRemoveAsset(asset.symbol)}
-                      disabled={removingAsset === asset.symbol}
-                      className="p-2 text-red-400 hover:text-red-300 hover:bg-red-900/20 rounded-lg transition-colors disabled:opacity-50"
-                      title="Remove asset"
-                    >
-                      {removingAsset === asset.symbol ? (
-                        <WagmiSpinner size="sm" />
-                      ) : (
+                    <div className="flex gap-1 justify-center">
+                      <button
+                        onClick={() => handleEditAsset(asset)}
+                        className="p-2 text-blue-400 hover:text-blue-300 hover:bg-blue-900/20 rounded-lg transition-colors"
+                        title="Edit asset"
+                      >
                         <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
                         </svg>
-                      )}
-                    </button>
+                      </button>
+                      <button
+                        onClick={() => handleRemoveAsset(asset.symbol)}
+                        disabled={removingAsset === asset.symbol}
+                        className="p-2 text-red-400 hover:text-red-300 hover:bg-red-900/20 rounded-lg transition-colors disabled:opacity-50"
+                        title="Remove asset"
+                      >
+                        {removingAsset === asset.symbol ? (
+                          <WagmiSpinner size="sm" />
+                        ) : (
+                          <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                          </svg>
+                        )}
+                      </button>
+                    </div>
                   </td>
                 </tr>
               ))}
@@ -523,6 +596,17 @@ export default function PortfolioOverview({ className, onRefresh, isPrivacyMode 
         onAssetAdded={handleAssetAdded}
         selectedAsset={selectedAsset}
       />
+
+      {editingAsset && (
+        <EditAssetForm
+          asset={editingAsset}
+          onSave={handleEditAssetSave}
+          onCancel={() => {
+            setEditingAsset(null);
+            setShowEditForm(false);
+          }}
+        />
+      )}
     </div>
   );
 }
