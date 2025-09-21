@@ -199,17 +199,19 @@ export class SheetsAdapter {
           const coinType = row[5]?.toString() || '';
           const quantity = parseFloat(row[6]) || 0;
           const currentPrice = parseFloat(row[7]) || 0;
-          const totalValue = parseFloat(row[8]) || 0;
+          // Handle totalValue - it might be empty if Google Sheets formula hasn't calculated yet
+          const totalValue = row[8] && !isNaN(parseFloat(row[8])) ? parseFloat(row[8]) : (quantity * currentPrice);
           const lastPriceUpdate = row[9]?.toString() || '';
           const coinGeckoId = row[10]?.toString()?.trim() || undefined; // Column K (index 10)
           const priceChange24h = row[11] ? parseFloat(row[11]) : undefined; // Column L (index 11)
           const thesis = row[12]?.toString() || ''; // Column M (index 12)
 
           // Only add assets that have a name and symbol, and exclude header-like entries
+          // Note: totalValue can be NaN if Google Sheets formula hasn't calculated yet
           if (assetName && symbol && 
               assetName.toLowerCase() !== 'asset name' && 
               symbol.toLowerCase() !== 'symbol' &&
-              !isNaN(quantity) && !isNaN(currentPrice) && !isNaN(totalValue)) {
+              !isNaN(quantity) && !isNaN(currentPrice)) {
             portfolioAssets.push({
               assetName,
               symbol,
@@ -527,7 +529,7 @@ export class SheetsAdapter {
       const response = await this.sheets.spreadsheets.values.update({
         spreadsheetId: this.sheetId,
         range,
-        valueInputOption: 'RAW',
+        valueInputOption: 'USER_ENTERED',
         requestBody: {
           values: [assetRow]
         }
