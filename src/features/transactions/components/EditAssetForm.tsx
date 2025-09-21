@@ -204,7 +204,7 @@ export default function EditAssetForm({ isOpen, asset, onSave, onClose }: EditAs
                   <strong>Note:</strong> You are editing the {asset.symbol} asset in <strong>{asset.location}</strong> with type <strong>{asset.coinType}</strong>. 
                   {asset.symbol === 'AURA' && (
                     <span className="block mt-1 text-yellow-400">
-                      ⚠️ There are multiple {asset.symbol} assets. Make sure you're editing the correct one based on location and type.
+                      ⚠️ There are multiple {asset.symbol} assets. Make sure you&apos;re editing the correct one based on location and type.
                     </span>
                   )}
                 </div>
