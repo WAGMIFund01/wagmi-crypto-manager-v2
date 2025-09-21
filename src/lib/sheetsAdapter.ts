@@ -580,7 +580,13 @@ export class SheetsAdapter {
 
       // Delete the row
       console.log(`Attempting to delete row ${rowIndexToRemove}...`);
-      const deleteResponse = await this.sheets.spreadsheets.batchUpdate({
+      console.log(`Delete request details:`);
+      console.log(`- Sheet ID: ${this.sheetId}`);
+      console.log(`- Row index (1-based): ${rowIndexToRemove}`);
+      console.log(`- Start index (0-based): ${rowIndexToRemove - 1}`);
+      console.log(`- End index (0-based): ${rowIndexToRemove}`);
+      
+      const deleteRequest = {
         spreadsheetId: this.sheetId,
         requestBody: {
           requests: [{
@@ -594,7 +600,11 @@ export class SheetsAdapter {
             }
           }]
         }
-      });
+      };
+      
+      console.log('Full delete request:', JSON.stringify(deleteRequest, null, 2));
+      
+      const deleteResponse = await this.sheets.spreadsheets.batchUpdate(deleteRequest);
 
       console.log('Delete operation response:', deleteResponse.data);
       console.log(`Asset ${symbol} removed successfully from row ${rowIndexToRemove}`);
