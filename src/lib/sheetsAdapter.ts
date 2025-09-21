@@ -679,6 +679,10 @@ export class SheetsAdapter {
         await this.initializeServiceAccount();
       }
 
+      if (!this.sheets) {
+        throw new Error('Google Sheets API client not initialized');
+      }
+
       // Get the current portfolio data
       const response = await this.sheets.spreadsheets.values.get({
         spreadsheetId: this.sheetId,
