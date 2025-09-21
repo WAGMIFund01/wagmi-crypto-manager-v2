@@ -26,18 +26,27 @@ export default function PortfolioOverview({ className, onRefresh, isPrivacyMode 
 
   const fetchPortfolioData = async () => {
     try {
+      console.log('🔄 Fetching portfolio data...');
       setLoading(true);
       setError(null);
       const response = await fetch('/api/get-portfolio-data');
       const data = await response.json();
 
+      console.log('📊 Portfolio data response:', {
+        success: data.success,
+        assetCount: data.assets?.length || 0,
+        assets: data.assets?.map((asset: any) => asset.symbol) || []
+      });
+
       if (data.success) {
         setAssets(data.assets);
+        console.log('✅ Portfolio data updated successfully');
       } else {
         setError(data.error || 'Failed to fetch portfolio data');
+        console.log('❌ Portfolio data fetch failed:', data.error);
       }
     } catch (err) {
-      console.error('Error fetching portfolio data:', err);
+      console.error('❌ Error fetching portfolio data:', err);
       setError('Failed to fetch portfolio data');
     } finally {
       setLoading(false);
