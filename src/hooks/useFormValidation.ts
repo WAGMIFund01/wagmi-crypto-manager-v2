@@ -51,7 +51,7 @@ export function useFormValidation({
     if (!fieldRules) return true;
 
     const fieldValue = data[field];
-    const fieldError = validateField(fieldValue, fieldRules);
+    const fieldError = validateFieldUtil(fieldValue, fieldRules);
     
     setErrors(prev => {
       const newErrors = { ...prev };
