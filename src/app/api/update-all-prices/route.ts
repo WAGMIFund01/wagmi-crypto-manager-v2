@@ -172,9 +172,15 @@ export async function POST(request: NextRequest) {
           console.log(`    Current price (${currentPriceRange}): ${newPrice}`);
           console.log(`    Last update (${lastUpdateRange}): ${currentTimestamp}`);
 
+          // Test: Try updating current price with different formats
+          console.log(`    Testing different value formats for current price:`);
+          console.log(`      - As number: ${newPrice}`);
+          console.log(`      - As string: "${newPrice}"`);
+          console.log(`      - As string with toString: ${newPrice.toString()}`);
+
           updates.push({
             range: currentPriceRange,
-            values: [[newPrice]]
+            values: [[newPrice.toString()]] // Try as string to see if that works
           });
           updates.push({
             range: lastUpdateRange,
@@ -208,10 +214,11 @@ export async function POST(request: NextRequest) {
       console.log('Executing batch update to Google Sheets...');
       console.log('Updates:', updates.map(u => `${u.range}: ${u.values[0][0]}`));
       
+      // Try different valueInputOption to see if that fixes the current price issue
       const batchUpdateResult = await sheets.spreadsheets.values.batchUpdate({
         spreadsheetId: sheetId,
         requestBody: {
-          valueInputOption: 'RAW',
+          valueInputOption: 'USER_ENTERED', // Changed from 'RAW' to 'USER_ENTERED'
           data: updates
         }
       });
