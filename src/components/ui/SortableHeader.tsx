@@ -65,12 +65,23 @@ export default function SortableHeader({
     }
   };
 
+  const getJustifyClass = () => {
+    switch (align) {
+      case 'center':
+        return 'justify-center';
+      case 'right':
+        return 'justify-end';
+      default:
+        return 'justify-start';
+    }
+  };
+
   return (
     <th 
       className={`px-6 py-3 cursor-pointer select-none transition-colors duration-200 hover:bg-gray-700/30 ${getAlignmentClass()} ${className}`}
       onClick={handleClick}
     >
-      <div className="flex items-center justify-center group">
+      <div className={`flex items-center ${getJustifyClass()} group`}>
         <span className={`text-xs font-medium uppercase tracking-wider ${
           isActive ? 'text-white' : 'text-gray-400'
         } group-hover:text-white transition-colors`}>
