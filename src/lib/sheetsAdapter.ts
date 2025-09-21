@@ -509,14 +509,25 @@ export class SheetsAdapter {
 
       console.log('Adding new asset to portfolio:', assetRow);
 
-      const range = 'Portfolio Overview!A:M'; // All columns from A to M
+      // First, find the last row with data to determine where to insert
+      const lastRowResponse = await this.sheets.spreadsheets.values.get({
+        spreadsheetId: this.sheetId,
+        range: 'Portfolio Overview!A:A', // Just check column A to find last row
+      });
+
+      const lastRow = lastRowResponse.data.values?.length || 1;
+      const insertRow = lastRow + 1;
       
-      // Append the new row to the sheet
-      const response = await this.sheets.spreadsheets.values.append({
+      console.log(`Last row with data: ${lastRow}, inserting at row: ${insertRow}`);
+
+      // Insert the new row at the specific position
+      const range = `Portfolio Overview!A${insertRow}:M${insertRow}`;
+      console.log(`Inserting at range: ${range}`);
+      
+      const response = await this.sheets.spreadsheets.values.update({
         spreadsheetId: this.sheetId,
         range,
         valueInputOption: 'RAW',
-        insertDataOption: 'INSERT_ROWS',
         requestBody: {
           values: [assetRow]
         }
