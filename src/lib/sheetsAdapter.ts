@@ -598,9 +598,30 @@ export class SheetsAdapter {
 
       console.log('Delete operation response:', deleteResponse.data);
       console.log(`Asset ${symbol} removed successfully from row ${rowIndexToRemove}`);
+      
+      // Verify the asset was actually removed
+      console.log('Verifying asset removal...');
+      const verifyResponse = await this.sheets.spreadsheets.values.get({
+        spreadsheetId: this.sheetId,
+        range: 'Portfolio Overview!A:M'
+      });
+      
+      const verifyRows = verifyResponse.data.values || [];
+      const stillExists = verifyRows.some((row: any[], index: number) => 
+        index > 0 && row && row.length > 1 && row[1]?.toString().toUpperCase() === symbol.toUpperCase()
+      );
+      
+      console.log(`Verification: Asset ${symbol} still exists: ${stillExists}`);
+      console.log(`Total rows after removal: ${verifyRows.length}`);
+      
+      if (stillExists) {
+        console.error(`ERROR: Asset ${symbol} was not actually removed from the sheet!`);
+        throw new Error(`Asset ${symbol} was not actually removed from the sheet`);
+      }
+      
     } catch (error) {
       console.error('Error removing asset from portfolio:', error);
-      throw new Error('Failed to remove asset from portfolio');
+      throw new Error(`Failed to remove asset from portfolio: ${error instanceof Error ? error.message : 'Unknown error'}`);
     }
   }
 }
