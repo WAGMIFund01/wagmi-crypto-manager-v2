@@ -361,16 +361,9 @@ export default function PortfolioOverview({ className, onRefresh, isPrivacyMode 
 
   return (
     <div className={`${className} space-y-6`}>
-      {/* Add Asset Button */}
+      {/* Portfolio Overview Header */}
       <div className="flex justify-between items-center">
         <h2 className="text-2xl font-bold text-white">Portfolio Overview</h2>
-        <WagmiButton
-          variant="primary"
-          onClick={() => setShowSearchModal(true)}
-          className="flex items-center space-x-2"
-        >
-          <span>Add Asset</span>
-        </WagmiButton>
       </div>
 
       {/* Portfolio Breakdown Charts */}
@@ -403,8 +396,15 @@ export default function PortfolioOverview({ className, onRefresh, isPrivacyMode 
 
       {/* Assets Table */}
       <WagmiCard variant="container" theme="green" size="lg" className="overflow-hidden">
-        <div className="px-6 py-4 border-b border-gray-700">
+        <div className="px-6 py-4 border-b border-gray-700 flex justify-between items-center">
           <WagmiText variant="h4" weight="semibold" color="primary">Portfolio Assets</WagmiText>
+          <WagmiButton
+            variant="primary"
+            onClick={() => setShowSearchModal(true)}
+            className="flex items-center space-x-2"
+          >
+            <span>Add Asset</span>
+          </WagmiButton>
         </div>
         
         {/* Mobile Layout */}
