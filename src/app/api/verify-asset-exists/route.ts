@@ -16,23 +16,16 @@ export async function GET(request: Request) {
     console.log(`=== VERIFYING ASSET EXISTS: ${symbol} ===`);
 
     // Get all portfolio data
-    const portfolioData = await sheetsAdapter.getPortfolioData();
+    const portfolioAssets = await sheetsAdapter.getPortfolioData();
     
-    if (!portfolioData.success) {
-      return NextResponse.json({
-        success: false,
-        error: 'Failed to fetch portfolio data'
-      }, { status: 500 });
-    }
-
     // Check if the asset exists
-    const assetExists = portfolioData.assets?.some(asset => 
+    const assetExists = portfolioAssets.some(asset => 
       asset.symbol?.toUpperCase() === symbol.toUpperCase()
     );
 
-    const matchingAssets = portfolioData.assets?.filter(asset => 
+    const matchingAssets = portfolioAssets.filter(asset => 
       asset.symbol?.toUpperCase() === symbol.toUpperCase()
-    ) || [];
+    );
 
     console.log(`Asset ${symbol} exists: ${assetExists}`);
     console.log(`Matching assets:`, matchingAssets);
@@ -42,8 +35,8 @@ export async function GET(request: Request) {
       symbol: symbol.toUpperCase(),
       exists: assetExists,
       matchingAssets: matchingAssets,
-      totalAssets: portfolioData.assets?.length || 0,
-      allSymbols: portfolioData.assets?.map(asset => asset.symbol) || []
+      totalAssets: portfolioAssets.length,
+      allSymbols: portfolioAssets.map(asset => asset.symbol)
     });
 
   } catch (error: unknown) {
