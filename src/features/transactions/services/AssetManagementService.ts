@@ -47,10 +47,8 @@ export class AssetManagementService {
         };
       }
 
-      // Calculate total value
-      const totalValue = assetData.quantity * assetData.currentPrice;
-
       // Prepare asset data for Google Sheets
+      // Note: Total Value (Column I) will be calculated by Google Sheets formula
       const assetRow = [
         assetData.name,                    // Column A: Asset Name
         assetData.symbol,                  // Column B: Symbol
@@ -60,7 +58,7 @@ export class AssetManagementService {
         assetData.coinType || 'Altcoin',  // Column F: Coin Type
         assetData.quantity,               // Column G: Quantity
         assetData.currentPrice,           // Column H: Current Price
-        totalValue,                       // Column I: Total Value
+        '',                               // Column I: Total Value (let Google Sheets formula calculate)
         new Date().toISOString(),         // Column J: Last Price Update
         assetData.coinGeckoId,            // Column K: CoinGecko ID
         0,                                // Column L: 24hr Price Change (will be updated by price service)

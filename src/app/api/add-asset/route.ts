@@ -62,8 +62,8 @@ export async function POST(request: Request) {
           symbol: assetData.symbol,
           name: assetData.name,
           quantity: assetData.quantity,
-          currentPrice: assetData.currentPrice,
-          totalValue: assetData.quantity * assetData.currentPrice
+          currentPrice: assetData.currentPrice
+          // totalValue will be calculated by Google Sheets formula
         }
       });
     } else {

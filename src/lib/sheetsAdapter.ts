@@ -721,9 +721,9 @@ export class SheetsAdapter {
       // Get current asset data to preserve some fields
       const currentRow = rows[rowIndexToEdit - 1];
       const currentPrice = currentRow && currentRow.length > 7 ? parseFloat(currentRow[7]) || 0 : 0;
-      const totalValue = editData.quantity * currentPrice;
 
       // Prepare the updated row data
+      // Note: Total Value (Column I) will be calculated by Google Sheets formula
       const updatedRow = [
         currentRow[0] || '', // Asset Name (keep existing)
         editData.symbol.toUpperCase(), // Symbol
@@ -733,7 +733,7 @@ export class SheetsAdapter {
         editData.coinType, // Coin Type
         editData.quantity, // Quantity
         currentPrice, // Current Price (keep existing)
-        totalValue, // Total Value (recalculated)
+        '', // Total Value (let Google Sheets formula calculate)
         currentRow[9] || '', // Last Price Update (keep existing)
         currentRow[10] || '', // Price Change 24h (keep existing)
         currentRow[11] || '', // CoinGecko ID (keep existing)
@@ -762,8 +762,9 @@ export class SheetsAdapter {
           quantity: editData.quantity,
           riskLevel: editData.riskLevel,
           location: editData.location,
-          thesis: editData.thesis,
-          totalValue: totalValue
+          coinType: editData.coinType,
+          thesis: editData.thesis
+          // totalValue will be calculated by Google Sheets formula
         }
       };
 
