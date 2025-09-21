@@ -10,6 +10,7 @@ export { default as FilterChip } from './FilterChip';
 export { default as FilterGroup } from './FilterGroup';
 export { default as StackedBarChart } from './StackedBarChart';
 export { default as ModuleCard } from './ModuleCard';
+export { default as SmartDropdown } from './SmartDropdown';
 
 // Icons
 export * from './icons/WagmiIcons';

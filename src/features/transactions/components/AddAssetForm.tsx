@@ -2,9 +2,10 @@
 
 import React, { useState, useEffect } from 'react';
 import StandardModal from '@/components/ui/StandardModal';
-import { WagmiInput, WagmiButton, WagmiSpinner } from '@/components/ui';
+import { WagmiInput, WagmiButton, WagmiSpinner, SmartDropdown } from '@/components/ui';
 import { AssetSearchResult } from '../services/AssetSearchService';
 import { detectChain } from '../utils/chainDetection';
+import { usePortfolioFieldOptions } from '@/hooks/usePortfolioFieldOptions';
 
 interface AddAssetFormProps {
   isOpen: boolean;
@@ -23,6 +24,9 @@ export default function AddAssetForm({ isOpen, onClose, onAssetAdded, selectedAs
   const [thesis, setThesis] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  
+  // Fetch portfolio field options for smart dropdowns
+  const { options: fieldOptions, loading: optionsLoading } = usePortfolioFieldOptions();
 
   // Sync with prop changes and auto-detect chain
   useEffect(() => {
@@ -261,27 +265,23 @@ export default function AddAssetForm({ isOpen, onClose, onAssetAdded, selectedAs
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-300 mb-2">
-              Location
-            </label>
-            <WagmiInput
-              type="text"
-              placeholder="e.g., Phantom, Exchange"
+            <SmartDropdown
+              label="Location"
               value={location}
-              onChange={(e) => setLocation(e.target.value)}
+              onChange={setLocation}
+              placeholder="e.g., Phantom, Exchange"
+              options={fieldOptions.locations}
               className="w-full"
             />
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-300 mb-2">
-              Coin Type
-            </label>
-            <WagmiInput
-              type="text"
-              placeholder="e.g., Altcoin, Memecoin, Major"
+            <SmartDropdown
+              label="Coin Type"
               value={coinType}
-              onChange={(e) => setCoinType(e.target.value)}
+              onChange={setCoinType}
+              placeholder="e.g., Altcoin, Memecoin, Major"
+              options={fieldOptions.coinTypes}
               className="w-full"
             />
           </div>

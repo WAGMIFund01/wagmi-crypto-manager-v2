@@ -3,8 +3,10 @@
 import { useState } from 'react';
 import WagmiButton from '@/components/ui/WagmiButton';
 import WagmiInput from '@/components/ui/WagmiInput';
+import { SmartDropdown } from '@/components/ui';
 import StandardModal from '@/components/ui/StandardModal';
 import { PortfolioAsset } from '@/lib/sheetsAdapter';
+import { usePortfolioFieldOptions } from '@/hooks/usePortfolioFieldOptions';
 
 interface EditAssetFormProps {
   isOpen: boolean;
@@ -33,6 +35,9 @@ export default function EditAssetForm({ isOpen, asset, onSave, onClose }: EditAs
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  
+  // Fetch portfolio field options for smart dropdowns
+  const { options: fieldOptions } = usePortfolioFieldOptions();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -126,14 +131,12 @@ export default function EditAssetForm({ isOpen, asset, onSave, onClose }: EditAs
 
             {/* Location */}
             <div>
-              <label className="block text-sm font-medium text-gray-300 mb-2">
-                Location
-              </label>
-              <WagmiInput
-                type="text"
-                placeholder="e.g., Phantom, Exchange"
+              <SmartDropdown
+                label="Location"
                 value={formData.location}
-                onChange={(e) => handleInputChange('location', e.target.value)}
+                onChange={(value) => handleInputChange('location', value)}
+                placeholder="e.g., Phantom, Exchange"
+                options={fieldOptions.locations}
                 disabled={isSubmitting}
                 className="w-full"
               />
@@ -141,14 +144,12 @@ export default function EditAssetForm({ isOpen, asset, onSave, onClose }: EditAs
 
             {/* Coin Type */}
             <div>
-              <label className="block text-sm font-medium text-gray-300 mb-2">
-                Coin Type
-              </label>
-              <WagmiInput
-                type="text"
-                placeholder="e.g., Altcoin, Memecoin, Major"
+              <SmartDropdown
+                label="Coin Type"
                 value={formData.coinType}
-                onChange={(e) => handleInputChange('coinType', e.target.value)}
+                onChange={(value) => handleInputChange('coinType', value)}
+                placeholder="e.g., Altcoin, Memecoin, Major"
+                options={fieldOptions.coinTypes}
                 disabled={isSubmitting}
                 className="w-full"
               />
