@@ -10,14 +10,15 @@ expect.extend(matchers)
 // Fix React.act compatibility issue for testing library
 global.React = React
 
-// Ensure React.act is available
+// Ensure React.act is available for React 18
 if (React.act) {
   global.React.act = React.act
 } else {
   // Fallback for environments where React.act is not available
-  global.React.act = (callback: () => void) => {
-    callback()
-  }
+  global.React.act = ((callback: () => any) => {
+    const result = callback()
+    return result instanceof Promise ? result : Promise.resolve(result)
+  }) as typeof React.act
 }
 
 // Cleanup after each test case

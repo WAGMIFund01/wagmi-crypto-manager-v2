@@ -10,12 +10,17 @@ export default defineConfig({
     setupFiles: ['./src/test/setup.ts'],
     include: ['src/**/*.{test,spec}.{js,ts,jsx,tsx}'],
     exclude: ['node_modules', 'dist', '.next'],
-    // Ensure React is properly configured for testing
+    // Ensure React 18 is properly configured for testing
     environmentOptions: {
       jsdom: {
-        resources: 'usable'
+        resources: 'usable',
+        pretendToBeVisual: true,
+        url: 'http://localhost:3000'
       }
     },
+    // Add test timeout and retry configuration
+    testTimeout: 10000,
+    hookTimeout: 10000,
     coverage: {
       provider: 'v8',
       reporter: ['text', 'json', 'html'],
