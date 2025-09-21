@@ -48,7 +48,7 @@ export class AssetManagementService {
       }
 
       // Prepare asset data for Google Sheets
-      // Note: Total Value (Column I) will be calculated by Google Sheets formula
+      // Note: Total Value (Column I) is completely skipped to preserve Google Sheets formula
       const assetRow = [
         assetData.name,                    // Column A: Asset Name
         assetData.symbol,                  // Column B: Symbol
@@ -58,7 +58,7 @@ export class AssetManagementService {
         assetData.coinType || 'Altcoin',  // Column F: Coin Type
         assetData.quantity,               // Column G: Quantity
         assetData.currentPrice,           // Column H: Current Price
-        '',                               // Column I: Total Value (let Google Sheets formula calculate)
+        // Column I: Total Value - SKIPPED COMPLETELY (preserve Google Sheets formula)
         new Date().toISOString(),         // Column J: Last Price Update
         assetData.coinGeckoId,            // Column K: CoinGecko ID
         0,                                // Column L: 24hr Price Change (will be updated by price service)

@@ -523,15 +523,36 @@ export class SheetsAdapter {
       console.log(`Last row with data: ${lastRow}, inserting at row: ${insertRow}`);
 
       // Insert the new row at the specific position
+      // Note: We skip Column I (Total Value) to preserve Google Sheets formula
       const range = `Portfolio Overview!A${insertRow}:M${insertRow}`;
       console.log(`Inserting at range: ${range}`);
       
-      const response = await this.sheets.spreadsheets.values.update({
+      // We need to insert values in two parts to skip Column I
+      // Part 1: Columns A-H (Asset Name through Current Price)
+      const part1Range = `Portfolio Overview!A${insertRow}:H${insertRow}`;
+      const part1Values = [assetRow.slice(0, 8)]; // First 8 columns
+      
+      // Part 2: Columns J-M (Last Price Update through Thesis)
+      const part2Range = `Portfolio Overview!J${insertRow}:M${insertRow}`;
+      const part2Values = [assetRow.slice(8)]; // Last 5 columns (skipping Column I)
+      
+      // Insert Part 1
+      await this.sheets.spreadsheets.values.update({
         spreadsheetId: this.sheetId,
-        range,
+        range: part1Range,
         valueInputOption: 'USER_ENTERED',
         requestBody: {
-          values: [assetRow]
+          values: part1Values
+        }
+      });
+      
+      // Insert Part 2
+      const response = await this.sheets.spreadsheets.values.update({
+        spreadsheetId: this.sheetId,
+        range: part2Range,
+        valueInputOption: 'USER_ENTERED',
+        requestBody: {
+          values: part2Values
         }
       });
 
@@ -736,8 +757,8 @@ export class SheetsAdapter {
       const currentPrice = currentRow && currentRow.length > 7 ? parseFloat(currentRow[7]) || 0 : 0;
 
       // Prepare the updated row data
-      // Note: Total Value (Column I) will be calculated by Google Sheets formula
-      const updatedRow = [
+      // Note: Total Value (Column I) is completely skipped to preserve Google Sheets formula
+      const part1Data = [
         currentRow[0] || '', // Asset Name (keep existing)
         editData.symbol.toUpperCase(), // Symbol
         currentRow[2] || '', // Chain (keep existing)
@@ -746,22 +767,36 @@ export class SheetsAdapter {
         editData.coinType, // Coin Type
         editData.quantity, // Quantity
         currentPrice, // Current Price (keep existing)
-        '', // Total Value (let Google Sheets formula calculate)
+      ];
+
+      const part2Data = [
         currentRow[9] || '', // Last Price Update (keep existing)
         currentRow[10] || '', // Price Change 24h (keep existing)
         currentRow[11] || '', // CoinGecko ID (keep existing)
         editData.thesis // Thesis
       ];
 
-      console.log(`Updating row ${rowIndexToEdit} with data:`, updatedRow);
+      console.log(`Updating row ${rowIndexToEdit} with data (Part 1):`, part1Data);
+      console.log(`Updating row ${rowIndexToEdit} with data (Part 2):`, part2Data);
 
-      // Update the row in Google Sheets
+      // Update the row in Google Sheets in two parts to skip Column I
+      // Part 1: Columns A-H
+      const part1Response = await this.sheets.spreadsheets.values.update({
+        spreadsheetId: this.sheetId,
+        range: `Portfolio Overview!A${rowIndexToEdit}:H${rowIndexToEdit}`,
+        valueInputOption: 'USER_ENTERED',
+        requestBody: {
+          values: [part1Data]
+        }
+      });
+
+      // Part 2: Columns J-M
       const updateResponse = await this.sheets.spreadsheets.values.update({
         spreadsheetId: this.sheetId,
-        range: `Portfolio Overview!A${rowIndexToEdit}:M${rowIndexToEdit}`,
-        valueInputOption: 'RAW',
+        range: `Portfolio Overview!J${rowIndexToEdit}:M${rowIndexToEdit}`,
+        valueInputOption: 'USER_ENTERED',
         requestBody: {
-          values: [updatedRow]
+          values: [part2Data]
         }
       });
 
