@@ -10,6 +10,12 @@ export default defineConfig({
     setupFiles: ['./src/test/setup.ts'],
     include: ['src/**/*.{test,spec}.{js,ts,jsx,tsx}'],
     exclude: ['node_modules', 'dist', '.next'],
+    // Ensure React is properly configured for testing
+    environmentOptions: {
+      jsdom: {
+        resources: 'usable'
+      }
+    },
     coverage: {
       provider: 'v8',
       reporter: ['text', 'json', 'html'],

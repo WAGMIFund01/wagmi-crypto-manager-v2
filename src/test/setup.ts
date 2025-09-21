@@ -7,8 +7,18 @@ import React from 'react'
 // Extend Vitest's expect with jest-dom matchers
 expect.extend(matchers)
 
-// Fix React.act compatibility issue
+// Fix React.act compatibility issue for testing library
 global.React = React
+
+// Ensure React.act is available
+if (React.act) {
+  global.React.act = React.act
+} else {
+  // Fallback for environments where React.act is not available
+  global.React.act = (callback: () => void) => {
+    callback()
+  }
+}
 
 // Cleanup after each test case
 afterEach(() => {
