@@ -586,13 +586,30 @@ export class SheetsAdapter {
       console.log(`- Start index (0-based): ${rowIndexToRemove - 1}`);
       console.log(`- End index (0-based): ${rowIndexToRemove}`);
       
+      // Get the actual sheet ID for Portfolio Overview
+      console.log('Getting sheet metadata to find correct sheet ID...');
+      const sheetMetadata = await this.sheets.spreadsheets.get({
+        spreadsheetId: this.sheetId
+      });
+      
+      const portfolioSheet = sheetMetadata.data.sheets?.find(sheet => 
+        sheet.properties?.title === 'Portfolio Overview'
+      );
+      
+      if (!portfolioSheet || !portfolioSheet.properties?.sheetId) {
+        throw new Error('Portfolio Overview sheet not found or missing sheet ID');
+      }
+      
+      const actualSheetId = portfolioSheet.properties.sheetId;
+      console.log(`Found Portfolio Overview sheet ID: ${actualSheetId}`);
+      
       const deleteRequest = {
         spreadsheetId: this.sheetId,
         requestBody: {
           requests: [{
             deleteDimension: {
               range: {
-                sheetId: 0, // Portfolio Overview is the first sheet
+                sheetId: actualSheetId, // Use the actual sheet ID, not 0
                 dimension: 'ROWS',
                 startIndex: rowIndexToRemove - 1, // Convert to 0-based index
                 endIndex: rowIndexToRemove
