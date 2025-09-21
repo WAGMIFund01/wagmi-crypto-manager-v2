@@ -735,9 +735,16 @@ export class SheetsAdapter {
       for (let i = 1; i < rows.length; i++) {
         const row = rows[i];
         const rowSymbol = row && row.length > 1 ? row[1]?.toString().toUpperCase() : '';
-        console.log(`Row ${i}: Symbol = "${rowSymbol}", Asset = "${row[0]}"`);
+        const rowLocation = row && row.length > 4 ? row[4]?.toString() : '';
+        const rowCoinType = row && row.length > 5 ? row[5]?.toString() : '';
         
-        if (row && row.length > 1 && rowSymbol === editData.symbol.toUpperCase()) {
+        console.log(`Row ${i}: Symbol = "${rowSymbol}", Location = "${rowLocation}", CoinType = "${rowCoinType}", Asset = "${row[0]}"`);
+        
+        // Match by symbol, location, and coinType to identify the specific asset
+        if (row && row.length > 5 && 
+            rowSymbol === editData.symbol.toUpperCase() &&
+            rowLocation === editData.location &&
+            rowCoinType === editData.coinType) {
           rowIndexToEdit = i + 1; // +1 because Google Sheets uses 1-based indexing
           console.log(`Found matching asset at row ${rowIndexToEdit}`);
           break;
@@ -745,10 +752,10 @@ export class SheetsAdapter {
       }
       
       if (rowIndexToEdit === -1) {
-        console.log(`No asset found with symbol: ${editData.symbol}`);
+        console.log(`No asset found with symbol: ${editData.symbol}, location: ${editData.location}, coinType: ${editData.coinType}`);
         return {
           success: false,
-          error: `Asset with symbol ${editData.symbol} not found`
+          error: `Asset with symbol ${editData.symbol}, location ${editData.location}, and type ${editData.coinType} not found`
         };
       }
 
