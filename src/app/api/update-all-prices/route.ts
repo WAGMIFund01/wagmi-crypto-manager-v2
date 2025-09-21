@@ -108,28 +108,37 @@ export async function POST(request: NextRequest) {
     let priceData: Record<string, { usd: number; usd_24h_change?: number }> = {};
     let coinGeckoError: string | null = null;
 
+    console.log(`CoinGecko IDs to fetch: ${coinGeckoIdsToFetch.size} unique IDs`);
+    console.log('CoinGecko IDs:', Array.from(coinGeckoIdsToFetch));
+
     if (coinGeckoIdsToFetch.size > 0) {
       const coinGeckoIds = Array.from(coinGeckoIdsToFetch).join(',');
+      const apiUrl = `https://api.coingecko.com/api/v3/simple/price?ids=${coinGeckoIds}&vs_currencies=usd&include_24hr_change=true`;
+      
+      console.log('CoinGecko API URL:', apiUrl);
       
       try {
-        const priceResponse = await fetch(
-          `https://api.coingecko.com/api/v3/simple/price?ids=${coinGeckoIds}&vs_currencies=usd&include_24hr_change=true`,
-          {
-            headers: {
-              'Accept': 'application/json',
-              ...(config.coinGeckoApiKey && { 'x-cg-demo-api-key': config.coinGeckoApiKey }),
-            },
-          }
-        );
+        const priceResponse = await fetch(apiUrl, {
+          headers: {
+            'Accept': 'application/json',
+            ...(config.coinGeckoApiKey && { 'x-cg-demo-api-key': config.coinGeckoApiKey }),
+          },
+        });
+
+        console.log('CoinGecko API response status:', priceResponse.status, priceResponse.statusText);
 
         if (!priceResponse.ok) {
           throw new Error(`CoinGecko API error: ${priceResponse.status} ${priceResponse.statusText}`);
         }
 
         priceData = await priceResponse.json();
+        console.log('CoinGecko API response data:', priceData);
       } catch (error) {
         coinGeckoError = error instanceof Error ? error.message : 'Unknown CoinGecko API error';
+        console.error('CoinGecko API error:', error);
       }
+    } else {
+      console.log('No CoinGecko IDs to fetch - all assets missing valid CoinGecko IDs');
     }
 
     // Step 4: Update asset details with price information
@@ -137,17 +146,31 @@ export async function POST(request: NextRequest) {
     const updates: { range: string; values: (string | number)[][] }[] = [];
     let updatedCount = 0;
 
+    console.log('=== PRICE UPDATE DEBUG ===');
+    console.log('Total assets to process:', assetDetails.length);
+    console.log('CoinGecko price data received:', Object.keys(priceData).length, 'assets');
+    console.log('CoinGecko error:', coinGeckoError);
+
     for (const asset of assetDetails) {
+      console.log(`Processing asset: ${asset.symbol} (${asset.coinGeckoId}) - Status: ${asset.status}`);
+      
       if (asset.status === 'success' && asset.coinGeckoId) {
         const priceInfo = priceData[asset.coinGeckoId];
         const newPrice = priceInfo?.usd;
         const newPriceChange = priceInfo?.usd_24h_change;
+
+        console.log(`  Price info for ${asset.coinGeckoId}:`, priceInfo);
+        console.log(`  New price: ${newPrice}, Price change: ${newPriceChange}`);
 
         if (newPrice !== undefined) {
           asset.newPrice = newPrice;
           const rowNum = asset.rowIndex + 1; // Google Sheets is 1-indexed
           const currentPriceRange = `Portfolio Overview!H${rowNum}`;
           const lastUpdateRange = `Portfolio Overview!J${rowNum}`;
+
+          console.log(`  Adding update for row ${rowNum}:`);
+          console.log(`    Current price (${currentPriceRange}): ${newPrice}`);
+          console.log(`    Last update (${lastUpdateRange}): ${currentTimestamp}`);
 
           updates.push({
             range: currentPriceRange,
@@ -161,6 +184,7 @@ export async function POST(request: NextRequest) {
           // Add 24hr price change update if available
           if (newPriceChange !== undefined) {
             const priceChangeRange = `Portfolio Overview!L${rowNum}`;
+            console.log(`    24hr change (${priceChangeRange}): ${newPriceChange}`);
             updates.push({
               range: priceChangeRange,
               values: [[newPriceChange]]
@@ -171,19 +195,30 @@ export async function POST(request: NextRequest) {
         } else {
           asset.status = 'coinGecko_error';
           asset.error = `No price data returned from CoinGecko for ID: ${asset.coinGeckoId}`;
+          console.log(`  ERROR: No price data for ${asset.coinGeckoId}`);
         }
+      } else {
+        console.log(`  SKIPPED: Asset ${asset.symbol} - Status: ${asset.status}, CoinGecko ID: ${asset.coinGeckoId}`);
       }
     }
 
     // Step 5: Execute batch update if there are updates to make
+    console.log(`Total updates to execute: ${updates.length}`);
     if (updates.length > 0) {
-      await sheets.spreadsheets.values.batchUpdate({
+      console.log('Executing batch update to Google Sheets...');
+      console.log('Updates:', updates.map(u => `${u.range}: ${u.values[0][0]}`));
+      
+      const batchUpdateResult = await sheets.spreadsheets.values.batchUpdate({
         spreadsheetId: sheetId,
         requestBody: {
           valueInputOption: 'RAW',
           data: updates
         }
       });
+      
+      console.log('Batch update result:', batchUpdateResult.data);
+    } else {
+      console.log('No updates to execute - no valid price data found');
     }
 
     // Step 6: Return detailed results
