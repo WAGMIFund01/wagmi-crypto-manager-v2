@@ -13,7 +13,7 @@ export async function GET(request: NextRequest) {
       ? `https://${process.env.VERCEL_URL}` 
       : 'http://localhost:3000';
     
-    const response = await fetch(`${baseUrl}/api/update-portfolio-prices`, {
+    const response = await fetch(`${baseUrl}/api/update-all-prices`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',

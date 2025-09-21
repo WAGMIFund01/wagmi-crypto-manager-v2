@@ -29,7 +29,7 @@ export async function POST(request: NextRequest) {
     // Step 1: Read current portfolio data including CoinGecko ID column
     const portfolioResponse = await sheets.spreadsheets.values.get({
       spreadsheetId: sheetId,
-      range: 'Portfolio Overview!A:K', // Extended to include column K for CoinGecko ID
+      range: 'Portfolio Overview!A:L', // Extended to include columns K (CoinGecko ID) and L (24hr price change)
     });
 
     const rows = portfolioResponse.data.values;
