@@ -10,11 +10,13 @@ export async function PUT(request: Request) {
       riskLevel, 
       location, 
       coinType,
-      thesis 
+      thesis,
+      originalAsset
     } = body;
 
     console.log(`=== EDITING ASSET: ${symbol} ===`);
     console.log('Edit data:', { symbol, quantity, riskLevel, location, coinType, thesis });
+    console.log('Original asset data:', originalAsset);
 
     // Validate required fields
     if (!symbol) {
@@ -31,14 +33,15 @@ export async function PUT(request: Request) {
       }, { status: 400 });
     }
 
-    // Edit the asset in Google Sheets
+    // Edit the asset in Google Sheets using original asset data to identify which asset to edit
     const result = await sheetsAdapter.editPortfolioAsset({
       symbol: symbol.toUpperCase(),
       quantity: parseFloat(quantity),
       riskLevel: riskLevel || 'Medium',
       location: location || 'Exchange',
       coinType: coinType || 'Altcoin',
-      thesis: thesis || ''
+      thesis: thesis || '',
+      originalAsset: originalAsset
     });
 
     if (result.success) {

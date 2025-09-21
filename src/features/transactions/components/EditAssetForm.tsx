@@ -18,6 +18,7 @@ interface EditAssetFormProps {
     location: string;
     coinType: string;
     thesis: string;
+    originalAsset: PortfolioAsset;
   }) => Promise<void>;
   onClose: () => void;
 }
@@ -58,7 +59,8 @@ export default function EditAssetForm({ isOpen, asset, onSave, onClose }: EditAs
         riskLevel: formData.riskLevel,
         location: formData.location,
         coinType: formData.coinType,
-        thesis: formData.thesis
+        thesis: formData.thesis,
+        originalAsset: asset
       };
       
       console.log('Calling onSave with data:', saveData);
@@ -166,7 +168,7 @@ export default function EditAssetForm({ isOpen, asset, onSave, onClose }: EditAs
 
             {/* Current Info Display */}
             <div className="bg-gray-800/50 rounded-lg p-4 space-y-2">
-              <div className="text-sm text-gray-400">Current Information:</div>
+              <div className="text-sm text-gray-400 font-medium">Current Asset Information:</div>
               <div className="grid grid-cols-2 gap-2 text-sm">
                 <div>
                   <span className="text-gray-400">Current Price:</span>
@@ -185,8 +187,26 @@ export default function EditAssetForm({ isOpen, asset, onSave, onClose }: EditAs
                   <div className="text-white font-medium">{asset.chain}</div>
                 </div>
                 <div>
-                  <span className="text-gray-400">Type:</span>
+                  <span className="text-gray-400">Current Type:</span>
                   <div className="text-white font-medium">{asset.coinType}</div>
+                </div>
+                <div>
+                  <span className="text-gray-400">Current Location:</span>
+                  <div className="text-white font-medium">{asset.location}</div>
+                </div>
+                <div>
+                  <span className="text-gray-400">Current Quantity:</span>
+                  <div className="text-white font-medium">{asset.quantity.toLocaleString()}</div>
+                </div>
+              </div>
+              <div className="mt-3 pt-2 border-t border-gray-600">
+                <div className="text-xs text-gray-500">
+                  <strong>Note:</strong> You are editing the {asset.symbol} asset in <strong>{asset.location}</strong> with type <strong>{asset.coinType}</strong>. 
+                  {asset.symbol === 'AURA' && (
+                    <span className="block mt-1 text-yellow-400">
+                      ⚠️ There are multiple {asset.symbol} assets. Make sure you're editing the correct one based on location and type.
+                    </span>
+                  )}
                 </div>
               </div>
             </div>

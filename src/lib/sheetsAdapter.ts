@@ -706,6 +706,7 @@ export class SheetsAdapter {
     location: string;
     coinType: string;
     thesis: string;
+    originalAsset?: any;
   }): Promise<{ success: boolean; data?: any; error?: string }> {
     try {
       console.log(`Editing asset ${editData.symbol} in portfolio...`);
@@ -727,10 +728,17 @@ export class SheetsAdapter {
       console.log('Portfolio data fetched successfully');
       const rows = response.data.values || [];
       
-      // Find the row index of the asset to edit
+      // Find the row index of the asset to edit using original asset data
       let rowIndexToEdit = -1;
       console.log(`Looking for asset with symbol: ${editData.symbol.toUpperCase()}`);
       console.log(`Total rows in sheet: ${rows.length}`);
+      
+      // Use original asset data to find the correct row, or fall back to new data matching
+      const searchSymbol = editData.originalAsset?.symbol?.toUpperCase() || editData.symbol.toUpperCase();
+      const searchLocation = editData.originalAsset?.location || editData.location;
+      const searchCoinType = editData.originalAsset?.coinType || editData.coinType;
+      
+      console.log(`Searching for asset with original values - Symbol: "${searchSymbol}", Location: "${searchLocation}", CoinType: "${searchCoinType}"`);
       
       for (let i = 1; i < rows.length; i++) {
         const row = rows[i];
@@ -740,11 +748,11 @@ export class SheetsAdapter {
         
         console.log(`Row ${i}: Symbol = "${rowSymbol}", Location = "${rowLocation}", CoinType = "${rowCoinType}", Asset = "${row[0]}"`);
         
-        // Match by symbol, location, and coinType to identify the specific asset
+        // Match by original asset data to identify the specific asset
         if (row && row.length > 5 && 
-            rowSymbol === editData.symbol.toUpperCase() &&
-            rowLocation === editData.location &&
-            rowCoinType === editData.coinType) {
+            rowSymbol === searchSymbol &&
+            rowLocation === searchLocation &&
+            rowCoinType === searchCoinType) {
           rowIndexToEdit = i + 1; // +1 because Google Sheets uses 1-based indexing
           console.log(`Found matching asset at row ${rowIndexToEdit}`);
           break;
@@ -752,10 +760,10 @@ export class SheetsAdapter {
       }
       
       if (rowIndexToEdit === -1) {
-        console.log(`No asset found with symbol: ${editData.symbol}, location: ${editData.location}, coinType: ${editData.coinType}`);
+        console.log(`No asset found with symbol: ${searchSymbol}, location: ${searchLocation}, coinType: ${searchCoinType}`);
         return {
           success: false,
-          error: `Asset with symbol ${editData.symbol}, location ${editData.location}, and type ${editData.coinType} not found`
+          error: `Asset with symbol ${searchSymbol}, location ${searchLocation}, and type ${searchCoinType} not found`
         };
       }
 

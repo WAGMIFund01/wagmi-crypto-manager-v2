@@ -122,6 +122,7 @@ export default function PortfolioOverview({ className, onRefresh, isPrivacyMode 
     location: string;
     coinType: string;
     thesis: string;
+    originalAsset: PortfolioAsset;
   }) => {
     try {
       console.log('=== PortfolioOverview: handleEditAssetSave called ===');
@@ -132,7 +133,10 @@ export default function PortfolioOverview({ className, onRefresh, isPrivacyMode 
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify(editData),
+        body: JSON.stringify({
+          ...editData,
+          originalAsset: editData.originalAsset
+        }),
       });
 
       console.log('API response status:', response.status);
