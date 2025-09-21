@@ -80,6 +80,12 @@ export default function PortfolioOverview({ className, onRefresh, isPrivacyMode 
   const handleRemoveAsset = async (symbol: string) => {
     console.log('Delete button clicked for symbol:', symbol);
     
+    // Prevent multiple simultaneous deletion attempts
+    if (removingAsset) {
+      console.log('Another deletion is already in progress, ignoring this request');
+      return;
+    }
+    
     if (!confirm(`Are you sure you want to remove ${symbol} from the portfolio?`)) {
       console.log('User cancelled deletion');
       return;
@@ -102,11 +108,19 @@ export default function PortfolioOverview({ className, onRefresh, isPrivacyMode 
         fetchPortfolioData(); // Refresh the portfolio data
       } else {
         console.log('Asset removal failed:', data.error);
-        alert(`Failed to remove asset: ${data.error}`);
+        const errorMsg = data.error || 'Unknown error occurred';
+        
+        // Provide more specific error messages
+        if (errorMsg.includes('not actually removed')) {
+          alert(`Asset deletion verification failed: ${errorMsg}\n\nThis might be due to:\n- Duplicate entries in the sheet\n- Sheet protection settings\n- Google Sheets API permissions`);
+        } else {
+          alert(`Failed to remove asset: ${errorMsg}`);
+        }
       }
     } catch (err) {
       console.error('Error removing asset:', err);
-      alert('Failed to remove asset');
+      const errorMsg = err instanceof Error ? err.message : 'Unknown error occurred';
+      alert(`Failed to remove asset: ${errorMsg}`);
     } finally {
       setRemovingAsset(null);
     }

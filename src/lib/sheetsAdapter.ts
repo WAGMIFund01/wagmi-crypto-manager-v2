@@ -558,6 +558,7 @@ export class SheetsAdapter {
       
       // Find the row index of the asset to remove (skip header row)
       let rowIndexToRemove = -1;
+      const matchingRows: number[] = [];
       console.log(`Looking for asset with symbol: ${symbol.toUpperCase()}`);
       console.log(`Total rows in sheet: ${rows.length}`);
       
@@ -567,16 +568,25 @@ export class SheetsAdapter {
         console.log(`Row ${i}: Symbol = "${rowSymbol}", Asset = "${row[0]}"`);
         
         if (row && row.length > 1 && rowSymbol === symbol.toUpperCase()) {
-          rowIndexToRemove = i + 1; // +1 because Google Sheets uses 1-based indexing
-          console.log(`Found matching asset at row ${rowIndexToRemove}`);
-          break;
+          matchingRows.push(i + 1); // +1 because Google Sheets uses 1-based indexing
+          console.log(`Found matching asset at row ${i + 1}`);
         }
       }
-
-      if (rowIndexToRemove === -1) {
+      
+      if (matchingRows.length === 0) {
         console.log(`No asset found with symbol: ${symbol}`);
         throw new Error(`Asset with symbol ${symbol} not found`);
       }
+      
+      if (matchingRows.length > 1) {
+        console.log(`⚠️ WARNING: Found ${matchingRows.length} duplicate entries for ${symbol}:`);
+        matchingRows.forEach((rowIndex, index) => {
+          console.log(`  ${index + 1}. Row ${rowIndex}: ${rows[rowIndex - 1]}`);
+        });
+        console.log(`Will delete the first occurrence at row ${matchingRows[0]}`);
+      }
+      
+      rowIndexToRemove = matchingRows[0]; // Delete the first occurrence
 
       // Delete the row
       console.log(`Attempting to delete row ${rowIndexToRemove}...`);
