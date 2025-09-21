@@ -1,48 +1,54 @@
-'use client';
+import { useState, useEffect } from 'react'
 
-import { useState, useEffect } from 'react';
-
-interface PortfolioFieldOptions {
-  chains: string[];
-  riskLevels: string[];
-  locations: string[];
-  coinTypes: string[];
+export interface UsePortfolioFieldOptionsReturn {
+  options: string[]
+  loading: boolean
+  error: string | null
 }
 
-export function usePortfolioFieldOptions() {
-  const [options, setOptions] = useState<PortfolioFieldOptions>({
-    chains: [],
-    riskLevels: [],
-    locations: [],
-    coinTypes: []
-  });
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
+/**
+ * Hook to fetch unique field options for portfolio forms
+ * Used by SmartDropdown components to provide autocomplete suggestions
+ */
+export function usePortfolioFieldOptions(field: 'chain' | 'riskLevel' | 'location' | 'coinType'): UsePortfolioFieldOptionsReturn {
+  const [options, setOptions] = useState<string[]>([])
+  const [loading, setLoading] = useState(false)
+  const [error, setError] = useState<string | null>(null)
 
   useEffect(() => {
     const fetchOptions = async () => {
+      setLoading(true)
+      setError(null)
+
       try {
-        setLoading(true);
-        setError(null);
+        const response = await fetch(`/api/get-portfolio-field-options?field=${field}`)
         
-        const response = await fetch('/api/get-portfolio-field-options');
-        const data = await response.json();
+        if (!response.ok) {
+          throw new Error(`Failed to fetch ${field} options`)
+        }
+
+        const data = await response.json()
         
         if (data.success) {
-          setOptions(data.data);
+          setOptions(data.options || [])
         } else {
-          setError(data.error || 'Failed to fetch field options');
+          throw new Error(data.error || `Failed to fetch ${field} options`)
         }
       } catch (err) {
-        console.error('Error fetching portfolio field options:', err);
-        setError('Failed to fetch field options');
+        console.error(`Error fetching ${field} options:`, err)
+        setError(err instanceof Error ? err.message : 'Unknown error')
+        setOptions([])
       } finally {
-        setLoading(false);
+        setLoading(false)
       }
-    };
+    }
 
-    fetchOptions();
-  }, []);
+    fetchOptions()
+  }, [field])
 
-  return { options, loading, error };
+  return {
+    options,
+    loading,
+    error
+  }
 }
