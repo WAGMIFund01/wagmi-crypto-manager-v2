@@ -35,6 +35,30 @@ export default function StackedBarChart({
   
   const total = sortedEntries.reduce((sum, [, value]) => sum + value, 0);
   
+  // Handle empty data state
+  if (sortedEntries.length === 0 || total === 0) {
+    return (
+      <WagmiCard 
+        variant="kpi" 
+        theme="green" 
+        size="md" 
+        className={className}
+      >
+        <div className="flex items-center justify-between mb-4">
+          <h3 className="text-lg font-semibold text-white">{title}</h3>
+          {headerButton && (
+            <div className="flex-shrink-0">
+              {headerButton}
+            </div>
+          )}
+        </div>
+        <div className="text-center py-8">
+          <div className="text-gray-400 text-sm">No data available</div>
+        </div>
+      </WagmiCard>
+    );
+  }
+  
   return (
     <WagmiCard 
       variant="kpi" 
@@ -55,7 +79,10 @@ export default function StackedBarChart({
         <div className="h-8 bg-gray-700 rounded-lg overflow-hidden flex">
           {sortedEntries.map(([key, value], index) => {
             const percentage = (value / total) * 100;
-            const color = Array.isArray(colors) ? colors[index % colors.length] : colors[key];
+            // Handle case-insensitive color matching
+            const color = Array.isArray(colors) 
+              ? colors[index % colors.length] 
+              : (colors[key] || colors[key.toLowerCase()] || colors[key.toUpperCase()]);
             return (
               <div
                 key={key}
@@ -74,7 +101,10 @@ export default function StackedBarChart({
         <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-2 text-xs">
           {sortedEntries.map(([key, value], index) => {
             const percentage = (value / total) * 100;
-            const color = Array.isArray(colors) ? colors[index % colors.length] : colors[key];
+            // Handle case-insensitive color matching
+            const color = Array.isArray(colors) 
+              ? colors[index % colors.length] 
+              : (colors[key] || colors[key.toLowerCase()] || colors[key.toUpperCase()]);
             return (
               <div key={key} className="flex items-center space-x-2">
                 <div 

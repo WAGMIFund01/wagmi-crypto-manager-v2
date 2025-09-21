@@ -170,11 +170,17 @@ export default function InvestorPage() {
   // Color palettes for different chart types
   const assetColors = Object.values(COLORS.chart);
   
-  const riskColors = COLORS.risk;
+  // Create risk color mapping with case-insensitive matching
+  const riskColors = Object.fromEntries(
+    Object.entries(COLORS.risk).map(([key, color]) => [key.toLowerCase(), color])
+  );
 
   const locationColors = Object.values(COLORS.chart);
 
-  const typeColors = COLORS.assetType;
+  // Create type color mapping with case-insensitive matching
+  const typeColors = Object.fromEntries(
+    Object.entries(COLORS.assetType).map(([key, color]) => [key.toLowerCase(), color])
+  );
 
   if (loading || !investorId) {
     return (
