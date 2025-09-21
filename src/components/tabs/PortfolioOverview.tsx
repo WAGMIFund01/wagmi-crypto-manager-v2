@@ -74,7 +74,12 @@ export default function PortfolioOverview({ className, onRefresh, isPrivacyMode 
   const handleAssetAdded = () => {
     setSelectedAsset(null);
     setShowAddForm(false);
-    fetchPortfolioData(); // Refresh the portfolio data
+    // Trigger full refresh including KPI data (AUM ribbon)
+    if (onRefresh) {
+      onRefresh();
+    } else {
+      fetchPortfolioData(); // Fallback to local refresh
+    }
   };
 
   const handleRemoveAsset = async (symbol: string) => {
@@ -105,7 +110,12 @@ export default function PortfolioOverview({ className, onRefresh, isPrivacyMode 
 
       if (data.success) {
         console.log('Asset removal successful, refreshing portfolio data');
-        fetchPortfolioData(); // Refresh the portfolio data
+        // Trigger full refresh including KPI data (AUM ribbon)
+        if (onRefresh) {
+          onRefresh();
+        } else {
+          fetchPortfolioData(); // Fallback to local refresh
+        }
       } else {
         console.log('Asset removal failed:', data.error);
         const errorMsg = data.error || 'Unknown error occurred';
