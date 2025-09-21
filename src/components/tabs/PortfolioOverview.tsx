@@ -490,37 +490,55 @@ export default function PortfolioOverview({ className, onRefresh, isPrivacyMode 
         {/* Desktop Layout */}
         <div className="hidden md:block">
           <div className="overflow-x-auto">
-            <table className="w-full">
+            <table className="w-full table-fixed">
             <thead className="bg-gray-900/50">
               <tr>
-                <SortableHeader sortKey="assetName" currentSort={sortConfig} onSort={handleSort} align="left">
-                  Asset
-                </SortableHeader>
-                <SortableHeader sortKey="chain" currentSort={sortConfig} onSort={handleSort} align="left">
-                  Chain
-                </SortableHeader>
-                <SortableHeader sortKey="riskLevel" currentSort={sortConfig} onSort={handleSort} align="left">
-                  Risk
-                </SortableHeader>
-                <SortableHeader sortKey="location" currentSort={sortConfig} onSort={handleSort} align="left">
-                  Location
-                </SortableHeader>
-                <SortableHeader sortKey="coinType" currentSort={sortConfig} onSort={handleSort} align="left">
-                  Type
-                </SortableHeader>
-                <SortableHeader sortKey="quantity" currentSort={sortConfig} onSort={handleSort} align="right">
-                  Quantity
-                </SortableHeader>
-                <SortableHeader sortKey="currentPrice" currentSort={sortConfig} onSort={handleSort} align="right">
-                  Price
-                </SortableHeader>
-                <SortableHeader sortKey="priceChange24h" currentSort={sortConfig} onSort={handleSort} align="right">
-                  24h Change
-                </SortableHeader>
-                <SortableHeader sortKey="totalValue" currentSort={sortConfig} onSort={handleSort} align="right">
-                  Value
-                </SortableHeader>
-                <th className="px-6 py-3 text-center">
+                <th className="w-32 px-3 py-3 text-left">
+                  <SortableHeader sortKey="assetName" currentSort={sortConfig} onSort={handleSort} align="left">
+                    Asset
+                  </SortableHeader>
+                </th>
+                <th className="w-20 px-3 py-3 text-left">
+                  <SortableHeader sortKey="chain" currentSort={sortConfig} onSort={handleSort} align="left">
+                    Chain
+                  </SortableHeader>
+                </th>
+                <th className="w-16 px-3 py-3 text-left">
+                  <SortableHeader sortKey="riskLevel" currentSort={sortConfig} onSort={handleSort} align="left">
+                    Risk
+                  </SortableHeader>
+                </th>
+                <th className="w-24 px-3 py-3 text-left">
+                  <SortableHeader sortKey="location" currentSort={sortConfig} onSort={handleSort} align="left">
+                    Location
+                  </SortableHeader>
+                </th>
+                <th className="w-20 px-3 py-3 text-left">
+                  <SortableHeader sortKey="coinType" currentSort={sortConfig} onSort={handleSort} align="left">
+                    Type
+                  </SortableHeader>
+                </th>
+                <th className="w-24 px-3 py-3 text-right">
+                  <SortableHeader sortKey="quantity" currentSort={sortConfig} onSort={handleSort} align="right">
+                    Quantity
+                  </SortableHeader>
+                </th>
+                <th className="w-20 px-3 py-3 text-right">
+                  <SortableHeader sortKey="currentPrice" currentSort={sortConfig} onSort={handleSort} align="right">
+                    Price
+                  </SortableHeader>
+                </th>
+                <th className="w-20 px-3 py-3 text-right">
+                  <SortableHeader sortKey="priceChange24h" currentSort={sortConfig} onSort={handleSort} align="right">
+                    24h Change
+                  </SortableHeader>
+                </th>
+                <th className="w-24 px-3 py-3 text-right">
+                  <SortableHeader sortKey="totalValue" currentSort={sortConfig} onSort={handleSort} align="right">
+                    Value
+                  </SortableHeader>
+                </th>
+                <th className="w-24 px-3 py-3 text-center sticky right-0 bg-gray-900/95 backdrop-blur-sm z-10 border-l border-gray-700">
                   <WagmiText variant="label" color="muted">Actions</WagmiText>
                 </th>
               </tr>
@@ -528,45 +546,45 @@ export default function PortfolioOverview({ className, onRefresh, isPrivacyMode 
             <tbody className="divide-y divide-gray-700">
               {sortedAssets.map((asset, index) => (
                 <tr key={`${asset.symbol}-${index}`} className="hover:bg-gray-800/30 transition-colors">
-                  <td className="px-6 py-4 whitespace-nowrap">
+                  <td className="px-3 py-4 truncate">
                     <div>
-                      <div className="text-sm font-medium text-white">{asset.assetName}</div>
-                      <div className="text-sm text-gray-400">{asset.symbol}</div>
+                      <div className="text-sm font-medium text-white truncate">{asset.assetName}</div>
+                      <div className="text-sm text-gray-400 truncate">{asset.symbol}</div>
                     </div>
                   </td>
-                  <td className="px-6 py-4 whitespace-nowrap">
+                  <td className="px-3 py-4 truncate">
                     <span className={`text-sm font-medium ${getChainColorClass(asset.chain)}`}>
                       {asset.chain}
                     </span>
                   </td>
-                  <td className="px-6 py-4 whitespace-nowrap">
+                  <td className="px-3 py-4 truncate">
                     <span className={`text-sm font-medium ${getRiskColorClass(asset.riskLevel)}`}>
                       {asset.riskLevel}
                     </span>
                   </td>
-                  <td className="px-6 py-4 whitespace-nowrap">
-                    <div className="text-sm text-gray-300">{asset.location}</div>
+                  <td className="px-3 py-4 truncate">
+                    <div className="text-sm text-gray-300 truncate">{asset.location}</div>
                   </td>
-                  <td className="px-6 py-4 whitespace-nowrap">
-                    <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-700 text-gray-300">
+                  <td className="px-3 py-4 truncate">
+                    <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-gray-700 text-gray-300">
                       {asset.coinType}
                     </span>
                   </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-right">
+                  <td className="px-3 py-4 text-right">
                     <div className="text-sm text-gray-300">{isPrivacyMode ? createMask() : formatNumber(asset.quantity)}</div>
                   </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-right">
+                  <td className="px-3 py-4 text-right">
                     <div className="text-sm text-gray-300">{formatCurrency(asset.currentPrice)}</div>
                   </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-right">
+                  <td className="px-3 py-4 text-right">
                     <div className={`text-sm font-medium ${formatPriceChange(asset.priceChange24h).color}`}>
                       {formatPriceChange(asset.priceChange24h).text}
                     </div>
                   </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-right">
+                  <td className="px-3 py-4 text-right">
                     <div className="text-sm font-medium text-gray-300">{isPrivacyMode ? createMask() : formatCurrency(asset.totalValue)}</div>
                   </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-center">
+                  <td className="px-3 py-4 text-center sticky right-0 bg-gray-800/95 backdrop-blur-sm z-10 border-l border-gray-700">
                     <div className="flex gap-1 justify-center">
                       <WagmiButton
                         variant="icon"
