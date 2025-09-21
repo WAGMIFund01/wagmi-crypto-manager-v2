@@ -3,7 +3,6 @@
 import { useState } from 'react';
 import WagmiButton from '@/components/ui/WagmiButton';
 import WagmiInput from '@/components/ui/WagmiInput';
-import WagmiCard from '@/components/ui/WagmiCard';
 import StandardModal from '@/components/ui/StandardModal';
 import { PortfolioAsset } from '@/lib/sheetsAdapter';
 
