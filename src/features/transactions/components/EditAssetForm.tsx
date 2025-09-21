@@ -34,24 +34,32 @@ export default function EditAssetForm({ asset, onSave, onCancel }: EditAssetForm
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    console.log('=== EditAssetForm: Form submitted ===');
+    console.log('Form data:', formData);
     setIsSubmitting(true);
     setError(null);
 
     try {
       // Validate quantity
       const quantity = parseFloat(formData.quantity);
+      console.log('Parsed quantity:', quantity);
       if (isNaN(quantity) || quantity <= 0) {
         throw new Error('Please enter a valid quantity');
       }
 
-      await onSave({
+      const saveData = {
         symbol: formData.symbol,
         quantity: quantity,
         riskLevel: formData.riskLevel,
         location: formData.location,
         thesis: formData.thesis
-      });
+      };
+      
+      console.log('Calling onSave with data:', saveData);
+      await onSave(saveData);
+      console.log('onSave completed successfully');
     } catch (err) {
+      console.error('Error in handleSubmit:', err);
       setError(err instanceof Error ? err.message : 'Failed to update asset');
     } finally {
       setIsSubmitting(false);

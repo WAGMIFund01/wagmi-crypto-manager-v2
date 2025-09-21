@@ -110,7 +110,9 @@ export default function PortfolioOverview({ className, onRefresh, isPrivacyMode 
     thesis: string;
   }) => {
     try {
-      console.log('Updating asset:', editData);
+      console.log('=== PortfolioOverview: handleEditAssetSave called ===');
+      console.log('Edit data received:', editData);
+      
       const response = await fetch('/api/edit-asset', {
         method: 'PUT',
         headers: {
@@ -119,12 +121,15 @@ export default function PortfolioOverview({ className, onRefresh, isPrivacyMode 
         body: JSON.stringify(editData),
       });
 
+      console.log('API response status:', response.status);
       const data = await response.json();
+      console.log('API response data:', data);
 
       if (data.success) {
-        console.log('Asset updated successfully');
+        console.log('Asset updated successfully, calling handleAssetEdited');
         handleAssetEdited();
       } else {
+        console.error('API returned error:', data.error);
         throw new Error(data.error || 'Failed to update asset');
       }
     } catch (error) {
