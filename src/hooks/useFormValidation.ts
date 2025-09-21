@@ -3,7 +3,7 @@
 import { useState, useCallback } from 'react';
 import { 
   validateForm, 
-  validateField, 
+  validateField as validateFieldUtil, 
   ValidationRules, 
   ValidationResult,
   FieldError 
@@ -168,7 +168,7 @@ export function useFieldValidation(rules: ValidationRules) {
     const fieldRules = rules[field];
     if (!fieldRules) return true;
 
-    const fieldError = validateField(value, fieldRules);
+    const fieldError = validateFieldUtil(value, fieldRules);
     
     setErrors(prev => {
       const newErrors = { ...prev };
