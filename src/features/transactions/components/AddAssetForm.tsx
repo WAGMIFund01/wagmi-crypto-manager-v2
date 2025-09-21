@@ -18,9 +18,9 @@ export default function AddAssetForm({ isOpen, onClose, onAssetAdded, selectedAs
   const [selectedAsset, setSelectedAsset] = useState<AssetSearchResult | null>(propSelectedAsset || null);
   const [quantity, setQuantity] = useState('');
   const [chain, setChain] = useState('');
-  const [riskLevel, setRiskLevel] = useState('Medium');
+  const [riskLevel, setRiskLevel] = useState('');
   const [location, setLocation] = useState('');
-  const [coinType, setCoinType] = useState('Altcoin');
+  const [coinType, setCoinType] = useState('');
   const [thesis, setThesis] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -126,9 +126,9 @@ export default function AddAssetForm({ isOpen, onClose, onAssetAdded, selectedAs
         setSelectedAsset(null);
         setQuantity('');
         setChain('');
-        setRiskLevel('Medium');
+        setRiskLevel('');
         setLocation('');
-        setCoinType('Altcoin');
+        setCoinType('');
         setThesis('');
         
         // Close modal and refresh data
@@ -150,9 +150,9 @@ export default function AddAssetForm({ isOpen, onClose, onAssetAdded, selectedAs
     setSelectedAsset(null);
     setQuantity('');
     setChain('');
-    setRiskLevel('Medium');
+    setRiskLevel('');
     setLocation('');
-    setCoinType('Altcoin');
+    setCoinType('');
     setThesis('');
     setError(null);
     onClose();
@@ -236,7 +236,7 @@ export default function AddAssetForm({ isOpen, onClose, onAssetAdded, selectedAs
               label="Chain"
               value={chain}
               onChange={setChain}
-              placeholder="e.g., Ethereum, Solana"
+              placeholder="Select or type chain (e.g., Ethereum, Solana)"
               options={fieldOptions.chains}
               className="w-full"
             />
@@ -252,7 +252,7 @@ export default function AddAssetForm({ isOpen, onClose, onAssetAdded, selectedAs
               label="Risk Level"
               value={riskLevel}
               onChange={setRiskLevel}
-              placeholder="Select risk level"
+              placeholder="Select or type risk level (e.g., Low, Medium, High)"
               options={fieldOptions.riskLevels}
               className="w-full"
             />
@@ -263,7 +263,7 @@ export default function AddAssetForm({ isOpen, onClose, onAssetAdded, selectedAs
               label="Location"
               value={location}
               onChange={setLocation}
-              placeholder="e.g., Phantom, Exchange"
+              placeholder="Select or type location (e.g., Phantom, Exchange)"
               options={fieldOptions.locations}
               className="w-full"
             />
@@ -274,7 +274,7 @@ export default function AddAssetForm({ isOpen, onClose, onAssetAdded, selectedAs
               label="Coin Type"
               value={coinType}
               onChange={setCoinType}
-              placeholder="e.g., Altcoin, Memecoin, Major"
+              placeholder="Select or type coin type (e.g., Altcoin, Memecoin, Major)"
               options={fieldOptions.coinTypes}
               className="w-full"
             />
