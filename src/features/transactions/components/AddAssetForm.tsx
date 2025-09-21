@@ -252,7 +252,7 @@ export default function AddAssetForm({ isOpen, onClose, onAssetAdded, selectedAs
             <select
               value={riskLevel}
               onChange={(e) => setRiskLevel(e.target.value)}
-              className="w-full px-3 py-2 bg-gray-800 border border-gray-600 rounded-lg text-white focus:outline-none focus:border-green-500"
+              className="w-full px-3 py-2 bg-gray-800 border border-gray-600 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent"
             >
               <option value="Low">Low</option>
               <option value="Medium">Medium</option>
@@ -277,17 +277,13 @@ export default function AddAssetForm({ isOpen, onClose, onAssetAdded, selectedAs
             <label className="block text-sm font-medium text-gray-300 mb-2">
               Coin Type
             </label>
-            <select
+            <WagmiInput
+              type="text"
+              placeholder="e.g., Altcoin, Memecoin, Major"
               value={coinType}
               onChange={(e) => setCoinType(e.target.value)}
-              className="w-full px-3 py-2 bg-gray-800 border border-gray-600 rounded-lg text-white focus:outline-none focus:border-green-500"
-            >
-              <option value="Major">Major</option>
-              <option value="Altcoin">Altcoin</option>
-              <option value="Memecoin">Memecoin</option>
-              <option value="DeFi">DeFi</option>
-              <option value="NFT">NFT</option>
-            </select>
+              className="w-full"
+            />
           </div>
         </div>
 

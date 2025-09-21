@@ -5,6 +5,7 @@ import TransactionModal from '@/components/TransactionModal';
 import { WagmiInput, FilterGroup, FilterChip, WagmiSpinner } from '@/components/ui';
 import SortableHeader from '@/components/ui/SortableHeader';
 import { sortData, createSortHandler, SortConfig } from '@/shared/utils/sorting';
+import { COLORS, getConditionalColor } from '@/shared/constants/colors';
 
 interface Investor {
   id: string;
@@ -256,7 +257,7 @@ export default function Investors({ isPrivacyMode = false, onRefresh }: Investor
   if (error) {
     return (
       <div className="space-y-6">
-        <div style={{ color: '#FF4D4D', fontSize: '18px' }}>Error: {error}</div>
+        <div style={{ color: COLORS.semantic.error, fontSize: '18px' }}>Error: {error}</div>
       </div>
     );
   }
@@ -408,7 +409,7 @@ export default function Investors({ isPrivacyMode = false, onRefresh }: Investor
 
 
       {/* Investor Table */}
-      <div className="rounded-lg overflow-hidden" style={{ backgroundColor: '#1A1F1A' }}>
+      <div className="rounded-lg overflow-hidden" style={{ backgroundColor: COLORS.background.primary }}>
         {/* Mobile Layout */}
         <div className="md:hidden">
           <div className="p-4 space-y-4">
@@ -425,7 +426,7 @@ export default function Investors({ isPrivacyMode = false, onRefresh }: Investor
                     <div className="text-sm text-gray-400">{isPrivacyMode ? createMask() : investor.name}</div>
                   </div>
                   <div className="text-right">
-                    <div className="text-base font-medium" style={{ color: investor.returnPercentage >= 0 ? '#00FF95' : '#FF4D4D' }}>
+                    <div className="text-base font-medium" style={{ color: getConditionalColor(investor.returnPercentage) }}>
                       {formatPercentage(investor.returnPercentage)}
                     </div>
                     <div className="text-sm text-gray-400">Return</div>
@@ -475,7 +476,7 @@ export default function Investors({ isPrivacyMode = false, onRefresh }: Investor
           <div className="overflow-x-auto">
             <table className="w-full">
             <thead>
-              <tr style={{ backgroundColor: '#2A2A2A' }}>
+              <tr style={{ backgroundColor: COLORS.background.secondary }}>
                 <SortableHeader sortKey="id" currentSort={sortConfig} onSort={handleSort} align="left">
                   ID
                 </SortableHeader>
@@ -522,31 +523,31 @@ export default function Investors({ isPrivacyMode = false, onRefresh }: Investor
                     e.currentTarget.style.backgroundColor = index % 2 === 0 ? 'transparent' : 'rgba(255, 255, 255, 0.02)';
                   }}
                 >
-                  <td className="px-4 py-3 text-sm font-medium" style={{ color: '#FFFFFF' }}>
+                  <td className="px-4 py-3 text-sm font-medium" style={{ color: COLORS.text.primary }}>
                     {investor.id}
                   </td>
-                  <td className="px-4 py-3 text-sm" style={{ color: '#FFFFFF' }}>
+                  <td className="px-4 py-3 text-sm" style={{ color: COLORS.text.primary }}>
                     {isPrivacyMode ? createMask() : investor.name}
                   </td>
-                  <td className="px-4 py-3 text-sm" style={{ color: '#FFFFFF' }}>
+                  <td className="px-4 py-3 text-sm" style={{ color: COLORS.text.primary }}>
                     {investor.investorType || 'N/A'}
                   </td>
-                  <td className="px-4 py-3 text-sm" style={{ color: '#FFFFFF' }}>
+                  <td className="px-4 py-3 text-sm" style={{ color: COLORS.text.primary }}>
                     {formatDate(investor.joinDate)}
                   </td>
-                  <td className="px-4 py-3 text-sm" style={{ color: '#FFFFFF' }}>
+                  <td className="px-4 py-3 text-sm" style={{ color: COLORS.text.primary }}>
                     {isPrivacyMode ? createMask() : formatCurrency(investor.investmentValue)}
                   </td>
-                  <td className="px-4 py-3 text-sm" style={{ color: '#FFFFFF' }}>
+                  <td className="px-4 py-3 text-sm" style={{ color: COLORS.text.primary }}>
                     {isPrivacyMode ? createMask() : formatCurrency(investor.currentValue)}
                   </td>
-                  <td className="px-4 py-3 text-sm" style={{ color: '#FFFFFF' }}>
+                  <td className="px-4 py-3 text-sm" style={{ color: COLORS.text.primary }}>
                     {isPrivacyMode ? createMask() : `${(investor.sharePercentage * 100).toFixed(1)}%`}
                   </td>
-                  <td className="px-4 py-3 text-sm font-medium" style={{ color: investor.returnPercentage >= 0 ? '#00FF95' : '#FF4D4D' }}>
+                  <td className="px-4 py-3 text-sm font-medium" style={{ color: getConditionalColor(investor.returnPercentage) }}>
                     {formatPercentage(investor.returnPercentage)}
                   </td>
-                  <td className="px-4 py-3 text-sm" style={{ color: '#FFFFFF' }}>
+                  <td className="px-4 py-3 text-sm" style={{ color: COLORS.text.primary }}>
                     {isPrivacyMode ? createMask() : formatCurrency(investor.fees)}
                   </td>
                 </tr>

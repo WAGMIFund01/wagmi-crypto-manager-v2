@@ -9,6 +9,7 @@ import AddAssetForm from '@/features/transactions/components/AddAssetForm';
 import EditAssetForm from '@/features/transactions/components/EditAssetForm';
 import { AssetSearchResult } from '@/features/transactions/services/AssetSearchService';
 import { sortData, createSortHandler, SortConfig } from '@/shared/utils/sorting';
+import { COLORS, getRiskColor, getAssetTypeColor, getChainColor } from '@/shared/constants/colors';
 
 interface PortfolioOverviewProps {
   className?: string;
@@ -119,6 +120,7 @@ export default function PortfolioOverview({ className, onRefresh, isPrivacyMode 
     quantity: number;
     riskLevel: string;
     location: string;
+    coinType: string;
     thesis: string;
   }) => {
     try {
@@ -235,7 +237,7 @@ export default function PortfolioOverview({ className, onRefresh, isPrivacyMode 
     }
   };
 
-  const getRiskColor = (riskLevel: string) => {
+  const getRiskColorClass = (riskLevel: string) => {
     switch (riskLevel.toLowerCase()) {
       case 'high':
         return 'text-red-400';
@@ -252,7 +254,7 @@ export default function PortfolioOverview({ className, onRefresh, isPrivacyMode 
     }
   };
 
-  const getChainColor = (chain: string) => {
+  const getChainColorClass = (chain: string) => {
     switch (chain.toLowerCase()) {
       case 'ethereum':
         return 'text-blue-400';
@@ -332,30 +334,11 @@ export default function PortfolioOverview({ className, onRefresh, isPrivacyMode 
   const typeDistribution = calculateDistribution('coinType');
 
   // Color palettes for different chart types
-  const assetColors = [
-    '#00FF95', '#FF6B35', '#3B82F6', '#8B5CF6', '#F59E0B', 
-    '#EF4444', '#10B981', '#F97316', '#6366F1', '#EC4899'
-  ];
-  
-  const riskColors = {
-    'High': '#EF4444',
-    'Medium': '#F59E0B', 
-    'Low': '#10B981',
-    'Degen': '#8B5CF6',
-    'None': '#6B7280'
-  };
-
-  const locationColors = [
-    '#00FF95', '#FF6B35', '#3B82F6', '#8B5CF6', '#F59E0B',
-    '#EF4444', '#10B981', '#F97316', '#6366F1', '#EC4899'
-  ];
-
-  const typeColors = {
-    'Memecoin': '#8B5CF6',
-    'Major': '#00FF95',
-    'Altcoin': '#3B82F6',
-    'Stablecoin': '#6B7280'
-  };
+  // Use centralized chart colors
+  const assetColors = Object.values(COLORS.chart);
+  const riskColors = COLORS.risk;
+  const locationColors = Object.values(COLORS.chart);
+  const typeColors = COLORS.assetType;
 
 
   return (
@@ -426,29 +409,32 @@ export default function PortfolioOverview({ className, onRefresh, isPrivacyMode 
                       </div>
                     </div>
                     <div className="flex gap-1">
-                      <button
+                      <WagmiButton
+                        variant="icon"
+                        theme="blue"
+                        size="sm"
                         onClick={() => handleEditAsset(asset)}
-                        className="p-2 text-blue-400 hover:text-blue-300 hover:bg-blue-900/20 rounded-lg transition-colors"
                         title="Edit asset"
-                      >
-                        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
-                        </svg>
-                      </button>
-                      <button
+                        icon={
+                          <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                          </svg>
+                        }
+                      />
+                      <WagmiButton
+                        variant="icon"
+                        theme="red"
+                        size="sm"
                         onClick={() => handleRemoveAsset(asset.symbol)}
                         disabled={removingAsset === asset.symbol}
-                        className="p-2 text-red-400 hover:text-red-300 hover:bg-red-900/20 rounded-lg transition-colors disabled:opacity-50"
+                        loading={removingAsset === asset.symbol}
                         title="Remove asset"
-                      >
-                        {removingAsset === asset.symbol ? (
-                          <WagmiSpinner size="sm" />
-                        ) : (
+                        icon={
                           <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
                           </svg>
-                        )}
-                      </button>
+                        }
+                      />
                     </div>
                   </div>
                 </div>
@@ -457,11 +443,11 @@ export default function PortfolioOverview({ className, onRefresh, isPrivacyMode 
                 <div className="grid grid-cols-2 gap-3 text-sm">
                   <div>
                     <div className="text-gray-400 text-xs uppercase tracking-wide">Chain</div>
-                    <div className={`font-medium ${getChainColor(asset.chain)}`}>{asset.chain}</div>
+                    <div className={`font-medium ${getChainColorClass(asset.chain)}`}>{asset.chain}</div>
                   </div>
                   <div>
                     <div className="text-gray-400 text-xs uppercase tracking-wide">Risk</div>
-                    <div className={`font-medium ${getRiskColor(asset.riskLevel)}`}>{asset.riskLevel}</div>
+                    <div className={`font-medium ${getRiskColorClass(asset.riskLevel)}`}>{asset.riskLevel}</div>
                   </div>
                   <div>
                     <div className="text-gray-400 text-xs uppercase tracking-wide">Location</div>
@@ -531,12 +517,12 @@ export default function PortfolioOverview({ className, onRefresh, isPrivacyMode 
                     </div>
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">
-                    <span className={`text-sm font-medium ${getChainColor(asset.chain)}`}>
+                    <span className={`text-sm font-medium ${getChainColorClass(asset.chain)}`}>
                       {asset.chain}
                     </span>
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">
-                    <span className={`text-sm font-medium ${getRiskColor(asset.riskLevel)}`}>
+                    <span className={`text-sm font-medium ${getRiskColorClass(asset.riskLevel)}`}>
                       {asset.riskLevel}
                     </span>
                   </td>
@@ -564,29 +550,32 @@ export default function PortfolioOverview({ className, onRefresh, isPrivacyMode 
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-center">
                     <div className="flex gap-1 justify-center">
-                      <button
+                      <WagmiButton
+                        variant="icon"
+                        theme="blue"
+                        size="sm"
                         onClick={() => handleEditAsset(asset)}
-                        className="p-2 text-blue-400 hover:text-blue-300 hover:bg-blue-900/20 rounded-lg transition-colors"
                         title="Edit asset"
-                      >
-                        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
-                        </svg>
-                      </button>
-                      <button
+                        icon={
+                          <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                          </svg>
+                        }
+                      />
+                      <WagmiButton
+                        variant="icon"
+                        theme="red"
+                        size="sm"
                         onClick={() => handleRemoveAsset(asset.symbol)}
                         disabled={removingAsset === asset.symbol}
-                        className="p-2 text-red-400 hover:text-red-300 hover:bg-red-900/20 rounded-lg transition-colors disabled:opacity-50"
+                        loading={removingAsset === asset.symbol}
                         title="Remove asset"
-                      >
-                        {removingAsset === asset.symbol ? (
-                          <WagmiSpinner size="sm" />
-                        ) : (
+                        icon={
                           <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
                           </svg>
-                        )}
-                      </button>
+                        }
+                      />
                     </div>
                   </td>
                 </tr>

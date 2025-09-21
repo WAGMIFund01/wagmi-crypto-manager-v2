@@ -9,11 +9,12 @@ export async function PUT(request: Request) {
       quantity, 
       riskLevel, 
       location, 
+      coinType,
       thesis 
     } = body;
 
     console.log(`=== EDITING ASSET: ${symbol} ===`);
-    console.log('Edit data:', { symbol, quantity, riskLevel, location, thesis });
+    console.log('Edit data:', { symbol, quantity, riskLevel, location, coinType, thesis });
 
     // Validate required fields
     if (!symbol) {
@@ -36,6 +37,7 @@ export async function PUT(request: Request) {
       quantity: parseFloat(quantity),
       riskLevel: riskLevel || 'Medium',
       location: location || 'Exchange',
+      coinType: coinType || 'Altcoin',
       thesis: thesis || ''
     });
 

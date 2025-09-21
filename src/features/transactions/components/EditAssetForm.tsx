@@ -13,13 +13,13 @@ interface EditAssetFormProps {
     quantity: number;
     riskLevel: string;
     location: string;
+    coinType: string;
     thesis: string;
   }) => Promise<void>;
   onCancel: () => void;
 }
 
 const RISK_LEVELS = ['Low', 'Medium', 'High'];
-const LOCATIONS = ['Exchange', 'Cold Storage', 'Hot Wallet', 'DeFi Protocol', 'Staking'];
 
 export default function EditAssetForm({ asset, onSave, onCancel }: EditAssetFormProps) {
   const [formData, setFormData] = useState({
@@ -27,6 +27,7 @@ export default function EditAssetForm({ asset, onSave, onCancel }: EditAssetForm
     quantity: asset.quantity.toString(),
     riskLevel: asset.riskLevel,
     location: asset.location,
+    coinType: asset.coinType || 'Altcoin',
     thesis: asset.thesis || ''
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -52,6 +53,7 @@ export default function EditAssetForm({ asset, onSave, onCancel }: EditAssetForm
         quantity: quantity,
         riskLevel: formData.riskLevel,
         location: formData.location,
+        coinType: formData.coinType,
         thesis: formData.thesis
       };
       
@@ -126,16 +128,29 @@ export default function EditAssetForm({ asset, onSave, onCancel }: EditAssetForm
               <label className="block text-sm font-medium text-gray-300 mb-2">
                 Location
               </label>
-              <select
+              <WagmiInput
+                type="text"
+                placeholder="e.g., Phantom, Exchange"
                 value={formData.location}
                 onChange={(e) => handleInputChange('location', e.target.value)}
-                className="w-full px-3 py-2 bg-gray-800 border border-gray-600 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent disabled:opacity-50"
                 disabled={isSubmitting}
-              >
-                {LOCATIONS.map(location => (
-                  <option key={location} value={location}>{location}</option>
-                ))}
-              </select>
+                className="w-full"
+              />
+            </div>
+
+            {/* Coin Type */}
+            <div>
+              <label className="block text-sm font-medium text-gray-300 mb-2">
+                Coin Type
+              </label>
+              <WagmiInput
+                type="text"
+                placeholder="e.g., Altcoin, Memecoin, Major"
+                value={formData.coinType}
+                onChange={(e) => handleInputChange('coinType', e.target.value)}
+                disabled={isSubmitting}
+                className="w-full"
+              />
             </div>
 
             {/* Thesis */}

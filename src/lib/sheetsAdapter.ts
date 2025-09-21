@@ -670,6 +670,7 @@ export class SheetsAdapter {
     quantity: number;
     riskLevel: string;
     location: string;
+    coinType: string;
     thesis: string;
   }): Promise<{ success: boolean; data?: any; error?: string }> {
     try {
@@ -729,7 +730,7 @@ export class SheetsAdapter {
         currentRow[2] || '', // Chain (keep existing)
         editData.riskLevel, // Risk Level
         editData.location, // Location
-        currentRow[5] || '', // Coin Type (keep existing)
+        editData.coinType, // Coin Type
         editData.quantity, // Quantity
         currentPrice, // Current Price (keep existing)
         totalValue, // Total Value (recalculated)

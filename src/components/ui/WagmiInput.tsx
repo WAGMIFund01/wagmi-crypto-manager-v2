@@ -2,6 +2,7 @@
 
 import React, { forwardRef, useState } from 'react';
 import { cn } from '@/shared/utils';
+import WagmiButton from './WagmiButton';
 
 interface WagmiInputProps extends Omit<React.InputHTMLAttributes<HTMLInputElement>, 'size'> {
   variant?: 'default' | 'search' | 'password' | 'email' | 'number';
@@ -199,14 +200,15 @@ const WagmiInput = forwardRef<HTMLInputElement, WagmiInputProps>(
           {(icon && iconPosition === 'right') || showPasswordToggle ? (
             <div className="absolute right-3 top-1/2 transform -translate-y-1/2">
               {showPasswordToggle ? (
-                <button
-                  type="button"
+                <WagmiButton
+                  variant="ghost"
+                  theme="gray"
+                  size="icon"
                   onClick={() => setShowPassword(!showPassword)}
-                  className="text-gray-400 hover:text-white transition-colors duration-200"
                   tabIndex={-1}
-                >
-                  {showPassword ? <EyeOffIcon /> : <EyeIcon />}
-                </button>
+                  className="p-0 w-6 h-6"
+                  icon={showPassword ? <EyeOffIcon /> : <EyeIcon />}
+                />
               ) : (
                 <div className="text-gray-400">
                   {icon}
