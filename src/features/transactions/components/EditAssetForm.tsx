@@ -1,10 +1,9 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import WagmiButton from '@/components/ui/WagmiButton';
 import WagmiInput from '@/components/ui/WagmiInput';
 import WagmiCard from '@/components/ui/WagmiCard';
-import WagmiSpinner from '@/components/ui/WagmiSpinner';
 import { PortfolioAsset } from '@/lib/sheetsAdapter';
 
 interface EditAssetFormProps {
@@ -178,18 +177,20 @@ export default function EditAssetForm({ asset, onSave, onCancel }: EditAssetForm
               <WagmiButton
                 type="button"
                 theme="gray"
-                text="Cancel"
                 onClick={onCancel}
                 disabled={isSubmitting}
                 className="flex-1"
-              />
+              >
+                Cancel
+              </WagmiButton>
               <WagmiButton
                 type="submit"
                 theme="green"
-                text={isSubmitting ? "Updating..." : "Update Asset"}
                 disabled={isSubmitting}
                 className="flex-1"
-              />
+              >
+                {isSubmitting ? "Updating..." : "Update Asset"}
+              </WagmiButton>
             </div>
           </form>
         </div>
