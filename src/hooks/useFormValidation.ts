@@ -168,19 +168,19 @@ export function useFieldValidation(rules: ValidationRules) {
     const fieldRules = rules[field];
     if (!fieldRules) return true;
 
-    const error = validateField(value, fieldRules);
+    const fieldError = validateField(value, fieldRules);
     
     setErrors(prev => {
       const newErrors = { ...prev };
-      if (error) {
-        newErrors[field] = error;
+      if (fieldError) {
+        newErrors[field] = fieldError;
       } else {
         delete newErrors[field];
       }
       return newErrors;
     });
 
-    return !error;
+    return !fieldError;
   }, [rules]);
 
   const clearFieldError = useCallback((field: string) => {
