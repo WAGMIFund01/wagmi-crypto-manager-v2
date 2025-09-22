@@ -16,7 +16,7 @@ jobs:
         run: |
           echo "🔄 Starting automatic price refresh..."
           
-          # Get the production URL (you'll need to replace this with your actual URL)
+          # Get the production URL
           PRODUCTION_URL="https://wagmi-crypto-manager-v2.vercel.app"
           
           # Call the cron refresh endpoint
