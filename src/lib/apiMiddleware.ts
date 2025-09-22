@@ -263,8 +263,8 @@ function extractUserIdFromRequest(req: NextRequest): string | undefined {
 }
 
 // Utility function to create a wrapped API route
-export function withApiMiddleware<T extends any[]>(
-  handler: (req: NextRequest, ...args: T) => Promise<NextResponse>,
+export function withApiMiddleware(
+  handler: (req: NextRequest) => Promise<NextResponse>,
   config?: Partial<ApiMiddlewareConfig>
 ) {
   const middleware = createApiMiddleware(config);
