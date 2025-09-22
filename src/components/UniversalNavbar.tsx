@@ -6,6 +6,7 @@ import WagmiButton from './ui/WagmiButton';
 import WagmiCard from './ui/WagmiCard';
 import { RefreshIcon } from './ui/icons/WagmiIcons';
 import { formatTimestampForDisplay } from '@/lib/timestamp-utils';
+import AutoRefreshStatus from './ui/AutoRefreshStatus';
 
 interface UniversalNavbarProps {
   activeTab: string;
@@ -648,6 +649,16 @@ export default function UniversalNavbar({
               </>
             )}
           </div>
+        </div>
+        
+        {/* Auto Refresh Status - Desktop */}
+        <div className="hidden md:block mt-2">
+          <AutoRefreshStatus />
+        </div>
+        
+        {/* Auto Refresh Status - Mobile */}
+        <div className="md:hidden mt-2">
+          <AutoRefreshStatus />
         </div>
         </div>
       </div>
