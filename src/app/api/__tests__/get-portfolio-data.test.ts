@@ -1,4 +1,5 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest'
+import { NextRequest } from 'next/server'
 import { GET } from '../get-portfolio-data/route'
 import { sheetsAdapter } from '@/lib/sheetsAdapter'
 
@@ -38,7 +39,8 @@ describe('/api/get-portfolio-data', () => {
 
     vi.mocked(sheetsAdapter.getPortfolioData).mockResolvedValue(mockData)
 
-    const response = await GET()
+    const request = new NextRequest('http://localhost:3000/api/get-portfolio-data')
+    const response = await GET(request)
     const result = await response.json()
 
     expect(response.status).toBe(200)
@@ -58,7 +60,8 @@ describe('/api/get-portfolio-data', () => {
 
     vi.mocked(sheetsAdapter.getPortfolioData).mockResolvedValue(mockError)
 
-    const response = await GET()
+    const request = new NextRequest('http://localhost:3000/api/get-portfolio-data')
+    const response = await GET(request)
     const result = await response.json()
 
     expect(response.status).toBe(200)
@@ -71,7 +74,8 @@ describe('/api/get-portfolio-data', () => {
   it('should handle exceptions', async () => {
     vi.mocked(sheetsAdapter.getPortfolioData).mockRejectedValue(new Error('Sheets API error'))
 
-    const response = await GET()
+    const request = new NextRequest('http://localhost:3000/api/get-portfolio-data')
+    const response = await GET(request)
     const result = await response.json()
 
     expect(response.status).toBe(500)
