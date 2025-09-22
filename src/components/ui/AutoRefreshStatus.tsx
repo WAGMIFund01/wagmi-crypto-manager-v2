@@ -13,37 +13,55 @@ export default function AutoRefreshStatus({ className }: AutoRefreshStatusProps)
   const [lastRefresh, setLastRefresh] = useState<Date | null>(null);
   const [isRefreshing, setIsRefreshing] = useState(false);
   const [nextRefresh, setNextRefresh] = useState<Date | null>(null);
+  const [timeRemaining, setTimeRemaining] = useState<string>('Calculating...');
 
-  // Calculate next refresh time (every 30 minutes)
+  // Calculate next refresh time and update countdown
   useEffect(() => {
     const calculateNextRefresh = () => {
       const now = new Date();
-      const next = new Date(now.getTime() + 30 * 60 * 1000); // 30 minutes from now
+      // If we have a last refresh, calculate from that time
+      // Otherwise, calculate from now
+      const baseTime = lastRefresh || now;
+      const next = new Date(baseTime.getTime() + 30 * 60 * 1000); // 30 minutes from base time
       setNextRefresh(next);
     };
 
     calculateNextRefresh();
-    const interval = setInterval(calculateNextRefresh, 60000); // Update every minute
+  }, [lastRefresh]);
+
+  // Update countdown every second
+  useEffect(() => {
+    const updateCountdown = () => {
+      if (!nextRefresh) {
+        setTimeRemaining('Calculating...');
+        return;
+      }
+      
+      const now = new Date();
+      const diff = nextRefresh.getTime() - now.getTime();
+      
+      if (diff <= 0) {
+        setTimeRemaining('Refreshing...');
+        // Reset the timer for the next cycle
+        const newNext = new Date(now.getTime() + 30 * 60 * 1000);
+        setNextRefresh(newNext);
+        return;
+      }
+      
+      const minutes = Math.floor(diff / 60000);
+      const seconds = Math.floor((diff % 60000) / 1000);
+      
+      setTimeRemaining(`${minutes}m ${seconds}s`);
+    };
+
+    updateCountdown();
+    const interval = setInterval(updateCountdown, 1000); // Update every second
 
     return () => clearInterval(interval);
-  }, []);
+  }, [nextRefresh]);
 
-  // Format time remaining
-  const getTimeRemaining = () => {
-    if (!nextRefresh) return 'Calculating...';
-    
-    const now = new Date();
-    const diff = nextRefresh.getTime() - now.getTime();
-    
-    if (diff <= 0) return 'Refreshing...';
-    
-    const minutes = Math.floor(diff / 60000);
-    const seconds = Math.floor((diff % 60000) / 1000);
-    
-    return `${minutes}m ${seconds}s`;
-  };
 
-  // Simulate refresh (in real implementation, this would be triggered by the actual refresh)
+  // Manual refresh function
   const handleManualRefresh = async () => {
     setIsRefreshing(true);
     
@@ -54,10 +72,11 @@ export default function AutoRefreshStatus({ className }: AutoRefreshStatusProps)
       });
       
       if (response.ok) {
-        setLastRefresh(new Date());
-        // Recalculate next refresh
         const now = new Date();
-        setNextRefresh(new Date(now.getTime() + 30 * 60 * 1000));
+        setLastRefresh(now);
+        console.log('Manual refresh completed at:', now.toLocaleTimeString());
+      } else {
+        console.error('Manual refresh failed:', response.status);
       }
     } catch (error) {
       console.error('Manual refresh failed:', error);
@@ -88,7 +107,7 @@ export default function AutoRefreshStatus({ className }: AutoRefreshStatusProps)
         
         <div className="flex items-center space-x-3">
           <div className="text-xs text-gray-400">
-            Next: {getTimeRemaining()}
+            Next: {timeRemaining}
           </div>
           
           <button
