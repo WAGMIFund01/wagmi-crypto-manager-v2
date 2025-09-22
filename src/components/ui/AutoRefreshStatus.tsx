@@ -7,9 +7,10 @@ import { RefreshIcon } from './icons/WagmiIcons';
 
 interface AutoRefreshStatusProps {
   className?: string;
+  onRefresh?: () => Promise<void>;
 }
 
-export default function AutoRefreshStatus({ className }: AutoRefreshStatusProps) {
+export default function AutoRefreshStatus({ className, onRefresh }: AutoRefreshStatusProps) {
   const [lastRefresh, setLastRefresh] = useState<Date | null>(null);
   const [isRefreshing, setIsRefreshing] = useState(false);
   const [nextRefresh, setNextRefresh] = useState<Date | null>(null);
@@ -56,6 +57,16 @@ export default function AutoRefreshStatus({ className }: AutoRefreshStatusProps)
       
       if (diff <= 0) {
         setTimeRemaining('Refreshing...');
+        // Trigger the actual refresh
+        if (onRefresh) {
+          console.log('Auto-refresh: Triggering refresh...');
+          onRefresh().then(() => {
+            console.log('Auto-refresh: Completed successfully');
+            setLastRefresh(new Date());
+          }).catch((error) => {
+            console.error('Auto-refresh: Failed:', error);
+          });
+        }
         // Calculate the next 30-minute mark
         const next30Min = new Date(now.getTime() + 30 * 60 * 1000);
         next30Min.setSeconds(0, 0);
@@ -81,17 +92,13 @@ export default function AutoRefreshStatus({ className }: AutoRefreshStatusProps)
     setIsRefreshing(true);
     
     try {
-      // Call the refresh API
-      const response = await fetch('/api/cron/refresh-prices', {
-        method: 'POST'
-      });
-      
-      if (response.ok) {
-        const now = new Date();
-        setLastRefresh(now);
-        console.log('Manual refresh completed at:', now.toLocaleTimeString());
+      if (onRefresh) {
+        console.log('Manual refresh: Triggering refresh...');
+        await onRefresh();
+        setLastRefresh(new Date());
+        console.log('Manual refresh completed at:', new Date().toLocaleTimeString());
       } else {
-        console.error('Manual refresh failed:', response.status);
+        console.error('Manual refresh: No refresh function provided');
       }
     } catch (error) {
       console.error('Manual refresh failed:', error);

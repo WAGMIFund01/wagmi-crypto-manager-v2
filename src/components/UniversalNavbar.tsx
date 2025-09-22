@@ -653,12 +653,12 @@ export default function UniversalNavbar({
         
         {/* Auto Refresh Status - Desktop */}
         <div className="hidden md:block mt-2">
-          <AutoRefreshStatus />
+          <AutoRefreshStatus onRefresh={handleRetryKPI} />
         </div>
         
         {/* Auto Refresh Status - Mobile */}
         <div className="md:hidden mt-2">
-          <AutoRefreshStatus />
+          <AutoRefreshStatus onRefresh={handleRetryKPI} />
         </div>
         </div>
       </div>
