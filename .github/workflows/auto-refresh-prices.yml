@@ -1,3 +1,4 @@
+# Auto Refresh Prices Workflow
 name: Auto Refresh Prices
 
 on:
@@ -20,7 +21,7 @@ jobs:
           PRODUCTION_URL="https://wagmi-crypto-manager-v2.vercel.app"
           
           # Call the cron refresh endpoint
-          echo "📡 Calling cron refresh API..."
+          echo "�� Calling cron refresh API..."
           REFRESH_RESPONSE=$(curl -s -X GET "$PRODUCTION_URL/api/cron/refresh-prices")
           echo "Refresh response: $REFRESH_RESPONSE"
           
