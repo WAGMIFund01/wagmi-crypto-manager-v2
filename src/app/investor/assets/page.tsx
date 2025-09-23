@@ -13,7 +13,6 @@ export default function InvestorAssetsPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [lastUpdatedTimestamp, setLastUpdatedTimestamp] = useState<string>('');
-  const [refreshTrigger, setRefreshTrigger] = useState(0);
 
   useEffect(() => {
     // Check if investor ID is stored in session storage
@@ -61,14 +60,6 @@ export default function InvestorAssetsPage() {
     }
   };
 
-  // Update timestamp display every minute to show updated relative time
-  useEffect(() => {
-    const interval = setInterval(() => {
-      setRefreshTrigger(prev => prev + 1);
-    }, 60000); // Update every minute
-
-    return () => clearInterval(interval);
-  }, []);
 
   const formatPriceChange = (change?: number) => {
     if (change === undefined || change === null) {
@@ -204,8 +195,6 @@ export default function InvestorAssetsPage() {
                 </p>
                 <p style={{ color: '#A0A0A0', fontSize: '11px', margin: 0, lineHeight: '1.2' }}>
                   Last updated: {lastUpdatedTimestamp ? formatTimestampForDisplay(lastUpdatedTimestamp) : 'Unknown'}
-                  {/* Force re-render by including refreshTrigger */}
-                  <span style={{ display: 'none' }}>{refreshTrigger}</span>
                 </p>
               </div>
               
@@ -275,8 +264,6 @@ export default function InvestorAssetsPage() {
                 </p>
                 <p style={{ color: '#A0A0A0', fontSize: '12px', margin: 0 }}>
                   Last updated: {lastUpdatedTimestamp ? formatTimestampForDisplay(lastUpdatedTimestamp) : 'Unknown'}
-                  {/* Force re-render by including refreshTrigger */}
-                  <span style={{ display: 'none' }}>{refreshTrigger}</span>
                 </p>
               </div>
               

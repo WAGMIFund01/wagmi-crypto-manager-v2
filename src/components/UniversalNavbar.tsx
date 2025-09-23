@@ -6,7 +6,6 @@ import WagmiButton from './ui/WagmiButton';
 import WagmiCard from './ui/WagmiCard';
 import { RefreshIcon } from './ui/icons/WagmiIcons';
 import { formatTimestampForDisplay } from '@/lib/timestamp-utils';
-import AutoRefreshStatus from './ui/AutoRefreshStatus';
 
 interface UniversalNavbarProps {
   activeTab: string;
@@ -36,7 +35,6 @@ export default function UniversalNavbar({
   const [isRetrying, setIsRetrying] = useState(false);
   const [isClient, setIsClient] = useState(false);
   const [lastUpdatedTimestamp, setLastUpdatedTimestamp] = useState<string>('');
-  const [refreshTrigger, setRefreshTrigger] = useState(0);
   // Ensure we're on the client side
   useEffect(() => {
     setIsClient(true);
@@ -64,15 +62,6 @@ export default function UniversalNavbar({
     fetchInitialTimestamp();
   }, []);
 
-  // Update timestamp display every minute to show updated relative time
-  useEffect(() => {
-    const interval = setInterval(() => {
-      // Force re-render by incrementing refresh trigger
-      setRefreshTrigger(prev => prev + 1);
-    }, 60000);
-
-    return () => clearInterval(interval);
-  }, []);
 
   // Function to fetch updated timestamp (can be called after updates)
   const fetchLastUpdatedTimestamp = async () => {
@@ -298,8 +287,6 @@ export default function UniversalNavbar({
             {/* Last Updated Timestamp - Mobile */}
             <p style={{ color: '#A0A0A0', fontSize: '11px' }}>
               Last updated: {lastUpdatedTimestamp ? formatTimestampForDisplay(lastUpdatedTimestamp) : 'Unknown'}
-              {/* Force re-render by including refreshTrigger */}
-              <span style={{ display: 'none' }}>{refreshTrigger}</span>
             </p>
             
             {/* Refresh Icon */}
@@ -472,8 +459,6 @@ export default function UniversalNavbar({
             {/* Last Updated Timestamp */}
             <p className="mr-8" style={{ color: '#A0A0A0', fontSize: '12px' }}>
               Last updated: {lastUpdatedTimestamp ? formatTimestampForDisplay(lastUpdatedTimestamp) : 'Unknown'}
-              {/* Force re-render by including refreshTrigger */}
-              <span style={{ display: 'none' }}>{refreshTrigger}</span>
             </p>
             
             {/* Refresh Icon */}
@@ -651,15 +636,6 @@ export default function UniversalNavbar({
           </div>
         </div>
         
-        {/* Auto Refresh Status - Desktop */}
-        <div className="hidden md:block mt-2">
-          <AutoRefreshStatus onRefresh={handleRetryKPI} />
-        </div>
-        
-        {/* Auto Refresh Status - Mobile */}
-        <div className="md:hidden mt-2">
-          <AutoRefreshStatus onRefresh={handleRetryKPI} />
-        </div>
         </div>
       </div>
     </header>

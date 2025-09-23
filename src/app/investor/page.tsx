@@ -41,7 +41,6 @@ export default function InvestorPage() {
   const [portfolioLoading, setPortfolioLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [lastUpdatedTimestamp, setLastUpdatedTimestamp] = useState<string>('');
-  const [refreshTrigger, setRefreshTrigger] = useState(0);
 
   useEffect(() => {
     // Check if investor ID is stored in session storage
@@ -139,15 +138,6 @@ export default function InvestorPage() {
     }
   };
 
-  // Update timestamp display every minute to show updated relative time
-  useEffect(() => {
-    const interval = setInterval(() => {
-      // Force re-render by incrementing refresh trigger
-      setRefreshTrigger(prev => prev + 1);
-    }, 60000);
-
-    return () => clearInterval(interval);
-  }, []);
 
   // Calculate distributions for charts from real portfolio data
   const calculateDistribution = (groupBy: keyof PortfolioAsset) => {
@@ -281,8 +271,6 @@ export default function InvestorPage() {
                 {/* Last Updated Timestamp */}
                 <p style={{ color: '#A0A0A0', fontSize: '12px', margin: 0, lineHeight: '1.3' }}>
                   Last updated: {lastUpdatedTimestamp ? formatTimestampForDisplay(lastUpdatedTimestamp) : 'Unknown'}
-                  {/* Force re-render by including refreshTrigger */}
-                  <span style={{ display: 'none' }}>{refreshTrigger}</span>
                 </p>
               </div>
               
@@ -364,8 +352,6 @@ export default function InvestorPage() {
                 {/* Last Updated Timestamp */}
                 <p style={{ color: '#A0A0A0', fontSize: '12px', margin: 0 }}>
                   Last updated: {lastUpdatedTimestamp ? formatTimestampForDisplay(lastUpdatedTimestamp) : 'Unknown'}
-                  {/* Force re-render by including refreshTrigger */}
-                  <span style={{ display: 'none' }}>{refreshTrigger}</span>
                 </p>
             </div>
             

@@ -40,7 +40,6 @@ export default function DashboardClient({ session, kpiData: initialKpiData, hasE
   const [isCheckingAuth, setIsCheckingAuth] = useState(true);
   const [isPrivacyMode, setIsPrivacyMode] = useState(false);
   const [kpiData, setKpiData] = useState(initialKpiData);
-  const [refreshTrigger, setRefreshTrigger] = useState(0);
 
   // Initialize active tab from URL parameters
   useEffect(() => {
@@ -107,7 +106,6 @@ export default function DashboardClient({ session, kpiData: initialKpiData, hasE
 
   // Create refresh function that triggers all data refreshes
   const triggerDataRefresh = () => {
-    setRefreshTrigger(prev => prev + 1);
     console.log('Data refresh triggered');
     // Also trigger KPI data refresh to update AUM ribbon
     handleKpiRefresh();
@@ -146,7 +144,6 @@ export default function DashboardClient({ session, kpiData: initialKpiData, hasE
         console.log('KPI data refreshed successfully');
         
         // Don't trigger portfolio refresh here to avoid infinite loop
-        // Portfolio refresh is handled by the refreshTrigger state
       } else {
         console.error('Failed to fetch fresh KPI data');
       }
