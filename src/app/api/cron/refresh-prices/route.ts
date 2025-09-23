@@ -57,22 +57,129 @@ export async function GET() {
       // Continue with other steps even if timestamp fails
     }
     
-    // Step 2: Update prices from CoinGecko (call external API)
+    // Step 2: Update prices from CoinGecko (inline implementation)
     console.log('💰 Vercel Cron: Updating prices from CoinGecko...');
     try {
-      const baseUrl = process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : 'https://wagmi-crypto-manager-v2.vercel.app';
-      const priceUpdateResponse = await fetch(`${baseUrl}/api/update-all-prices`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
+      // Read current portfolio data including CoinGecko ID column
+      const portfolioResponse = await sheets.spreadsheets.values.get({
+        spreadsheetId: sheetId,
+        range: 'Portfolio Overview!A:L', // Extended to include columns K (CoinGecko ID) and L (24hr price change)
       });
-      
-      if (!priceUpdateResponse.ok) {
-        throw new Error('Failed to update prices');
+
+      const rows = portfolioResponse.data.values;
+      if (!rows || rows.length < 2) {
+        throw new Error('No data found in Portfolio Overview sheet');
       }
+
+      // Process each asset and collect CoinGecko IDs
+      const coinGeckoIdsToFetch = new Set<string>();
+      const assetDetails: { symbol: string; rowIndex: number; coinGeckoId: string | null }[] = [];
+
+      for (let i = 1; i < rows.length; i++) {
+        const row = rows[i];
+        const symbol = row[1]?.toString().toUpperCase();
+        const quantity = parseFloat(row[6]?.toString()) || 0;
+        const coinGeckoId = row[10]?.toString()?.trim(); // Column K (0-indexed = 10)
+
+        // Only process assets with quantity > 0 and valid CoinGecko ID
+        if (symbol && quantity > 0 && coinGeckoId && coinGeckoId.length >= 2 && !coinGeckoId.includes(' ')) {
+          coinGeckoIdsToFetch.add(coinGeckoId);
+          assetDetails.push({ symbol, rowIndex: i, coinGeckoId });
+        }
+      }
+
+      console.log(`CoinGecko IDs to fetch: ${coinGeckoIdsToFetch.size} unique IDs`);
+
+      // Fetch prices from CoinGecko
+      let priceData: Record<string, { usd: number; usd_24h_change?: number }> = {};
       
-      console.log('✅ Prices updated successfully');
+      if (coinGeckoIdsToFetch.size > 0) {
+        const coinGeckoIds = Array.from(coinGeckoIdsToFetch).join(',');
+        const apiUrl = `https://api.coingecko.com/api/v3/simple/price?ids=${coinGeckoIds}&vs_currencies=usd&include_24hr_change=true`;
+        
+        console.log('CoinGecko API URL:', apiUrl);
+        
+        // Add a small delay to avoid hitting rate limits
+        await new Promise(resolve => setTimeout(resolve, 1000));
+        
+        const priceResponse = await fetch(apiUrl, {
+          headers: {
+            'Accept': 'application/json',
+          },
+        });
+
+        console.log('CoinGecko API response status:', priceResponse.status);
+
+        if (!priceResponse.ok) {
+          if (priceResponse.status === 429) {
+            throw new Error('CoinGecko API rate limit exceeded');
+          }
+          throw new Error(`CoinGecko API error: ${priceResponse.status} ${priceResponse.statusText}`);
+        }
+
+        const responseData = await priceResponse.json();
+        
+        // Check for rate limit error in response body
+        if (responseData.status && responseData.status.error_code === 429) {
+          throw new Error(`CoinGecko API rate limit exceeded: ${responseData.status.error_message}`);
+        }
+        
+        priceData = responseData;
+      }
+
+      // Update prices in Google Sheets
+      const currentTimestamp = new Date().toISOString();
+      const updates: { range: string; values: (string | number)[][] }[] = [];
+      let updatedCount = 0;
+
+      for (const asset of assetDetails) {
+        if (asset.coinGeckoId) {
+          const priceInfo = priceData[asset.coinGeckoId];
+          const newPrice = priceInfo?.usd;
+          const newPriceChange = priceInfo?.usd_24h_change;
+
+          if (newPrice !== undefined) {
+            const rowNum = asset.rowIndex + 1; // Google Sheets is 1-indexed
+            const currentPriceRange = `Portfolio Overview!H${rowNum}`;
+            const lastUpdateRange = `Portfolio Overview!J${rowNum}`;
+
+            updates.push({
+              range: currentPriceRange,
+              values: [[newPrice.toString()]]
+            });
+            updates.push({
+              range: lastUpdateRange,
+              values: [[currentTimestamp]]
+            });
+
+            // Add 24hr price change update if available
+            if (newPriceChange !== undefined) {
+              const priceChangeRange = `Portfolio Overview!L${rowNum}`;
+              updates.push({
+                range: priceChangeRange,
+                values: [[newPriceChange]]
+              });
+            }
+
+            updatedCount++;
+          }
+        }
+      }
+
+      // Execute batch update if there are updates to make
+      if (updates.length > 0) {
+        console.log(`Executing batch update: ${updates.length} updates for ${updatedCount} assets`);
+        
+        await sheets.spreadsheets.values.batchUpdate({
+          spreadsheetId: sheetId,
+          requestBody: {
+            valueInputOption: 'USER_ENTERED',
+            data: updates
+          }
+        });
+      }
+
+      console.log(`✅ Prices updated successfully: ${updatedCount} assets updated`);
     } catch (priceError) {
       console.error('❌ Failed to update prices:', priceError);
       // Continue with revalidation even if price update fails
