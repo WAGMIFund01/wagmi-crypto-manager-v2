@@ -7,7 +7,8 @@ export async function GET() {
     
     // Step 1: Update KPI timestamp
     console.log('📝 Vercel Cron: Updating KPI timestamp...');
-    const timestampUpdateResponse = await fetch(`${process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : 'http://localhost:3000'}/api/update-kpi-timestamp`, {
+    const baseUrl = process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : 'https://wagmi-crypto-manager-v2.vercel.app';
+    const timestampUpdateResponse = await fetch(`${baseUrl}/api/update-kpi-timestamp`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -20,7 +21,7 @@ export async function GET() {
     
     // Step 2: Update prices from CoinGecko
     console.log('💰 Vercel Cron: Updating prices from CoinGecko...');
-    const priceUpdateResponse = await fetch(`${process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : 'http://localhost:3000'}/api/update-all-prices`, {
+    const priceUpdateResponse = await fetch(`${baseUrl}/api/update-all-prices`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
