@@ -3,13 +3,26 @@ import { sheetsAdapter } from '@/lib/sheetsAdapter';
 import logger from '@/lib/logger';
 import errorMonitor from '@/lib/errorMonitor';
 import { withApiMiddleware } from '@/lib/apiMiddleware';
+import { unstable_cache } from 'next/cache';
+
+// Create a cached version of the portfolio data fetching
+const getCachedPortfolioData = unstable_cache(
+  async () => {
+    return await sheetsAdapter.getPortfolioData();
+  },
+  ['portfolio-data'],
+  {
+    tags: ['portfolio-data'],
+    revalidate: 60 // 60 seconds
+  }
+);
 
 async function getPortfolioDataHandler(req: NextRequest) {
   try {
     logger.info('Fetching portfolio data');
     
-    // Use the unified SheetsAdapter to fetch portfolio data
-    const portfolioAssets = await sheetsAdapter.getPortfolioData();
+    // Use the cached version of portfolio data fetching
+    const portfolioAssets = await getCachedPortfolioData();
 
     logger.info('Portfolio data fetched successfully', {
       assetCount: portfolioAssets?.length || 0,

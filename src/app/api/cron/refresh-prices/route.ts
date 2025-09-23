@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server';
-import { revalidatePath } from 'next/cache';
+import { revalidatePath, revalidateTag } from 'next/cache';
 import { google } from 'googleapis';
 
 export async function GET() {
@@ -187,10 +187,20 @@ export async function GET() {
       // Continue with revalidation even if price update fails
     }
     
-    // Step 3: Revalidate the dashboard page to force fresh data fetch
-    console.log('🔄 Vercel Cron: Revalidating dashboard...');
-    revalidatePath('/dashboard');
+    // Step 3: Revalidate all dashboard pages and cache tags to force fresh data fetch
+    console.log('🔄 Vercel Cron: Revalidating all dashboard pages and cache...');
     
+    // Revalidate all pages that display portfolio/KPI data
+    revalidatePath('/dashboard');
+    revalidatePath('/wagmi-fund-module');
+    revalidatePath('/investor');
+    
+    // Also revalidate cache tags for more aggressive cache invalidation
+    revalidateTag('portfolio-data');
+    revalidateTag('kpi-data');
+    revalidateTag('investor-data');
+    
+    console.log('✅ Vercel Cron: All dashboard pages and cache revalidated');
     console.log('✅ Vercel Cron: Price refresh completed successfully');
     
     return NextResponse.json({

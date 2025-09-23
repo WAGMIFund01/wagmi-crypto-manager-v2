@@ -3,6 +3,8 @@
  * This runs on the server, eliminating client-side load time
  */
 
+import { unstable_cache } from 'next/cache';
+
 export interface KPIData {
   totalInvestors: number;
   totalInvested: number;
@@ -12,8 +14,9 @@ export interface KPIData {
   lastUpdated: string; // Timestamp from Google Sheets
 }
 
-export async function fetchKPIData(forceRefresh: boolean = false): Promise<KPIData | null> {
-  try {
+// Create a cached version of KPI data fetching
+const getCachedKPIData = unstable_cache(
+  async (forceRefresh: boolean = false) => {
     // Google Sheet ID for WAGMI Investment Manager Database
     const SHEET_ID = '1h04nkcnQmxaFml8RubIGmPgffMiyoEIg350ryjXK0tM';
 
@@ -34,9 +37,7 @@ export async function fetchKPIData(forceRefresh: boolean = false): Promise<KPIDa
           'Pragma': 'no-cache',
           'Expires': '0'
         })
-      },
-      // Only use Next.js cache when not forcing refresh
-      ...(forceRefresh ? {} : { next: { revalidate: 60 } })
+      }
     });
 
     if (!response.ok) {
@@ -141,6 +142,16 @@ export async function fetchKPIData(forceRefresh: boolean = false): Promise<KPIDa
     console.error('Error fetching KPI data on server:', error);
     return null;
   }
+  },
+  ['kpi-data'],
+  {
+    tags: ['kpi-data'],
+    revalidate: 60 // 60 seconds
+  }
+);
+
+export async function fetchKPIData(forceRefresh: boolean = false): Promise<KPIData | null> {
+  return await getCachedKPIData(forceRefresh);
 }
 
 // No fallback data - errors should be displayed instead of hidden
