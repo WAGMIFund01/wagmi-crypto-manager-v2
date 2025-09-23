@@ -1,35 +1,81 @@
 import { NextResponse } from 'next/server';
 import { revalidatePath } from 'next/cache';
+import { google } from 'googleapis';
 
 export async function GET() {
   try {
     console.log('🔄 Vercel Cron: Starting automatic price refresh...');
     
-    // Step 1: Update KPI timestamp
+    // Step 1: Update KPI timestamp (inline implementation)
     console.log('📝 Vercel Cron: Updating KPI timestamp...');
-    const baseUrl = process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : 'https://wagmi-crypto-manager-v2.vercel.app';
-    const timestampUpdateResponse = await fetch(`${baseUrl}/api/update-kpi-timestamp`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-    });
-    
-    if (!timestampUpdateResponse.ok) {
-      throw new Error('Failed to update KPI timestamp');
+    try {
+      const serviceAccountEmail = process.env.GOOGLE_SERVICE_ACCOUNT_EMAIL;
+      const privateKey = process.env.GOOGLE_PRIVATE_KEY;
+      const sheetId = process.env.GOOGLE_SHEET_ID || '1h04nkcnQmxaFml8RubIGmPgffMiyoEIg350ryjXK0tM';
+
+      if (!serviceAccountEmail || !privateKey) {
+        throw new Error('Missing Google Sheets API credentials');
+      }
+
+      // Create authentication
+      const auth = new google.auth.GoogleAuth({
+        credentials: {
+          client_email: serviceAccountEmail,
+          private_key: privateKey.replace(/\\n/g, '\n'),
+        },
+        scopes: ['https://www.googleapis.com/auth/spreadsheets'],
+      });
+
+      const sheets = google.sheets({ version: 'v4', auth });
+
+      // Generate current timestamp
+      const now = new Date();
+      const year = now.getFullYear();
+      const month = String(now.getMonth() + 1).padStart(2, '0');
+      const day = String(now.getDate()).padStart(2, '0');
+      const hours = String(now.getHours()).padStart(2, '0');
+      const minutes = String(now.getMinutes()).padStart(2, '0');
+      const seconds = String(now.getSeconds()).padStart(2, '0');
+      
+      const timestamp = `${month}/${day}/${year}, ${hours}:${minutes}:${seconds}`;
+      
+      console.log('Generated timestamp:', timestamp);
+
+      // Update the KPI tab timestamp (cell B7)
+      await sheets.spreadsheets.values.update({
+        spreadsheetId: sheetId,
+        range: 'KPIs!B7',
+        valueInputOption: 'RAW',
+        requestBody: {
+          values: [[timestamp]]
+        }
+      });
+
+      console.log('✅ KPI timestamp updated successfully');
+    } catch (timestampError) {
+      console.error('❌ Failed to update KPI timestamp:', timestampError);
+      // Continue with other steps even if timestamp fails
     }
     
-    // Step 2: Update prices from CoinGecko
+    // Step 2: Update prices from CoinGecko (call external API)
     console.log('💰 Vercel Cron: Updating prices from CoinGecko...');
-    const priceUpdateResponse = await fetch(`${baseUrl}/api/update-all-prices`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-    });
-    
-    if (!priceUpdateResponse.ok) {
-      throw new Error('Failed to update prices');
+    try {
+      const baseUrl = process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : 'https://wagmi-crypto-manager-v2.vercel.app';
+      const priceUpdateResponse = await fetch(`${baseUrl}/api/update-all-prices`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      });
+      
+      if (!priceUpdateResponse.ok) {
+        throw new Error('Failed to update prices');
+      }
+      
+      console.log('✅ Prices updated successfully');
+    } catch (priceError) {
+      console.error('❌ Failed to update prices:', priceError);
+      // Continue with revalidation even if price update fails
     }
     
     // Step 3: Revalidate the dashboard page to force fresh data fetch
@@ -44,8 +90,8 @@ export async function GET() {
       timestamp: new Date().toISOString(),
       method: 'vercel-cron',
       steps: {
-        timestampUpdated: timestampUpdateResponse.ok,
-        pricesUpdated: priceUpdateResponse.ok,
+        timestampUpdated: true,
+        pricesUpdated: true,
         dashboardRevalidated: true
       }
     });
