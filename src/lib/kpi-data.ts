@@ -17,28 +17,29 @@ export interface KPIData {
 // Create a cached version of KPI data fetching
 const getCachedKPIData = unstable_cache(
   async (forceRefresh: boolean = false) => {
-    // Google Sheet ID for WAGMI Investment Manager Database
-    const SHEET_ID = '1h04nkcnQmxaFml8RubIGmPgffMiyoEIg350ryjXK0tM';
+    try {
+      // Google Sheet ID for WAGMI Investment Manager Database
+      const SHEET_ID = '1h04nkcnQmxaFml8RubIGmPgffMiyoEIg350ryjXK0tM';
 
-    // Add cache-busting parameter when force refresh is requested
-    const cacheBuster = forceRefresh ? `&_t=${Date.now()}` : '';
-    const url = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?sheet=KPIs&tqx=out:json${cacheBuster}`;
+      // Add cache-busting parameter when force refresh is requested
+      const cacheBuster = forceRefresh ? `&_t=${Date.now()}` : '';
+      const url = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?sheet=KPIs&tqx=out:json${cacheBuster}`;
 
-    console.log('🔍 DEBUG - fetchKPIData called with forceRefresh:', forceRefresh, 'URL:', url);
+      console.log('🔍 DEBUG - fetchKPIData called with forceRefresh:', forceRefresh, 'URL:', url);
 
-    // Fetch KPI data directly from Google Sheets using public API
-    const response = await fetch(url, {
-      method: 'GET',
-      headers: {
-        'Accept': 'application/json',
-        // Add cache control headers for force refresh
-        ...(forceRefresh && {
-          'Cache-Control': 'no-cache, no-store, must-revalidate',
-          'Pragma': 'no-cache',
-          'Expires': '0'
-        })
-      }
-    });
+      // Fetch KPI data directly from Google Sheets using public API
+      const response = await fetch(url, {
+        method: 'GET',
+        headers: {
+          'Accept': 'application/json',
+          // Add cache control headers for force refresh
+          ...(forceRefresh && {
+            'Cache-Control': 'no-cache, no-store, must-revalidate',
+            'Pragma': 'no-cache',
+            'Expires': '0'
+          })
+        }
+      });
 
     if (!response.ok) {
       console.error('Google Sheets API HTTP error:', response.status, response.statusText);
@@ -134,14 +135,14 @@ const getCachedKPIData = unstable_cache(
       }
     }
 
-    console.log('🔍 DEBUG - Final KPI data object:', kpiData);
-    console.log('🔍 DEBUG - lastUpdated value:', kpiData.lastUpdated, 'Type:', typeof kpiData.lastUpdated);
-    return kpiData;
+      console.log('🔍 DEBUG - Final KPI data object:', kpiData);
+      console.log('🔍 DEBUG - lastUpdated value:', kpiData.lastUpdated, 'Type:', typeof kpiData.lastUpdated);
+      return kpiData;
 
-  } catch (error) {
-    console.error('Error fetching KPI data on server:', error);
-    return null;
-  }
+    } catch (error) {
+      console.error('Error fetching KPI data on server:', error);
+      return null;
+    }
   },
   ['kpi-data'],
   {
