@@ -3,35 +3,60 @@ import { revalidatePath } from 'next/cache';
 
 export async function GET() {
   try {
-    console.log('🔄 Cron job: Starting automatic price refresh...');
+    console.log('🔄 Vercel Cron: Starting automatic price refresh...');
     
-    // Step 1: Revalidate the dashboard page to clear cache
+    // Step 1: Update KPI timestamp
+    console.log('📝 Vercel Cron: Updating KPI timestamp...');
+    const timestampUpdateResponse = await fetch(`${process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : 'http://localhost:3000'}/api/update-kpi-timestamp`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    });
+    
+    if (!timestampUpdateResponse.ok) {
+      throw new Error('Failed to update KPI timestamp');
+    }
+    
+    // Step 2: Update prices from CoinGecko
+    console.log('💰 Vercel Cron: Updating prices from CoinGecko...');
+    const priceUpdateResponse = await fetch(`${process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : 'http://localhost:3000'}/api/update-all-prices`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    });
+    
+    if (!priceUpdateResponse.ok) {
+      throw new Error('Failed to update prices');
+    }
+    
+    // Step 3: Revalidate the dashboard page to force fresh data fetch
+    console.log('🔄 Vercel Cron: Revalidating dashboard...');
     revalidatePath('/dashboard');
-    console.log('✅ Cron job: Dashboard page revalidated');
     
-    // Step 2: You could add additional price update logic here
-    // For example, calling external APIs to update prices in your database
-    // This is where you'd integrate with CoinGecko, CoinMarketCap, etc.
-    
-    const timestamp = new Date().toISOString();
-    
-    console.log(`✅ Cron job: Price refresh completed at ${timestamp}`);
+    console.log('✅ Vercel Cron: Price refresh completed successfully');
     
     return NextResponse.json({
       success: true,
-      message: 'Prices refreshed successfully',
-      timestamp,
-      method: 'cron-job'
+      message: 'Prices refreshed successfully via Vercel Cron',
+      timestamp: new Date().toISOString(),
+      method: 'vercel-cron',
+      steps: {
+        timestampUpdated: timestampUpdateResponse.ok,
+        pricesUpdated: priceUpdateResponse.ok,
+        dashboardRevalidated: true
+      }
     });
     
   } catch (error) {
-    console.error('❌ Cron job: Error during price refresh:', error);
+    console.error('❌ Vercel Cron: Error during price refresh:', error);
     
     return NextResponse.json({
       success: false,
-      error: 'Failed to refresh prices',
+      error: error instanceof Error ? error.message : 'Unknown error',
       timestamp: new Date().toISOString(),
-      method: 'cron-job'
+      method: 'vercel-cron'
     }, { status: 500 });
   }
 }

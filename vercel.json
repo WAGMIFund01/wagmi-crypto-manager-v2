@@ -14,5 +14,11 @@
   "github": {
     "enabled": true,
     "autoAlias": false
-  }
+  },
+  "crons": [
+    {
+      "path": "/api/cron/refresh-prices",
+      "schedule": "*/30 * * * *"
+    }
+  ]
 }
