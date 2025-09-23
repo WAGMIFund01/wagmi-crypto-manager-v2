@@ -6,27 +6,29 @@ export async function GET() {
   try {
     console.log('🔄 Vercel Cron: Starting automatic price refresh...');
     
+    // Initialize Google Sheets authentication
+    const serviceAccountEmail = process.env.GOOGLE_SERVICE_ACCOUNT_EMAIL;
+    const privateKey = process.env.GOOGLE_PRIVATE_KEY;
+    const sheetId = process.env.GOOGLE_SHEET_ID || '1h04nkcnQmxaFml8RubIGmPgffMiyoEIg350ryjXK0tM';
+
+    if (!serviceAccountEmail || !privateKey) {
+      throw new Error('Missing Google Sheets API credentials');
+    }
+
+    // Create authentication
+    const auth = new google.auth.GoogleAuth({
+      credentials: {
+        client_email: serviceAccountEmail,
+        private_key: privateKey.replace(/\\n/g, '\n'),
+      },
+      scopes: ['https://www.googleapis.com/auth/spreadsheets'],
+    });
+
+    const sheets = google.sheets({ version: 'v4', auth });
+
     // Step 1: Update KPI timestamp (inline implementation)
     console.log('📝 Vercel Cron: Updating KPI timestamp...');
     try {
-      const serviceAccountEmail = process.env.GOOGLE_SERVICE_ACCOUNT_EMAIL;
-      const privateKey = process.env.GOOGLE_PRIVATE_KEY;
-      const sheetId = process.env.GOOGLE_SHEET_ID || '1h04nkcnQmxaFml8RubIGmPgffMiyoEIg350ryjXK0tM';
-
-      if (!serviceAccountEmail || !privateKey) {
-        throw new Error('Missing Google Sheets API credentials');
-      }
-
-      // Create authentication
-      const auth = new google.auth.GoogleAuth({
-        credentials: {
-          client_email: serviceAccountEmail,
-          private_key: privateKey.replace(/\\n/g, '\n'),
-        },
-        scopes: ['https://www.googleapis.com/auth/spreadsheets'],
-      });
-
-      const sheets = google.sheets({ version: 'v4', auth });
 
       // Generate current timestamp
       const now = new Date();
