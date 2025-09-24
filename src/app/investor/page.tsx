@@ -11,6 +11,8 @@ import { formatCurrency, formatPercentage } from '@/shared/utils';
 import { COLORS } from '@/shared/constants/colors';
 import { PortfolioAsset } from '@/lib/sheetsAdapter';
 import { formatTimestampForDisplay } from '@/lib/timestamp-utils';
+import { fetchPerformanceData, PerformanceData } from '@/services/performanceDataService';
+import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
 
 interface InvestorData {
   name: string;
@@ -36,9 +38,12 @@ export default function InvestorPage() {
   const [investorData, setInvestorData] = useState<InvestorData | null>(null);
   const [transactions, setTransactions] = useState<Transaction[]>([]);
   const [portfolioAssets, setPortfolioAssets] = useState<PortfolioAsset[]>([]);
+  const [performanceData, setPerformanceData] = useState<PerformanceData[]>([]);
+  const [viewMode, setViewMode] = useState<'mom' | 'cumulative'>('mom');
   const [loading, setLoading] = useState(true);
   const [transactionsLoading, setTransactionsLoading] = useState(false);
   const [portfolioLoading, setPortfolioLoading] = useState(false);
+  const [performanceLoading, setPerformanceLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [lastUpdatedTimestamp, setLastUpdatedTimestamp] = useState<string>('');
 
@@ -72,6 +77,7 @@ export default function InvestorPage() {
     // Fetch transactions and portfolio data for this investor
     fetchTransactions(storedInvestorId);
     fetchPortfolioData();
+    fetchPerformanceDataForInvestor();
     fetchLastUpdatedTimestamp();
     
     setLoading(false);
@@ -124,6 +130,19 @@ export default function InvestorPage() {
     }
   };
 
+  const fetchPerformanceDataForInvestor = async () => {
+    setPerformanceLoading(true);
+    try {
+      const data = await fetchPerformanceData();
+      setPerformanceData(data);
+    } catch (error) {
+      console.error('Error fetching performance data:', error);
+      // Don't set error for performance - just log it
+    } finally {
+      setPerformanceLoading(false);
+    }
+  };
+
   const fetchLastUpdatedTimestamp = async () => {
     try {
       const response = await fetch('/api/get-last-updated-timestamp');
@@ -156,6 +175,104 @@ export default function InvestorPage() {
   const riskDistribution = calculateDistribution('riskLevel');
   const locationDistribution = calculateDistribution('location');
   const typeDistribution = calculateDistribution('coinType');
+
+  // Calculate top and worst performers - group by symbol to avoid duplicates
+  const calculatePerformers = () => {
+    const assetMap = new Map();
+    
+    portfolioAssets.forEach(asset => {
+      const symbol = asset.symbol;
+      const value = asset.quantity * asset.currentPrice;
+      const returnPercentage = asset.priceChange24h || 0;
+      
+      if (assetMap.has(symbol)) {
+        // Aggregate values for the same asset across different locations
+        const existing = assetMap.get(symbol);
+        const oldValue = existing.value;
+        const oldReturn = existing.returnPercentage;
+        
+        // Add the new value
+        existing.value += value;
+        
+        // Calculate weighted average for return percentage
+        existing.returnPercentage = ((oldReturn * oldValue) + (returnPercentage * value)) / existing.value;
+      } else {
+        assetMap.set(symbol, {
+          symbol: asset.symbol,
+          name: asset.assetName,
+          returnPercentage: returnPercentage,
+          value: value
+        });
+      }
+    });
+    
+    const performers = Array.from(assetMap.values()).sort((a, b) => b.returnPercentage - a.returnPercentage);
+    return {
+      topPerformers: performers.slice(0, 5),
+      worstPerformers: performers.slice(-5).reverse()
+    };
+  };
+
+  const { topPerformers, worstPerformers } = calculatePerformers();
+
+  // Chart helper functions
+  const formatPercentageForChart = (value: number) => {
+    return `${value >= 0 ? '+' : ''}${value.toFixed(2)}%`;
+  };
+
+  // Custom tooltip for comparison charts
+  const CustomComparisonTooltip = ({ active, payload, label }: any) => {
+    if (active && payload && payload.length) {
+      return (
+        <div className="bg-gray-800 border border-gray-600 rounded-lg p-3 shadow-lg">
+          <p className="text-white font-medium mb-2">{label}</p>
+          {payload.map((entry: any, index: number) => (
+            <p key={index} style={{ color: entry.color }} className="text-sm">
+              {entry.name}: {formatPercentageForChart(entry.value)}
+            </p>
+          ))}
+        </div>
+      );
+    }
+    return null;
+  };
+
+  // Get the appropriate data keys based on view mode
+  const getDataKeys = () => {
+    if (viewMode === 'mom') {
+      return {
+        wagmi: 'wagmiMoM',
+        total: 'totalMoM',
+        total3: 'total3MoM',
+        wagmiName: 'WAGMI Fund',
+        totalName: 'Total Benchmark',
+        total3Name: 'Total 3 Benchmark'
+      };
+    } else {
+      return {
+        wagmi: 'wagmiCumulative',
+        total: 'totalCumulative',
+        total3: 'total3Cumulative',
+        wagmiName: 'WAGMI Fund',
+        totalName: 'Total Benchmark',
+        total3Name: 'Total 3 Benchmark'
+      };
+    }
+  };
+
+  const dataKeys = getDataKeys();
+
+  // Filter performance data for current and historical months only
+  const filteredData = performanceData.filter(item => {
+    const [month, year] = item.month.split('-');
+    const monthIndex = new Date(`${month} 1, ${year}`).getMonth();
+    const itemYear = parseInt(year);
+    const currentDate = new Date();
+    const currentMonth = currentDate.getMonth();
+    const currentYear = currentDate.getFullYear();
+    
+    return itemYear < currentYear || (itemYear === currentYear && monthIndex <= currentMonth);
+  });
 
   // Color palettes for different chart types
   const assetColors = Object.values(COLORS.chart);
@@ -462,13 +579,13 @@ export default function InvestorPage() {
           </WagmiCard>
         </div>
 
-        {/* Portfolio Breakdown Charts */}
+        {/* Portfolio Breakdown by Asset and Risk */}
         {portfolioLoading ? (
-          <div className="flex items-center justify-center py-12 mb-8">
+          <div className="flex items-center justify-center py-8 mb-6">
             <WagmiSpinner size="lg" theme="green" showText text="Loading portfolio breakdown..." centered />
           </div>
         ) : (
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
             <StackedBarChart
               title="Portfolio Breakdown by Asset"
               data={assetDistribution}
@@ -494,6 +611,164 @@ export default function InvestorPage() {
               formatValue={(value) => privacyMode ? '•••••' : formatCurrency(value, false)}
               showTooltips={false}
             />
+          </div>
+        )}
+
+        {/* Top/Worst Performers */}
+        {portfolioLoading ? (
+          <div className="flex items-center justify-center py-8 mb-6">
+            <WagmiSpinner size="lg" theme="green" showText text="Loading performers..." centered />
+          </div>
+        ) : (
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 mb-6">
+            {/* Top Performers */}
+            <WagmiCard variant="default" theme="green" size="md">
+              <div className="p-4">
+                <h3 className="text-base font-semibold text-white mb-3">Top Performers (24h)</h3>
+                <div className="space-y-2">
+                  {topPerformers.map((asset, index) => (
+                    <div key={asset.symbol} className="flex items-center justify-between p-2 bg-gray-800/30 rounded-md">
+                      <div className="flex items-center space-x-2">
+                        <div className="w-6 h-6 bg-green-600 rounded-full flex items-center justify-center text-white text-xs font-bold">
+                          {index + 1}
+                        </div>
+                        <div>
+                          <div className="text-white font-medium text-sm">{asset.symbol}</div>
+                          <div className="text-gray-400 text-xs">{asset.name}</div>
+                        </div>
+                      </div>
+                      <div className="text-green-400 font-medium text-sm">
+                        {formatPercentage(asset.returnPercentage, false, true)}
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </WagmiCard>
+
+            {/* Worst Performers */}
+            <WagmiCard variant="default" theme="green" size="md">
+              <div className="p-4">
+                <h3 className="text-base font-semibold text-white mb-3">Worst Performers (24h)</h3>
+                <div className="space-y-2">
+                  {worstPerformers.map((asset, index) => (
+                    <div key={asset.symbol} className="flex items-center justify-between p-2 bg-gray-800/30 rounded-md">
+                      <div className="flex items-center space-x-2">
+                        <div className="w-6 h-6 bg-red-600 rounded-full flex items-center justify-center text-white text-xs font-bold">
+                          {index + 1}
+                        </div>
+                        <div>
+                          <div className="text-white font-medium text-sm">{asset.symbol}</div>
+                          <div className="text-gray-400 text-xs">{asset.name}</div>
+                        </div>
+                      </div>
+                      <div className="text-red-400 font-medium text-sm">
+                        {formatPercentage(asset.returnPercentage, false, true)}
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </WagmiCard>
+          </div>
+        )}
+
+        {/* Benchmark Performance Charts */}
+        {performanceLoading ? (
+          <div className="flex items-center justify-center py-12 mb-8">
+            <WagmiSpinner size="lg" theme="green" showText text="Loading performance charts..." centered />
+          </div>
+        ) : performanceData.length > 0 ? (
+          <div className="mb-8">
+            <h2 
+              className="text-xl font-bold mb-6"
+              style={{ 
+                color: '#00FF95',
+                textShadow: '0 0 10px rgba(0, 255, 149, 0.3)'
+              }}
+            >
+              Fund Performance vs Benchmarks
+            </h2>
+            <div className="bg-gray-800/50 rounded-lg p-6">
+              <div className="flex items-center justify-between mb-4">
+                <h3 className="text-lg font-semibold text-white">Performance vs Benchmarks</h3>
+                
+                {/* Toggle Buttons */}
+                <div className="flex bg-gray-700 rounded-lg p-1">
+                  <button
+                    onClick={() => setViewMode('mom')}
+                    className={`px-4 py-2 rounded-md text-sm font-medium transition-colors ${
+                      viewMode === 'mom'
+                        ? 'bg-green-600 text-white'
+                        : 'text-gray-300 hover:text-white'
+                    }`}
+                  >
+                    MoM Performance
+                  </button>
+                  <button
+                    onClick={() => setViewMode('cumulative')}
+                    className={`px-4 py-2 rounded-md text-sm font-medium transition-colors ${
+                      viewMode === 'cumulative'
+                        ? 'bg-green-600 text-white'
+                        : 'text-gray-300 hover:text-white'
+                    }`}
+                  >
+                    Cumulative Return
+                  </button>
+                </div>
+              </div>
+              
+              <div className="h-80">
+                <ResponsiveContainer width="100%" height="100%">
+                  <BarChart data={filteredData} margin={{ top: 20, right: 30, left: 20, bottom: 5 }}>
+                    <CartesianGrid strokeDasharray="3 3" stroke="#374151" />
+                    <XAxis 
+                      dataKey="month" 
+                      stroke="#9CA3AF"
+                      fontSize={12}
+                      angle={-45}
+                      textAnchor="end"
+                      height={60}
+                    />
+                    <YAxis 
+                      stroke="#9CA3AF"
+                      fontSize={12}
+                      tickFormatter={(value) => `${value.toFixed(1)}%`}
+                    />
+                    <Tooltip content={<CustomComparisonTooltip />} />
+                    <Legend />
+                    <Bar 
+                      dataKey={dataKeys.wagmi} 
+                      fill="#00FF95"
+                      name={dataKeys.wagmiName}
+                      radius={[2, 2, 0, 0]}
+                    />
+                    <Bar 
+                      dataKey={dataKeys.total} 
+                      fill="#3B82F6"
+                      name={dataKeys.totalName}
+                      radius={[2, 2, 0, 0]}
+                    />
+                    <Bar 
+                      dataKey={dataKeys.total3} 
+                      fill="#F59E0B"
+                      name={dataKeys.total3Name}
+                      radius={[2, 2, 0, 0]}
+                    />
+                  </BarChart>
+                </ResponsiveContainer>
+              </div>
+            </div>
+          </div>
+        ) : null}
+
+        {/* Portfolio Breakdown by Location and Type */}
+        {portfolioLoading ? (
+          <div className="flex items-center justify-center py-12 mb-8">
+            <WagmiSpinner size="lg" theme="green" showText text="Loading portfolio breakdown..." centered />
+          </div>
+        ) : (
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
             <StackedBarChart
               title="Portfolio Breakdown by Location"
               data={locationDistribution}
