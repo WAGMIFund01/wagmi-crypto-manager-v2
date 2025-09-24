@@ -137,26 +137,34 @@ const mockPerformanceData: PerformanceData[] = [
 ];
 
 export async function fetchPerformanceData(): Promise<PerformanceData[]> {
-  // Simulate API call delay
-  await new Promise(resolve => setTimeout(resolve, 500));
-  
-  // In a real implementation, this would fetch from your actual data source
-  // For example: const response = await fetch('/api/performance-data');
-  // return response.json();
-  
-  return mockPerformanceData;
+  try {
+    const response = await fetch('/api/get-performance-data');
+    const result = await response.json();
+    
+    if (result.success && result.data) {
+      return result.data;
+    } else {
+      console.error('Failed to fetch performance data:', result.error);
+      // Fallback to mock data if API fails
+      return mockPerformanceData;
+    }
+  } catch (error) {
+    console.error('Error fetching performance data from API:', error);
+    // Fallback to mock data if API fails
+    return mockPerformanceData;
+  }
 }
 
 // Helper function to get the latest performance data
-export function getLatestPerformanceData(): PerformanceData | null {
-  if (mockPerformanceData.length === 0) return null;
-  return mockPerformanceData[mockPerformanceData.length - 1];
+export function getLatestPerformanceData(data: PerformanceData[]): PerformanceData | null {
+  if (data.length === 0) return null;
+  return data[data.length - 1];
 }
 
 // Helper function to calculate year-to-date performance
-export function getYearToDatePerformance(): { wagmi: number; total: number; total3: number } {
+export function getYearToDatePerformance(data: PerformanceData[]): { wagmi: number; total: number; total3: number } {
   const currentYear = new Date().getFullYear();
-  const yearStartData = mockPerformanceData.find(item => 
+  const yearStartData = data.find(item => 
     item.month.includes(currentYear.toString()) && item.month.includes('Jan')
   );
   
@@ -164,7 +172,7 @@ export function getYearToDatePerformance(): { wagmi: number; total: number; tota
     return { wagmi: 0, total: 0, total3: 0 };
   }
   
-  const latestData = getLatestPerformanceData();
+  const latestData = getLatestPerformanceData(data);
   if (!latestData) {
     return { wagmi: 0, total: 0, total3: 0 };
   }
