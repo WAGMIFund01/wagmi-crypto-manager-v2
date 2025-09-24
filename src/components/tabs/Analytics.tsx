@@ -4,6 +4,8 @@ import { useState, useEffect } from 'react';
 import { PortfolioAsset } from '@/lib/sheetsAdapter';
 import { WagmiCard, WagmiSpinner } from '@/components/ui';
 import { COLORS } from '@/shared/constants/colors';
+import PerformanceCharts from '@/components/charts/PerformanceCharts';
+import { fetchPerformanceData, PerformanceData } from '@/services/performanceDataService';
 
 interface AnalyticsData {
   totalValue: number;
@@ -32,6 +34,7 @@ interface AnalyticsData {
 
 export default function Analytics() {
   const [analyticsData, setAnalyticsData] = useState<AnalyticsData | null>(null);
+  const [performanceData, setPerformanceData] = useState<PerformanceData[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
@@ -44,15 +47,22 @@ export default function Analytics() {
       setLoading(true);
       setError(null);
       
-      const response = await fetch('/api/get-portfolio-data');
-      const data = await response.json();
+      // Fetch both portfolio data and performance data in parallel
+      const [portfolioResponse, perfData] = await Promise.all([
+        fetch('/api/get-portfolio-data'),
+        fetchPerformanceData()
+      ]);
       
-      if (data.success && data.assets) {
-        const analytics = calculateAnalytics(data.assets);
+      const portfolioData = await portfolioResponse.json();
+      
+      if (portfolioData.success && portfolioData.assets) {
+        const analytics = calculateAnalytics(portfolioData.assets);
         setAnalyticsData(analytics);
       } else {
         throw new Error('Failed to fetch portfolio data');
       }
+      
+      setPerformanceData(perfData);
     } catch (err) {
       console.error('Error fetching analytics data:', err);
       setError(err instanceof Error ? err.message : 'Failed to load analytics');
@@ -389,6 +399,22 @@ export default function Analytics() {
           </div>
         </WagmiCard>
       </div>
+
+      {/* Performance Charts Section */}
+      {performanceData.length > 0 && (
+        <div className="mt-8">
+          <h3 
+            className="text-xl font-bold mb-6"
+            style={{ 
+              color: '#00FF95',
+              textShadow: '0 0 10px rgba(0, 255, 149, 0.3)'
+            }}
+          >
+            Historical Performance Analysis
+          </h3>
+          <PerformanceCharts data={performanceData} />
+        </div>
+      )}
     </div>
   );
 }
