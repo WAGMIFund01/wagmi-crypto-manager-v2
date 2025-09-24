@@ -1,6 +1,6 @@
 'use client';
 
-import { BarChart, Bar, LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
+import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
 
 interface PerformanceData {
   month: string;
@@ -112,12 +112,12 @@ export default function PerformanceCharts({ data }: PerformanceChartsProps) {
         </div>
       </div>
 
-      {/* Chart 2: Line Chart - MoM Performance Comparison */}
+      {/* Chart 2: Bar Chart - MoM Performance Comparison */}
       <div className="bg-gray-800/50 rounded-lg p-6">
         <h3 className="text-lg font-semibold text-white mb-4">Month-over-Month Performance Comparison</h3>
         <div className="h-80">
           <ResponsiveContainer width="100%" height="100%">
-            <LineChart data={filteredData} margin={{ top: 20, right: 30, left: 20, bottom: 5 }}>
+            <BarChart data={filteredData} margin={{ top: 20, right: 30, left: 20, bottom: 5 }}>
               <CartesianGrid strokeDasharray="3 3" stroke="#374151" />
               <XAxis 
                 dataKey="month" 
@@ -134,41 +134,35 @@ export default function PerformanceCharts({ data }: PerformanceChartsProps) {
               />
               <Tooltip content={<CustomLineTooltip />} />
               <Legend />
-              <Line 
-                type="monotone" 
+              <Bar 
                 dataKey="wagmiMoM" 
-                stroke="#00FF95" 
-                strokeWidth={3}
+                fill="#00FF95"
                 name="WAGMI Fund"
-                dot={{ fill: '#00FF95', strokeWidth: 2, r: 4 }}
+                radius={[2, 2, 0, 0]}
               />
-              <Line 
-                type="monotone" 
+              <Bar 
                 dataKey="totalMoM" 
-                stroke="#3B82F6" 
-                strokeWidth={2}
+                fill="#3B82F6"
                 name="Total Benchmark"
-                dot={{ fill: '#3B82F6', strokeWidth: 2, r: 3 }}
+                radius={[2, 2, 0, 0]}
               />
-              <Line 
-                type="monotone" 
+              <Bar 
                 dataKey="total3MoM" 
-                stroke="#F59E0B" 
-                strokeWidth={2}
+                fill="#F59E0B"
                 name="Total 3 Benchmark"
-                dot={{ fill: '#F59E0B', strokeWidth: 2, r: 3 }}
+                radius={[2, 2, 0, 0]}
               />
-            </LineChart>
+            </BarChart>
           </ResponsiveContainer>
         </div>
       </div>
 
-      {/* Chart 3: Line Chart - Cumulative Return Comparison */}
+      {/* Chart 3: Bar Chart - Cumulative Return Comparison */}
       <div className="bg-gray-800/50 rounded-lg p-6">
-        <h3 className="text-lg font-semibold text-white mb-4">Cumulative Return Comparison (Indexed to 1)</h3>
+        <h3 className="text-lg font-semibold text-white mb-4">Cumulative Return Comparison</h3>
         <div className="h-80">
           <ResponsiveContainer width="100%" height="100%">
-            <LineChart data={filteredData} margin={{ top: 20, right: 30, left: 20, bottom: 5 }}>
+            <BarChart data={filteredData} margin={{ top: 20, right: 30, left: 20, bottom: 5 }}>
               <CartesianGrid strokeDasharray="3 3" stroke="#374151" />
               <XAxis 
                 dataKey="month" 
@@ -181,35 +175,29 @@ export default function PerformanceCharts({ data }: PerformanceChartsProps) {
               <YAxis 
                 stroke="#9CA3AF"
                 fontSize={12}
-                tickFormatter={(value) => value.toFixed(2)}
+                tickFormatter={(value) => `${value.toFixed(1)}%`}
               />
               <Tooltip content={<CustomLineTooltip />} />
               <Legend />
-              <Line 
-                type="monotone" 
+              <Bar 
                 dataKey="wagmiCumulative" 
-                stroke="#00FF95" 
-                strokeWidth={3}
+                fill="#00FF95"
                 name="WAGMI Fund"
-                dot={{ fill: '#00FF95', strokeWidth: 2, r: 4 }}
+                radius={[2, 2, 0, 0]}
               />
-              <Line 
-                type="monotone" 
+              <Bar 
                 dataKey="totalCumulative" 
-                stroke="#3B82F6" 
-                strokeWidth={2}
+                fill="#3B82F6"
                 name="Total Benchmark"
-                dot={{ fill: '#3B82F6', strokeWidth: 2, r: 3 }}
+                radius={[2, 2, 0, 0]}
               />
-              <Line 
-                type="monotone" 
+              <Bar 
                 dataKey="total3Cumulative" 
-                stroke="#F59E0B" 
-                strokeWidth={2}
+                fill="#F59E0B"
                 name="Total 3 Benchmark"
-                dot={{ fill: '#F59E0B', strokeWidth: 2, r: 3 }}
+                radius={[2, 2, 0, 0]}
               />
-            </LineChart>
+            </BarChart>
           </ResponsiveContainer>
         </div>
       </div>
