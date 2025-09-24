@@ -40,14 +40,17 @@ async function getPerformanceDataHandler(req: NextRequest) {
 
     const text = await response.text();
     
-    // Remove the prefix that Google Sheets adds
-    const jsonText = text.replace(/^.*?\(/, '').replace(/\);?$/, '');
+    // Parse the Google Sheets response - it's wrapped in a function call
+    const match = text.match(/google\.visualization\.Query\.setResponse\((.*)\);?$/);
+    if (!match) {
+      throw new Error('Could not parse Google Sheets response format');
+    }
     
     let data;
     try {
-      data = JSON.parse(jsonText);
+      data = JSON.parse(match[1]);
     } catch (parseError) {
-      console.error('Failed to parse Google Sheets response:', parseError);
+      console.error('Failed to parse Google Sheets JSON:', parseError);
       throw new Error('Failed to parse performance data from Google Sheets');
     }
 
@@ -59,14 +62,13 @@ async function getPerformanceDataHandler(req: NextRequest) {
     const rows = data.table.rows;
     const performanceData: PerformanceData[] = [];
 
-    // Skip header rows and process data rows
-    // Based on your spreadsheet, data starts from row 4 (index 3) and goes to row 14 (index 13)
-    for (let i = 3; i < rows.length && i < 14; i++) {
+    // Process data rows - data starts from row 0 (Oct-2024)
+    for (let i = 0; i < rows.length; i++) {
       const row = rows[i];
-      if (!row.c || row.c.length < 18) continue; // Ensure we have enough columns
+      if (!row.c || row.c.length < 17) continue; // Ensure we have enough columns
 
       // Extract data from specific columns
-      const month = row.c[1]?.v; // Column B - Date
+      const monthCell = row.c[1]; // Column B - Date
       const endingAUM = row.c[6]?.v; // Column G - Ending AUM
       const wagmiMoM = row.c[7]?.v; // Column H - MoM Return
       const wagmiCumulative = row.c[8]?.v; // Column I - Cumulative Return
@@ -75,30 +77,43 @@ async function getPerformanceDataHandler(req: NextRequest) {
       const total3MoM = row.c[15]?.v; // Column P - MoM return (Total 3)
       const total3Cumulative = row.c[16]?.v; // Column Q - Cumulative Return (Total 3)
 
-      // Skip rows with no month data (future months)
-      if (!month) continue;
+      // Skip rows with no month data (future months or empty rows)
+      if (!monthCell?.f) continue;
 
-      // Convert month to proper format (e.g., "Oct-2024")
-      let formattedMonth = month;
-      if (typeof month === 'string' && month.includes('/')) {
-        const [monthPart, yearPart] = month.split('/');
-        const monthNames = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 
-                           'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
-        const monthIndex = parseInt(monthPart) - 1;
-        if (monthIndex >= 0 && monthIndex < 12) {
-          formattedMonth = `${monthNames[monthIndex]}-${yearPart}`;
-        }
+      // Use the formatted value from Google Sheets (e.g., " Oct-2024")
+      const formattedMonth = monthCell.f.trim();
+      
+      // Skip future months - only process current and historical data
+      const currentDate = new Date();
+      const currentYear = currentDate.getFullYear();
+      const currentMonth = currentDate.getMonth();
+      
+      // Parse the month from the formatted string (e.g., "Oct-2024")
+      const monthMatch = formattedMonth.match(/(\w{3})-(\d{4})/);
+      if (!monthMatch) continue;
+      
+      const monthName = monthMatch[1];
+      const year = parseInt(monthMatch[2]);
+      
+      const monthNames = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 
+                         'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+      const monthIndex = monthNames.indexOf(monthName);
+      
+      // Skip future months
+      if (year > currentYear || (year === currentYear && monthIndex > currentMonth)) {
+        continue;
       }
 
       performanceData.push({
         month: formattedMonth,
         endingAUM: parseFloat(endingAUM) || 0,
-        wagmiMoM: parseFloat(wagmiMoM) || 0,
-        totalMoM: parseFloat(totalMoM) || 0,
-        total3MoM: parseFloat(total3MoM) || 0,
-        wagmiCumulative: parseFloat(wagmiCumulative) || 0,
-        totalCumulative: parseFloat(totalCumulative) || 0,
-        total3Cumulative: parseFloat(total3Cumulative) || 0,
+        // Convert decimal percentages to percentage values (0.285 -> 28.5)
+        wagmiMoM: (parseFloat(wagmiMoM) || 0) * 100,
+        totalMoM: (parseFloat(totalMoM) || 0) * 100,
+        total3MoM: (parseFloat(total3MoM) || 0) * 100,
+        wagmiCumulative: (parseFloat(wagmiCumulative) || 0) * 100,
+        totalCumulative: (parseFloat(totalCumulative) || 0) * 100,
+        total3Cumulative: (parseFloat(total3Cumulative) || 0) * 100,
       });
     }
 
