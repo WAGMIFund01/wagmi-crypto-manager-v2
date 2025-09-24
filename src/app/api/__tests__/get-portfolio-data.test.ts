@@ -3,6 +3,11 @@ import { NextRequest } from 'next/server'
 import { GET } from '../get-portfolio-data/route'
 import { sheetsAdapter } from '@/lib/sheetsAdapter'
 
+// Mock unstable_cache from next/cache
+vi.mock('next/cache', () => ({
+  unstable_cache: vi.fn((fn) => fn)
+}))
+
 // Mock the sheetsAdapter instance
 vi.mock('@/lib/sheetsAdapter', () => ({
   sheetsAdapter: {
