@@ -13,6 +13,18 @@ export { default as ModuleCard } from './ModuleCard';
 export { default as SmartDropdown } from './SmartDropdown';
 export { default as FormError, FieldError, FormErrorDisplay } from './FormError';
 
+// Standardized Components
+export {
+  StandardContainer,
+  StandardSection,
+  StandardGrid,
+  StandardFlex,
+  StandardLoading,
+  StandardError,
+  StandardEmptyState,
+  StandardPageLayout,
+} from './StandardizedComponents';
+
 // Icons
 export * from './icons/WagmiIcons';
 
