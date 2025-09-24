@@ -215,11 +215,6 @@ export default function Analytics({ onRefresh }: AnalyticsProps) {
 
   return (
     <div className="space-y-6">
-      <div className="flex items-center justify-end">
-        <p className="text-sm text-gray-400">
-          Data refreshes automatically via navbar refresh button
-        </p>
-      </div>
 
       {/* Performance Analysis */}
       <div className="grid grid-cols-1 xl:grid-cols-2 gap-4 md:gap-6">
