@@ -365,10 +365,6 @@ export default function PortfolioOverview({ className, onRefresh, isPrivacyMode 
 
   return (
     <div className={`${className} space-y-6`}>
-      {/* Portfolio Overview Header */}
-      <div className="flex justify-between items-center">
-        <h2 className="text-2xl font-bold text-white">Portfolio Overview</h2>
-      </div>
 
       {/* Portfolio Breakdown Charts */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">

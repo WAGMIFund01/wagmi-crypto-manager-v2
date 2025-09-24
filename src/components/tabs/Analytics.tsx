@@ -215,64 +215,10 @@ export default function Analytics({ onRefresh }: AnalyticsProps) {
 
   return (
     <div className="space-y-6">
-      <div className="flex items-center justify-between">
-      <h2 
-        className="text-2xl font-bold"
-        style={{ 
-          color: '#00FF95',
-          textShadow: '0 0 10px rgba(0, 255, 149, 0.3)'
-        }}
-      >
-        Analytics & Reports
-      </h2>
+      <div className="flex items-center justify-end">
         <p className="text-sm text-gray-400">
           Data refreshes automatically via navbar refresh button
         </p>
-      </div>
-
-      {/* Key Performance Metrics */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6">
-        <WagmiCard variant="kpi" theme="green" size="md">
-          <div className="text-center">
-            <div className="text-2xl font-bold mb-1" style={{ color: COLORS.text.primary }}>
-              {formatCurrency(analyticsData.totalValue)}
-            </div>
-            <div className="text-sm text-gray-400">Total Portfolio Value</div>
-          </div>
-        </WagmiCard>
-
-        <WagmiCard variant="kpi" theme="green" size="md">
-          <div className="text-center">
-            <div className="text-2xl font-bold mb-1" style={{ color: COLORS.text.primary }}>
-              {formatCurrency(analyticsData.totalReturn)}
-            </div>
-            <div className="text-sm text-gray-400">Total Return</div>
-            <div className={`text-xs mt-1 ${analyticsData.totalReturnPercentage >= 0 ? 'text-green-400' : 'text-red-400'}`}>
-              {formatPercentage(analyticsData.totalReturnPercentage)}
-            </div>
-          </div>
-        </WagmiCard>
-
-        <WagmiCard variant="kpi" theme="green" size="md">
-          <div className="text-center">
-            <div className="text-2xl font-bold mb-1" style={{ color: COLORS.text.primary }}>
-              {formatCurrency(analyticsData.dailyChange)}
-            </div>
-            <div className="text-sm text-gray-400">24h Change</div>
-            <div className={`text-xs mt-1 ${analyticsData.dailyChangePercentage >= 0 ? 'text-green-400' : 'text-red-400'}`}>
-              {formatPercentage(analyticsData.dailyChangePercentage)}
-            </div>
-          </div>
-        </WagmiCard>
-
-        <WagmiCard variant="kpi" theme="green" size="md">
-          <div className="text-center">
-            <div className="text-2xl font-bold mb-1" style={{ color: COLORS.text.primary }}>
-              {analyticsData.assetCount}
-            </div>
-            <div className="text-sm text-gray-400">Total Assets</div>
-          </div>
-        </WagmiCard>
       </div>
 
       {/* Performance Analysis */}
