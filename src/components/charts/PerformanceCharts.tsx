@@ -2,6 +2,8 @@
 
 import { useState } from 'react';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
+import { WagmiButton, WagmiCard } from '@/components/ui';
+import { getSpacing, getStandardCardStyle } from '@/shared/utils/standardization';
 
 interface PerformanceData {
   month: string;
@@ -108,11 +110,12 @@ export default function PerformanceCharts({ data }: PerformanceChartsProps) {
   const dataKeys = getDataKeys();
 
   return (
-    <div className="space-y-8">
+    <div className={getSpacing('xl')}>
       {/* Chart 1: Bar Chart - Historical Fund Performance (Ending AUM) */}
-      <div className="bg-gray-800/50 rounded-lg p-6">
-        <h3 className="text-lg font-semibold text-white mb-4">Historical Fund Performance (Ending AUM)</h3>
-        <div className="h-80">
+      <WagmiCard variant="default" theme="green" size="lg">
+        <div className="p-4 md:p-6">
+          <h3 className="text-lg font-semibold text-white mb-4">Historical Fund Performance (Ending AUM)</h3>
+        <div className="h-64 md:h-80">
           <ResponsiveContainer width="100%" height="100%">
             <BarChart data={filteredData} margin={{ top: 20, right: 30, left: 20, bottom: 5 }}>
               <CartesianGrid strokeDasharray="3 3" stroke="#374151" />
@@ -138,39 +141,37 @@ export default function PerformanceCharts({ data }: PerformanceChartsProps) {
             </BarChart>
           </ResponsiveContainer>
         </div>
-      </div>
+        </div>
+      </WagmiCard>
 
       {/* Chart 2: Toggleable Performance vs Benchmarks */}
-      <div className="bg-gray-800/50 rounded-lg p-6">
-        <div className="flex items-center justify-between mb-4">
+      <WagmiCard variant="default" theme="green" size="lg">
+        <div className="p-4 md:p-6">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between mb-4 gap-3">
           <h3 className="text-lg font-semibold text-white">Performance vs Benchmarks</h3>
           
           {/* Toggle Buttons */}
-          <div className="flex bg-gray-700 rounded-lg p-1">
-            <button
+          <div className="flex bg-gray-700 rounded-lg p-1 w-full sm:w-auto">
+            <WagmiButton
               onClick={() => setViewMode('mom')}
-              className={`px-4 py-2 rounded-md text-sm font-medium transition-colors ${
-                viewMode === 'mom'
-                  ? 'bg-green-600 text-white'
-                  : 'text-gray-300 hover:text-white'
-              }`}
+              variant={viewMode === 'mom' ? 'primary' : 'outline'}
+              theme="green"
+              size="sm"
             >
               MoM Performance
-            </button>
-            <button
+            </WagmiButton>
+            <WagmiButton
               onClick={() => setViewMode('cumulative')}
-              className={`px-4 py-2 rounded-md text-sm font-medium transition-colors ${
-                viewMode === 'cumulative'
-                  ? 'bg-green-600 text-white'
-                  : 'text-gray-300 hover:text-white'
-              }`}
+              variant={viewMode === 'cumulative' ? 'primary' : 'outline'}
+              theme="green"
+              size="sm"
             >
               Cumulative Return
-            </button>
+            </WagmiButton>
           </div>
         </div>
         
-        <div className="h-80">
+        <div className="h-64 md:h-80">
           <ResponsiveContainer width="100%" height="100%">
             <BarChart data={filteredData} margin={{ top: 20, right: 30, left: 20, bottom: 5 }}>
               <CartesianGrid strokeDasharray="3 3" stroke="#374151" />
@@ -210,7 +211,8 @@ export default function PerformanceCharts({ data }: PerformanceChartsProps) {
             </BarChart>
           </ResponsiveContainer>
         </div>
-      </div>
+        </div>
+      </WagmiCard>
     </div>
   );
 }

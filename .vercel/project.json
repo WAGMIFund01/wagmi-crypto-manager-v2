@@ -1,1 +1,16 @@
-{"projectId":"prj_PrTygdV5UZJVhswQMSWtL8XUpSgP","orgId":"team_6YjkQGE7rnAg2O9RiExkUyXM","projectName":"wagmi-crypto-manager-v2"}
+{
+  "projectId": "prj_PrTygdV5UZJVhswQMSWtL8XUpSgP",
+  "orgId": "team_6YjkQGE7rnAg2O9RiExkUyXM",
+  "projectName": "wagmi-crypto-manager-v2",
+  "settings": {
+    "createdAt": 1757367722114,
+    "framework": "nextjs",
+    "devCommand": null,
+    "installCommand": "npm install",
+    "buildCommand": "npm run build",
+    "outputDirectory": ".next",
+    "rootDirectory": null,
+    "directoryListing": false,
+    "nodeVersion": "22.x"
+  }
+}

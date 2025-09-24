@@ -397,7 +397,7 @@ export default function UniversalNavbar({
           
           {/* Mobile Row 4 - Navigation Tabs */}
           <div className="flex justify-center items-center py-3" style={{ borderTop: '1px solid #333' }}>
-            <nav className="flex space-x-6">
+            <nav className="flex space-x-4 sm:space-x-6 overflow-x-auto w-full justify-center">
               {[
                 { id: 'portfolio', label: 'Portfolio' },
                 { id: 'analytics', label: 'Analytics' },

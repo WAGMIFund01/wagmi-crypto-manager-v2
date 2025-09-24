@@ -177,7 +177,7 @@ export default function DashboardClient({ session, kpiData: initialKpiData, hasE
       case 'portfolio':
         return <PortfolioOverview onRefresh={triggerDataRefresh} isPrivacyMode={isPrivacyMode} />;
       case 'analytics':
-        return <Analytics />;
+        return <Analytics onRefresh={triggerDataRefresh} />;
       case 'investors':
         return <Investors isPrivacyMode={isPrivacyMode} onRefresh={triggerDataRefresh} />;
       default:

@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { PortfolioAsset } from '@/lib/sheetsAdapter';
-import { WagmiCard, WagmiSpinner } from '@/components/ui';
+import { WagmiCard, WagmiSpinner, WagmiButton } from '@/components/ui';
 import { COLORS } from '@/shared/constants/colors';
 import PerformanceCharts from '@/components/charts/PerformanceCharts';
 import { fetchPerformanceData, PerformanceData } from '@/services/performanceDataService';
@@ -32,7 +32,11 @@ interface AnalyticsData {
   assetTypeDistribution: Record<string, number>;
 }
 
-export default function Analytics() {
+interface AnalyticsProps {
+  onRefresh?: () => void;
+}
+
+export default function Analytics({ onRefresh }: AnalyticsProps) {
   const [analyticsData, setAnalyticsData] = useState<AnalyticsData | null>(null);
   const [performanceData, setPerformanceData] = useState<PerformanceData[]>([]);
   const [loading, setLoading] = useState(true);
@@ -41,6 +45,13 @@ export default function Analytics() {
   useEffect(() => {
     fetchAnalyticsData();
   }, []); // eslint-disable-line react-hooks/exhaustive-deps
+
+  // Refresh when onRefresh callback changes (triggered by parent)
+  useEffect(() => {
+    if (onRefresh) {
+      fetchAnalyticsData();
+    }
+  }, [onRefresh]);
 
   const fetchAnalyticsData = async () => {
     try {
@@ -182,12 +193,14 @@ export default function Analytics() {
     return (
       <div className="text-center py-8">
         <p className="text-red-400 mb-4">{error}</p>
-        <button 
+        <WagmiButton 
           onClick={fetchAnalyticsData}
-          className="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors"
+          variant="primary"
+          theme="green"
+          size="md"
         >
           Retry
-        </button>
+        </WagmiButton>
       </div>
     );
   }
@@ -203,28 +216,25 @@ export default function Analytics() {
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
-        <h2 
-          className="text-2xl font-bold"
-          style={{ 
-            color: '#00FF95',
-            textShadow: '0 0 10px rgba(0, 255, 149, 0.3)'
-          }}
-        >
-          Analytics & Reports
-        </h2>
-        <button 
-          onClick={fetchAnalyticsData}
-          className="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors text-sm"
-        >
-          Refresh Data
-        </button>
+      <h2 
+        className="text-2xl font-bold"
+        style={{ 
+          color: '#00FF95',
+          textShadow: '0 0 10px rgba(0, 255, 149, 0.3)'
+        }}
+      >
+        Analytics & Reports
+      </h2>
+        <p className="text-sm text-gray-400">
+          Data refreshes automatically via navbar refresh button
+        </p>
       </div>
 
       {/* Key Performance Metrics */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6">
         <WagmiCard variant="kpi" theme="green" size="md">
           <div className="text-center">
-            <div className="text-2xl font-bold text-white mb-1">
+            <div className="text-2xl font-bold mb-1" style={{ color: COLORS.text.primary }}>
               {formatCurrency(analyticsData.totalValue)}
             </div>
             <div className="text-sm text-gray-400">Total Portfolio Value</div>
@@ -233,7 +243,7 @@ export default function Analytics() {
 
         <WagmiCard variant="kpi" theme="green" size="md">
           <div className="text-center">
-            <div className="text-2xl font-bold text-white mb-1">
+            <div className="text-2xl font-bold mb-1" style={{ color: COLORS.text.primary }}>
               {formatCurrency(analyticsData.totalReturn)}
             </div>
             <div className="text-sm text-gray-400">Total Return</div>
@@ -245,7 +255,7 @@ export default function Analytics() {
 
         <WagmiCard variant="kpi" theme="green" size="md">
           <div className="text-center">
-            <div className="text-2xl font-bold text-white mb-1">
+            <div className="text-2xl font-bold mb-1" style={{ color: COLORS.text.primary }}>
               {formatCurrency(analyticsData.dailyChange)}
             </div>
             <div className="text-sm text-gray-400">24h Change</div>
@@ -257,7 +267,7 @@ export default function Analytics() {
 
         <WagmiCard variant="kpi" theme="green" size="md">
           <div className="text-center">
-            <div className="text-2xl font-bold text-white mb-1">
+            <div className="text-2xl font-bold mb-1" style={{ color: COLORS.text.primary }}>
               {analyticsData.assetCount}
             </div>
             <div className="text-sm text-gray-400">Total Assets</div>
@@ -266,28 +276,28 @@ export default function Analytics() {
       </div>
 
       {/* Performance Analysis */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+      <div className="grid grid-cols-1 xl:grid-cols-2 gap-4 md:gap-6">
         {/* Top Performers */}
         <WagmiCard variant="default" theme="green" size="lg">
-          <div className="p-6">
-            <h3 className="text-lg font-semibold text-white mb-4">Top Performers (24h)</h3>
-            <div className="space-y-3">
+          <div className="p-4 md:p-6">
+            <h3 className="text-lg font-semibold mb-4" style={{ color: COLORS.text.primary }}>Top Performers (24h)</h3>
+            <div className="space-y-2 md:space-y-3">
               {analyticsData.topPerformers.map((asset, index) => (
-                <div key={asset.symbol} className="flex items-center justify-between p-3 bg-gray-800/50 rounded-lg">
-                  <div className="flex items-center space-x-3">
-                    <div className="w-8 h-8 bg-green-600 rounded-full flex items-center justify-center text-white text-sm font-bold">
+                <div key={asset.symbol} className="flex items-center justify-between p-2 md:p-3 bg-gray-800/50 rounded-lg">
+                  <div className="flex items-center space-x-2 md:space-x-3 min-w-0 flex-1">
+                    <div className="w-6 h-6 md:w-8 md:h-8 bg-green-600 rounded-full flex items-center justify-center text-white text-xs md:text-sm font-bold flex-shrink-0">
                       {index + 1}
                     </div>
-                    <div>
-                      <div className="text-white font-medium">{asset.symbol}</div>
-                      <div className="text-gray-400 text-sm">{asset.name}</div>
+                    <div className="min-w-0 flex-1">
+                      <div className="text-white font-medium text-sm md:text-base truncate">{asset.symbol}</div>
+                      <div className="text-gray-400 text-xs md:text-sm truncate">{asset.name}</div>
                     </div>
                   </div>
-                  <div className="text-right">
-                    <div className="text-green-400 font-medium">
+                  <div className="text-right flex-shrink-0 ml-2">
+                    <div className="text-green-400 font-medium text-sm md:text-base">
                       {formatPercentage(asset.returnPercentage)}
                     </div>
-                    <div className="text-gray-400 text-sm">
+                    <div className="text-gray-400 text-xs md:text-sm">
                       {formatCurrency(asset.value)}
                     </div>
                   </div>
@@ -299,25 +309,25 @@ export default function Analytics() {
 
         {/* Worst Performers */}
         <WagmiCard variant="default" theme="green" size="lg">
-          <div className="p-6">
-            <h3 className="text-lg font-semibold text-white mb-4">Worst Performers (24h)</h3>
-            <div className="space-y-3">
+          <div className="p-4 md:p-6">
+            <h3 className="text-lg font-semibold mb-4" style={{ color: COLORS.text.primary }}>Worst Performers (24h)</h3>
+            <div className="space-y-2 md:space-y-3">
               {analyticsData.worstPerformers.map((asset, index) => (
-                <div key={asset.symbol} className="flex items-center justify-between p-3 bg-gray-800/50 rounded-lg">
-                  <div className="flex items-center space-x-3">
-                    <div className="w-8 h-8 bg-red-600 rounded-full flex items-center justify-center text-white text-sm font-bold">
+                <div key={asset.symbol} className="flex items-center justify-between p-2 md:p-3 bg-gray-800/50 rounded-lg">
+                  <div className="flex items-center space-x-2 md:space-x-3 min-w-0 flex-1">
+                    <div className="w-6 h-6 md:w-8 md:h-8 bg-red-600 rounded-full flex items-center justify-center text-white text-xs md:text-sm font-bold flex-shrink-0">
                       {index + 1}
                     </div>
-                    <div>
-                      <div className="text-white font-medium">{asset.symbol}</div>
-                      <div className="text-gray-400 text-sm">{asset.name}</div>
+                    <div className="min-w-0 flex-1">
+                      <div className="text-white font-medium text-sm md:text-base truncate">{asset.symbol}</div>
+                      <div className="text-gray-400 text-xs md:text-sm truncate">{asset.name}</div>
                     </div>
                   </div>
-                  <div className="text-right">
-                    <div className="text-red-400 font-medium">
+                  <div className="text-right flex-shrink-0 ml-2">
+                    <div className="text-red-400 font-medium text-sm md:text-base">
                       {formatPercentage(asset.returnPercentage)}
                     </div>
-                    <div className="text-gray-400 text-sm">
+                    <div className="text-gray-400 text-xs md:text-sm">
                       {formatCurrency(asset.value)}
                     </div>
                   </div>
@@ -329,7 +339,7 @@ export default function Analytics() {
       </div>
 
       {/* Portfolio Distribution */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+      <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4 md:gap-6">
         {/* Risk Distribution */}
         <WagmiCard variant="default" theme="green" size="lg">
           <div className="p-6">
@@ -409,7 +419,7 @@ export default function Analytics() {
                     <div className="w-full bg-gray-700 rounded-full h-2">
                       <div 
                         className="h-2 rounded-full transition-all duration-300"
-                        style={{ 
+          style={{ 
                           width: `${percentage}%`,
                           backgroundColor: color
                         }}
@@ -429,13 +439,13 @@ export default function Analytics() {
         <div className="mt-8">
           <h3 
             className="text-xl font-bold mb-6"
-            style={{ 
-              color: '#00FF95',
-              textShadow: '0 0 10px rgba(0, 255, 149, 0.3)'
-            }}
-          >
+              style={{ 
+                color: '#00FF95',
+                textShadow: '0 0 10px rgba(0, 255, 149, 0.3)'
+              }}
+            >
             Historical Performance Analysis
-          </h3>
+            </h3>
           <PerformanceCharts data={performanceData} />
         </div>
       )}

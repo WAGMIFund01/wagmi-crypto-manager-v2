@@ -173,8 +173,6 @@ export default function InvestorPage() {
 
   const assetDistribution = calculateDistribution('assetName');
   const riskDistribution = calculateDistribution('riskLevel');
-  const locationDistribution = calculateDistribution('location');
-  const typeDistribution = calculateDistribution('coinType');
 
   // Calculate top and worst performers - group by symbol to avoid duplicates
   const calculatePerformers = () => {
@@ -282,12 +280,6 @@ export default function InvestorPage() {
     Object.entries(COLORS.risk).map(([key, color]) => [key.toLowerCase(), color])
   );
 
-  const locationColors = Object.values(COLORS.chart);
-
-  // Create type color mapping with case-insensitive matching
-  const typeColors = Object.fromEntries(
-    Object.entries(COLORS.assetType).map(([key, color]) => [key.toLowerCase(), color])
-  );
 
   if (loading || !investorId) {
     return (
@@ -690,8 +682,7 @@ export default function InvestorPage() {
               Fund Performance vs Benchmarks
             </h2>
             <div className="bg-gray-800/50 rounded-lg p-6">
-              <div className="flex items-center justify-between mb-4">
-                <h3 className="text-lg font-semibold text-white">Performance vs Benchmarks</h3>
+              <div className="flex items-center justify-end mb-4">
                 
                 {/* Toggle Buttons */}
                 <div className="flex bg-gray-700 rounded-lg p-1">
@@ -762,29 +753,6 @@ export default function InvestorPage() {
           </div>
         ) : null}
 
-        {/* Portfolio Breakdown by Location and Type */}
-        {portfolioLoading ? (
-          <div className="flex items-center justify-center py-12 mb-8">
-            <WagmiSpinner size="lg" theme="green" showText text="Loading portfolio breakdown..." centered />
-          </div>
-        ) : (
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
-            <StackedBarChart
-              title="Portfolio Breakdown by Location"
-              data={locationDistribution}
-              colors={locationColors}
-              formatValue={(value) => privacyMode ? '•••••' : formatCurrency(value, false)}
-              showTooltips={false}
-            />
-            <StackedBarChart
-              title="Portfolio Breakdown by Type"
-              data={typeDistribution}
-              colors={typeColors}
-              formatValue={(value) => privacyMode ? '•••••' : formatCurrency(value, false)}
-              showTooltips={false}
-            />
-          </div>
-        )}
 
         {/* Transaction History */}
         <div
