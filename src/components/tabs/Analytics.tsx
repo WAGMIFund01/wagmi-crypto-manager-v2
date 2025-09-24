@@ -221,7 +221,7 @@ export default function Analytics({ onRefresh }: AnalyticsProps) {
         {/* Top Performers */}
         <WagmiCard variant="default" theme="green" size="lg">
           <div className="p-4 md:p-6">
-            <h3 className="text-lg font-semibold mb-4" style={{ color: COLORS.text.primary }}>Top Performers (24h)</h3>
+            <h3 className="text-lg font-semibold mb-2" style={{ color: COLORS.text.primary }}>Top Performers (24h)</h3>
             <div className="space-y-2 md:space-y-3">
               {analyticsData.topPerformers.map((asset, index) => (
                 <div key={asset.symbol} className="flex items-center justify-between p-2 md:p-3 bg-gray-800/50 rounded-lg">
@@ -251,7 +251,7 @@ export default function Analytics({ onRefresh }: AnalyticsProps) {
         {/* Worst Performers */}
         <WagmiCard variant="default" theme="green" size="lg">
           <div className="p-4 md:p-6">
-            <h3 className="text-lg font-semibold mb-4" style={{ color: COLORS.text.primary }}>Worst Performers (24h)</h3>
+            <h3 className="text-lg font-semibold mb-2" style={{ color: COLORS.text.primary }}>Worst Performers (24h)</h3>
             <div className="space-y-2 md:space-y-3">
               {analyticsData.worstPerformers.map((asset, index) => (
                 <div key={asset.symbol} className="flex items-center justify-between p-2 md:p-3 bg-gray-800/50 rounded-lg">
