@@ -1,5 +1,6 @@
 'use client';
 
+import { useState } from 'react';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
 
 interface PerformanceData {
@@ -18,6 +19,8 @@ interface PerformanceChartsProps {
 }
 
 export default function PerformanceCharts({ data }: PerformanceChartsProps) {
+  const [viewMode, setViewMode] = useState<'mom' | 'cumulative'>('mom');
+  
   // Filter out future months - only show current and historical data
   const currentDate = new Date();
   const currentMonth = currentDate.getMonth();
@@ -62,8 +65,8 @@ export default function PerformanceCharts({ data }: PerformanceChartsProps) {
     return null;
   };
 
-  // Custom tooltip for line charts
-  const CustomLineTooltip = ({ active, payload, label }: any) => {
+  // Custom tooltip for comparison charts
+  const CustomComparisonTooltip = ({ active, payload, label }: any) => {
     if (active && payload && payload.length) {
       return (
         <div className="bg-gray-800 border border-gray-600 rounded-lg p-3 shadow-lg">
@@ -78,6 +81,31 @@ export default function PerformanceCharts({ data }: PerformanceChartsProps) {
     }
     return null;
   };
+
+  // Get the appropriate data keys based on view mode
+  const getDataKeys = () => {
+    if (viewMode === 'mom') {
+      return {
+        wagmi: 'wagmiMoM',
+        total: 'totalMoM',
+        total3: 'total3MoM',
+        wagmiName: 'WAGMI Fund',
+        totalName: 'Total Benchmark',
+        total3Name: 'Total 3 Benchmark'
+      };
+    } else {
+      return {
+        wagmi: 'wagmiCumulative',
+        total: 'totalCumulative',
+        total3: 'total3Cumulative',
+        wagmiName: 'WAGMI Fund',
+        totalName: 'Total Benchmark',
+        total3Name: 'Total 3 Benchmark'
+      };
+    }
+  };
+
+  const dataKeys = getDataKeys();
 
   return (
     <div className="space-y-8">
@@ -112,54 +140,36 @@ export default function PerformanceCharts({ data }: PerformanceChartsProps) {
         </div>
       </div>
 
-      {/* Chart 2: Bar Chart - MoM Performance Comparison */}
+      {/* Chart 2: Toggleable Performance vs Benchmarks */}
       <div className="bg-gray-800/50 rounded-lg p-6">
-        <h3 className="text-lg font-semibold text-white mb-4">Month-over-Month Performance Comparison</h3>
-        <div className="h-80">
-          <ResponsiveContainer width="100%" height="100%">
-            <BarChart data={filteredData} margin={{ top: 20, right: 30, left: 20, bottom: 5 }}>
-              <CartesianGrid strokeDasharray="3 3" stroke="#374151" />
-              <XAxis 
-                dataKey="month" 
-                stroke="#9CA3AF"
-                fontSize={12}
-                angle={-45}
-                textAnchor="end"
-                height={60}
-              />
-              <YAxis 
-                stroke="#9CA3AF"
-                fontSize={12}
-                tickFormatter={(value) => `${value.toFixed(1)}%`}
-              />
-              <Tooltip content={<CustomLineTooltip />} />
-              <Legend />
-              <Bar 
-                dataKey="wagmiMoM" 
-                fill="#00FF95"
-                name="WAGMI Fund"
-                radius={[2, 2, 0, 0]}
-              />
-              <Bar 
-                dataKey="totalMoM" 
-                fill="#3B82F6"
-                name="Total Benchmark"
-                radius={[2, 2, 0, 0]}
-              />
-              <Bar 
-                dataKey="total3MoM" 
-                fill="#F59E0B"
-                name="Total 3 Benchmark"
-                radius={[2, 2, 0, 0]}
-              />
-            </BarChart>
-          </ResponsiveContainer>
+        <div className="flex items-center justify-between mb-4">
+          <h3 className="text-lg font-semibold text-white">Performance vs Benchmarks</h3>
+          
+          {/* Toggle Buttons */}
+          <div className="flex bg-gray-700 rounded-lg p-1">
+            <button
+              onClick={() => setViewMode('mom')}
+              className={`px-4 py-2 rounded-md text-sm font-medium transition-colors ${
+                viewMode === 'mom'
+                  ? 'bg-green-600 text-white'
+                  : 'text-gray-300 hover:text-white'
+              }`}
+            >
+              MoM Performance
+            </button>
+            <button
+              onClick={() => setViewMode('cumulative')}
+              className={`px-4 py-2 rounded-md text-sm font-medium transition-colors ${
+                viewMode === 'cumulative'
+                  ? 'bg-green-600 text-white'
+                  : 'text-gray-300 hover:text-white'
+              }`}
+            >
+              Cumulative Return
+            </button>
+          </div>
         </div>
-      </div>
-
-      {/* Chart 3: Bar Chart - Cumulative Return Comparison */}
-      <div className="bg-gray-800/50 rounded-lg p-6">
-        <h3 className="text-lg font-semibold text-white mb-4">Cumulative Return Comparison</h3>
+        
         <div className="h-80">
           <ResponsiveContainer width="100%" height="100%">
             <BarChart data={filteredData} margin={{ top: 20, right: 30, left: 20, bottom: 5 }}>
@@ -177,24 +187,24 @@ export default function PerformanceCharts({ data }: PerformanceChartsProps) {
                 fontSize={12}
                 tickFormatter={(value) => `${value.toFixed(1)}%`}
               />
-              <Tooltip content={<CustomLineTooltip />} />
+              <Tooltip content={<CustomComparisonTooltip />} />
               <Legend />
               <Bar 
-                dataKey="wagmiCumulative" 
+                dataKey={dataKeys.wagmi} 
                 fill="#00FF95"
-                name="WAGMI Fund"
+                name={dataKeys.wagmiName}
                 radius={[2, 2, 0, 0]}
               />
               <Bar 
-                dataKey="totalCumulative" 
+                dataKey={dataKeys.total} 
                 fill="#3B82F6"
-                name="Total Benchmark"
+                name={dataKeys.totalName}
                 radius={[2, 2, 0, 0]}
               />
               <Bar 
-                dataKey="total3Cumulative" 
+                dataKey={dataKeys.total3} 
                 fill="#F59E0B"
-                name="Total 3 Benchmark"
+                name={dataKeys.total3Name}
                 radius={[2, 2, 0, 0]}
               />
             </BarChart>

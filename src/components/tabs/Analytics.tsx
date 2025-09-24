@@ -90,13 +90,37 @@ export default function Analytics() {
     
     const dailyChangePercentage = totalValue > 0 ? (dailyChange / totalValue) * 100 : 0;
 
-    // Calculate top and worst performers
-    const performers = assets.map(asset => ({
-      symbol: asset.symbol,
-      name: asset.assetName,
-      returnPercentage: asset.priceChange24h || 0,
-      value: asset.quantity * asset.currentPrice
-    })).sort((a, b) => b.returnPercentage - a.returnPercentage);
+    // Calculate top and worst performers - group by symbol to avoid duplicates
+    const assetMap = new Map();
+    
+    assets.forEach(asset => {
+      const symbol = asset.symbol;
+      const value = asset.quantity * asset.currentPrice;
+      const returnPercentage = asset.priceChange24h || 0;
+      
+      if (assetMap.has(symbol)) {
+        // Aggregate values for the same asset across different locations
+        const existing = assetMap.get(symbol);
+        const oldValue = existing.value;
+        const oldReturn = existing.returnPercentage;
+        
+        // Add the new value
+        existing.value += value;
+        
+        // Calculate weighted average for return percentage
+        // Weighted average = (oldReturn * oldValue + newReturn * newValue) / (oldValue + newValue)
+        existing.returnPercentage = ((oldReturn * oldValue) + (returnPercentage * value)) / existing.value;
+      } else {
+        assetMap.set(symbol, {
+          symbol: asset.symbol,
+          name: asset.assetName,
+          returnPercentage: returnPercentage,
+          value: value
+        });
+      }
+    });
+    
+    const performers = Array.from(assetMap.values()).sort((a, b) => b.returnPercentage - a.returnPercentage);
 
     const topPerformers = performers.slice(0, 5);
     const worstPerformers = performers.slice(-5).reverse();
