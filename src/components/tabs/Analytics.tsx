@@ -51,7 +51,7 @@ export default function Analytics({ onRefresh }: AnalyticsProps) {
     if (onRefresh) {
       fetchAnalyticsData();
     }
-  }, [onRefresh]);
+  }, [onRefresh, fetchAnalyticsData]);
 
   const fetchAnalyticsData = async () => {
     try {

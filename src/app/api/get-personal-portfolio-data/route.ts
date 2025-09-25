@@ -17,7 +17,7 @@ const getCachedPersonalPortfolioData = unstable_cache(
   }
 );
 
-async function getPersonalPortfolioDataHandler(req: NextRequest) {
+async function getPersonalPortfolioDataHandler(_req: NextRequest) {
   try {
     logger.info('Fetching personal portfolio data');
     
@@ -41,9 +41,12 @@ async function getPersonalPortfolioDataHandler(req: NextRequest) {
       errorType: 'personal_portfolio_data_fetch_error',
     });
     
-    errorMonitor.recordError('personal_portfolio_data_fetch_error', {
+    errorMonitor.recordError(errorObj, {
       endpoint: '/api/get-personal-portfolio-data',
-      error: errorObj.message
+      additionalContext: {
+        operation: 'get_personal_portfolio_data',
+        errorType: 'personal_portfolio_data_fetch_error'
+      }
     });
 
     return NextResponse.json({

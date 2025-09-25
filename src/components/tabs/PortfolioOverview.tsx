@@ -90,14 +90,14 @@ export default function PortfolioOverview({ className, onRefresh, isPrivacyMode 
 
   useEffect(() => {
     fetchPortfolioData();
-  }, []);
+  }, [fetchPortfolioData]);
 
   // Refresh when onRefresh callback changes (triggered by parent)
   useEffect(() => {
     if (onRefresh) {
       fetchPortfolioData();
     }
-  }, [onRefresh]);
+  }, [onRefresh, fetchPortfolioData]);
 
   // Asset management functions
   const handleAssetSelect = (asset: AssetSearchResult) => {

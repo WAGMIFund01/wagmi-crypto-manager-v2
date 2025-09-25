@@ -51,7 +51,7 @@ export default function DashboardClient({ session, kpiData: initialKpiData, hasE
     if (tab && availableTabs.includes(tab)) {
       setActiveTab(tab);
     }
-  }, [searchParams]);
+  }, [searchParams, dataSource]);
 
   useEffect(() => {
     // Check for dev mode session
