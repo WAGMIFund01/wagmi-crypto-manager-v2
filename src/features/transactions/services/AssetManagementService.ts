@@ -145,6 +145,90 @@ export class AssetManagementService {
       errors
     };
   }
+
+  /**
+   * Add a new asset to the personal portfolio
+   */
+  async addPersonalAsset(assetData: NewAssetData): Promise<AssetManagementResult> {
+    try {
+      console.log('Adding personal asset:', assetData);
+
+      // Validate the asset data
+      const validation = this.validateAssetData(assetData);
+      if (!validation.isValid) {
+        return {
+          success: false,
+          message: 'Validation failed',
+          error: validation.errors.join(', ')
+        };
+      }
+
+      // Use the sheets adapter to add the asset to personal portfolio
+      const result = await sheetsAdapter.addPersonalAsset(assetData);
+
+      if (result.success) {
+        return {
+          success: true,
+          message: 'Personal asset added successfully'
+        };
+      } else {
+        return {
+          success: false,
+          message: 'Failed to add personal asset',
+          error: result.error
+        };
+      }
+
+    } catch (error) {
+      console.error('Error adding personal asset:', error);
+      return {
+        success: false,
+        message: 'Failed to add personal asset',
+        error: error instanceof Error ? error.message : 'Unknown error'
+      };
+    }
+  }
+
+  /**
+   * Remove an asset from the personal portfolio
+   */
+  async removePersonalAsset(symbol: string): Promise<AssetManagementResult> {
+    try {
+      console.log('Removing personal asset:', symbol);
+
+      if (!symbol || symbol.trim().length === 0) {
+        return {
+          success: false,
+          message: 'Symbol is required',
+          error: 'Symbol parameter is missing'
+        };
+      }
+
+      // Use the sheets adapter to remove the asset from personal portfolio
+      const result = await sheetsAdapter.removePersonalAsset(symbol.trim().toUpperCase());
+
+      if (result.success) {
+        return {
+          success: true,
+          message: `Personal asset ${symbol} removed successfully`
+        };
+      } else {
+        return {
+          success: false,
+          message: 'Failed to remove personal asset',
+          error: result.error
+        };
+      }
+
+    } catch (error) {
+      console.error('Error removing personal asset:', error);
+      return {
+        success: false,
+        message: 'Failed to remove personal asset',
+        error: error instanceof Error ? error.message : 'Unknown error'
+      };
+    }
+  }
 }
 
 // Export singleton instance

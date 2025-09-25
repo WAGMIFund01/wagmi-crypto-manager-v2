@@ -839,6 +839,259 @@ export class SheetsAdapter {
       };
     }
   }
+
+  /**
+   * Get all personal portfolio assets from the Personal portfolio sheet
+   */
+  async getPersonalPortfolioData(): Promise<PortfolioAsset[]> {
+    try {
+      await this.initializeServiceAccount();
+      
+      if (!this.sheets) {
+        throw new Error('Sheets API not initialized');
+      }
+
+      console.log('Fetching personal portfolio data from Personal portfolio sheet...');
+      
+      const response = await this.sheets.spreadsheets.values.get({
+        spreadsheetId: this.sheetId,
+        range: 'Personal portfolio!A2:Z1000', // Adjust range as needed
+      });
+
+      const rows = response.data.values;
+      if (!rows || rows.length === 0) {
+        console.log('No personal portfolio data found');
+        return [];
+      }
+
+      const assets: PortfolioAsset[] = [];
+      
+      for (const row of rows) {
+        if (row.length >= 8 && row[0] && row[1]) { // Ensure we have at least basic data
+          const asset: PortfolioAsset = {
+            assetName: row[0] || '',
+            symbol: row[1] || '',
+            chain: row[2] || 'Unknown',
+            riskLevel: row[3] || 'Medium',
+            location: row[4] || 'Unknown',
+            coinType: row[5] || 'Altcoin',
+            quantity: parseFloat(row[6]) || 0,
+            currentPrice: parseFloat(row[7]) || 0,
+            totalValue: parseFloat(row[6]) * parseFloat(row[7]) || 0,
+            lastPriceUpdate: row[8] || new Date().toISOString(),
+            priceChange24h: parseFloat(row[9]) || 0,
+            coinGeckoId: row[10] || '',
+            thesis: row[11] || ''
+          };
+          assets.push(asset);
+        }
+      }
+
+      console.log(`Fetched ${assets.length} personal portfolio assets`);
+      return assets;
+
+    } catch (error) {
+      console.error('Error fetching personal portfolio data:', error);
+      throw new Error(`Failed to fetch personal portfolio data: ${error instanceof Error ? error.message : 'Unknown error'}`);
+    }
+  }
+
+  /**
+   * Add a new asset to the personal portfolio
+   */
+  async addPersonalAsset(assetData: any): Promise<{ success: boolean; asset?: any; error?: string }> {
+    try {
+      await this.initializeServiceAccount();
+      
+      if (!this.sheets) {
+        throw new Error('Sheets API not initialized');
+      }
+
+      console.log('Adding personal asset:', assetData);
+
+      // Prepare the row data
+      const rowData = [
+        assetData.name,
+        assetData.symbol,
+        assetData.chain,
+        assetData.riskLevel,
+        assetData.location,
+        assetData.coinType,
+        assetData.quantity,
+        assetData.currentPrice,
+        new Date().toISOString(), // lastPriceUpdate
+        0, // priceChange24h
+        assetData.coinGeckoId,
+        assetData.thesis
+      ];
+
+      // Append the new row to the Personal portfolio sheet
+      const response = await this.sheets.spreadsheets.values.append({
+        spreadsheetId: this.sheetId,
+        range: 'Personal portfolio!A:Z',
+        valueInputOption: 'USER_ENTERED',
+        requestBody: {
+          values: [rowData]
+        }
+      });
+
+      console.log('Personal asset added successfully:', response.data);
+      
+      return {
+        success: true,
+        asset: {
+          ...assetData,
+          totalValue: assetData.quantity * assetData.currentPrice
+        }
+      };
+
+    } catch (error) {
+      console.error('Error adding personal asset:', error);
+      return {
+        success: false,
+        error: `Failed to add personal asset: ${error instanceof Error ? error.message : 'Unknown error'}`
+      };
+    }
+  }
+
+  /**
+   * Edit an existing asset in the personal portfolio
+   */
+  async editPersonalAsset(editData: any): Promise<{ success: boolean; asset?: any; error?: string }> {
+    try {
+      await this.initializeServiceAccount();
+      
+      if (!this.sheets) {
+        throw new Error('Sheets API not initialized');
+      }
+
+      console.log('Editing personal asset:', editData);
+
+      // First, find the row index of the asset to edit
+      const response = await this.sheets.spreadsheets.values.get({
+        spreadsheetId: this.sheetId,
+        range: 'Personal portfolio!A2:Z1000',
+      });
+
+      const rows = response.data.values;
+      if (!rows) {
+        throw new Error('No data found in personal portfolio sheet');
+      }
+
+      let rowIndexToEdit = -1;
+      for (let i = 0; i < rows.length; i++) {
+        if (rows[i][1] === editData.symbol) { // Check symbol column (B)
+          rowIndexToEdit = i + 2; // +2 because we start from row 2 and arrays are 0-indexed
+          break;
+        }
+      }
+
+      if (rowIndexToEdit === -1) {
+        throw new Error(`Asset with symbol ${editData.symbol} not found in personal portfolio`);
+      }
+
+      // Update the asset data
+      const updateData = [
+        editData.quantity,
+        editData.riskLevel,
+        editData.location,
+        editData.coinType,
+        editData.thesis
+      ];
+
+      const updateResponse = await this.sheets.spreadsheets.values.update({
+        spreadsheetId: this.sheetId,
+        range: `Personal portfolio!G${rowIndexToEdit}:K${rowIndexToEdit}`,
+        valueInputOption: 'USER_ENTERED',
+        requestBody: {
+          values: [updateData]
+        }
+      });
+
+      console.log('Personal asset updated successfully:', updateResponse.data);
+      
+      return {
+        success: true,
+        asset: editData
+      };
+
+    } catch (error) {
+      console.error('Error editing personal asset:', error);
+      return {
+        success: false,
+        error: `Failed to edit personal asset: ${error instanceof Error ? error.message : 'Unknown error'}`
+      };
+    }
+  }
+
+  /**
+   * Remove an asset from the personal portfolio
+   */
+  async removePersonalAsset(symbol: string): Promise<{ success: boolean; removedAsset?: any; error?: string }> {
+    try {
+      await this.initializeServiceAccount();
+      
+      if (!this.sheets) {
+        throw new Error('Sheets API not initialized');
+      }
+
+      console.log('Removing personal asset:', symbol);
+
+      // First, find the row index of the asset to remove
+      const response = await this.sheets.spreadsheets.values.get({
+        spreadsheetId: this.sheetId,
+        range: 'Personal portfolio!A2:Z1000',
+      });
+
+      const rows = response.data.values;
+      if (!rows) {
+        throw new Error('No data found in personal portfolio sheet');
+      }
+
+      let rowIndexToRemove = -1;
+      for (let i = 0; i < rows.length; i++) {
+        if (rows[i][1] === symbol) { // Check symbol column (B)
+          rowIndexToRemove = i + 2; // +2 because we start from row 2 and arrays are 0-indexed
+          break;
+        }
+      }
+
+      if (rowIndexToRemove === -1) {
+        throw new Error(`Asset with symbol ${symbol} not found in personal portfolio`);
+      }
+
+      // Delete the row
+      const deleteResponse = await this.sheets.spreadsheets.batchUpdate({
+        spreadsheetId: this.sheetId,
+        requestBody: {
+          requests: [{
+            deleteDimension: {
+              range: {
+                sheetId: 0, // Assuming Personal portfolio is the first sheet
+                dimension: 'ROWS',
+                startIndex: rowIndexToRemove - 1,
+                endIndex: rowIndexToRemove
+              }
+            }
+          }]
+        }
+      });
+
+      console.log('Personal asset removed successfully:', deleteResponse.data);
+      
+      return {
+        success: true,
+        removedAsset: { symbol }
+      };
+
+    } catch (error) {
+      console.error('Error removing personal asset:', error);
+      return {
+        success: false,
+        error: `Failed to remove personal asset: ${error instanceof Error ? error.message : 'Unknown error'}`
+      };
+    }
+  }
 }
 
 // Export a singleton instance
