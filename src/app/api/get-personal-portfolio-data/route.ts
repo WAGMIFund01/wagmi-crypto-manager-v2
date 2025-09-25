@@ -36,9 +36,9 @@ async function getPersonalPortfolioDataHandler(req: NextRequest) {
 
   } catch (error) {
     const errorObj = error as Error;
-    logger.error('Failed to fetch personal portfolio data', {
-      error: errorObj.message,
-      stack: errorObj.stack
+    logger.error('Failed to fetch personal portfolio data', errorObj, {
+      endpoint: '/api/get-personal-portfolio-data',
+      errorType: 'personal_portfolio_data_fetch_error',
     });
     
     errorMonitor.recordError('personal_portfolio_data_fetch_error', {
