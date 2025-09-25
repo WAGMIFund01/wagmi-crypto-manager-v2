@@ -42,17 +42,6 @@ export default function Analytics({ onRefresh }: AnalyticsProps) {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  useEffect(() => {
-    fetchAnalyticsData();
-  }, []); // eslint-disable-line react-hooks/exhaustive-deps
-
-  // Refresh when onRefresh callback changes (triggered by parent)
-  useEffect(() => {
-    if (onRefresh) {
-      fetchAnalyticsData();
-    }
-  }, [onRefresh, fetchAnalyticsData]);
-
   const fetchAnalyticsData = useCallback(async () => {
     try {
       setLoading(true);
@@ -81,6 +70,17 @@ export default function Analytics({ onRefresh }: AnalyticsProps) {
       setLoading(false);
     }
   }, []);
+
+  useEffect(() => {
+    fetchAnalyticsData();
+  }, [fetchAnalyticsData]);
+
+  // Refresh when onRefresh callback changes (triggered by parent)
+  useEffect(() => {
+    if (onRefresh) {
+      fetchAnalyticsData();
+    }
+  }, [onRefresh, fetchAnalyticsData]);
 
   const calculateAnalytics = (assets: PortfolioAsset[]): AnalyticsData => {
     const totalValue = assets.reduce((sum, asset) => sum + (asset.quantity * asset.currentPrice), 0);
