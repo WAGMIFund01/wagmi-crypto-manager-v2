@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { sheetsAdapter } from '@/lib/sheetsAdapter';
-import { logger } from '@/lib/logger';
-import { errorMonitor } from '@/lib/errorMonitor';
+import logger from '@/lib/logger';
+import errorMonitor from '@/lib/errorMonitor';
 import { withApiMiddleware } from '@/lib/apiMiddleware';
 
 async function handler(req: NextRequest) {
