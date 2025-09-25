@@ -269,7 +269,7 @@ export default function UniversalNavbar({
           <div className="flex justify-center items-center py-4">
             <h1 
               className="font-bold cursor-pointer"
-              onClick={() => onTabChange('portfolio')}
+              onClick={() => router.push('/module-selection')}
               style={{ 
                 color: '#00FF95',
                 fontSize: '28px',
@@ -441,7 +441,7 @@ export default function UniversalNavbar({
           <div className="flex items-center">
             <h1 
               className="font-bold cursor-pointer"
-              onClick={() => onTabChange('portfolio')}
+              onClick={() => router.push('/module-selection')}
               style={{ 
                 color: '#00FF95',
                 fontSize: '36px',
