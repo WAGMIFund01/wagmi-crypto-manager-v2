@@ -145,6 +145,95 @@ export class AssetManagementService {
       errors
     };
   }
+
+  /**
+   * Add a new asset to the personal portfolio
+   */
+  async addPersonalAsset(assetData: NewAssetData): Promise<AssetManagementResult> {
+    try {
+      // Validate required fields
+      if (!assetData.coinGeckoId || !assetData.symbol || !assetData.name || !assetData.quantity) {
+        return {
+          success: false,
+          message: 'Missing required fields',
+          error: 'coinGeckoId, symbol, name, and quantity are required'
+        };
+      }
+
+      if (assetData.quantity <= 0) {
+        return {
+          success: false,
+          message: 'Invalid quantity',
+          error: 'Quantity must be greater than 0'
+        };
+      }
+
+      // Prepare asset data for Google Sheets
+      // Note: Total Value (Column I) is completely skipped to preserve Google Sheets formula
+      const assetRow = [
+        assetData.name,                    // Column A: Asset Name
+        assetData.symbol,                  // Column B: Symbol
+        assetData.chain || '',            // Column C: Chain
+        assetData.riskLevel || 'Medium',  // Column D: Risk Level
+        assetData.location || '',         // Column E: Location
+        assetData.coinType || 'Altcoin',  // Column F: Coin Type
+        assetData.quantity,               // Column G: Quantity
+        assetData.currentPrice,           // Column H: Current Price
+        // Column I: Total Value - SKIPPED COMPLETELY (preserve Google Sheets formula)
+        new Date().toISOString(),         // Column J: Last Price Update
+        assetData.coinGeckoId,            // Column K: CoinGecko ID
+        0,                                // Column L: 24hr Price Change (will be updated by price service)
+        assetData.thesis || ''            // Column M: Thesis
+      ];
+
+      // Add the asset to the personal portfolio using SheetsAdapter
+      await sheetsAdapter.addPersonalPortfolioAsset(assetRow);
+
+      return {
+        success: true,
+        message: `Successfully added ${assetData.quantity} ${assetData.symbol} to personal portfolio`
+      };
+
+    } catch (error) {
+      console.error('Error adding asset to personal portfolio:', error);
+      return {
+        success: false,
+        message: 'Failed to add asset to personal portfolio',
+        error: error instanceof Error ? error.message : 'Unknown error'
+      };
+    }
+  }
+
+  /**
+   * Remove an asset from the personal portfolio
+   */
+  async removePersonalAsset(symbol: string): Promise<AssetManagementResult> {
+    try {
+      if (!symbol || symbol.trim().length === 0) {
+        return {
+          success: false,
+          message: 'Symbol is required',
+          error: 'Asset symbol cannot be empty'
+        };
+      }
+
+      // Remove the asset using SheetsAdapter
+      await sheetsAdapter.removePersonalPortfolioAsset(symbol.toUpperCase());
+
+      return {
+        success: true,
+        message: `Successfully removed ${symbol.toUpperCase()} from personal portfolio`
+      };
+
+    } catch (error) {
+      console.error('Error removing asset from personal portfolio:', error);
+      return {
+        success: false,
+        message: 'Failed to remove asset from personal portfolio',
+        error: error instanceof Error ? error.message : 'Unknown error'
+      };
+    }
+  }
 }
 
 // Export singleton instance

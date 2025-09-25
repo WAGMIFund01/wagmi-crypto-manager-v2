@@ -41,7 +41,6 @@ export default function ModuleSelectionPage() {
           <ModuleCard 
             title="Personal Portfolio Module"
             route="/personal-portfolio"
-            isComingSoon={true}
             className="flex-1 max-w-sm"
           />
           <ModuleCard 
@@ -63,7 +62,6 @@ export default function ModuleSelectionPage() {
             <ModuleCard 
               title="Personal Portfolio Module"
               route="/personal-portfolio"
-              isComingSoon={true}
               className="flex-1 max-w-sm"
             />
           </div>
@@ -86,7 +84,6 @@ export default function ModuleSelectionPage() {
           <ModuleCard 
             title="Personal Portfolio Module"
             route="/personal-portfolio"
-            isComingSoon={true}
           />
           <ModuleCard 
             title="Developer Module"

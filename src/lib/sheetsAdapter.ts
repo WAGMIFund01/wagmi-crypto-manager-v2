@@ -241,6 +241,85 @@ export class SheetsAdapter {
   }
 
   /**
+   * Get all personal portfolio assets from the Personal portfolio sheet
+   */
+  async getPersonalPortfolioData(): Promise<PortfolioAsset[]> {
+    try {
+      await this.initializeServiceAccount();
+      
+      if (!this.sheets) {
+        throw new Error('Sheets API not initialized');
+      }
+
+      // Read the entire Personal portfolio sheet
+      const response = await this.sheets.spreadsheets.values.get({
+        spreadsheetId: this.sheetId,
+        range: 'Personal portfolio!A:M', // A through M columns
+      });
+
+      if (!response.data.values || response.data.values.length === 0) {
+        throw new Error('No data found in Personal portfolio sheet');
+      }
+
+      const rows = response.data.values;
+      const portfolioAssets: PortfolioAsset[] = [];
+
+      // Process all rows starting from index 1 (skip header row)
+      for (let i = 1; i < rows.length; i++) {
+        const row = rows[i];
+        
+        // Ensure we have enough columns (at least 10 required columns)
+        if (row && row.length >= 10) {
+          const assetName = row[0]?.toString() || '';
+          const symbol = row[1]?.toString() || '';
+          const chain = row[2]?.toString() || '';
+          const riskLevel = row[3]?.toString() || '';
+          const location = row[4]?.toString() || '';
+          const coinType = row[5]?.toString() || '';
+          const quantity = parseFloat(row[6]) || 0;
+          const currentPrice = parseFloat(row[7]) || 0;
+          // Handle totalValue - it might be empty if Google Sheets formula hasn't calculated yet
+          const totalValue = row[8] && !isNaN(parseFloat(row[8])) ? parseFloat(row[8]) : (quantity * currentPrice);
+          const lastPriceUpdate = row[9]?.toString() || '';
+          const coinGeckoId = row[10]?.toString()?.trim() || undefined; // Column K (index 10)
+          const priceChange24h = row[11] ? parseFloat(row[11]) : undefined; // Column L (index 11)
+          const thesis = row[12]?.toString() || ''; // Column M (index 12)
+
+          // Only add assets that have a name and symbol, and exclude header-like entries
+          // Note: totalValue can be NaN if Google Sheets formula hasn't calculated yet
+          if (assetName && symbol && 
+              assetName.toLowerCase() !== 'asset name' && 
+              symbol.toLowerCase() !== 'symbol' &&
+              !isNaN(quantity) && !isNaN(currentPrice)) {
+            portfolioAssets.push({
+              assetName,
+              symbol,
+              chain,
+              riskLevel,
+              location,
+              coinType,
+              quantity,
+              currentPrice,
+              totalValue,
+              lastPriceUpdate,
+              coinGeckoId,
+              priceChange24h,
+              thesis
+            });
+          }
+        }
+      }
+
+      console.log(`Google Sheets personal portfolio data extracted: ${portfolioAssets.length} assets`);
+      return portfolioAssets;
+
+    } catch (error) {
+      console.error('Error fetching personal portfolio data:', error);
+      throw new Error('Failed to fetch personal portfolio data');
+    }
+  }
+
+  /**
    * Get all investors from the Investors sheet
    */
   async getKpiData(): Promise<{
@@ -836,6 +915,304 @@ export class SheetsAdapter {
       return {
         success: false,
         error: `Failed to edit asset in portfolio: ${error instanceof Error ? error.message : 'Unknown error'}`
+      };
+    }
+  }
+
+  /**
+   * Add a new asset to the Personal portfolio sheet
+   */
+  async addPersonalPortfolioAsset(assetRow: any[]): Promise<void> {
+    try {
+      if (!this.sheets) {
+        throw new Error('Sheets API not initialized');
+      }
+
+      console.log('Adding new asset to personal portfolio:', assetRow);
+
+      // First, find the last row with data to determine where to insert
+      const lastRowResponse = await this.sheets.spreadsheets.values.get({
+        spreadsheetId: this.sheetId,
+        range: 'Personal portfolio!A:A', // Just check column A to find last row
+      });
+
+      const lastRow = lastRowResponse.data.values?.length || 1;
+      const insertRow = lastRow + 1;
+      
+      console.log(`Last row with data: ${lastRow}, inserting at row: ${insertRow}`);
+
+      // Insert the new row at the specific position
+      // Note: We skip Column I (Total Value) to preserve Google Sheets formula
+      const range = `Personal portfolio!A${insertRow}:M${insertRow}`;
+      console.log(`Inserting at range: ${range}`);
+      
+      // We need to insert values in two parts to skip Column I
+      // Part 1: Columns A-H (Asset Name through Current Price)
+      const part1Range = `Personal portfolio!A${insertRow}:H${insertRow}`;
+      const part1Values = [assetRow.slice(0, 8)]; // First 8 columns
+      
+      // Part 2: Columns J-M (Last Price Update through Thesis)
+      const part2Range = `Personal portfolio!J${insertRow}:M${insertRow}`;
+      const part2Values = [assetRow.slice(8)]; // Last 5 columns (skipping Column I)
+      
+      // Insert Part 1
+      await this.sheets.spreadsheets.values.update({
+        spreadsheetId: this.sheetId,
+        range: part1Range,
+        valueInputOption: 'USER_ENTERED',
+        requestBody: {
+          values: part1Values
+        }
+      });
+      
+      // Insert Part 2
+      const response = await this.sheets.spreadsheets.values.update({
+        spreadsheetId: this.sheetId,
+        range: part2Range,
+        valueInputOption: 'USER_ENTERED',
+        requestBody: {
+          values: part2Values
+        }
+      });
+
+      console.log('Asset added to personal portfolio successfully:', response.data);
+    } catch (error) {
+      console.error('Error adding asset to personal portfolio:', error);
+      throw new Error(`Failed to add asset to personal portfolio: ${error instanceof Error ? error.message : 'Unknown error'}`);
+    }
+  }
+
+  /**
+   * Remove an asset from the Personal portfolio sheet by symbol
+   */
+  async removePersonalPortfolioAsset(symbol: string): Promise<void> {
+    try {
+      if (!this.sheets) {
+        console.error('Sheets API not initialized');
+        throw new Error('Sheets API not initialized');
+      }
+
+      console.log('Removing asset from personal portfolio:', symbol);
+
+      // First, get all personal portfolio data to find the row index
+      console.log('Fetching personal portfolio data to find asset row...');
+      const response = await this.sheets.spreadsheets.values.get({
+        spreadsheetId: this.sheetId,
+        range: 'Personal portfolio!A:M'
+      });
+      console.log('Personal portfolio data fetched successfully');
+
+      const rows = response.data.values || [];
+      
+      // Find the row index of the asset to remove (skip header row)
+      let rowIndexToRemove = -1;
+      const matchingRows: number[] = [];
+      console.log(`Looking for asset with symbol: ${symbol.toUpperCase()}`);
+      console.log(`Total rows in sheet: ${rows.length}`);
+      
+      for (let i = 1; i < rows.length; i++) {
+        const row = rows[i];
+        const rowSymbol = row && row.length > 1 ? row[1]?.toString().toUpperCase() : '';
+        console.log(`Row ${i}: Symbol = "${rowSymbol}", Asset = "${row[0]}"`);
+        
+        if (row && row.length > 1 && rowSymbol === symbol.toUpperCase()) {
+          matchingRows.push(i + 1); // +1 because Google Sheets uses 1-based indexing
+          console.log(`Found matching asset at row ${i + 1}`);
+        }
+      }
+      
+      if (matchingRows.length === 0) {
+        console.log(`No asset found with symbol: ${symbol}`);
+        throw new Error(`Asset with symbol ${symbol} not found`);
+      }
+      
+      if (matchingRows.length > 1) {
+        console.log(`⚠️ WARNING: Found ${matchingRows.length} duplicate entries for ${symbol}:`);
+        matchingRows.forEach((rowIndex, index) => {
+          console.log(`  ${index + 1}. Row ${rowIndex}: ${rows[rowIndex - 1]}`);
+        });
+        console.log(`Will delete the first occurrence at row ${matchingRows[0]}`);
+      }
+      
+      rowIndexToRemove = matchingRows[0]; // Delete the first occurrence
+
+      // Delete the row
+      console.log(`Attempting to delete row ${rowIndexToRemove}...`);
+      console.log(`Delete request details:`);
+      console.log(`- Sheet ID: ${this.sheetId}`);
+      console.log(`- Row index (1-based): ${rowIndexToRemove}`);
+      console.log(`- Start index (0-based): ${rowIndexToRemove - 1}`);
+      console.log(`- End index (0-based): ${rowIndexToRemove}`);
+      
+      // Get the actual sheet ID for Personal portfolio
+      console.log('Getting sheet metadata to find correct sheet ID...');
+      const sheetMetadata = await this.sheets.spreadsheets.get({
+        spreadsheetId: this.sheetId
+      });
+      
+      const personalPortfolioSheet = sheetMetadata.data.sheets?.find(sheet => 
+        sheet.properties?.title === 'Personal portfolio'
+      );
+      
+      if (!personalPortfolioSheet || !personalPortfolioSheet.properties?.sheetId) {
+        throw new Error('Personal portfolio sheet not found or missing sheet ID');
+      }
+      
+      const actualSheetId = personalPortfolioSheet.properties.sheetId;
+      console.log(`Found Personal portfolio sheet ID: ${actualSheetId}`);
+      
+      const deleteRequest = {
+        spreadsheetId: this.sheetId,
+        requestBody: {
+          requests: [{
+            deleteDimension: {
+              range: {
+                sheetId: actualSheetId, // Use the actual sheet ID, not 0
+                dimension: 'ROWS',
+                startIndex: rowIndexToRemove - 1, // Convert to 0-based index
+                endIndex: rowIndexToRemove
+              }
+            }
+          }]
+        }
+      };
+      
+      console.log('Full delete request:', JSON.stringify(deleteRequest, null, 2));
+      
+      const deleteResponse = await this.sheets.spreadsheets.batchUpdate(deleteRequest);
+
+      console.log('Delete operation response:', deleteResponse.data);
+      console.log(`Successfully deleted asset ${symbol} from personal portfolio at row ${rowIndexToRemove}`);
+      
+    } catch (error) {
+      console.error('Error removing asset from personal portfolio:', error);
+      throw new Error(`Failed to remove asset from personal portfolio: ${error instanceof Error ? error.message : 'Unknown error'}`);
+    }
+  }
+
+  /**
+   * Edit an asset in the Personal portfolio sheet
+   */
+  async editPersonalPortfolioAsset(editData: {
+    symbol: string;
+    quantity: number;
+    riskLevel: string;
+    location: string;
+    coinType: string;
+    thesis: string;
+    originalAsset?: any;
+  }): Promise<{ success: boolean; data?: any; error?: string }> {
+    try {
+      console.log(`Editing asset ${editData.symbol} in personal portfolio...`);
+      
+      if (!this.isServiceAccountInitialized) {
+        await this.initializeServiceAccount();
+      }
+
+      if (!this.sheets) {
+        throw new Error('Google Sheets API client not initialized');
+      }
+
+      // Get the current personal portfolio data
+      const response = await this.sheets.spreadsheets.values.get({
+        spreadsheetId: this.sheetId,
+        range: 'Personal portfolio!A:M'
+      });
+      
+      console.log('Personal portfolio data fetched successfully');
+      const rows = response.data.values || [];
+      
+      // Find the row index of the asset to edit using original asset data
+      let rowIndexToEdit = -1;
+      console.log(`Looking for asset with symbol: ${editData.symbol.toUpperCase()}`);
+      console.log(`Total rows in sheet: ${rows.length}`);
+      
+      // Use original asset data to find the correct row, or fall back to new data matching
+      const searchSymbol = editData.originalAsset?.symbol?.toUpperCase() || editData.symbol.toUpperCase();
+      const searchLocation = editData.originalAsset?.location || editData.location;
+      const searchCoinType = editData.originalAsset?.coinType || editData.coinType;
+      
+      console.log(`Searching for asset with original values - Symbol: "${searchSymbol}", Location: "${searchLocation}", CoinType: "${searchCoinType}"`);
+      
+      for (let i = 1; i < rows.length; i++) {
+        const row = rows[i];
+        const rowSymbol = row && row.length > 1 ? row[1]?.toString().toUpperCase() : '';
+        const rowLocation = row && row.length > 4 ? row[4]?.toString() : '';
+        const rowCoinType = row && row.length > 5 ? row[5]?.toString() : '';
+        
+        console.log(`Row ${i}: Symbol = "${rowSymbol}", Location = "${rowLocation}", CoinType = "${rowCoinType}", Asset = "${row[0]}"`);
+        
+        // Match by original asset data to identify the specific asset
+        if (row && row.length > 5 &&
+            rowSymbol === searchSymbol &&
+            rowLocation === searchLocation &&
+            rowCoinType === searchCoinType) {
+          rowIndexToEdit = i + 1; // +1 because Google Sheets uses 1-based indexing
+          console.log(`Found matching asset at row ${rowIndexToEdit}`);
+          break;
+        }
+      }
+      
+      if (rowIndexToEdit === -1) {
+        console.log(`No asset found with matching criteria`);
+        throw new Error(`Asset with symbol ${editData.symbol} not found in personal portfolio`);
+      }
+      
+      console.log(`Editing asset at row ${rowIndexToEdit}`);
+      
+      // Prepare the updated row data
+      // We need to update specific columns while preserving others
+      const updates = [
+        {
+          range: `Personal portfolio!G${rowIndexToEdit}`, // Quantity
+          values: [[editData.quantity]]
+        },
+        {
+          range: `Personal portfolio!D${rowIndexToEdit}`, // Risk Level
+          values: [[editData.riskLevel]]
+        },
+        {
+          range: `Personal portfolio!E${rowIndexToEdit}`, // Location
+          values: [[editData.location]]
+        },
+        {
+          range: `Personal portfolio!F${rowIndexToEdit}`, // Coin Type
+          values: [[editData.coinType]]
+        },
+        {
+          range: `Personal portfolio!M${rowIndexToEdit}`, // Thesis
+          values: [[editData.thesis]]
+        }
+      ];
+      
+      // Update each field individually
+      for (const update of updates) {
+        console.log(`Updating range ${update.range} with value:`, update.values[0]);
+        
+        const updateResponse = await this.sheets.spreadsheets.values.update({
+          spreadsheetId: this.sheetId,
+          range: update.range,
+          valueInputOption: 'USER_ENTERED',
+          requestBody: {
+            values: update.values
+          }
+        });
+        
+        console.log(`Update response for ${update.range}:`, updateResponse.data);
+      }
+      
+      console.log(`Successfully edited asset ${editData.symbol} in personal portfolio`);
+      
+      return {
+        success: true,
+        data: { message: 'Asset updated successfully' }
+      };
+      
+    } catch (error) {
+      console.error('Error editing asset in personal portfolio:', error);
+      return {
+        success: false,
+        error: `Failed to edit asset in personal portfolio: ${error instanceof Error ? error.message : 'Unknown error'}`
       };
     }
   }
