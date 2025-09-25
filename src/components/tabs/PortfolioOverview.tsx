@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect, useMemo } from 'react';
+import React, { useState, useEffect, useMemo, useCallback } from 'react';
 import { PortfolioAsset } from '@/lib/sheetsAdapter';
 import { StackedBarChart, WagmiCard, WagmiSpinner, WagmiText, WagmiButton } from '@/components/ui';
 import SortableHeader from '@/components/ui/SortableHeader';
@@ -59,7 +59,7 @@ export default function PortfolioOverview({ className, onRefresh, isPrivacyMode 
   
   const handleSort = createSortHandler(sortConfig, setSortConfig);
 
-  const fetchPortfolioData = async () => {
+  const fetchPortfolioData = useCallback(async () => {
     try {
       console.log('🔄 Fetching portfolio data...');
       setLoading(true);
@@ -86,7 +86,7 @@ export default function PortfolioOverview({ className, onRefresh, isPrivacyMode 
     } finally {
       setLoading(false);
     }
-  };
+  }, [apiEndpoints.getData]);
 
   useEffect(() => {
     fetchPortfolioData();

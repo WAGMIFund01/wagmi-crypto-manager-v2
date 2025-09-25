@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { PortfolioAsset } from '@/lib/sheetsAdapter';
 import { WagmiCard, WagmiSpinner, WagmiButton } from '@/components/ui';
 import { COLORS } from '@/shared/constants/colors';
@@ -53,7 +53,7 @@ export default function Analytics({ onRefresh }: AnalyticsProps) {
     }
   }, [onRefresh, fetchAnalyticsData]);
 
-  const fetchAnalyticsData = async () => {
+  const fetchAnalyticsData = useCallback(async () => {
     try {
       setLoading(true);
       setError(null);
@@ -80,7 +80,7 @@ export default function Analytics({ onRefresh }: AnalyticsProps) {
     } finally {
       setLoading(false);
     }
-  };
+  }, []);
 
   const calculateAnalytics = (assets: PortfolioAsset[]): AnalyticsData => {
     const totalValue = assets.reduce((sum, asset) => sum + (asset.quantity * asset.currentPrice), 0);

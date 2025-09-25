@@ -29,12 +29,11 @@ export async function DELETE(request: Request) {
       const connectionTest = await sheetsAdapter.testConnection();
       console.log('Connection test result:', connectionTest);
       
-      if (!connectionTest.success) {
-        console.log('Connection test failed:', connectionTest.error);
+      if (!connectionTest) {
+        console.log('ERROR: SheetsAdapter connection failed');
         return NextResponse.json({
           success: false,
           error: 'Database connection failed',
-          details: connectionTest.error,
           errorCode: 'CONNECTION_FAILED'
         }, { status: 500 });
       }
