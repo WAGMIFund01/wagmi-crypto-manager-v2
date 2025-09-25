@@ -22,6 +22,7 @@ export interface AssetManagementResult {
   success: boolean;
   message: string;
   error?: string;
+  asset?: any;
 }
 
 export class AssetManagementService {
@@ -169,7 +170,8 @@ export class AssetManagementService {
       if (result.success) {
         return {
           success: true,
-          message: 'Personal asset added successfully'
+          message: 'Personal asset added successfully',
+          asset: result.asset
         };
       } else {
         return {
