@@ -162,7 +162,7 @@ export default function PersonalAddAssetForm({ isOpen, onClose, onAssetAdded, se
               </div>
               <div>
                 <span className="text-gray-400">Market Cap Rank:</span>
-                <span className="text-white ml-2">{selectedAsset.market_cap_rank || 'N/A'}</span>
+                <span className="text-white ml-2">{selectedAsset.market_cap ? `#${selectedAsset.market_cap}` : 'N/A'}</span>
               </div>
             </div>
           </div>
@@ -184,28 +184,26 @@ export default function PersonalAddAssetForm({ isOpen, onClose, onAssetAdded, se
 
         {/* Chain Selection */}
         <div>
-          <SmartDropdown
-            label="Chain"
-            value={formData.chain}
-            onChange={(value) => setFieldValue('chain', value)}
-            options={fieldOptions.chains}
-            error={errors.chain}
-            placeholder="Select chain"
-            required
-          />
+            <SmartDropdown
+              label="Chain"
+              value={formData.chain}
+              onChange={(value) => setFieldValue('chain', value)}
+              options={fieldOptions.chains}
+              placeholder="Select chain"
+              required
+            />
         </div>
 
         {/* Risk Level Selection */}
         <div>
-          <SmartDropdown
-            label="Risk Level"
-            value={formData.riskLevel}
-            onChange={(value) => setFieldValue('riskLevel', value)}
-            options={fieldOptions.riskLevels}
-            error={errors.riskLevel}
-            placeholder="Select risk level"
-            required
-          />
+            <SmartDropdown
+              label="Risk Level"
+              value={formData.riskLevel}
+              onChange={(value) => setFieldValue('riskLevel', value)}
+              options={fieldOptions.riskLevels}
+              placeholder="Select risk level"
+              required
+            />
         </div>
 
         {/* Location Selection */}
@@ -215,7 +213,6 @@ export default function PersonalAddAssetForm({ isOpen, onClose, onAssetAdded, se
             value={formData.location}
             onChange={(value) => setFieldValue('location', value)}
             options={fieldOptions.locations}
-            error={errors.location}
             placeholder="Select location"
             required
           />
@@ -228,7 +225,6 @@ export default function PersonalAddAssetForm({ isOpen, onClose, onAssetAdded, se
             value={formData.coinType}
             onChange={(value) => setFieldValue('coinType', value)}
             options={fieldOptions.coinTypes}
-            error={errors.coinType}
             placeholder="Select coin type"
             required
           />
@@ -236,20 +232,24 @@ export default function PersonalAddAssetForm({ isOpen, onClose, onAssetAdded, se
 
         {/* Thesis Input */}
         <div>
-          <WagmiInput
-            label="Investment Thesis"
-            type="textarea"
+          <label className="block text-sm font-medium text-gray-300 mb-2">
+            Investment Thesis
+          </label>
+          <textarea
+            placeholder="Enter your investment thesis (optional)"
             value={formData.thesis}
             onChange={(e) => setFieldValue('thesis', e.target.value)}
-            error={errors.thesis}
-            placeholder="Enter your investment thesis (optional)"
             rows={3}
+            className="w-full px-3 py-2 bg-gray-800 border border-gray-600 rounded-lg text-white focus:outline-none focus:border-green-500 resize-none"
           />
+          {errors.thesis && (
+            <p className="text-red-500 text-sm mt-1">{errors.thesis}</p>
+          )}
         </div>
 
         {/* Submit Error */}
         {submitError && (
-          <FormError message={submitError} />
+          <FormError error={submitError} />
         )}
 
         {/* Action Buttons */}
