@@ -24,7 +24,10 @@ async function handler(req: NextRequest) {
   } catch (error) {
     const errorObj = error instanceof Error ? error : new Error(String(error));
     logger.error('Error fetching personal portfolio data:', errorObj);
-    errorMonitor.recordError(errorObj, 'personal_portfolio_data_fetch_error');
+    errorMonitor.recordError(errorObj, {
+      endpoint: '/api/get-personal-portfolio-data',
+      additionalContext: { operation: 'fetch_personal_portfolio_data' }
+    });
     
     return NextResponse.json(
       { 
