@@ -20,6 +20,7 @@ interface UniversalNavbarProps {
   } | null;
   hasError?: boolean;
   onKpiRefresh?: () => Promise<void>;
+  dataSource?: 'wagmi-fund' | 'personal-portfolio';
 }
 
 export default function UniversalNavbar({ 
@@ -28,7 +29,8 @@ export default function UniversalNavbar({
   onPrivacyModeChange,
   kpiData = null, 
   hasError = false,
-  onKpiRefresh
+  onKpiRefresh,
+  dataSource = 'wagmi-fund'
 }: UniversalNavbarProps) {
   const router = useRouter();
   const [isPrivacyMode, setIsPrivacyMode] = useState(false);
@@ -353,12 +355,14 @@ export default function UniversalNavbar({
               </div>
             ) : formattedKpiData ? (
               <div className="flex items-center space-x-4 text-center">
-                <div className="text-center">
-                  <div style={{ color: '#A0A0A0', fontSize: '10px' }}>Investors</div>
-                  <div style={{ color: '#FFFFFF', fontSize: '14px', fontWeight: '600' }}>
-                    {formattedKpiData.activeInvestors}
+                {dataSource === 'wagmi-fund' && (
+                  <div className="text-center">
+                    <div style={{ color: '#A0A0A0', fontSize: '10px' }}>Investors</div>
+                    <div style={{ color: '#FFFFFF', fontSize: '14px', fontWeight: '600' }}>
+                      {formattedKpiData.activeInvestors}
+                    </div>
                   </div>
-                </div>
+                )}
                 <div className="text-center">
                   <div style={{ color: '#A0A0A0', fontSize: '10px' }}>AUM</div>
                   <div style={{ color: '#FFFFFF', fontSize: '14px', fontWeight: '600' }}>
@@ -401,7 +405,7 @@ export default function UniversalNavbar({
               {[
                 { id: 'portfolio', label: 'Portfolio' },
                 { id: 'analytics', label: 'Analytics' },
-                { id: 'investors', label: 'Investors' }
+                ...(dataSource === 'wagmi-fund' ? [{ id: 'investors', label: 'Investors' }] : [])
               ].map((tab) => (
                 <button
                   key={tab.id}
@@ -523,7 +527,7 @@ export default function UniversalNavbar({
             {[
               { id: 'portfolio', label: 'Portfolio Overview' },
               { id: 'analytics', label: 'Analytics' },
-              { id: 'investors', label: 'Investors' }
+              ...(dataSource === 'wagmi-fund' ? [{ id: 'investors', label: 'Investors' }] : [])
             ].map((tab) => (
               <button
                 key={tab.id}
@@ -582,15 +586,17 @@ export default function UniversalNavbar({
             ) : (
               /* KPI Data - Four evenly spaced metrics */
               <>
-                {/* Active Investors */}
-                <WagmiCard variant="ribbon" theme="green" size="sm">
-                  <p className="text-xs font-normal text-gray-400 mb-1 uppercase tracking-wide">
-                    Active Investors
-                  </p>
-                  <p className="text-sm font-semibold text-white">
-                    {formattedKpiData?.activeInvestors || '--'}
-                  </p>
-                </WagmiCard>
+                {dataSource === 'wagmi-fund' && (
+                  /* Active Investors */
+                  <WagmiCard variant="ribbon" theme="green" size="sm">
+                    <p className="text-xs font-normal text-gray-400 mb-1 uppercase tracking-wide">
+                      Active Investors
+                    </p>
+                    <p className="text-sm font-semibold text-white">
+                      {formattedKpiData?.activeInvestors || '--'}
+                    </p>
+                  </WagmiCard>
+                )}
 
                 {/* Total AUM */}
                 <WagmiCard variant="ribbon" theme="green" size="sm">

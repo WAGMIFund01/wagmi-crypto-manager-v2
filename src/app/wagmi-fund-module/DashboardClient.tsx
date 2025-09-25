@@ -34,17 +34,21 @@ export default function DashboardClient({ session, kpiData: initialKpiData, hasE
   const router = useRouter();
   const searchParams = useSearchParams();
   const pathname = usePathname();
+  
+  // Detect module based on pathname
+  const dataSource = pathname.includes('/personal-portfolio') ? 'personal-portfolio' : 'wagmi-fund';
   const [devSession, setDevSession] = useState(null);
   const [isDevMode, setIsDevMode] = useState(false);
   const [activeTab, setActiveTab] = useState('portfolio');
   const [isCheckingAuth, setIsCheckingAuth] = useState(true);
   const [isPrivacyMode, setIsPrivacyMode] = useState(false);
-  const [kpiData, setKpiData] = useState(initialKpiData);
+  const [kpiData, setKpiData] = useState(dataSource === 'personal-portfolio' ? null : initialKpiData);
 
   // Initialize active tab from URL parameters
   useEffect(() => {
     const tab = searchParams.get('tab');
-    if (tab && ['portfolio', 'analytics', 'investors'].includes(tab)) {
+    const availableTabs = dataSource === 'personal-portfolio' ? ['portfolio', 'analytics'] : ['portfolio', 'analytics', 'investors'];
+    if (tab && availableTabs.includes(tab)) {
       setActiveTab(tab);
     }
   }, [searchParams]);
@@ -175,13 +179,21 @@ export default function DashboardClient({ session, kpiData: initialKpiData, hasE
   const renderTabContent = () => {
     switch (activeTab) {
       case 'portfolio':
-        return <PortfolioOverview onRefresh={triggerDataRefresh} isPrivacyMode={isPrivacyMode} />;
+        return <PortfolioOverview onRefresh={triggerDataRefresh} isPrivacyMode={isPrivacyMode} dataSource={dataSource} />;
       case 'analytics':
+        // For personal portfolio, skip analytics for now
+        if (dataSource === 'personal-portfolio') {
+          return <div className="text-center py-8"><p className="text-gray-400">Analytics coming soon for personal portfolio</p></div>;
+        }
         return <Analytics onRefresh={triggerDataRefresh} />;
       case 'investors':
+        // Only show investors for WAGMI fund
+        if (dataSource === 'personal-portfolio') {
+          return <div className="text-center py-8"><p className="text-gray-400">Investors tab not available for personal portfolio</p></div>;
+        }
         return <Investors isPrivacyMode={isPrivacyMode} onRefresh={triggerDataRefresh} />;
       default:
-        return <PortfolioOverview onRefresh={triggerDataRefresh} isPrivacyMode={isPrivacyMode} />;
+        return <PortfolioOverview onRefresh={triggerDataRefresh} isPrivacyMode={isPrivacyMode} dataSource={dataSource} />;
     }
   };
 
@@ -195,6 +207,7 @@ export default function DashboardClient({ session, kpiData: initialKpiData, hasE
         kpiData={kpiData}
         hasError={hasError}
         onKpiRefresh={handleKpiRefresh}
+        dataSource={dataSource}
       />
 
       {/* Main Content */}

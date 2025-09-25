@@ -15,12 +15,31 @@ interface PortfolioOverviewProps {
   className?: string;
   onRefresh?: () => void;
   isPrivacyMode?: boolean;
+  dataSource?: 'wagmi-fund' | 'personal-portfolio';
 }
 
-export default function PortfolioOverview({ className, onRefresh, isPrivacyMode = false }: PortfolioOverviewProps) {
+export default function PortfolioOverview({ className, onRefresh, isPrivacyMode = false, dataSource = 'wagmi-fund' }: PortfolioOverviewProps) {
   const [assets, setAssets] = useState<PortfolioAsset[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+
+  // Helper function to get API endpoints based on dataSource
+  const getApiEndpoints = () => {
+    if (dataSource === 'personal-portfolio') {
+      return {
+        getData: '/api/get-personal-portfolio-data',
+        editAsset: '/api/edit-personal-asset',
+        removeAsset: '/api/remove-personal-asset'
+      };
+    }
+    return {
+      getData: '/api/get-portfolio-data',
+      editAsset: '/api/edit-asset',
+      removeAsset: '/api/remove-asset'
+    };
+  };
+
+  const apiEndpoints = getApiEndpoints();
   
   // Asset management state
   const [showSearchModal, setShowSearchModal] = useState(false);
@@ -45,7 +64,7 @@ export default function PortfolioOverview({ className, onRefresh, isPrivacyMode 
       console.log('🔄 Fetching portfolio data...');
       setLoading(true);
       setError(null);
-      const response = await fetch('/api/get-portfolio-data');
+      const response = await fetch(apiEndpoints.getData);
       const data = await response.json();
 
       console.log('📊 Portfolio data response:', {
@@ -128,7 +147,7 @@ export default function PortfolioOverview({ className, onRefresh, isPrivacyMode 
       console.log('=== PortfolioOverview: handleEditAssetSave called ===');
       console.log('Edit data received:', editData);
       
-      const response = await fetch('/api/edit-asset', {
+      const response = await fetch(apiEndpoints.editAsset, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
@@ -174,7 +193,7 @@ export default function PortfolioOverview({ className, onRefresh, isPrivacyMode 
     setRemovingAsset(symbol);
     try {
       console.log('Making API call to remove asset:', symbol);
-      const response = await fetch(`/api/remove-asset?symbol=${encodeURIComponent(symbol)}`, {
+      const response = await fetch(`${apiEndpoints.removeAsset}?symbol=${encodeURIComponent(symbol)}`, {
         method: 'DELETE',
       });
 
@@ -634,6 +653,7 @@ export default function PortfolioOverview({ className, onRefresh, isPrivacyMode 
         onClose={() => setShowAddForm(false)}
         onAssetAdded={handleAssetAdded}
         selectedAsset={selectedAsset}
+        dataSource={dataSource}
       />
 
       {editingAsset && (
