@@ -63,6 +63,14 @@ export default function PersonalAddAssetForm({ isOpen, onClose, onAssetAdded, se
     }
   }, [propSelectedAsset, setFieldValue]);
 
+  const handleQuantityChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const value = e.target.value;
+    // Allow only positive numbers with up to 8 decimal places
+    if (value === '' || /^\d*\.?\d{0,8}$/.test(value)) {
+      setFieldValue('quantity', value);
+    }
+  };
+
   // Reset form when modal opens/closes
   useEffect(() => {
     if (isOpen) {
@@ -170,16 +178,21 @@ export default function PersonalAddAssetForm({ isOpen, onClose, onAssetAdded, se
 
         {/* Quantity Input */}
         <div>
+          <label className="block text-sm font-medium text-gray-300 mb-2">
+            Quantity *
+          </label>
           <WagmiInput
-            label="Quantity"
-            type="number"
-            step="any"
-            value={formData.quantity}
-            onChange={(e) => setFieldValue('quantity', e.target.value)}
-            error={errors.quantity}
+            type="text"
             placeholder="Enter quantity"
+            value={formData.quantity}
+            onChange={handleQuantityChange}
+            error={errors.quantity}
             required
+            className="w-full"
           />
+          {errors.quantity && (
+            <div className="mt-1 text-sm text-red-400">{errors.quantity}</div>
+          )}
         </div>
 
         {/* Chain Selection */}
