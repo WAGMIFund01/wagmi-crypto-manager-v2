@@ -23,6 +23,7 @@ export interface AssetManagementResult {
   message: string;
   error?: string;
   asset?: any;
+  removedAsset?: any;
 }
 
 export class AssetManagementService {
@@ -212,7 +213,8 @@ export class AssetManagementService {
       if (result.success) {
         return {
           success: true,
-          message: `Personal asset ${symbol} removed successfully`
+          message: `Personal asset ${symbol} removed successfully`,
+          removedAsset: result.removedAsset
         };
       } else {
         return {
