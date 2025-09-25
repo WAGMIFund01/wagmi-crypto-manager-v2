@@ -48,8 +48,7 @@ export async function POST(request: Request) {
     if (result.success) {
       return NextResponse.json({
         success: true,
-        message: result.message,
-        data: result.data
+        message: result.message
       });
     } else {
       console.log('Asset addition failed:', result.error);

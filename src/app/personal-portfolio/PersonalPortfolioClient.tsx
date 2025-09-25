@@ -1,13 +1,11 @@
 'use client';
 
-import { useRouter } from 'next/navigation';
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import UniversalNavbar from '@/components/UniversalNavbar';
 import PersonalPortfolioOverview from '@/components/tabs/PersonalPortfolioOverview';
 import PersonalPortfolioAnalytics from '@/components/tabs/PersonalPortfolioAnalytics';
 
 export default function PersonalPortfolioClient() {
-  const router = useRouter();
   const [activeTab, setActiveTab] = useState('portfolio');
   const [isPrivacyMode, setIsPrivacyMode] = useState(false);
 
