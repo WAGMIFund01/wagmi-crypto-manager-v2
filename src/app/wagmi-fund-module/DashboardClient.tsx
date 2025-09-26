@@ -47,10 +47,17 @@ export default function DashboardClient({ session, kpiData: initialKpiData, hasE
   // Initialize active tab from URL parameters
   useEffect(() => {
     const tab = searchParams.get('tab');
-    if (tab && ['portfolio', 'analytics', 'investors'].includes(tab)) {
+    const allowedTabs = dataSource === 'personal-portfolio' 
+      ? ['portfolio'] 
+      : ['portfolio', 'analytics', 'investors'];
+    
+    if (tab && allowedTabs.includes(tab)) {
       setActiveTab(tab);
+    } else if (dataSource === 'personal-portfolio' && tab && !allowedTabs.includes(tab)) {
+      // Force portfolio tab for Personal Portfolio if invalid tab is requested
+      setActiveTab('portfolio');
     }
-  }, [searchParams]);
+  }, [searchParams, dataSource]);
 
   useEffect(() => {
     // Check for dev mode session
@@ -95,6 +102,16 @@ export default function DashboardClient({ session, kpiData: initialKpiData, hasE
 
   // Handle tab change
   const handleTabChange = (tabId: string) => {
+    // Validate tab access based on dataSource
+    const allowedTabs = dataSource === 'personal-portfolio' 
+      ? ['portfolio'] 
+      : ['portfolio', 'analytics', 'investors'];
+    
+    if (!allowedTabs.includes(tabId)) {
+      console.warn(`Tab ${tabId} not allowed for ${dataSource} module`);
+      return;
+    }
+    
     setActiveTab(tabId);
     // Update URL with tab parameter
     const params = new URLSearchParams(searchParams.toString());

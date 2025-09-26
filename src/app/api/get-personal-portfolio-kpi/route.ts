@@ -8,8 +8,8 @@ export async function GET(request: NextRequest) {
   try {
     logger.info('Fetching personal portfolio KPI data', { requestId });
     
-    // Get Personal Portfolio KPI data using sheetsAdapter method
-    const kpiData = await sheetsAdapter.getPersonalPortfolioKpiData();
+    // Get Personal Portfolio AUM from KPIs tab (cell A8)
+    const kpiData = await sheetsAdapter.getPersonalPortfolioKpiFromKpisTab();
 
     logger.info('Personal portfolio KPI data fetched successfully', { 
       requestId, 

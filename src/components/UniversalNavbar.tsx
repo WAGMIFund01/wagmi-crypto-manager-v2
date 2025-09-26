@@ -371,19 +371,21 @@ export default function UniversalNavbar({
               </div>
             ) : formattedKpiData ? (
               <div className="flex items-center space-x-4 text-center">
-                <div className="text-center">
-                  <div style={{ color: '#A0A0A0', fontSize: '10px' }}>Investors</div>
-                  <div style={{ color: '#FFFFFF', fontSize: '14px', fontWeight: '600' }}>
-                    {formattedKpiData.activeInvestors}
+                {dataSource !== 'personal-portfolio' && (
+                  <div className="text-center">
+                    <div style={{ color: '#A0A0A0', fontSize: '10px' }}>Investors</div>
+                    <div style={{ color: '#FFFFFF', fontSize: '14px', fontWeight: '600' }}>
+                      {formattedKpiData.activeInvestors}
+                    </div>
                   </div>
-                </div>
+                )}
                 <div className="text-center">
                   <div style={{ color: '#A0A0A0', fontSize: '10px' }}>AUM</div>
                   <div style={{ color: '#FFFFFF', fontSize: '14px', fontWeight: '600' }}>
                     {formattedKpiData.totalAUM}
                   </div>
                 </div>
-                {formattedKpiData.cumulativeReturn && (
+                {dataSource !== 'personal-portfolio' && formattedKpiData.cumulativeReturn && (
                   <div className="text-center">
                     <div style={{ color: '#A0A0A0', fontSize: '10px' }}>Return</div>
                     <div 
@@ -397,7 +399,7 @@ export default function UniversalNavbar({
                     </div>
                   </div>
                 )}
-                {formattedKpiData.monthOnMonth && (
+                {dataSource !== 'personal-portfolio' && formattedKpiData.monthOnMonth && (
                   <div className="text-center">
                     <div style={{ color: '#A0A0A0', fontSize: '10px' }}>MoM</div>
                     <div 
@@ -422,8 +424,10 @@ export default function UniversalNavbar({
             <nav className="flex space-x-4 sm:space-x-6 overflow-x-auto w-full justify-center">
               {[
                 { id: 'portfolio', label: 'Portfolio' },
-                { id: 'analytics', label: 'Analytics' },
-                { id: 'investors', label: 'Investors' }
+                ...(dataSource === 'personal-portfolio' ? [] : [
+                  { id: 'analytics', label: 'Analytics' },
+                  { id: 'investors', label: 'Investors' }
+                ])
               ].map((tab) => (
                 <button
                   key={tab.id}
@@ -544,8 +548,10 @@ export default function UniversalNavbar({
           <nav className="flex space-x-8">
             {[
               { id: 'portfolio', label: 'Portfolio Overview' },
-              { id: 'analytics', label: 'Analytics' },
-              { id: 'investors', label: 'Investors' }
+              ...(dataSource === 'personal-portfolio' ? [] : [
+                { id: 'analytics', label: 'Analytics' },
+                { id: 'investors', label: 'Investors' }
+              ])
             ].map((tab) => (
               <button
                 key={tab.id}
@@ -604,17 +610,19 @@ export default function UniversalNavbar({
             ) : (
               /* KPI Data - Four evenly spaced metrics */
               <>
-                {/* Active Investors */}
-                <WagmiCard variant="ribbon" theme="green" size="sm">
-                  <p className="text-xs font-normal text-gray-400 mb-1 uppercase tracking-wide">
-                    Active Investors
-                  </p>
-                  <p className="text-sm font-semibold text-white">
-                    {formattedKpiData?.activeInvestors || '--'}
-                  </p>
-                </WagmiCard>
+                {/* Active Investors - Only for WAGMI Fund */}
+                {dataSource !== 'personal-portfolio' && (
+                  <WagmiCard variant="ribbon" theme="green" size="sm">
+                    <p className="text-xs font-normal text-gray-400 mb-1 uppercase tracking-wide">
+                      Active Investors
+                    </p>
+                    <p className="text-sm font-semibold text-white">
+                      {formattedKpiData?.activeInvestors || '--'}
+                    </p>
+                  </WagmiCard>
+                )}
 
-                {/* Total AUM */}
+                {/* Total AUM - Always show */}
                 <WagmiCard variant="ribbon" theme="green" size="sm">
                   <p className="text-xs font-normal text-gray-400 mb-1 uppercase tracking-wide">
                     Total AUM
@@ -624,35 +632,39 @@ export default function UniversalNavbar({
                   </p>
                 </WagmiCard>
 
-                {/* Cumulative Return */}
-                <WagmiCard variant="ribbon" theme="green" size="sm">
-                  <p className="text-xs font-normal text-gray-400 mb-1 uppercase tracking-wide">
-                    Cumulative Return
-                  </p>
-                  <p 
-                    className="text-sm font-semibold"
-                    style={{ 
-                      color: formattedKpiData?.cumulativeReturn?.startsWith('+') ? '#00FF95' : '#FF4D4D'
-                    }}
-                  >
-                    {formattedKpiData?.cumulativeReturn || '--'}
-                  </p>
-                </WagmiCard>
+                {/* Cumulative Return - Only for WAGMI Fund */}
+                {dataSource !== 'personal-portfolio' && (
+                  <WagmiCard variant="ribbon" theme="green" size="sm">
+                    <p className="text-xs font-normal text-gray-400 mb-1 uppercase tracking-wide">
+                      Cumulative Return
+                    </p>
+                    <p 
+                      className="text-sm font-semibold"
+                      style={{ 
+                        color: formattedKpiData?.cumulativeReturn?.startsWith('+') ? '#00FF95' : '#FF4D4D'
+                      }}
+                    >
+                      {formattedKpiData?.cumulativeReturn || '--'}
+                    </p>
+                  </WagmiCard>
+                )}
 
-                {/* MoM Return */}
-                <WagmiCard variant="ribbon" theme="green" size="sm">
-                  <p className="text-xs font-normal text-gray-400 mb-1 uppercase tracking-wide">
-                    MoM Return
-                  </p>
-                  <p 
-                    className="text-sm font-semibold"
-                    style={{ 
-                      color: formattedKpiData?.monthOnMonth?.startsWith('+') ? '#00FF95' : '#FF4D4D'
-                    }}
-                  >
-                    {formattedKpiData?.monthOnMonth || '--'}
-                  </p>
-                </WagmiCard>
+                {/* MoM Return - Only for WAGMI Fund */}
+                {dataSource !== 'personal-portfolio' && (
+                  <WagmiCard variant="ribbon" theme="green" size="sm">
+                    <p className="text-xs font-normal text-gray-400 mb-1 uppercase tracking-wide">
+                      MoM Return
+                    </p>
+                    <p 
+                      className="text-sm font-semibold"
+                      style={{ 
+                        color: formattedKpiData?.monthOnMonth?.startsWith('+') ? '#00FF95' : '#FF4D4D'
+                      }}
+                    >
+                      {formattedKpiData?.monthOnMonth || '--'}
+                    </p>
+                  </WagmiCard>
+                )}
               </>
             )}
           </div>

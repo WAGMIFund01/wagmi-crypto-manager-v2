@@ -1189,9 +1189,9 @@ export class SheetsAdapter {
   }
 
   /**
-   * Get Personal Portfolio KPI data
+   * Get Personal Portfolio KPI data from KPIs tab (cell A8)
    */
-  async getPersonalPortfolioKpiData(): Promise<{
+  async getPersonalPortfolioKpiFromKpisTab(): Promise<{
     totalAUM: number;
     lastUpdated: string;
   }> {
@@ -1204,36 +1204,31 @@ export class SheetsAdapter {
         throw new Error('Google Sheets API client not initialized');
       }
 
+      // Get data from KPIs tab
       const response = await this.sheets.spreadsheets.values.get({
         spreadsheetId: this.sheetId,
-        range: 'Personal portfolio!A:M',
+        range: 'KPIs!A:B',
       });
 
       const rows = response.data.values || [];
       
-      if (rows.length <= 1) {
-        return {
-          totalAUM: 0,
-          lastUpdated: new Date().toISOString()
-        };
-      }
-
+      // Find the "Total AUM - personal" row (should be around row 8)
       let totalAUM = 0;
       let lastUpdated = new Date().toISOString();
       
-      for (let i = 1; i < rows.length; i++) {
+      for (let i = 0; i < rows.length; i++) {
         const row = rows[i];
-        if (!row || row.length === 0) continue;
-        
-        const totalValue = parseFloat(row[8]?.toString()) || 0;
-        const rowLastUpdated = row[9]?.toString();
-        
-        if (totalValue > 0) {
-          totalAUM += totalValue;
-        }
-        
-        if (rowLastUpdated && rowLastUpdated > lastUpdated) {
-          lastUpdated = rowLastUpdated;
+        if (row && row.length >= 2) {
+          const metricName = row[0]?.toString().toLowerCase();
+          const value = row[1]?.toString();
+          
+          if (metricName && metricName.includes('total aum - personal')) {
+            totalAUM = parseFloat(value) || 0;
+          }
+          
+          if (metricName && metricName.includes('last updated')) {
+            lastUpdated = value || new Date().toISOString();
+          }
         }
       }
       
@@ -1242,7 +1237,7 @@ export class SheetsAdapter {
         lastUpdated
       };
     } catch (error) {
-      console.error('Error fetching Personal Portfolio KPI data:', error);
+      console.error('Error fetching Personal Portfolio KPI data from KPIs tab:', error);
       throw error;
     }
   }
