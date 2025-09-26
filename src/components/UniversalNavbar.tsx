@@ -254,6 +254,12 @@ export default function UniversalNavbar({
     monthOnMonth: kpiData.monthOnMonth // No masking for return metrics
   } : null;
 
+  // Debug logging
+  console.log('UniversalNavbar - kpiData:', kpiData);
+  console.log('UniversalNavbar - formattedKpiData:', formattedKpiData);
+  console.log('UniversalNavbar - isPrivacyMode:', isPrivacyMode);
+  console.log('UniversalNavbar - dataSource:', dataSource);
+
   // Show loading state during hydration
   if (!isClient) {
     return (
