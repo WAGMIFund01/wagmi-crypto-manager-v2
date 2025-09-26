@@ -869,19 +869,19 @@ export class SheetsAdapter {
       for (const row of rows) {
         if (row.length >= 8 && row[0] && row[1]) { // Ensure we have at least basic data
           const asset: PortfolioAsset = {
-            assetName: row[0] || '',
-            symbol: row[1] || '',
-            chain: row[2] || 'Unknown',
-            riskLevel: row[3] || 'Medium',
-            location: row[4] || 'Unknown',
-            coinType: row[5] || 'Altcoin',
-            quantity: parseFloat(row[6]) || 0,
-            currentPrice: parseFloat(row[7]) || 0,
-            totalValue: parseFloat(row[6]) * parseFloat(row[7]) || 0,
-            lastPriceUpdate: row[8] || new Date().toISOString(),
-            priceChange24h: parseFloat(row[9]) || 0,
-            coinGeckoId: row[10] || '',
-            thesis: row[11] || ''
+            assetName: row[0] || '',           // A: Asset Name
+            symbol: row[1] || '',              // B: Symbol
+            chain: row[2] || 'Unknown',        // C: Chain
+            riskLevel: row[3] || 'Medium',     // D: Risk level
+            location: row[4] || 'Unknown',     // E: Location
+            coinType: row[5] || 'Altcoin',     // F: Coin Type
+            quantity: parseFloat(row[6]) || 0, // G: # Quantity
+            currentPrice: parseFloat(row[7]) || 0, // H: # Current price
+            totalValue: parseFloat(row[8]) || (parseFloat(row[6]) * parseFloat(row[7]) || 0), // I: # Total Value
+            lastPriceUpdate: row[9] || new Date().toISOString(), // J: Last Price Update
+            coinGeckoId: row[10] || '',        // K: CoinGecko ID
+            priceChange24h: parseFloat(row[11]) || 0, // L: 24hr price change
+            thesis: row[12] || ''              // M: Thesis
           };
           assets.push(asset);
         }
@@ -909,20 +909,21 @@ export class SheetsAdapter {
 
       console.log('Adding personal asset:', assetData);
 
-      // Prepare the row data
+      // Prepare the row data - match the Personal portfolio sheet structure
       const rowData = [
-        assetData.name,
-        assetData.symbol,
-        assetData.chain,
-        assetData.riskLevel,
-        assetData.location,
-        assetData.coinType,
-        assetData.quantity,
-        assetData.currentPrice,
-        new Date().toISOString(), // lastPriceUpdate
-        0, // priceChange24h
-        assetData.coinGeckoId,
-        assetData.thesis
+        assetData.name,           // A: Asset Name
+        assetData.symbol,         // B: Symbol
+        assetData.chain,          // C: Chain
+        assetData.riskLevel,      // D: Risk level
+        assetData.location,       // E: Location
+        assetData.coinType,       // F: Coin Type
+        assetData.quantity,       // G: # Quantity
+        assetData.currentPrice,   // H: # Current price
+        '',                       // I: # Total Value (leave empty for Google Sheets formula)
+        new Date().toISOString(), // J: Last Price Update
+        assetData.coinGeckoId,    // K: CoinGecko ID
+        0,                        // L: 24hr price change
+        assetData.thesis || ''    // M: Thesis (if it exists, otherwise empty)
       ];
 
       // Append the new row to the Personal portfolio sheet
@@ -990,21 +991,34 @@ export class SheetsAdapter {
         throw new Error(`Asset with symbol ${editData.symbol} not found in personal portfolio`);
       }
 
-      // Update the asset data
-      const updateData = [
-        editData.quantity,
-        editData.riskLevel,
-        editData.location,
-        editData.coinType,
-        editData.thesis
-      ];
-
-      const updateResponse = await this.sheets.spreadsheets.values.update({
+      // Update the asset data - only update the fields that can be edited
+      // G: Quantity, D: Risk Level, E: Location, F: Coin Type, M: Thesis
+      const updateResponse = await this.sheets.spreadsheets.values.batchUpdate({
         spreadsheetId: this.sheetId,
-        range: `Personal portfolio!G${rowIndexToEdit}:K${rowIndexToEdit}`,
-        valueInputOption: 'USER_ENTERED',
         requestBody: {
-          values: [updateData]
+          valueInputOption: 'USER_ENTERED',
+          data: [
+            {
+              range: `Personal portfolio!G${rowIndexToEdit}:G${rowIndexToEdit}`,
+              values: [[editData.quantity]]
+            },
+            {
+              range: `Personal portfolio!D${rowIndexToEdit}:D${rowIndexToEdit}`,
+              values: [[editData.riskLevel]]
+            },
+            {
+              range: `Personal portfolio!E${rowIndexToEdit}:E${rowIndexToEdit}`,
+              values: [[editData.location]]
+            },
+            {
+              range: `Personal portfolio!F${rowIndexToEdit}:F${rowIndexToEdit}`,
+              values: [[editData.coinType]]
+            },
+            {
+              range: `Personal portfolio!M${rowIndexToEdit}:M${rowIndexToEdit}`,
+              values: [[editData.thesis || '']]
+            }
+          ]
         }
       });
 
