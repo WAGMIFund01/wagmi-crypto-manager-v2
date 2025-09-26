@@ -4,6 +4,10 @@ import { config } from '@/lib/config';
 
 export async function POST(request: NextRequest) {
   try {
+    // Get dataSource from request body
+    const body = await request.json().catch(() => ({}));
+    const dataSource = body.dataSource || 'wagmi-fund';
+    
     const serviceAccountEmail = process.env.GOOGLE_SERVICE_ACCOUNT_EMAIL;
     const privateKey = process.env.GOOGLE_PRIVATE_KEY;
     const sheetId = process.env.GOOGLE_SHEET_ID || '1h04nkcnQmxaFml8RubIGmPgffMiyoEIg350ryjXK0tM';
@@ -27,16 +31,20 @@ export async function POST(request: NextRequest) {
     const sheets = google.sheets({ version: 'v4', auth });
 
     // Step 1: Read current portfolio data including CoinGecko ID column
+    const sheetRange = dataSource === 'personal-portfolio' 
+      ? 'Personal portfolio!A:L' 
+      : 'Portfolio Overview!A:L';
+    
     const portfolioResponse = await sheets.spreadsheets.values.get({
       spreadsheetId: sheetId,
-      range: 'Portfolio Overview!A:L', // Extended to include columns K (CoinGecko ID) and L (24hr price change)
+      range: sheetRange, // Extended to include columns K (CoinGecko ID) and L (24hr price change)
     });
 
     const rows = portfolioResponse.data.values;
     if (!rows || rows.length < 2) {
       return NextResponse.json({
         success: false,
-        error: 'No data found in Portfolio Overview sheet'
+        error: `No data found in ${dataSource === 'personal-portfolio' ? 'Personal portfolio' : 'Portfolio Overview'} sheet`
       }, { status: 404 });
     }
 
@@ -190,8 +198,9 @@ export async function POST(request: NextRequest) {
         if (newPrice !== undefined) {
           asset.newPrice = newPrice;
           const rowNum = asset.rowIndex + 1; // Google Sheets is 1-indexed
-          const currentPriceRange = `Portfolio Overview!H${rowNum}`;
-          const lastUpdateRange = `Portfolio Overview!J${rowNum}`;
+          const sheetName = dataSource === 'personal-portfolio' ? 'Personal portfolio' : 'Portfolio Overview';
+          const currentPriceRange = `${sheetName}!H${rowNum}`;
+          const lastUpdateRange = `${sheetName}!J${rowNum}`;
 
           console.log(`  Adding update for row ${rowNum}:`);
           console.log(`    Current price (${currentPriceRange}): ${newPrice}`);
@@ -214,7 +223,7 @@ export async function POST(request: NextRequest) {
 
           // Add 24hr price change update if available
           if (newPriceChange !== undefined) {
-            const priceChangeRange = `Portfolio Overview!L${rowNum}`;
+            const priceChangeRange = `${sheetName}!L${rowNum}`;
             console.log(`    24hr change (${priceChangeRange}): ${newPriceChange}`);
             updates.push({
               range: priceChangeRange,

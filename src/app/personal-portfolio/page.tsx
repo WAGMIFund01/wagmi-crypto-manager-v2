@@ -1,6 +1,5 @@
 import { getServerSession } from 'next-auth';
 import { authOptions } from '@/lib/auth';
-import { fetchKPIData } from '@/lib/kpi-data';
 import DashboardClient from '@/app/wagmi-fund-module/DashboardClient';
 
 // Enable ISR with 60-second revalidation (consistent with WAGMI Fund module)
@@ -10,27 +9,35 @@ export default async function PersonalPortfolioPage() {
   // Get session on the server (consistent with WAGMI Fund module)
   const session = await getServerSession(authOptions);
   
-  // Fetch KPI data on the server (consistent with WAGMI Fund module)
-  const kpiData = await fetchKPIData();
-  const hasError = !kpiData;
+  // Fetch Personal Portfolio KPI data on the server-side
+  let kpiData = null;
+  let hasError = false;
   
-  // Transform data for display only if we have valid data (consistent with WAGMI Fund module)
-  const transformedKpiData = kpiData ? {
-    activeInvestors: kpiData.totalInvestors.toString(),
-    totalAUM: `$${kpiData.totalAUM.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`,
-    cumulativeReturn: `${kpiData.cumulativeReturn >= 0 ? '+' : ''}${kpiData.cumulativeReturn.toFixed(1)}%`,
-    monthOnMonth: `${kpiData.monthlyReturn >= 0 ? '+' : ''}${kpiData.monthlyReturn.toFixed(1)}%`,
-    lastUpdated: kpiData.lastUpdated
-  } : null;
+  try {
+    const response = await fetch(`${process.env.NEXTAUTH_URL || 'http://localhost:3000'}/api/get-personal-portfolio-kpi`, {
+      cache: 'no-store' // Ensure fresh data
+    });
+    
+    if (response.ok) {
+      const data = await response.json();
+      if (data.success) {
+        kpiData = {
+          totalAUM: `$${data.data.totalAUM.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`,
+          lastUpdated: data.data.lastUpdated
+        };
+      }
+    }
+  } catch (error) {
+    console.error('Error fetching personal portfolio KPI data:', error);
+    hasError = true;
+  }
   
-  // Step 2: Identical UI - Use same data source as WAGMI Fund for now
-  // This ensures we have a clean baseline before implementing conditional rendering
-  // Let DashboardClient handle authentication (consistent with WAGMI Fund module)
   return (
     <DashboardClient 
       session={session}
-      kpiData={transformedKpiData}
+      kpiData={kpiData}
       hasError={hasError}
+      dataSource="personal-portfolio"
     />
   );
 }

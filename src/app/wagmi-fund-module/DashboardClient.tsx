@@ -28,9 +28,10 @@ interface DashboardClientProps {
     lastUpdated: string;
   } | null;
   hasError: boolean;
+  dataSource?: 'wagmi-fund' | 'personal-portfolio';
 }
 
-export default function DashboardClient({ session, kpiData: initialKpiData, hasError }: DashboardClientProps) {
+export default function DashboardClient({ session, kpiData: initialKpiData, hasError, dataSource = 'wagmi-fund' }: DashboardClientProps) {
   const router = useRouter();
   const searchParams = useSearchParams();
   const pathname = usePathname();
@@ -41,8 +42,7 @@ export default function DashboardClient({ session, kpiData: initialKpiData, hasE
   const [isPrivacyMode, setIsPrivacyMode] = useState(false);
   const [kpiData, setKpiData] = useState(initialKpiData);
 
-  // Detect data source based on current pathname
-  const dataSource = pathname.includes('/personal-portfolio') ? 'personal-portfolio' : 'wagmi-fund';
+  // Data source is now passed as a prop from the parent component
 
   // Initialize active tab from URL parameters
   useEffect(() => {
@@ -117,7 +117,24 @@ export default function DashboardClient({ session, kpiData: initialKpiData, hasE
   // Handle comprehensive data refresh
   const handleKpiRefresh = async () => {
     try {
-      // Determine API endpoint based on data source
+      // First, update all prices in the database
+      console.log(`🔄 Updating prices for ${dataSource}...`);
+      const priceUpdateResponse = await fetch('/api/update-all-prices', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ dataSource }),
+      });
+
+      if (priceUpdateResponse.ok) {
+        const priceUpdateResult = await priceUpdateResponse.json();
+        console.log('✅ Price update completed:', priceUpdateResult);
+      } else {
+        console.warn('⚠️ Price update failed, continuing with KPI refresh...');
+      }
+
+      // Then, determine API endpoint based on data source
       const apiEndpoint = dataSource === 'personal-portfolio' 
         ? '/api/get-personal-portfolio-kpi' 
         : '/api/kpi-data?force=true';
