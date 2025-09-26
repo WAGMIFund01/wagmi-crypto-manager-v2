@@ -937,16 +937,35 @@ export class SheetsAdapter {
       
       console.log(`Last row with data: ${lastRow}, inserting at row: ${insertRow}`);
 
-      // Insert the new row at the specific position starting from column A
-      const range = `Personal portfolio!A${insertRow}:M${insertRow}`;
-      console.log(`Inserting at range: ${range}`);
+      // Insert the new row in two parts to skip the Total Value column (I)
+      // Part 1: Columns A-H (Asset Name through Current Price)
+      const part1Range = `Personal portfolio!A${insertRow}:H${insertRow}`;
+      const part1Values = [rowData.slice(0, 8)]; // First 8 columns
       
-      const response = await this.sheets.spreadsheets.values.update({
+      // Part 2: Columns J-M (Last Price Update through Thesis)
+      const part2Range = `Personal portfolio!J${insertRow}:M${insertRow}`;
+      const part2Values = [rowData.slice(8)]; // Last 5 columns (skipping Column I)
+      
+      console.log(`Inserting Part 1 at range: ${part1Range}`);
+      console.log(`Inserting Part 2 at range: ${part2Range}`);
+      
+      // Insert Part 1
+      await this.sheets.spreadsheets.values.update({
         spreadsheetId: this.sheetId,
-        range: range,
+        range: part1Range,
         valueInputOption: 'USER_ENTERED',
         requestBody: {
-          values: [rowData]
+          values: part1Values
+        }
+      });
+      
+      // Insert Part 2
+      const response = await this.sheets.spreadsheets.values.update({
+        spreadsheetId: this.sheetId,
+        range: part2Range,
+        valueInputOption: 'USER_ENTERED',
+        requestBody: {
+          values: part2Values
         }
       });
 
