@@ -131,6 +131,10 @@ export default function UniversalNavbar({
       });
       
       if (revalidationResponse.ok) {
+        // Wait for database operations to complete before refreshing UI
+        console.log('Waiting for database operations to complete...');
+        await new Promise(resolve => setTimeout(resolve, 1500)); // 1.5 second delay
+        
         // Refresh KPI data using callback if available, otherwise reload page
         if (onKpiRefresh) {
           console.log('Refreshing KPI data...');
