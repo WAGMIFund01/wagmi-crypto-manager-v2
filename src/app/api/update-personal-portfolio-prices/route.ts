@@ -1,27 +1,53 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { sheetsAdapter } from '@/lib/sheetsAdapter';
+import { google } from 'googleapis';
+import { config } from '@/lib/config';
 
 export async function POST(request: NextRequest) {
   try {
     console.log('Starting Personal Portfolio price update...');
 
-    // Get Personal Portfolio data to find assets that need price updates
-    const portfolioResponse = await fetch(`${request.nextUrl.origin}/api/get-personal-portfolio-data`);
-    const portfolioData = await portfolioResponse.json();
+    const serviceAccountEmail = process.env.GOOGLE_SERVICE_ACCOUNT_EMAIL;
+    const privateKey = process.env.GOOGLE_PRIVATE_KEY;
+    const sheetId = process.env.GOOGLE_SHEET_ID || '1h04nkcnQmxaFml8RubIGmPgffMiyoEIg350ryjXK0tM';
 
-    if (!portfolioData.success || !portfolioData.assets) {
+    if (!serviceAccountEmail || !privateKey) {
       return NextResponse.json({
         success: false,
-        error: 'Failed to fetch Personal Portfolio data'
+        error: 'Missing Google Sheets API credentials'
+      }, { status: 503 });
+    }
+
+    // Create authentication
+    const auth = new google.auth.GoogleAuth({
+      credentials: {
+        client_email: serviceAccountEmail,
+        private_key: privateKey.replace(/\\n/g, '\n'),
+      },
+      scopes: ['https://www.googleapis.com/auth/spreadsheets'],
+    });
+
+    const sheets = google.sheets({ version: 'v4', auth });
+
+    // Step 1: Read current Personal Portfolio data including CoinGecko ID column
+    const portfolioResponse = await sheets.spreadsheets.values.get({
+      spreadsheetId: sheetId,
+      range: 'Personal portfolio!A:M', // Include all columns A-M
+    });
+
+    const rows = portfolioResponse.data.values;
+    if (!rows || rows.length < 2) {
+      return NextResponse.json({
+        success: false,
+        error: 'No data found in Personal portfolio sheet'
       }, { status: 404 });
     }
 
-    const assets = portfolioData.assets;
-    console.log(`Found ${assets.length} assets in Personal Portfolio`);
+    console.log(`Found ${rows.length - 1} assets in Personal Portfolio`);
 
-    // Process each asset and collect detailed information
+    // Step 2: Process each asset and collect detailed information
     const assetDetails: {
       symbol: string;
+      rowIndex: number;
       coinGeckoId: string | null;
       status: 'success' | 'no_coinGecko_id' | 'invalid_coinGecko_id' | 'coinGecko_error';
       error?: string;
@@ -31,26 +57,35 @@ export async function POST(request: NextRequest) {
 
     const coinGeckoIdsToFetch = new Set<string>();
 
-    // Collect unique CoinGecko IDs
-    for (const asset of assets) {
-      const coinGeckoId = asset.coinGeckoId?.toString()?.trim();
+    // Process each row (skip header row)
+    for (let i = 1; i < rows.length; i++) {
+      const row = rows[i];
+      const symbol = row[1]?.toString().toUpperCase(); // Column B
+      const coinGeckoId = row[10]?.toString()?.trim(); // Column K (0-indexed = 10)
       
+      const assetDetail: {
+        symbol: string;
+        rowIndex: number;
+        coinGeckoId: string | null;
+        status: 'success' | 'no_coinGecko_id' | 'invalid_coinGecko_id' | 'coinGecko_error';
+        error?: string;
+        newPrice?: number;
+        priceChange24h?: number;
+      } = {
+        symbol: symbol || 'UNKNOWN',
+        rowIndex: i,
+        coinGeckoId: coinGeckoId || null,
+        status: 'success'
+      };
+
       if (coinGeckoId) {
         coinGeckoIdsToFetch.add(coinGeckoId);
-        
-        assetDetails.push({
-          symbol: asset.symbol,
-          coinGeckoId,
-          status: 'success'
-        });
       } else {
-        assetDetails.push({
-          symbol: asset.symbol,
-          coinGeckoId: null,
-          status: 'no_coinGecko_id',
-          error: 'No CoinGecko ID found'
-        });
+        assetDetail.status = 'no_coinGecko_id';
+        assetDetail.error = 'No CoinGecko ID found';
       }
+
+      assetDetails.push(assetDetail);
     }
 
     console.log(`Found ${coinGeckoIdsToFetch.size} unique CoinGecko IDs to fetch`);
@@ -102,33 +137,55 @@ export async function POST(request: NextRequest) {
       }
     }
 
-    // Update prices in Personal Portfolio sheet
+    // Update prices in Personal Portfolio sheet using batch update
     const updateResults = [];
+    const batchUpdates = [];
+
     for (const assetDetail of assetDetails) {
       if (assetDetail.newPrice !== undefined) {
-        try {
-          // Update the asset with new price and 24hr change
-          const updateResult = await sheetsAdapter.editPersonalAsset({
-            symbol: assetDetail.symbol,
-            currentPrice: assetDetail.newPrice,
-            priceChange24h: assetDetail.priceChange24h || 0
-          });
-          
-          updateResults.push({
-            symbol: assetDetail.symbol,
-            success: updateResult.success,
-            error: updateResult.error
-          });
-          
-          console.log(`Updated ${assetDetail.symbol}: $${assetDetail.newPrice} (${assetDetail.priceChange24h?.toFixed(2)}%)`);
-        } catch (error) {
-          console.error(`Failed to update ${assetDetail.symbol}:`, error);
-          updateResults.push({
-            symbol: assetDetail.symbol,
-            success: false,
-            error: error instanceof Error ? error.message : 'Unknown error'
-          });
-        }
+        const rowIndex = assetDetail.rowIndex + 1; // +1 because Google Sheets is 1-indexed
+        
+        // Update current price (Column H)
+        batchUpdates.push({
+          range: `Personal portfolio!H${rowIndex}:H${rowIndex}`,
+          values: [[assetDetail.newPrice]]
+        });
+        
+        // Update 24hr price change (Column L)
+        batchUpdates.push({
+          range: `Personal portfolio!L${rowIndex}:L${rowIndex}`,
+          values: [[assetDetail.priceChange24h || 0]]
+        });
+        
+        updateResults.push({
+          symbol: assetDetail.symbol,
+          success: true,
+          newPrice: assetDetail.newPrice,
+          priceChange24h: assetDetail.priceChange24h || 0
+        });
+        
+        console.log(`Prepared update for ${assetDetail.symbol}: $${assetDetail.newPrice} (${assetDetail.priceChange24h?.toFixed(2)}%)`);
+      }
+    }
+
+    // Execute batch update if we have updates to make
+    if (batchUpdates.length > 0) {
+      try {
+        const batchUpdateResponse = await sheets.spreadsheets.values.batchUpdate({
+          spreadsheetId: sheetId,
+          requestBody: {
+            valueInputOption: 'USER_ENTERED',
+            data: batchUpdates
+          }
+        });
+        
+        console.log(`Successfully updated ${batchUpdates.length / 2} assets in Personal Portfolio`);
+      } catch (error) {
+        console.error('Error updating Personal Portfolio prices:', error);
+        return NextResponse.json({
+          success: false,
+          error: `Failed to update Personal Portfolio prices: ${error instanceof Error ? error.message : 'Unknown error'}`
+        }, { status: 500 });
       }
     }
 
@@ -141,7 +198,7 @@ export async function POST(request: NextRequest) {
       success: true,
       message: `Updated prices for ${successfulUpdates} assets`,
       details: {
-        totalAssets: assets.length,
+        totalAssets: rows.length - 1, // -1 for header row
         successfulUpdates,
         failedUpdates,
         updateResults
