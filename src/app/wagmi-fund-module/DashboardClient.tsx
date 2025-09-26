@@ -118,41 +118,77 @@ export default function DashboardClient({ session, kpiData: initialKpiData, hasE
   // Handle comprehensive data refresh
   const handleKpiRefresh = async () => {
     try {
-      // Fetch fresh KPI data from the API with force refresh to bypass caching
-      const response = await fetch('/api/kpi-data?force=true', {
-        method: 'GET',
-        headers: {
-          'Content-Type': 'application/json',
-          'Cache-Control': 'no-cache, no-store, must-revalidate',
-          'Pragma': 'no-cache',
-          'Expires': '0'
-        },
-      });
+      if (dataSource === 'personal-portfolio') {
+        // For Personal Portfolio: Fetch Personal Portfolio KPI data
+        console.log('Refreshing Personal Portfolio KPI data...');
+        const response = await fetch('/api/get-personal-portfolio-kpi?force=true', {
+          method: 'GET',
+          headers: {
+            'Content-Type': 'application/json',
+            'Cache-Control': 'no-cache, no-store, must-revalidate',
+            'Pragma': 'no-cache',
+            'Expires': '0'
+          },
+        });
 
-      if (response.ok) {
-        const freshKpiData = await response.json();
-        console.log('🔍 DEBUG - Fresh KPI data received:', freshKpiData);
-        console.log('🔍 DEBUG - lastUpdated from API:', freshKpiData.lastUpdated);
-        
-        // Transform the data to match the expected format
-        const transformedKpiData = {
-          activeInvestors: freshKpiData.totalInvestors.toString(),
-          totalAUM: `$${freshKpiData.totalAUM.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`,
-          cumulativeReturn: `${freshKpiData.cumulativeReturn >= 0 ? '+' : ''}${freshKpiData.cumulativeReturn.toFixed(1)}%`,
-          monthOnMonth: `${freshKpiData.monthlyReturn >= 0 ? '+' : ''}${freshKpiData.monthlyReturn.toFixed(1)}%`,
-          lastUpdated: freshKpiData.lastUpdated
-        };
-        
-        console.log('🔍 DEBUG - Transformed KPI data:', transformedKpiData);
-        setKpiData(transformedKpiData);
-        console.log('KPI data refreshed successfully');
-        
-        // Don't trigger portfolio refresh here to avoid infinite loop
+        if (response.ok) {
+          const freshKpiData = await response.json();
+          console.log('🔍 DEBUG - Personal Portfolio KPI data received:', freshKpiData);
+          
+          if (freshKpiData.success && freshKpiData.data) {
+            // Transform the data to match the expected format (only AUM for Personal Portfolio)
+            const transformedKpiData = {
+              activeInvestors: 'N/A', // Not applicable for personal portfolio
+              totalAUM: `$${freshKpiData.data.totalAUM.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`,
+              cumulativeReturn: 'N/A', // Not applicable for personal portfolio
+              monthOnMonth: 'N/A', // Not applicable for personal portfolio
+              lastUpdated: freshKpiData.data.lastUpdated
+            };
+            
+            console.log('🔍 DEBUG - Transformed Personal Portfolio KPI data:', transformedKpiData);
+            setKpiData(transformedKpiData);
+            console.log('Personal Portfolio KPI data refreshed successfully');
+          }
+        } else {
+          console.error('Failed to fetch Personal Portfolio KPI data');
+        }
       } else {
-        console.error('Failed to fetch fresh KPI data');
+        // For WAGMI Fund: Fetch fresh KPI data from the API with force refresh to bypass caching
+        const response = await fetch('/api/kpi-data?force=true', {
+          method: 'GET',
+          headers: {
+            'Content-Type': 'application/json',
+            'Cache-Control': 'no-cache, no-store, must-revalidate',
+            'Pragma': 'no-cache',
+            'Expires': '0'
+          },
+        });
+
+        if (response.ok) {
+          const freshKpiData = await response.json();
+          console.log('🔍 DEBUG - Fresh KPI data received:', freshKpiData);
+          console.log('🔍 DEBUG - lastUpdated from API:', freshKpiData.lastUpdated);
+          
+          // Transform the data to match the expected format
+          const transformedKpiData = {
+            activeInvestors: freshKpiData.totalInvestors.toString(),
+            totalAUM: `$${freshKpiData.totalAUM.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`,
+            cumulativeReturn: `${freshKpiData.cumulativeReturn >= 0 ? '+' : ''}${freshKpiData.cumulativeReturn.toFixed(1)}%`,
+            monthOnMonth: `${freshKpiData.monthlyReturn >= 0 ? '+' : ''}${freshKpiData.monthlyReturn.toFixed(1)}%`,
+            lastUpdated: freshKpiData.lastUpdated
+          };
+          
+          console.log('🔍 DEBUG - Transformed KPI data:', transformedKpiData);
+          setKpiData(transformedKpiData);
+          console.log('KPI data refreshed successfully');
+          
+          // Don't trigger portfolio refresh here to avoid infinite loop
+        } else {
+          console.error('Failed to fetch fresh KPI data');
+        }
       }
     } catch (error) {
-      console.error('Error refreshing KPI data:', error);
+      console.error('Error refreshing data:', error);
     }
   };
 

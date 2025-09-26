@@ -1024,44 +1024,76 @@ export class SheetsAdapter {
         throw new Error(`Asset with symbol ${editData.symbol} not found in personal portfolio`);
       }
 
-      // Update the asset data - only update the fields that can be edited
-      // G: Quantity, D: Risk Level, E: Location, F: Coin Type, M: Thesis
-      await this.sheets.spreadsheets.values.update({
-        spreadsheetId: this.sheetId,
-        range: `Personal portfolio!G${rowIndexToEdit}:G${rowIndexToEdit}`,
-        valueInputOption: 'USER_ENTERED',
-        requestBody: { values: [[editData.quantity]] }
-      });
+      // Update the asset data - update all provided fields
+      // H: Current Price, L: 24hr Price Change, G: Quantity, D: Risk Level, E: Location, F: Coin Type, M: Thesis
+      
+      // Update current price if provided (Column H)
+      if (editData.currentPrice !== undefined) {
+        await this.sheets.spreadsheets.values.update({
+          spreadsheetId: this.sheetId,
+          range: `Personal portfolio!H${rowIndexToEdit}:H${rowIndexToEdit}`,
+          valueInputOption: 'USER_ENTERED',
+          requestBody: { values: [[editData.currentPrice]] }
+        });
+      }
 
-      await this.sheets.spreadsheets.values.update({
-        spreadsheetId: this.sheetId,
-        range: `Personal portfolio!D${rowIndexToEdit}:D${rowIndexToEdit}`,
-        valueInputOption: 'USER_ENTERED',
-        requestBody: { values: [[editData.riskLevel]] }
-      });
+      // Update 24hr price change if provided (Column L)
+      if (editData.priceChange24h !== undefined) {
+        await this.sheets.spreadsheets.values.update({
+          spreadsheetId: this.sheetId,
+          range: `Personal portfolio!L${rowIndexToEdit}:L${rowIndexToEdit}`,
+          valueInputOption: 'USER_ENTERED',
+          requestBody: { values: [[editData.priceChange24h]] }
+        });
+      }
 
-      await this.sheets.spreadsheets.values.update({
-        spreadsheetId: this.sheetId,
-        range: `Personal portfolio!E${rowIndexToEdit}:E${rowIndexToEdit}`,
-        valueInputOption: 'USER_ENTERED',
-        requestBody: { values: [[editData.location]] }
-      });
+      // Update other fields if provided
+      if (editData.quantity !== undefined) {
+        await this.sheets.spreadsheets.values.update({
+          spreadsheetId: this.sheetId,
+          range: `Personal portfolio!G${rowIndexToEdit}:G${rowIndexToEdit}`,
+          valueInputOption: 'USER_ENTERED',
+          requestBody: { values: [[editData.quantity]] }
+        });
+      }
 
-      await this.sheets.spreadsheets.values.update({
-        spreadsheetId: this.sheetId,
-        range: `Personal portfolio!F${rowIndexToEdit}:F${rowIndexToEdit}`,
-        valueInputOption: 'USER_ENTERED',
-        requestBody: { values: [[editData.coinType]] }
-      });
+      if (editData.riskLevel !== undefined) {
+        await this.sheets.spreadsheets.values.update({
+          spreadsheetId: this.sheetId,
+          range: `Personal portfolio!D${rowIndexToEdit}:D${rowIndexToEdit}`,
+          valueInputOption: 'USER_ENTERED',
+          requestBody: { values: [[editData.riskLevel]] }
+        });
+      }
 
-      const updateResponse = await this.sheets.spreadsheets.values.update({
-        spreadsheetId: this.sheetId,
-        range: `Personal portfolio!M${rowIndexToEdit}:M${rowIndexToEdit}`,
-        valueInputOption: 'USER_ENTERED',
-        requestBody: { values: [[editData.thesis || '']] }
-      });
+      if (editData.location !== undefined) {
+        await this.sheets.spreadsheets.values.update({
+          spreadsheetId: this.sheetId,
+          range: `Personal portfolio!E${rowIndexToEdit}:E${rowIndexToEdit}`,
+          valueInputOption: 'USER_ENTERED',
+          requestBody: { values: [[editData.location]] }
+        });
+      }
 
-      console.log('Personal asset updated successfully:', updateResponse.data);
+      if (editData.coinType !== undefined) {
+        await this.sheets.spreadsheets.values.update({
+          spreadsheetId: this.sheetId,
+          range: `Personal portfolio!F${rowIndexToEdit}:F${rowIndexToEdit}`,
+          valueInputOption: 'USER_ENTERED',
+          requestBody: { values: [[editData.coinType]] }
+        });
+      }
+
+      if (editData.thesis !== undefined) {
+        const updateResponse = await this.sheets.spreadsheets.values.update({
+          spreadsheetId: this.sheetId,
+          range: `Personal portfolio!M${rowIndexToEdit}:M${rowIndexToEdit}`,
+          valueInputOption: 'USER_ENTERED',
+          requestBody: { values: [[editData.thesis || '']] }
+        });
+      }
+
+      console.log('Personal asset updated successfully');
       
       return {
         success: true,

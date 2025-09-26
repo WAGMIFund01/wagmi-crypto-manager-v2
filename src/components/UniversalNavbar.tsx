@@ -83,66 +83,96 @@ export default function UniversalNavbar({
   const handleRetryKPI = async () => {
     setIsRetrying(true);
     try {
-      // Step 1: Update KPI timestamp
-      console.log('Updating KPI timestamp...');
-      const timestampUpdateResponse = await fetch('/api/update-kpi-timestamp', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-      });
-      
-      if (!timestampUpdateResponse.ok) {
-        throw new Error('Failed to update KPI timestamp');
-      }
-      
-      const timestampUpdateResult = await timestampUpdateResponse.json();
-      console.log('Timestamp update result:', timestampUpdateResult);
-      
-      // Immediately set the timestamp to "Just now" since we just updated it
-      // Use UTC time to match our timestamp parsing logic
-      const now = new Date();
-      const currentTimestamp = `${String(now.getUTCMonth() + 1).padStart(2, '0')}/${String(now.getUTCDate()).padStart(2, '0')}/${now.getUTCFullYear()}, ${String(now.getUTCHours()).padStart(2, '0')}:${String(now.getUTCMinutes()).padStart(2, '0')}:${String(now.getUTCSeconds()).padStart(2, '0')}`;
-      setLastUpdatedTimestamp(currentTimestamp);
-      
-      // Step 2: Update prices from CoinGecko
-      console.log('Updating prices from CoinGecko...');
-      const priceUpdateResponse = await fetch('/api/update-all-prices', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-      });
-      
-      if (!priceUpdateResponse.ok) {
-        throw new Error('Failed to update prices');
-      }
-      
-      const priceUpdateResult = await priceUpdateResponse.json();
-      console.log('Price update result:', priceUpdateResult);
-      
-      // Step 3: Timestamp already set to current time above
-
-      // Step 4: Call revalidation API to clear cache
-      console.log('Revalidating KPI data...');
-      const revalidationResponse = await fetch('/api/revalidate-kpi', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-      });
-      
-      if (revalidationResponse.ok) {
-        // Refresh KPI data using callback if available, otherwise reload page
+      if (dataSource === 'personal-portfolio') {
+        // For Personal Portfolio: Only update prices and refresh data
+        console.log('Updating Personal Portfolio prices...');
+        
+        // Update Personal Portfolio prices
+        const priceUpdateResponse = await fetch('/api/update-personal-portfolio-prices', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+        });
+        
+        if (!priceUpdateResponse.ok) {
+          throw new Error('Failed to update Personal Portfolio prices');
+        }
+        
+        const priceUpdateResult = await priceUpdateResponse.json();
+        console.log('Personal Portfolio price update result:', priceUpdateResult);
+        
+        // Refresh data using callback if available
         if (onKpiRefresh) {
-          console.log('Refreshing KPI data...');
+          console.log('Refreshing Personal Portfolio data...');
           await onKpiRefresh();
         } else {
-          console.log('No KPI refresh callback, reloading page...');
+          console.log('No refresh callback, reloading page...');
           window.location.reload();
         }
       } else {
-        throw new Error('Failed to revalidate dashboard');
+        // For WAGMI Fund: Full KPI refresh process
+        // Step 1: Update KPI timestamp
+        console.log('Updating KPI timestamp...');
+        const timestampUpdateResponse = await fetch('/api/update-kpi-timestamp', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+        });
+        
+        if (!timestampUpdateResponse.ok) {
+          throw new Error('Failed to update KPI timestamp');
+        }
+        
+        const timestampUpdateResult = await timestampUpdateResponse.json();
+        console.log('Timestamp update result:', timestampUpdateResult);
+        
+        // Immediately set the timestamp to "Just now" since we just updated it
+        // Use UTC time to match our timestamp parsing logic
+        const now = new Date();
+        const currentTimestamp = `${String(now.getUTCMonth() + 1).padStart(2, '0')}/${String(now.getUTCDate()).padStart(2, '0')}/${now.getUTCFullYear()}, ${String(now.getUTCHours()).padStart(2, '0')}:${String(now.getUTCMinutes()).padStart(2, '0')}:${String(now.getUTCSeconds()).padStart(2, '0')}`;
+        setLastUpdatedTimestamp(currentTimestamp);
+        
+        // Step 2: Update prices from CoinGecko
+        console.log('Updating prices from CoinGecko...');
+        const priceUpdateResponse = await fetch('/api/update-all-prices', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+        });
+        
+        if (!priceUpdateResponse.ok) {
+          throw new Error('Failed to update prices');
+        }
+        
+        const priceUpdateResult = await priceUpdateResponse.json();
+        console.log('Price update result:', priceUpdateResult);
+        
+        // Step 3: Timestamp already set to current time above
+
+        // Step 4: Call revalidation API to clear cache
+        console.log('Revalidating KPI data...');
+        const revalidationResponse = await fetch('/api/revalidate-kpi', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+        });
+        
+        if (revalidationResponse.ok) {
+          // Refresh KPI data using callback if available, otherwise reload page
+          if (onKpiRefresh) {
+            console.log('Refreshing KPI data...');
+            await onKpiRefresh();
+          } else {
+            console.log('No KPI refresh callback, reloading page...');
+            window.location.reload();
+          }
+        } else {
+          throw new Error('Failed to revalidate dashboard');
+        }
       }
     } catch (error) {
       console.error('Error during refresh:', error);
@@ -355,44 +385,55 @@ export default function UniversalNavbar({
               </div>
             ) : formattedKpiData ? (
               <div className="flex items-center space-x-4 text-center">
-                {dataSource === 'wagmi-fund' && (
+                {dataSource === 'wagmi-fund' ? (
+                  <>
+                    {/* WAGMI Fund: Full mobile KPI metrics */}
+                    <div className="text-center">
+                      <div style={{ color: '#A0A0A0', fontSize: '10px' }}>Investors</div>
+                      <div style={{ color: '#FFFFFF', fontSize: '14px', fontWeight: '600' }}>
+                        {formattedKpiData.activeInvestors}
+                      </div>
+                    </div>
+                    <div className="text-center">
+                      <div style={{ color: '#A0A0A0', fontSize: '10px' }}>AUM</div>
+                      <div style={{ color: '#FFFFFF', fontSize: '14px', fontWeight: '600' }}>
+                        {formattedKpiData.totalAUM}
+                      </div>
+                    </div>
+                    <div className="text-center">
+                      <div style={{ color: '#A0A0A0', fontSize: '10px' }}>Return</div>
+                      <div 
+                        style={{ 
+                          color: formattedKpiData.cumulativeReturn.startsWith('+') ? '#00FF95' : '#FF6B6B', 
+                          fontSize: '14px', 
+                          fontWeight: '600' 
+                        }}
+                      >
+                        {formattedKpiData.cumulativeReturn}
+                      </div>
+                    </div>
+                    <div className="text-center">
+                      <div style={{ color: '#A0A0A0', fontSize: '10px' }}>MoM</div>
+                      <div 
+                        style={{ 
+                          color: formattedKpiData.monthOnMonth.startsWith('+') ? '#00FF95' : '#FF6B6B', 
+                          fontSize: '14px', 
+                          fontWeight: '600' 
+                        }}
+                      >
+                        {formattedKpiData.monthOnMonth}
+                      </div>
+                    </div>
+                  </>
+                ) : (
+                  /* Personal Portfolio: Only Portfolio Value */
                   <div className="text-center">
-                    <div style={{ color: '#A0A0A0', fontSize: '10px' }}>Investors</div>
+                    <div style={{ color: '#A0A0A0', fontSize: '10px' }}>Portfolio Value</div>
                     <div style={{ color: '#FFFFFF', fontSize: '14px', fontWeight: '600' }}>
-                      {formattedKpiData.activeInvestors}
+                      {formattedKpiData.totalAUM}
                     </div>
                   </div>
                 )}
-                <div className="text-center">
-                  <div style={{ color: '#A0A0A0', fontSize: '10px' }}>AUM</div>
-                  <div style={{ color: '#FFFFFF', fontSize: '14px', fontWeight: '600' }}>
-                    {formattedKpiData.totalAUM}
-                  </div>
-                </div>
-                <div className="text-center">
-                  <div style={{ color: '#A0A0A0', fontSize: '10px' }}>Return</div>
-                  <div 
-                    style={{ 
-                      color: formattedKpiData.cumulativeReturn.startsWith('+') ? '#00FF95' : '#FF6B6B', 
-                      fontSize: '14px', 
-                      fontWeight: '600' 
-                    }}
-                  >
-                    {formattedKpiData.cumulativeReturn}
-                  </div>
-                </div>
-                <div className="text-center">
-                  <div style={{ color: '#A0A0A0', fontSize: '10px' }}>MoM</div>
-                  <div 
-                    style={{ 
-                      color: formattedKpiData.monthOnMonth.startsWith('+') ? '#00FF95' : '#FF6B6B', 
-                      fontSize: '14px', 
-                      fontWeight: '600' 
-                    }}
-                  >
-                    {formattedKpiData.monthOnMonth}
-                  </div>
-                </div>
               </div>
             ) : (
               <div style={{ color: '#A0A0A0', fontSize: '12px' }}>Loading KPI data...</div>
@@ -584,59 +625,72 @@ export default function UniversalNavbar({
                 </div>
               </div>
             ) : (
-              /* KPI Data - Four evenly spaced metrics */
+              /* KPI Data - Conditional display based on dataSource */
               <>
-                {dataSource === 'wagmi-fund' && (
-                  /* Active Investors */
+                {dataSource === 'wagmi-fund' ? (
+                  /* WAGMI Fund: Full KPI metrics */
+                  <>
+                    {/* Active Investors */}
+                    <WagmiCard variant="ribbon" theme="green" size="sm">
+                      <p className="text-xs font-normal text-gray-400 mb-1 uppercase tracking-wide">
+                        Active Investors
+                      </p>
+                      <p className="text-sm font-semibold text-white">
+                        {formattedKpiData?.activeInvestors || '--'}
+                      </p>
+                    </WagmiCard>
+
+                    {/* Total AUM */}
+                    <WagmiCard variant="ribbon" theme="green" size="sm">
+                      <p className="text-xs font-normal text-gray-400 mb-1 uppercase tracking-wide">
+                        Total AUM
+                      </p>
+                      <p className="text-sm font-semibold text-white">
+                        {formattedKpiData?.totalAUM || '--'}
+                      </p>
+                    </WagmiCard>
+
+                    {/* Cumulative Return */}
+                    <WagmiCard variant="ribbon" theme="green" size="sm">
+                      <p className="text-xs font-normal text-gray-400 mb-1 uppercase tracking-wide">
+                        Cumulative Return
+                      </p>
+                      <p 
+                        className="text-sm font-semibold"
+                        style={{ 
+                          color: formattedKpiData?.cumulativeReturn?.startsWith('+') ? '#00FF95' : '#FF4D4D'
+                        }}
+                      >
+                        {formattedKpiData?.cumulativeReturn || '--'}
+                      </p>
+                    </WagmiCard>
+
+                    {/* MoM Return */}
+                    <WagmiCard variant="ribbon" theme="green" size="sm">
+                      <p className="text-xs font-normal text-gray-400 mb-1 uppercase tracking-wide">
+                        MoM Return
+                      </p>
+                      <p 
+                        className="text-sm font-semibold"
+                        style={{ 
+                          color: formattedKpiData?.monthOnMonth?.startsWith('+') ? '#00FF95' : '#FF4D4D'
+                        }}
+                      >
+                        {formattedKpiData?.monthOnMonth || '--'}
+                      </p>
+                    </WagmiCard>
+                  </>
+                ) : (
+                  /* Personal Portfolio: Only AUM */
                   <WagmiCard variant="ribbon" theme="green" size="sm">
                     <p className="text-xs font-normal text-gray-400 mb-1 uppercase tracking-wide">
-                      Active Investors
+                      Portfolio Value
                     </p>
                     <p className="text-sm font-semibold text-white">
-                      {formattedKpiData?.activeInvestors || '--'}
+                      {formattedKpiData?.totalAUM || '--'}
                     </p>
                   </WagmiCard>
                 )}
-
-                {/* Total AUM */}
-                <WagmiCard variant="ribbon" theme="green" size="sm">
-                  <p className="text-xs font-normal text-gray-400 mb-1 uppercase tracking-wide">
-                    Total AUM
-                  </p>
-                  <p className="text-sm font-semibold text-white">
-                    {formattedKpiData?.totalAUM || '--'}
-                  </p>
-                </WagmiCard>
-
-                {/* Cumulative Return */}
-                <WagmiCard variant="ribbon" theme="green" size="sm">
-                  <p className="text-xs font-normal text-gray-400 mb-1 uppercase tracking-wide">
-                    Cumulative Return
-                  </p>
-                  <p 
-                    className="text-sm font-semibold"
-                    style={{ 
-                      color: formattedKpiData?.cumulativeReturn?.startsWith('+') ? '#00FF95' : '#FF4D4D'
-                    }}
-                  >
-                    {formattedKpiData?.cumulativeReturn || '--'}
-                  </p>
-                </WagmiCard>
-
-                {/* MoM Return */}
-                <WagmiCard variant="ribbon" theme="green" size="sm">
-                  <p className="text-xs font-normal text-gray-400 mb-1 uppercase tracking-wide">
-                    MoM Return
-                  </p>
-                  <p 
-                    className="text-sm font-semibold"
-                    style={{ 
-                      color: formattedKpiData?.monthOnMonth?.startsWith('+') ? '#00FF95' : '#FF4D4D'
-                    }}
-                  >
-                    {formattedKpiData?.monthOnMonth || '--'}
-                  </p>
-                </WagmiCard>
               </>
             )}
           </div>
