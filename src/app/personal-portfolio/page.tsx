@@ -1,7 +1,15 @@
 import { redirect } from 'next/navigation';
+import { getServerSession } from 'next-auth';
+import { authOptions } from '@/lib/auth';
 
-export default function PersonalPortfolioPage() {
-  // For now, redirect to WAGMI Fund module to use identical UI
-  // This is Step 2 of our strangling approach - same UI, components, and functions
+export default async function PersonalPortfolioPage() {
+  // Check authentication
+  const session = await getServerSession(authOptions);
+  if (!session) {
+    redirect('/login');
+  }
+
+  // Step 2: Identical UI - Use same data source as WAGMI Fund for now
+  // This ensures we have a clean baseline before implementing conditional rendering
   redirect('/wagmi-fund-module');
 }
