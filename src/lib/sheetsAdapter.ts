@@ -1189,7 +1189,9 @@ export class SheetsAdapter {
   }
 
   /**
-   * Get Personal Portfolio KPI data from KPIs tab (cell A8)
+   * Get Personal Portfolio KPI data from KPIs tab
+   * - Total AUM from cell B8 (Total AUM - personal)
+   * - Last Updated from cell B9 (Last Updated - personal)
    */
   async getPersonalPortfolioKpiFromKpisTab(): Promise<{
     totalAUM: number;
@@ -1204,33 +1206,20 @@ export class SheetsAdapter {
         throw new Error('Google Sheets API client not initialized');
       }
 
-      // Get data from KPIs tab
+      // Get specific cells: B8 (Total AUM - personal) and B9 (Last Updated - personal)
       const response = await this.sheets.spreadsheets.values.get({
         spreadsheetId: this.sheetId,
-        range: 'KPIs!A:B',
+        range: 'KPIs!B8:B9',
       });
 
       const rows = response.data.values || [];
       
-      // Find the "Total AUM - personal" row (should be around row 8)
-      let totalAUM = 0;
-      let lastUpdated = new Date().toISOString();
+      // Extract values from the response
+      const totalAUMValue = rows[0] && rows[0][0] ? rows[0][0] : '0';
+      const lastUpdatedValue = rows[1] && rows[1][0] ? rows[1][0] : new Date().toISOString();
       
-      for (let i = 0; i < rows.length; i++) {
-        const row = rows[i];
-        if (row && row.length >= 2) {
-          const metricName = row[0]?.toString().toLowerCase();
-          const value = row[1]?.toString();
-          
-          if (metricName && metricName.includes('total aum - personal')) {
-            totalAUM = parseFloat(value) || 0;
-          }
-          
-          if (metricName && metricName.includes('last updated')) {
-            lastUpdated = value || new Date().toISOString();
-          }
-        }
-      }
+      const totalAUM = parseFloat(totalAUMValue.toString()) || 0;
+      const lastUpdated = lastUpdatedValue.toString();
       
       return {
         totalAUM,

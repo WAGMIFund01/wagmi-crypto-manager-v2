@@ -46,8 +46,12 @@ export default function UniversalNavbar({
   useEffect(() => {
     const fetchInitialTimestamp = async () => {
       try {
-        console.log('Fetching initial timestamp...');
-        const response = await fetch('/api/get-last-updated-timestamp');
+        console.log(`Fetching initial timestamp for ${dataSource}...`);
+        const timestampEndpoint = dataSource === 'personal-portfolio' 
+          ? '/api/get-personal-portfolio-timestamp' 
+          : '/api/get-last-updated-timestamp';
+          
+        const response = await fetch(timestampEndpoint);
         if (response.ok) {
           const data = await response.json();
           console.log('Initial timestamp response:', data);
@@ -80,7 +84,11 @@ export default function UniversalNavbar({
   // Function to fetch updated timestamp (can be called after updates)
   const fetchLastUpdatedTimestamp = async () => {
     try {
-      const response = await fetch('/api/get-last-updated-timestamp');
+      const timestampEndpoint = dataSource === 'personal-portfolio' 
+        ? '/api/get-personal-portfolio-timestamp' 
+        : '/api/get-last-updated-timestamp';
+        
+      const response = await fetch(timestampEndpoint);
       if (response.ok) {
         const data = await response.json();
         if (data.success && data.timestamp) {
@@ -95,9 +103,13 @@ export default function UniversalNavbar({
   const handleRetryKPI = async () => {
     setIsRetrying(true);
     try {
-      // Step 1: Update KPI timestamp
-      console.log('Updating KPI timestamp...');
-      const timestampUpdateResponse = await fetch('/api/update-kpi-timestamp', {
+      // Step 1: Update KPI timestamp based on dataSource
+      console.log(`Updating KPI timestamp for ${dataSource}...`);
+      const timestampEndpoint = dataSource === 'personal-portfolio' 
+        ? '/api/update-personal-portfolio-timestamp' 
+        : '/api/update-kpi-timestamp';
+        
+      const timestampUpdateResponse = await fetch(timestampEndpoint, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -105,7 +117,7 @@ export default function UniversalNavbar({
       });
       
       if (!timestampUpdateResponse.ok) {
-        throw new Error('Failed to update KPI timestamp');
+        throw new Error(`Failed to update ${dataSource} KPI timestamp`);
       }
       
       const timestampUpdateResult = await timestampUpdateResponse.json();
@@ -124,6 +136,7 @@ export default function UniversalNavbar({
         headers: {
           'Content-Type': 'application/json',
         },
+        body: JSON.stringify({ dataSource }), // Pass dataSource to the API
       });
       
       if (!priceUpdateResponse.ok) {

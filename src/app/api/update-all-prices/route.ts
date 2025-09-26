@@ -258,6 +258,36 @@ export async function POST(request: NextRequest) {
       });
       
       console.log('Batch update result:', batchUpdateResult.data);
+      
+      // Step 5.5: Update Personal Portfolio timestamp in KPIs tab if dataSource is personal-portfolio
+      if (dataSource === 'personal-portfolio') {
+        console.log('Updating Personal Portfolio timestamp in KPIs tab...');
+        try {
+          const now = new Date();
+          const year = now.getFullYear();
+          const month = String(now.getMonth() + 1).padStart(2, '0');
+          const day = String(now.getDate()).padStart(2, '0');
+          const hours = String(now.getHours()).padStart(2, '0');
+          const minutes = String(now.getMinutes()).padStart(2, '0');
+          const seconds = String(now.getSeconds()).padStart(2, '0');
+          
+          const timestamp = `${month}/${day}/${year}, ${hours}:${minutes}:${seconds}`;
+          
+          await sheets.spreadsheets.values.update({
+            spreadsheetId: sheetId,
+            range: 'KPIs!B9', // Last Updated - personal
+            valueInputOption: 'RAW',
+            requestBody: {
+              values: [[timestamp]]
+            }
+          });
+          
+          console.log('Personal Portfolio timestamp updated successfully:', timestamp);
+        } catch (timestampError) {
+          console.error('Failed to update Personal Portfolio timestamp:', timestampError);
+          // Continue even if timestamp update fails
+        }
+      }
     } else {
       console.log('No updates to execute - no valid price data found');
     }

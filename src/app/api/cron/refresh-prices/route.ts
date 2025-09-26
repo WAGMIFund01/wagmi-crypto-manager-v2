@@ -59,6 +59,36 @@ export async function GET() {
       // Continue with other steps even if timestamp fails
     }
     
+    // Step 1.5: Update Personal Portfolio timestamp (cell B9)
+    console.log('📝 Vercel Cron: Updating Personal Portfolio timestamp...');
+    try {
+      // Generate current timestamp (same as above)
+      const now = new Date();
+      const year = now.getFullYear();
+      const month = String(now.getMonth() + 1).padStart(2, '0');
+      const day = String(now.getDate()).padStart(2, '0');
+      const hours = String(now.getHours()).padStart(2, '0');
+      const minutes = String(now.getMinutes()).padStart(2, '0');
+      const seconds = String(now.getSeconds()).padStart(2, '0');
+      
+      const timestamp = `${month}/${day}/${year}, ${hours}:${minutes}:${seconds}`;
+      
+      // Update the Personal Portfolio timestamp (cell B9)
+      await sheets.spreadsheets.values.update({
+        spreadsheetId: sheetId,
+        range: 'KPIs!B9', // Last Updated - personal
+        valueInputOption: 'RAW',
+        requestBody: {
+          values: [[timestamp]]
+        }
+      });
+
+      console.log('✅ Personal Portfolio timestamp updated successfully');
+    } catch (personalTimestampError) {
+      console.error('❌ Failed to update Personal Portfolio timestamp:', personalTimestampError);
+      // Continue with other steps even if timestamp fails
+    }
+    
     // Step 2: Update prices from CoinGecko (inline implementation)
     console.log('💰 Vercel Cron: Updating prices from CoinGecko...');
     try {
