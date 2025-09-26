@@ -868,6 +868,7 @@ export class SheetsAdapter {
       }
 
       // Prepare the asset row for Personal portfolio
+      // Note: We skip Column I (Total Value) to preserve Google Sheets formula
       const assetRow = [
         assetData.assetName,           // A: Asset Name
         assetData.symbol,             // B: Symbol
@@ -877,7 +878,7 @@ export class SheetsAdapter {
         assetData.coinType,           // F: Coin Type
         assetData.quantity,           // G: Quantity
         assetData.currentPrice,       // H: Current Price
-        '',                          // I: Total Value (calculated by formula)
+        // I: Total Value - SKIPPED (preserve Google Sheets formula)
         new Date().toISOString(),     // J: Last Updated
         assetData.coinGeckoId || '',  // K: CoinGecko ID
         assetData.priceChange24h || 0, // L: 24hr Change
@@ -885,13 +886,32 @@ export class SheetsAdapter {
       ];
 
       // Add the asset to Personal portfolio sheet
+      // We need to insert values in two parts to skip Column I
+      // Part 1: Columns A-H (Asset Name through Current Price)
+      const part1Values = [assetRow.slice(0, 8)]; // First 8 columns
+      
+      // Part 2: Columns J-M (Last Price Update through Thesis)
+      const part2Values = [assetRow.slice(8)]; // Last 5 columns (skipping Column I)
+      
+      // Insert Part 1
       await this.sheets.spreadsheets.values.append({
         spreadsheetId: this.sheetId,
-        range: 'Personal portfolio!A:M',
+        range: 'Personal portfolio!A:H',
         valueInputOption: 'USER_ENTERED',
         insertDataOption: 'INSERT_ROWS',
         requestBody: {
-          values: [assetRow]
+          values: part1Values
+        }
+      });
+      
+      // Insert Part 2
+      await this.sheets.spreadsheets.values.append({
+        spreadsheetId: this.sheetId,
+        range: 'Personal portfolio!J:M',
+        valueInputOption: 'USER_ENTERED',
+        insertDataOption: 'INSERT_ROWS',
+        requestBody: {
+          values: part2Values
         }
       });
 
