@@ -8,72 +8,22 @@ export async function GET(request: NextRequest) {
   try {
     logger.info('Fetching personal portfolio KPI data', { requestId });
     
-    // Initialize Google Sheets connection
-    await sheetsAdapter.initializeServiceAccount();
-    
-    if (!sheetsAdapter.sheets) {
-      throw new Error('Sheets API not initialized');
-    }
-
-    // Get data from Personal portfolio sheet
-    const response = await sheetsAdapter.sheets.spreadsheets.values.get({
-      spreadsheetId: sheetsAdapter.sheetId,
-      range: 'Personal portfolio!A:M',
-    });
-
-    const rows = response.data.values || [];
-    
-    if (rows.length <= 1) {
-      logger.info('Personal portfolio KPI data fetched successfully', { 
-        requestId, 
-        totalAUM: 0 
-      });
-      return NextResponse.json({
-        success: true,
-        data: {
-          totalAUM: 0,
-          lastUpdated: new Date().toISOString()
-        }
-      });
-    }
-
-    // Calculate total AUM from the Total Value column (column I, index 8)
-    let totalAUM = 0;
-    let lastUpdated = new Date().toISOString();
-
-    for (let i = 1; i < rows.length; i++) {
-      const row = rows[i];
-      if (row && row.length > 8) {
-        const totalValue = parseFloat(row[8]) || 0;
-        totalAUM += totalValue;
-        
-        // Get the most recent price update timestamp
-        if (row[9] && row[9].trim()) {
-          const rowTimestamp = new Date(row[9]);
-          if (!isNaN(rowTimestamp.getTime()) && rowTimestamp > new Date(lastUpdated)) {
-            lastUpdated = row[9];
-          }
-        }
-      }
-    }
+    // Get Personal Portfolio KPI data using sheetsAdapter method
+    const kpiData = await sheetsAdapter.getPersonalPortfolioKpiData();
 
     logger.info('Personal portfolio KPI data fetched successfully', { 
       requestId, 
-      totalAUM 
+      totalAUM: kpiData.totalAUM 
     });
 
     return NextResponse.json({
       success: true,
-      data: {
-        totalAUM,
-        lastUpdated
-      }
+      data: kpiData
     });
 
   } catch (error) {
-    logger.error('Error fetching personal portfolio KPI data', { 
-      requestId, 
-      error: error instanceof Error ? error.message : 'Unknown error' 
+    logger.error('Error fetching personal portfolio KPI data', error instanceof Error ? error : new Error('Unknown error'), { 
+      requestId
     });
     
     return NextResponse.json({

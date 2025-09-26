@@ -16,6 +16,7 @@ export interface NewAssetData {
   location?: string;
   coinType?: string;
   thesis?: string;
+  dataSource?: 'wagmi-fund' | 'personal-portfolio';
 }
 
 export interface AssetManagementResult {
@@ -65,8 +66,25 @@ export class AssetManagementService {
         assetData.thesis || ''            // Column M: Thesis
       ];
 
-      // Add the asset to the portfolio using SheetsAdapter
-      await sheetsAdapter.addPortfolioAsset(assetRow);
+      // Add the asset to the appropriate portfolio using SheetsAdapter
+      if (assetData.dataSource === 'personal-portfolio') {
+        await sheetsAdapter.addPersonalAsset({
+          assetName: assetData.name,
+          symbol: assetData.symbol,
+          chain: assetData.chain || '',
+          riskLevel: assetData.riskLevel || 'Medium',
+          location: assetData.location || '',
+          coinType: assetData.coinType || 'Altcoin',
+          quantity: assetData.quantity,
+          currentPrice: assetData.currentPrice,
+          coinGeckoId: assetData.coinGeckoId,
+          priceChange24h: 0, // Assuming 0 initially, will be updated by price service
+          thesis: assetData.thesis || ''
+        });
+      } else {
+        // Default to WAGMI Fund
+        await sheetsAdapter.addPortfolioAsset(assetRow);
+      }
 
       return {
         success: true,
@@ -86,7 +104,7 @@ export class AssetManagementService {
   /**
    * Remove an asset from the portfolio
    */
-  async removeAsset(symbol: string): Promise<AssetManagementResult> {
+  async removeAsset(symbol: string, dataSource?: 'wagmi-fund' | 'personal-portfolio'): Promise<AssetManagementResult> {
     try {
       if (!symbol || symbol.trim().length === 0) {
         return {
@@ -96,8 +114,13 @@ export class AssetManagementService {
         };
       }
 
-      // Remove the asset using SheetsAdapter
-      await sheetsAdapter.removePortfolioAsset(symbol.toUpperCase());
+      // Remove the asset using the appropriate SheetsAdapter method
+      if (dataSource === 'personal-portfolio') {
+        await sheetsAdapter.removePersonalAsset(symbol.toUpperCase());
+      } else {
+        // Default to WAGMI Fund
+        await sheetsAdapter.removePortfolioAsset(symbol.toUpperCase());
+      }
 
       return {
         success: true,

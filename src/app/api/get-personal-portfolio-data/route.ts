@@ -8,59 +8,8 @@ export async function GET(request: NextRequest) {
   try {
     logger.info('Fetching personal portfolio data', { requestId });
     
-    // Initialize Google Sheets connection
-    await sheetsAdapter.initializeServiceAccount();
-    
-    if (!sheetsAdapter.sheets) {
-      throw new Error('Sheets API not initialized');
-    }
-
-    // Get data from Personal portfolio sheet
-    const response = await sheetsAdapter.sheets.spreadsheets.values.get({
-      spreadsheetId: sheetsAdapter.sheetId,
-      range: 'Personal portfolio!A:M',
-    });
-
-    const rows = response.data.values || [];
-    
-    if (rows.length <= 1) {
-      logger.info('Personal portfolio data fetched successfully', { 
-        requestId, 
-        assetCount: 0 
-      });
-      return NextResponse.json({
-        success: true,
-        assets: []
-      });
-    }
-
-    // Process the data (skip header row)
-    const assets = rows.slice(1).map((row: any[], index: number) => {
-      try {
-        return {
-          assetName: row[0] || '',
-          symbol: row[1] || '',
-          chain: row[2] || '',
-          riskLevel: row[3] || '',
-          location: row[4] || '',
-          coinType: row[5] || '',
-          quantity: parseFloat(row[6]) || 0,
-          currentPrice: parseFloat(row[7]) || 0,
-          totalValue: parseFloat(row[8]) || 0,
-          lastPriceUpdate: row[9] || '',
-          coinGeckoId: row[10] || '',
-          priceChange24h: parseFloat(row[11]) || 0,
-          thesis: row[12] || ''
-        };
-      } catch (error) {
-        logger.error('Error processing personal portfolio asset row', { 
-          requestId, 
-          rowIndex: index + 1, 
-          error: error instanceof Error ? error.message : 'Unknown error' 
-        });
-        return null;
-      }
-    }).filter(asset => asset !== null);
+    // Get Personal Portfolio data using sheetsAdapter method
+    const assets = await sheetsAdapter.getPersonalPortfolioData();
 
     logger.info('Personal portfolio data fetched successfully', { 
       requestId, 
@@ -73,9 +22,8 @@ export async function GET(request: NextRequest) {
     });
 
   } catch (error) {
-    logger.error('Error fetching personal portfolio data', { 
-      requestId, 
-      error: error instanceof Error ? error.message : 'Unknown error' 
+    logger.error('Error fetching personal portfolio data', error instanceof Error ? error : new Error('Unknown error'), { 
+      requestId
     });
     
     return NextResponse.json({

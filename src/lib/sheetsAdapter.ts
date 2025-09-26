@@ -890,7 +890,7 @@ export class SheetsAdapter {
         range: 'Personal portfolio!A:M',
         valueInputOption: 'USER_ENTERED',
         insertDataOption: 'INSERT_ROWS',
-        body: {
+        requestBody: {
           values: [assetRow]
         }
       });
@@ -1127,6 +1127,123 @@ export class SheetsAdapter {
         success: false,
         error: `Failed to remove asset from Personal portfolio: ${error instanceof Error ? error.message : 'Unknown error'}`
       };
+    }
+  }
+
+  /**
+   * Get Personal Portfolio data
+   */
+  async getPersonalPortfolioData(): Promise<PortfolioAsset[]> {
+    try {
+      if (!this.isServiceAccountInitialized) {
+        await this.initializeServiceAccount();
+      }
+
+      if (!this.sheets) {
+        throw new Error('Google Sheets API client not initialized');
+      }
+
+      const response = await this.sheets.spreadsheets.values.get({
+        spreadsheetId: this.sheetId,
+        range: 'Personal portfolio!A:M',
+      });
+
+      const rows = response.data.values || [];
+      
+      if (rows.length <= 1) {
+        return [];
+      }
+
+      const assets: PortfolioAsset[] = [];
+      
+      for (let i = 1; i < rows.length; i++) {
+        const row = rows[i];
+        if (!row || row.length === 0) continue;
+        
+        const asset: PortfolioAsset = {
+          assetName: row[0]?.toString() || '',
+          symbol: row[1]?.toString() || '',
+          chain: row[2]?.toString() || '',
+          riskLevel: row[3]?.toString() || 'Medium',
+          location: row[4]?.toString() || '',
+          coinType: row[5]?.toString() || 'Altcoin',
+          quantity: parseFloat(row[6]?.toString()) || 0,
+          currentPrice: parseFloat(row[7]?.toString()) || 0,
+          totalValue: parseFloat(row[8]?.toString()) || 0,
+          lastPriceUpdate: row[9]?.toString() || '',
+          coinGeckoId: row[10]?.toString() || '',
+          priceChange24h: parseFloat(row[11]?.toString()) || 0,
+          thesis: row[12]?.toString() || ''
+        };
+        
+        if (asset.symbol && asset.quantity > 0) {
+          assets.push(asset);
+        }
+      }
+      
+      return assets;
+    } catch (error) {
+      console.error('Error fetching Personal Portfolio data:', error);
+      throw error;
+    }
+  }
+
+  /**
+   * Get Personal Portfolio KPI data
+   */
+  async getPersonalPortfolioKpiData(): Promise<{
+    totalAUM: number;
+    lastUpdated: string;
+  }> {
+    try {
+      if (!this.isServiceAccountInitialized) {
+        await this.initializeServiceAccount();
+      }
+
+      if (!this.sheets) {
+        throw new Error('Google Sheets API client not initialized');
+      }
+
+      const response = await this.sheets.spreadsheets.values.get({
+        spreadsheetId: this.sheetId,
+        range: 'Personal portfolio!A:M',
+      });
+
+      const rows = response.data.values || [];
+      
+      if (rows.length <= 1) {
+        return {
+          totalAUM: 0,
+          lastUpdated: new Date().toISOString()
+        };
+      }
+
+      let totalAUM = 0;
+      let lastUpdated = new Date().toISOString();
+      
+      for (let i = 1; i < rows.length; i++) {
+        const row = rows[i];
+        if (!row || row.length === 0) continue;
+        
+        const totalValue = parseFloat(row[8]?.toString()) || 0;
+        const rowLastUpdated = row[9]?.toString();
+        
+        if (totalValue > 0) {
+          totalAUM += totalValue;
+        }
+        
+        if (rowLastUpdated && rowLastUpdated > lastUpdated) {
+          lastUpdated = rowLastUpdated;
+        }
+      }
+      
+      return {
+        totalAUM,
+        lastUpdated
+      };
+    } catch (error) {
+      console.error('Error fetching Personal Portfolio KPI data:', error);
+      throw error;
     }
   }
 }
