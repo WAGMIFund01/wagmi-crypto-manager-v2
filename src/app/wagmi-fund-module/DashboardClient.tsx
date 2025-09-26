@@ -49,9 +49,6 @@ export default function DashboardClient({ session, kpiData: initialKpiData, hasE
     }
   }, [searchParams]);
 
-  // Determine data source based on URL parameters or pathname
-  const dataSource = searchParams.get('dataSource') === 'personal-portfolio' ? 'personal-portfolio' : 'wagmi-fund';
-
   useEffect(() => {
     // Check for dev mode session
     const devSessionData = sessionStorage.getItem('devSession');
