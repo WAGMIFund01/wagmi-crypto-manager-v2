@@ -40,7 +40,7 @@ export default function UniversalNavbar({
     setIsClient(true);
   }, []);
 
-  // Fetch the initial timestamp when component mounts
+  // Fetch the initial timestamp when component mounts and set up auto-polling
   useEffect(() => {
     const fetchInitialTimestamp = async () => {
       try {
@@ -59,7 +59,19 @@ export default function UniversalNavbar({
       }
     };
 
+    // Fetch initial timestamp
     fetchInitialTimestamp();
+
+    // Set up automatic polling every minute (60000ms)
+    const interval = setInterval(() => {
+      console.log('🔄 Auto-updating timestamp...');
+      fetchInitialTimestamp();
+    }, 60000); // Update every minute
+
+    // Cleanup interval on component unmount
+    return () => {
+      clearInterval(interval);
+    };
   }, []);
 
 
