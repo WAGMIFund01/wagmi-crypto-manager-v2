@@ -18,14 +18,29 @@ export default async function PersonalPortfolioPage() {
       cache: 'no-store' // Ensure fresh data
     });
     
+    console.log('Personal Portfolio KPI fetch response status:', response.status);
+    
     if (response.ok) {
       const data = await response.json();
+      console.log('Personal Portfolio KPI data received:', data);
+      
       if (data.success) {
         kpiData = {
+          // Personal Portfolio only shows AUM, other fields are undefined for conditional rendering
+          activeInvestors: undefined, // Will be hidden by UniversalNavbar
           totalAUM: `$${data.data.totalAUM.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`,
+          cumulativeReturn: undefined, // Will be hidden by UniversalNavbar
+          monthOnMonth: undefined, // Will be hidden by UniversalNavbar
           lastUpdated: data.data.lastUpdated
         };
+        console.log('Personal Portfolio KPI data formatted:', kpiData);
+      } else {
+        console.error('Personal Portfolio KPI API returned success: false');
+        hasError = true;
       }
+    } else {
+      console.error('Personal Portfolio KPI API response not ok:', response.status);
+      hasError = true;
     }
   } catch (error) {
     console.error('Error fetching personal portfolio KPI data:', error);
