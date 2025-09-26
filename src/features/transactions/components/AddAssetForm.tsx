@@ -312,22 +312,24 @@ export default function AddAssetForm({ isOpen, onClose, onAssetAdded, selectedAs
           </div>
         </div>
 
-        {/* Thesis */}
-        <div>
-          <label className="block text-sm font-medium text-gray-300 mb-2">
-            Investment Thesis
-          </label>
-          <textarea
-            placeholder="Describe the investment rationale..."
-            value={formData.thesis}
-            onChange={(e) => setFieldValue('thesis', e.target.value)}
-            rows={3}
-            className="w-full px-3 py-2 bg-gray-800 border border-gray-600 rounded-lg text-white focus:outline-none focus:border-green-500 resize-none"
-          />
-          {errors.thesis && (
-            <div className="mt-1 text-sm text-red-400">{errors.thesis}</div>
-          )}
-        </div>
+        {/* Thesis - Only show for WAGMI Fund */}
+        {dataSource === 'wagmi-fund' && (
+          <div>
+            <label className="block text-sm font-medium text-gray-300 mb-2">
+              Investment Thesis
+            </label>
+            <textarea
+              placeholder="Describe the investment rationale..."
+              value={formData.thesis}
+              onChange={(e) => setFieldValue('thesis', e.target.value)}
+              rows={3}
+              className="w-full px-3 py-2 bg-gray-800 border border-gray-600 rounded-lg text-white focus:outline-none focus:border-green-500 resize-none"
+            />
+            {errors.thesis && (
+              <div className="mt-1 text-sm text-red-400">{errors.thesis}</div>
+            )}
+          </div>
+        )}
 
         {/* Error Display */}
         {submitError && (

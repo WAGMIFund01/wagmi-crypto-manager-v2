@@ -21,9 +21,10 @@ interface EditAssetFormProps {
     originalAsset: PortfolioAsset;
   }) => Promise<void>;
   onClose: () => void;
+  dataSource?: 'wagmi-fund' | 'personal-portfolio';
 }
 
-export default function EditAssetForm({ isOpen, asset, onSave, onClose }: EditAssetFormProps) {
+export default function EditAssetForm({ isOpen, asset, onSave, onClose, dataSource = 'wagmi-fund' }: EditAssetFormProps) {
   const [formData, setFormData] = useState({
     symbol: asset.symbol,
     quantity: asset.quantity.toString(),
@@ -151,20 +152,22 @@ export default function EditAssetForm({ isOpen, asset, onSave, onClose }: EditAs
               />
             </div>
 
-            {/* Thesis */}
-            <div>
-              <label className="block text-sm font-medium text-gray-300 mb-2">
-                Investment Thesis
-              </label>
-              <textarea
-                value={formData.thesis}
-                onChange={(e) => handleInputChange('thesis', e.target.value)}
-                placeholder="Enter your investment thesis for this asset..."
-                className="w-full px-3 py-2 bg-gray-800 border border-gray-600 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent disabled:opacity-50 resize-none"
-                rows={3}
-                disabled={isSubmitting}
-              />
-            </div>
+            {/* Thesis - Only show for WAGMI Fund */}
+            {dataSource === 'wagmi-fund' && (
+              <div>
+                <label className="block text-sm font-medium text-gray-300 mb-2">
+                  Investment Thesis
+                </label>
+                <textarea
+                  value={formData.thesis}
+                  onChange={(e) => handleInputChange('thesis', e.target.value)}
+                  placeholder="Enter your investment thesis for this asset..."
+                  className="w-full px-3 py-2 bg-gray-800 border border-gray-600 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent disabled:opacity-50 resize-none"
+                  rows={3}
+                  disabled={isSubmitting}
+                />
+              </div>
+            )}
 
             {/* Current Info Display */}
             <div className="bg-gray-800/50 rounded-lg p-4 space-y-2">

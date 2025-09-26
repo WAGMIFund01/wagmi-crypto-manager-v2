@@ -654,6 +654,7 @@ export default function PortfolioOverview({ className, onRefresh, isPrivacyMode 
             setEditingAsset(null);
             setShowEditForm(false);
           }}
+          dataSource={dataSource}
         />
       )}
     </div>
