@@ -126,6 +126,7 @@ export default function AddAssetForm({ isOpen, onClose, onAssetAdded, selectedAs
         name: assetToUse.name,
         quantity: parseFloat(formData.quantity),
         currentPrice: assetToUse.current_price || 0,
+        priceChange24h: assetToUse.price_change_percentage_24h || 0,
         chain: formData.chain.trim(),
         riskLevel: formData.riskLevel,
         location: formData.location.trim(),

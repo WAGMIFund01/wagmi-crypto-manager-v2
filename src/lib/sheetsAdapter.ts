@@ -922,7 +922,7 @@ export class SheetsAdapter {
         '',                       // I: # Total Value (leave empty for Google Sheets formula)
         new Date().toISOString(), // J: Last Price Update
         assetData.coinGeckoId,    // K: CoinGecko ID
-        0,                        // L: 24hr price change
+        assetData.priceChange24h || 0, // L: 24hr price change
         assetData.thesis || ''    // M: Thesis (if it exists, otherwise empty)
       ];
 
@@ -1026,33 +1026,39 @@ export class SheetsAdapter {
 
       // Update the asset data - only update the fields that can be edited
       // G: Quantity, D: Risk Level, E: Location, F: Coin Type, M: Thesis
-      const updateResponse = await this.sheets.spreadsheets.values.batchUpdate({
+      await this.sheets.spreadsheets.values.update({
         spreadsheetId: this.sheetId,
-        requestBody: {
-          valueInputOption: 'USER_ENTERED',
-          data: [
-            {
-              range: `Personal portfolio!G${rowIndexToEdit}:G${rowIndexToEdit}`,
-              values: [[editData.quantity]]
-            },
-            {
-              range: `Personal portfolio!D${rowIndexToEdit}:D${rowIndexToEdit}`,
-              values: [[editData.riskLevel]]
-            },
-            {
-              range: `Personal portfolio!E${rowIndexToEdit}:E${rowIndexToEdit}`,
-              values: [[editData.location]]
-            },
-            {
-              range: `Personal portfolio!F${rowIndexToEdit}:F${rowIndexToEdit}`,
-              values: [[editData.coinType]]
-            },
-            {
-              range: `Personal portfolio!M${rowIndexToEdit}:M${rowIndexToEdit}`,
-              values: [[editData.thesis || '']]
-            }
-          ]
-        }
+        range: `Personal portfolio!G${rowIndexToEdit}:G${rowIndexToEdit}`,
+        valueInputOption: 'USER_ENTERED',
+        requestBody: { values: [[editData.quantity]] }
+      });
+
+      await this.sheets.spreadsheets.values.update({
+        spreadsheetId: this.sheetId,
+        range: `Personal portfolio!D${rowIndexToEdit}:D${rowIndexToEdit}`,
+        valueInputOption: 'USER_ENTERED',
+        requestBody: { values: [[editData.riskLevel]] }
+      });
+
+      await this.sheets.spreadsheets.values.update({
+        spreadsheetId: this.sheetId,
+        range: `Personal portfolio!E${rowIndexToEdit}:E${rowIndexToEdit}`,
+        valueInputOption: 'USER_ENTERED',
+        requestBody: { values: [[editData.location]] }
+      });
+
+      await this.sheets.spreadsheets.values.update({
+        spreadsheetId: this.sheetId,
+        range: `Personal portfolio!F${rowIndexToEdit}:F${rowIndexToEdit}`,
+        valueInputOption: 'USER_ENTERED',
+        requestBody: { values: [[editData.coinType]] }
+      });
+
+      const updateResponse = await this.sheets.spreadsheets.values.update({
+        spreadsheetId: this.sheetId,
+        range: `Personal portfolio!M${rowIndexToEdit}:M${rowIndexToEdit}`,
+        valueInputOption: 'USER_ENTERED',
+        requestBody: { values: [[editData.thesis || '']] }
       });
 
       console.log('Personal asset updated successfully:', updateResponse.data);
@@ -1107,6 +1113,21 @@ export class SheetsAdapter {
         throw new Error(`Asset with symbol ${symbol} not found in personal portfolio`);
       }
 
+      // Get the actual sheet ID for Personal portfolio
+      const sheetMetadata = await this.sheets.spreadsheets.get({
+        spreadsheetId: this.sheetId
+      });
+      
+      const personalPortfolioSheet = sheetMetadata.data.sheets?.find(sheet => 
+        sheet.properties?.title === 'Personal portfolio'
+      );
+      
+      if (!personalPortfolioSheet || !personalPortfolioSheet.properties?.sheetId) {
+        throw new Error('Personal portfolio sheet not found or missing sheet ID');
+      }
+      
+      const actualSheetId = personalPortfolioSheet.properties.sheetId;
+
       // Delete the row
       const deleteResponse = await this.sheets.spreadsheets.batchUpdate({
         spreadsheetId: this.sheetId,
@@ -1114,7 +1135,7 @@ export class SheetsAdapter {
           requests: [{
             deleteDimension: {
               range: {
-                sheetId: 0, // Assuming Personal portfolio is the first sheet
+                sheetId: actualSheetId,
                 dimension: 'ROWS',
                 startIndex: rowIndexToRemove - 1,
                 endIndex: rowIndexToRemove

@@ -5,7 +5,7 @@ export async function POST(request: Request) {
   try {
     const body = await request.json();
     console.log('Received personal asset request body:', body);
-    const { coinGeckoId, symbol, name, quantity, currentPrice, chain, riskLevel, location, coinType, thesis } = body;
+    const { coinGeckoId, symbol, name, quantity, currentPrice, priceChange24h, chain, riskLevel, location, coinType, thesis } = body;
 
     // Validate required fields
     if (!coinGeckoId || !symbol || !name || !quantity || !currentPrice) {
@@ -32,6 +32,7 @@ export async function POST(request: Request) {
       name: name.trim(),
       quantity: parseFloat(quantity),
       currentPrice: parseFloat(currentPrice),
+      priceChange24h: parseFloat(priceChange24h) || 0,
       chain: chain?.trim() || 'Unknown',
       riskLevel: riskLevel || 'Medium',
       location: location?.trim() || 'Unknown',
