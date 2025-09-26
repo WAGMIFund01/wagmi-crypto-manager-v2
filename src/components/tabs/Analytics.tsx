@@ -60,8 +60,12 @@ export default function Analytics({ onRefresh, dataSource = 'wagmi-fund' }: Anal
       setError(null);
       
       // Fetch both portfolio data and performance data in parallel
+      const apiEndpoint = dataSource === 'personal-portfolio' 
+        ? '/api/get-personal-portfolio-data' 
+        : '/api/get-portfolio-data';
+      
       const [portfolioResponse, perfData] = await Promise.all([
-        fetch('/api/get-portfolio-data'),
+        fetch(apiEndpoint),
         fetchPerformanceData()
       ]);
       

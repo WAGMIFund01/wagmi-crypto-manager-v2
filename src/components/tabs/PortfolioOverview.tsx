@@ -46,7 +46,13 @@ export default function PortfolioOverview({ className, onRefresh, isPrivacyMode 
       console.log('🔄 Fetching portfolio data...');
       setLoading(true);
       setError(null);
-      const response = await fetch('/api/get-portfolio-data');
+      
+      // Use the correct API endpoint based on dataSource
+      const apiEndpoint = dataSource === 'personal-portfolio' 
+        ? '/api/get-personal-portfolio-data' 
+        : '/api/get-portfolio-data';
+      
+      const response = await fetch(apiEndpoint);
       const data = await response.json();
 
       console.log('📊 Portfolio data response:', {
