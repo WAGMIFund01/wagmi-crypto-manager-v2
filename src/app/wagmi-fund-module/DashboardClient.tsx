@@ -42,6 +42,19 @@ export default function DashboardClient({ session, kpiData: initialKpiData, hasE
   const [isPrivacyMode, setIsPrivacyMode] = useState(false);
   const [kpiData, setKpiData] = useState(initialKpiData);
 
+  // Debug logging
+  console.log('DashboardClient - initialKpiData:', initialKpiData);
+  console.log('DashboardClient - kpiData state:', kpiData);
+  console.log('DashboardClient - dataSource:', dataSource);
+
+  // Ensure kpiData is set correctly on mount
+  useEffect(() => {
+    if (initialKpiData && !kpiData) {
+      console.log('Setting kpiData from initialKpiData:', initialKpiData);
+      setKpiData(initialKpiData);
+    }
+  }, [initialKpiData, kpiData]);
+
   // Data source is now passed as a prop from the parent component
 
   // Initialize active tab from URL parameters
