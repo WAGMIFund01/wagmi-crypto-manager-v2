@@ -926,10 +926,24 @@ export class SheetsAdapter {
         assetData.thesis || ''    // M: Thesis (if it exists, otherwise empty)
       ];
 
-      // Append the new row to the Personal portfolio sheet
-      const response = await this.sheets.spreadsheets.values.append({
+      // First, find the last row with data to determine where to insert
+      const lastRowResponse = await this.sheets.spreadsheets.values.get({
         spreadsheetId: this.sheetId,
-        range: 'Personal portfolio!A:Z',
+        range: 'Personal portfolio!A:A', // Just check column A to find last row
+      });
+
+      const lastRow = lastRowResponse.data.values?.length || 1;
+      const insertRow = lastRow + 1;
+      
+      console.log(`Last row with data: ${lastRow}, inserting at row: ${insertRow}`);
+
+      // Insert the new row at the specific position starting from column A
+      const range = `Personal portfolio!A${insertRow}:M${insertRow}`;
+      console.log(`Inserting at range: ${range}`);
+      
+      const response = await this.sheets.spreadsheets.values.update({
+        spreadsheetId: this.sheetId,
+        range: range,
         valueInputOption: 'USER_ENTERED',
         requestBody: {
           values: [rowData]
