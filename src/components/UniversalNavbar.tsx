@@ -12,14 +12,15 @@ interface UniversalNavbarProps {
   onTabChange: (tabId: string) => void;
   onPrivacyModeChange?: (isPrivacyMode: boolean) => void;
   kpiData?: {
-    activeInvestors: string;
+    activeInvestors?: string;
     totalAUM: string;
-    cumulativeReturn: string;
-    monthOnMonth: string;
+    cumulativeReturn?: string;
+    monthOnMonth?: string;
     lastUpdated: string;
   } | null;
   hasError?: boolean;
   onKpiRefresh?: () => Promise<void>;
+  dataSource?: 'wagmi-fund' | 'personal-portfolio';
 }
 
 export default function UniversalNavbar({ 
@@ -28,7 +29,8 @@ export default function UniversalNavbar({
   onPrivacyModeChange,
   kpiData = null, 
   hasError = false,
-  onKpiRefresh
+  onKpiRefresh,
+  dataSource = 'wagmi-fund'
 }: UniversalNavbarProps) {
   const router = useRouter();
   const [isPrivacyMode, setIsPrivacyMode] = useState(false);
@@ -381,30 +383,34 @@ export default function UniversalNavbar({
                     {formattedKpiData.totalAUM}
                   </div>
                 </div>
-                <div className="text-center">
-                  <div style={{ color: '#A0A0A0', fontSize: '10px' }}>Return</div>
-                  <div 
-                    style={{ 
-                      color: formattedKpiData.cumulativeReturn.startsWith('+') ? '#00FF95' : '#FF6B6B', 
-                      fontSize: '14px', 
-                      fontWeight: '600' 
-                    }}
-                  >
-                    {formattedKpiData.cumulativeReturn}
+                {formattedKpiData.cumulativeReturn && (
+                  <div className="text-center">
+                    <div style={{ color: '#A0A0A0', fontSize: '10px' }}>Return</div>
+                    <div 
+                      style={{ 
+                        color: formattedKpiData.cumulativeReturn.startsWith('+') ? '#00FF95' : '#FF6B6B', 
+                        fontSize: '14px', 
+                        fontWeight: '600' 
+                      }}
+                    >
+                      {formattedKpiData.cumulativeReturn}
+                    </div>
                   </div>
-                </div>
-                <div className="text-center">
-                  <div style={{ color: '#A0A0A0', fontSize: '10px' }}>MoM</div>
-                  <div 
-                    style={{ 
-                      color: formattedKpiData.monthOnMonth.startsWith('+') ? '#00FF95' : '#FF6B6B', 
-                      fontSize: '14px', 
-                      fontWeight: '600' 
-                    }}
-                  >
-                    {formattedKpiData.monthOnMonth}
+                )}
+                {formattedKpiData.monthOnMonth && (
+                  <div className="text-center">
+                    <div style={{ color: '#A0A0A0', fontSize: '10px' }}>MoM</div>
+                    <div 
+                      style={{ 
+                        color: formattedKpiData.monthOnMonth.startsWith('+') ? '#00FF95' : '#FF6B6B', 
+                        fontSize: '14px', 
+                        fontWeight: '600' 
+                      }}
+                    >
+                      {formattedKpiData.monthOnMonth}
+                    </div>
                   </div>
-                </div>
+                )}
               </div>
             ) : (
               <div style={{ color: '#A0A0A0', fontSize: '12px' }}>Loading KPI data...</div>

@@ -21,10 +21,10 @@ interface Session {
 interface DashboardClientProps {
   session: Session | null;
   kpiData: {
-    activeInvestors: string;
+    activeInvestors?: string;
     totalAUM: string;
-    cumulativeReturn: string;
-    monthOnMonth: string;
+    cumulativeReturn?: string;
+    monthOnMonth?: string;
     lastUpdated: string;
   } | null;
   hasError: boolean;
@@ -40,6 +40,9 @@ export default function DashboardClient({ session, kpiData: initialKpiData, hasE
   const [isCheckingAuth, setIsCheckingAuth] = useState(true);
   const [isPrivacyMode, setIsPrivacyMode] = useState(false);
   const [kpiData, setKpiData] = useState(initialKpiData);
+
+  // Detect data source based on current pathname
+  const dataSource = pathname.includes('/personal-portfolio') ? 'personal-portfolio' : 'wagmi-fund';
 
   // Initialize active tab from URL parameters
   useEffect(() => {
@@ -114,8 +117,15 @@ export default function DashboardClient({ session, kpiData: initialKpiData, hasE
   // Handle comprehensive data refresh
   const handleKpiRefresh = async () => {
     try {
-      // Fetch fresh KPI data from the API with force refresh to bypass caching
-      const response = await fetch('/api/kpi-data?force=true', {
+      // Determine API endpoint based on data source
+      const apiEndpoint = dataSource === 'personal-portfolio' 
+        ? '/api/get-personal-portfolio-kpi' 
+        : '/api/kpi-data?force=true';
+      
+      console.log(`🔄 Refreshing KPI data for ${dataSource} from ${apiEndpoint}`);
+      
+      // Fetch fresh KPI data from the appropriate API
+      const response = await fetch(apiEndpoint, {
         method: 'GET',
         headers: {
           'Content-Type': 'application/json',
@@ -130,22 +140,33 @@ export default function DashboardClient({ session, kpiData: initialKpiData, hasE
         console.log('🔍 DEBUG - Fresh KPI data received:', freshKpiData);
         console.log('🔍 DEBUG - lastUpdated from API:', freshKpiData.lastUpdated);
         
-        // Transform the data to match the expected format
-        const transformedKpiData = {
-          activeInvestors: freshKpiData.totalInvestors.toString(),
-          totalAUM: `$${freshKpiData.totalAUM.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`,
-          cumulativeReturn: `${freshKpiData.cumulativeReturn >= 0 ? '+' : ''}${freshKpiData.cumulativeReturn.toFixed(1)}%`,
-          monthOnMonth: `${freshKpiData.monthlyReturn >= 0 ? '+' : ''}${freshKpiData.monthlyReturn.toFixed(1)}%`,
-          lastUpdated: freshKpiData.lastUpdated
-        };
+        // Transform the data based on data source
+        let transformedKpiData;
+        
+        if (dataSource === 'personal-portfolio') {
+          // Personal Portfolio: Only show AUM and lastUpdated
+          transformedKpiData = {
+            totalAUM: `$${freshKpiData.totalAUM.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`,
+            lastUpdated: freshKpiData.lastUpdated
+          };
+        } else {
+          // WAGMI Fund: Show all KPIs
+          transformedKpiData = {
+            activeInvestors: freshKpiData.totalInvestors.toString(),
+            totalAUM: `$${freshKpiData.totalAUM.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`,
+            cumulativeReturn: `${freshKpiData.cumulativeReturn >= 0 ? '+' : ''}${freshKpiData.cumulativeReturn.toFixed(1)}%`,
+            monthOnMonth: `${freshKpiData.monthlyReturn >= 0 ? '+' : ''}${freshKpiData.monthlyReturn.toFixed(1)}%`,
+            lastUpdated: freshKpiData.lastUpdated
+          };
+        }
         
         console.log('🔍 DEBUG - Transformed KPI data:', transformedKpiData);
         setKpiData(transformedKpiData);
-        console.log('KPI data refreshed successfully');
+        console.log(`KPI data refreshed successfully for ${dataSource}`);
         
         // Don't trigger portfolio refresh here to avoid infinite loop
       } else {
-        console.error('Failed to fetch fresh KPI data');
+        console.error(`Failed to fetch fresh KPI data from ${apiEndpoint}`);
       }
     } catch (error) {
       console.error('Error refreshing KPI data:', error);
@@ -175,13 +196,13 @@ export default function DashboardClient({ session, kpiData: initialKpiData, hasE
   const renderTabContent = () => {
     switch (activeTab) {
       case 'portfolio':
-        return <PortfolioOverview onRefresh={triggerDataRefresh} isPrivacyMode={isPrivacyMode} />;
+        return <PortfolioOverview onRefresh={triggerDataRefresh} isPrivacyMode={isPrivacyMode} dataSource={dataSource} />;
       case 'analytics':
-        return <Analytics onRefresh={triggerDataRefresh} />;
+        return <Analytics onRefresh={triggerDataRefresh} dataSource={dataSource} />;
       case 'investors':
-        return <Investors isPrivacyMode={isPrivacyMode} onRefresh={triggerDataRefresh} />;
+        return <Investors isPrivacyMode={isPrivacyMode} onRefresh={triggerDataRefresh} dataSource={dataSource} />;
       default:
-        return <PortfolioOverview onRefresh={triggerDataRefresh} isPrivacyMode={isPrivacyMode} />;
+        return <PortfolioOverview onRefresh={triggerDataRefresh} isPrivacyMode={isPrivacyMode} dataSource={dataSource} />;
     }
   };
 
@@ -195,6 +216,7 @@ export default function DashboardClient({ session, kpiData: initialKpiData, hasE
         kpiData={kpiData}
         hasError={hasError}
         onKpiRefresh={handleKpiRefresh}
+        dataSource={dataSource}
       />
 
       {/* Main Content */}

@@ -34,9 +34,10 @@ interface AnalyticsData {
 
 interface AnalyticsProps {
   onRefresh?: () => void;
+  dataSource?: 'wagmi-fund' | 'personal-portfolio';
 }
 
-export default function Analytics({ onRefresh }: AnalyticsProps) {
+export default function Analytics({ onRefresh, dataSource = 'wagmi-fund' }: AnalyticsProps) {
   const [analyticsData, setAnalyticsData] = useState<AnalyticsData | null>(null);
   const [performanceData, setPerformanceData] = useState<PerformanceData[]>([]);
   const [loading, setLoading] = useState(true);

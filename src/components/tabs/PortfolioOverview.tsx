@@ -15,9 +15,10 @@ interface PortfolioOverviewProps {
   className?: string;
   onRefresh?: () => void;
   isPrivacyMode?: boolean;
+  dataSource?: 'wagmi-fund' | 'personal-portfolio';
 }
 
-export default function PortfolioOverview({ className, onRefresh, isPrivacyMode = false }: PortfolioOverviewProps) {
+export default function PortfolioOverview({ className, onRefresh, isPrivacyMode = false, dataSource = 'wagmi-fund' }: PortfolioOverviewProps) {
   const [assets, setAssets] = useState<PortfolioAsset[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
