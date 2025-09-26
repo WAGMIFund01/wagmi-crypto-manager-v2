@@ -886,30 +886,41 @@ export class SheetsAdapter {
       ];
 
       // Add the asset to Personal portfolio sheet
+      // First, find the last row with data to determine where to insert
+      const lastRowResponse = await this.sheets.spreadsheets.values.get({
+        spreadsheetId: this.sheetId,
+        range: 'Personal portfolio!A:A', // Just check column A to find last row
+      });
+
+      const lastRow = lastRowResponse.data.values?.length || 1;
+      const insertRow = lastRow + 1;
+      
+      console.log(`Last row with data: ${lastRow}, inserting at row: ${insertRow}`);
+
       // We need to insert values in two parts to skip Column I
       // Part 1: Columns A-H (Asset Name through Current Price)
+      const part1Range = `Personal portfolio!A${insertRow}:H${insertRow}`;
       const part1Values = [assetRow.slice(0, 8)]; // First 8 columns
       
       // Part 2: Columns J-M (Last Price Update through Thesis)
+      const part2Range = `Personal portfolio!J${insertRow}:M${insertRow}`;
       const part2Values = [assetRow.slice(8)]; // Last 5 columns (skipping Column I)
       
       // Insert Part 1
-      await this.sheets.spreadsheets.values.append({
+      await this.sheets.spreadsheets.values.update({
         spreadsheetId: this.sheetId,
-        range: 'Personal portfolio!A:H',
+        range: part1Range,
         valueInputOption: 'USER_ENTERED',
-        insertDataOption: 'INSERT_ROWS',
         requestBody: {
           values: part1Values
         }
       });
       
       // Insert Part 2
-      await this.sheets.spreadsheets.values.append({
+      await this.sheets.spreadsheets.values.update({
         spreadsheetId: this.sheetId,
-        range: 'Personal portfolio!J:M',
+        range: part2Range,
         valueInputOption: 'USER_ENTERED',
-        insertDataOption: 'INSERT_ROWS',
         requestBody: {
           values: part2Values
         }
