@@ -944,7 +944,7 @@ export class SheetsAdapter {
       
       // Part 2: Columns J-M (Last Price Update through Thesis)
       const part2Range = `Personal portfolio!J${insertRow}:M${insertRow}`;
-      const part2Values = [rowData.slice(8)]; // Last 5 columns (skipping Column I)
+      const part2Values = [rowData.slice(9, 13)]; // Exactly 4 elements for J-M columns
       
       console.log(`Inserting Part 1 at range: ${part1Range}`);
       console.log(`Inserting Part 2 at range: ${part2Range}`);
