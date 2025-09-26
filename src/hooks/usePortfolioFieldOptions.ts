@@ -47,10 +47,10 @@ export function usePortfolioFieldOptions(): UsePortfolioFieldOptionsReturn {
         ])
 
         setOptions({
-          chains: chainsData.success ? chainsData.options || [] : [],
-          riskLevels: riskLevelsData.success ? riskLevelsData.options || [] : [],
-          locations: locationsData.success ? locationsData.options || [] : [],
-          coinTypes: coinTypesData.success ? coinTypesData.options || [] : []
+          chains: chainsData.success ? chainsData.data?.chains || [] : [],
+          riskLevels: riskLevelsData.success ? riskLevelsData.data?.riskLevels || [] : [],
+          locations: locationsData.success ? locationsData.data?.locations || [] : [],
+          coinTypes: coinTypesData.success ? coinTypesData.data?.coinTypes || [] : []
         })
       } catch (err) {
         console.error('Error fetching field options:', err)
