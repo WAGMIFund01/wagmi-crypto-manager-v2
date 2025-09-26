@@ -14,9 +14,10 @@ interface AddAssetFormProps {
   onClose: () => void;
   onAssetAdded: () => void;
   selectedAsset?: AssetSearchResult | null;
+  dataSource?: 'wagmi-fund' | 'personal-portfolio';
 }
 
-export default function AddAssetForm({ isOpen, onClose, onAssetAdded, selectedAsset: propSelectedAsset }: AddAssetFormProps) {
+export default function AddAssetForm({ isOpen, onClose, onAssetAdded, selectedAsset: propSelectedAsset, dataSource = 'wagmi-fund' }: AddAssetFormProps) {
   const [selectedAsset, setSelectedAsset] = useState<AssetSearchResult | null>(propSelectedAsset || null);
   const [loading, setLoading] = useState(false);
   const [submitError, setSubmitError] = useState<string | null>(null);
@@ -129,7 +130,8 @@ export default function AddAssetForm({ isOpen, onClose, onAssetAdded, selectedAs
         riskLevel: formData.riskLevel,
         location: formData.location.trim(),
         coinType: formData.coinType,
-        thesis: formData.thesis.trim()
+        thesis: formData.thesis.trim(),
+        dataSource: dataSource
       };
       
       console.log('Sending request data:', requestData);

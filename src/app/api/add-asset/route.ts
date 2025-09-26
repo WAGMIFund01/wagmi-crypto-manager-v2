@@ -5,7 +5,7 @@ export async function POST(request: Request) {
   try {
     const body = await request.json();
     console.log('Received request body:', body);
-    const { coinGeckoId, symbol, name, quantity, currentPrice, chain, riskLevel, location, coinType, thesis } = body;
+    const { coinGeckoId, symbol, name, quantity, currentPrice, chain, riskLevel, location, coinType, thesis, dataSource } = body;
 
     // Validate required fields
     if (!coinGeckoId || !symbol || !name || !quantity || !currentPrice) {
@@ -51,7 +51,10 @@ export async function POST(request: Request) {
 
     // Add the asset
     console.log('Calling assetManagementService.addAsset with:', assetData);
-    const result = await assetManagementService.addAsset(assetData);
+    const result = await assetManagementService.addAsset({
+      ...assetData,
+      dataSource: dataSource || 'wagmi-fund' // Default to WAGMI Fund if not specified
+    });
     console.log('AssetManagementService result:', result);
 
     if (result.success) {

@@ -839,6 +839,296 @@ export class SheetsAdapter {
       };
     }
   }
+
+  /**
+   * Add a new asset to the Personal portfolio
+   */
+  async addPersonalAsset(assetData: {
+    assetName: string;
+    symbol: string;
+    chain: string;
+    riskLevel: string;
+    location: string;
+    coinType: string;
+    quantity: number;
+    currentPrice: number;
+    coinGeckoId?: string;
+    priceChange24h?: number;
+    thesis?: string;
+  }): Promise<{ success: boolean; data?: any; error?: string }> {
+    try {
+      console.log(`Adding asset ${assetData.symbol} to Personal portfolio...`);
+      
+      if (!this.isServiceAccountInitialized) {
+        await this.initializeServiceAccount();
+      }
+
+      if (!this.sheets) {
+        throw new Error('Google Sheets API client not initialized');
+      }
+
+      // Prepare the asset row for Personal portfolio
+      const assetRow = [
+        assetData.assetName,           // A: Asset Name
+        assetData.symbol,             // B: Symbol
+        assetData.chain,              // C: Chain
+        assetData.riskLevel,          // D: Risk Level
+        assetData.location,           // E: Location
+        assetData.coinType,           // F: Coin Type
+        assetData.quantity,           // G: Quantity
+        assetData.currentPrice,       // H: Current Price
+        '',                          // I: Total Value (calculated by formula)
+        new Date().toISOString(),     // J: Last Updated
+        assetData.coinGeckoId || '',  // K: CoinGecko ID
+        assetData.priceChange24h || 0, // L: 24hr Change
+        assetData.thesis || ''        // M: Thesis
+      ];
+
+      // Add the asset to Personal portfolio sheet
+      await this.sheets.spreadsheets.values.append({
+        spreadsheetId: this.sheetId,
+        range: 'Personal portfolio!A:M',
+        valueInputOption: 'USER_ENTERED',
+        insertDataOption: 'INSERT_ROWS',
+        body: {
+          values: [assetRow]
+        }
+      });
+
+      console.log(`Asset ${assetData.symbol} added to Personal portfolio successfully`);
+      return {
+        success: true,
+        data: {
+          symbol: assetData.symbol,
+          name: assetData.assetName,
+          quantity: assetData.quantity,
+          currentPrice: assetData.currentPrice
+        }
+      };
+
+    } catch (error) {
+      console.error('Error adding asset to Personal portfolio:', error);
+      return {
+        success: false,
+        error: `Failed to add asset to Personal portfolio: ${error instanceof Error ? error.message : 'Unknown error'}`
+      };
+    }
+  }
+
+  /**
+   * Edit an existing asset in the Personal portfolio
+   */
+  async editPersonalAsset(editData: {
+    symbol: string;
+    assetName?: string;
+    chain?: string;
+    riskLevel?: string;
+    location?: string;
+    coinType?: string;
+    quantity?: number;
+    currentPrice?: number;
+    priceChange24h?: number;
+    thesis?: string;
+  }): Promise<{ success: boolean; data?: any; error?: string }> {
+    try {
+      console.log(`Editing asset ${editData.symbol} in Personal portfolio...`);
+      
+      if (!this.isServiceAccountInitialized) {
+        await this.initializeServiceAccount();
+      }
+
+      if (!this.sheets) {
+        throw new Error('Google Sheets API client not initialized');
+      }
+
+      // Get the current Personal portfolio data
+      const response = await this.sheets.spreadsheets.values.get({
+        spreadsheetId: this.sheetId,
+        range: 'Personal portfolio!A:M'
+      });
+      
+      const rows = response.data.values || [];
+      
+      // Find the row index of the asset to edit
+      let rowIndexToEdit = -1;
+      for (let i = 1; i < rows.length; i++) {
+        const row = rows[i];
+        if (row && row.length > 1 && row[1]?.toString().toUpperCase() === editData.symbol.toUpperCase()) {
+          rowIndexToEdit = i;
+          break;
+        }
+      }
+
+      if (rowIndexToEdit === -1) {
+        return {
+          success: false,
+          error: `Asset ${editData.symbol} not found in Personal portfolio`
+        };
+      }
+
+      // Prepare updates for individual fields
+      const updates: { range: string; values: any[][] }[] = [];
+      const rowNum = rowIndexToEdit + 1; // Google Sheets is 1-indexed
+
+      if (editData.assetName !== undefined) {
+        updates.push({
+          range: `Personal portfolio!A${rowNum}`,
+          values: [[editData.assetName]]
+        });
+      }
+      if (editData.chain !== undefined) {
+        updates.push({
+          range: `Personal portfolio!C${rowNum}`,
+          values: [[editData.chain]]
+        });
+      }
+      if (editData.riskLevel !== undefined) {
+        updates.push({
+          range: `Personal portfolio!D${rowNum}`,
+          values: [[editData.riskLevel]]
+        });
+      }
+      if (editData.location !== undefined) {
+        updates.push({
+          range: `Personal portfolio!E${rowNum}`,
+          values: [[editData.location]]
+        });
+      }
+      if (editData.coinType !== undefined) {
+        updates.push({
+          range: `Personal portfolio!F${rowNum}`,
+          values: [[editData.coinType]]
+        });
+      }
+      if (editData.quantity !== undefined) {
+        updates.push({
+          range: `Personal portfolio!G${rowNum}`,
+          values: [[editData.quantity]]
+        });
+      }
+      if (editData.currentPrice !== undefined) {
+        updates.push({
+          range: `Personal portfolio!H${rowNum}`,
+          values: [[editData.currentPrice]]
+        });
+      }
+      if (editData.priceChange24h !== undefined) {
+        updates.push({
+          range: `Personal portfolio!L${rowNum}`,
+          values: [[editData.priceChange24h]]
+        });
+      }
+      if (editData.thesis !== undefined) {
+        updates.push({
+          range: `Personal portfolio!M${rowNum}`,
+          values: [[editData.thesis]]
+        });
+      }
+
+      // Update last updated timestamp
+      updates.push({
+        range: `Personal portfolio!J${rowNum}`,
+        values: [[new Date().toISOString()]]
+      });
+
+      // Execute batch update if there are updates to make
+      if (updates.length > 0) {
+        await this.sheets.spreadsheets.values.batchUpdate({
+          spreadsheetId: this.sheetId,
+          requestBody: {
+            valueInputOption: 'USER_ENTERED',
+            data: updates
+          }
+        });
+      }
+
+      console.log(`Asset ${editData.symbol} edited in Personal portfolio successfully`);
+      return {
+        success: true,
+        data: {
+          ...editData
+        }
+      };
+
+    } catch (error) {
+      console.error('Error editing asset in Personal portfolio:', error);
+      return {
+        success: false,
+        error: `Failed to edit asset in Personal portfolio: ${error instanceof Error ? error.message : 'Unknown error'}`
+      };
+    }
+  }
+
+  /**
+   * Remove an asset from the Personal portfolio
+   */
+  async removePersonalAsset(symbol: string): Promise<{ success: boolean; error?: string }> {
+    try {
+      console.log(`Removing asset ${symbol} from Personal portfolio...`);
+      
+      if (!this.isServiceAccountInitialized) {
+        await this.initializeServiceAccount();
+      }
+
+      if (!this.sheets) {
+        throw new Error('Google Sheets API client not initialized');
+      }
+
+      // Get the current Personal portfolio data
+      const response = await this.sheets.spreadsheets.values.get({
+        spreadsheetId: this.sheetId,
+        range: 'Personal portfolio!A:M'
+      });
+      
+      const rows = response.data.values || [];
+      
+      // Find the row index of the asset to remove
+      let rowIndexToRemove = -1;
+      for (let i = 1; i < rows.length; i++) {
+        const row = rows[i];
+        if (row && row.length > 1 && row[1]?.toString().toUpperCase() === symbol.toUpperCase()) {
+          rowIndexToRemove = i;
+          break;
+        }
+      }
+
+      if (rowIndexToRemove === -1) {
+        return {
+          success: false,
+          error: `Asset ${symbol} not found in Personal portfolio`
+        };
+      }
+
+      // Delete the row
+      await this.sheets.spreadsheets.batchUpdate({
+        spreadsheetId: this.sheetId,
+        requestBody: {
+          requests: [{
+            deleteDimension: {
+              range: {
+                sheetId: 0, // Assuming Personal portfolio is the first sheet
+                dimension: 'ROWS',
+                startIndex: rowIndexToRemove,
+                endIndex: rowIndexToRemove + 1
+              }
+            }
+          }]
+        }
+      });
+
+      console.log(`Asset ${symbol} removed from Personal portfolio successfully`);
+      return {
+        success: true
+      };
+
+    } catch (error) {
+      console.error('Error removing asset from Personal portfolio:', error);
+      return {
+        success: false,
+        error: `Failed to remove asset from Personal portfolio: ${error instanceof Error ? error.message : 'Unknown error'}`
+      };
+    }
+  }
 }
 
 // Export a singleton instance

@@ -136,7 +136,8 @@ export default function PortfolioOverview({ className, onRefresh, isPrivacyMode 
         },
         body: JSON.stringify({
           ...editData,
-          originalAsset: editData.originalAsset
+          originalAsset: editData.originalAsset,
+          dataSource: dataSource
         }),
       });
 
@@ -175,7 +176,7 @@ export default function PortfolioOverview({ className, onRefresh, isPrivacyMode 
     setRemovingAsset(symbol);
     try {
       console.log('Making API call to remove asset:', symbol);
-      const response = await fetch(`/api/remove-asset?symbol=${encodeURIComponent(symbol)}`, {
+      const response = await fetch(`/api/remove-asset?symbol=${encodeURIComponent(symbol)}&dataSource=${dataSource}`, {
         method: 'DELETE',
       });
 
@@ -635,6 +636,7 @@ export default function PortfolioOverview({ className, onRefresh, isPrivacyMode 
         onClose={() => setShowAddForm(false)}
         onAssetAdded={handleAssetAdded}
         selectedAsset={selectedAsset}
+        dataSource={dataSource}
       />
 
       {editingAsset && (

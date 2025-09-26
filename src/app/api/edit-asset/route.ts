@@ -11,7 +11,8 @@ export async function PUT(request: Request) {
       location, 
       coinType,
       thesis,
-      originalAsset
+      originalAsset,
+      dataSource
     } = body;
 
     console.log(`=== EDITING ASSET: ${symbol} ===`);
@@ -34,15 +35,28 @@ export async function PUT(request: Request) {
     }
 
     // Edit the asset in Google Sheets using original asset data to identify which asset to edit
-    const result = await sheetsAdapter.editPortfolioAsset({
-      symbol: symbol.toUpperCase(),
-      quantity: parseFloat(quantity),
-      riskLevel: riskLevel || 'Medium',
-      location: location || 'Exchange',
-      coinType: coinType || 'Altcoin',
-      thesis: thesis || '',
-      originalAsset: originalAsset
-    });
+    let result;
+    if (dataSource === 'personal-portfolio') {
+      result = await sheetsAdapter.editPersonalAsset({
+        symbol: symbol.toUpperCase(),
+        quantity: parseFloat(quantity),
+        riskLevel: riskLevel || 'Medium',
+        location: location || 'Exchange',
+        coinType: coinType || 'Altcoin',
+        thesis: thesis || ''
+      });
+    } else {
+      // Default to WAGMI Fund
+      result = await sheetsAdapter.editPortfolioAsset({
+        symbol: symbol.toUpperCase(),
+        quantity: parseFloat(quantity),
+        riskLevel: riskLevel || 'Medium',
+        location: location || 'Exchange',
+        coinType: coinType || 'Altcoin',
+        thesis: thesis || '',
+        originalAsset: originalAsset
+      });
+    }
 
     if (result.success) {
       console.log(`Asset ${symbol} edited successfully`);
