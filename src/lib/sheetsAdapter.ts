@@ -957,6 +957,7 @@ export class SheetsAdapter {
     currentPrice?: number;
     priceChange24h?: number;
     thesis?: string;
+    originalAsset?: any;
   }): Promise<{ success: boolean; data?: any; error?: string }> {
     try {
       console.log(`Editing asset ${editData.symbol} in Personal portfolio...`);
@@ -977,20 +978,42 @@ export class SheetsAdapter {
       
       const rows = response.data.values || [];
       
-      // Find the row index of the asset to edit
+      // Find the row index of the asset to edit using original asset data
       let rowIndexToEdit = -1;
+      console.log(`Looking for asset with symbol: ${editData.symbol.toUpperCase()}`);
+      console.log(`Total rows in Personal portfolio sheet: ${rows.length}`);
+      
+      // Use original asset data to find the correct row, or fall back to new data matching
+      const searchSymbol = editData.originalAsset?.symbol?.toUpperCase() || editData.symbol.toUpperCase();
+      const searchLocation = editData.originalAsset?.location || editData.location;
+      const searchCoinType = editData.originalAsset?.coinType || editData.coinType;
+      
+      console.log(`Searching for Personal portfolio asset with original values - Symbol: "${searchSymbol}", Location: "${searchLocation}", CoinType: "${searchCoinType}"`);
+      
       for (let i = 1; i < rows.length; i++) {
         const row = rows[i];
-        if (row && row.length > 1 && row[1]?.toString().toUpperCase() === editData.symbol.toUpperCase()) {
+        const rowSymbol = row && row.length > 1 ? row[1]?.toString().toUpperCase() : '';
+        const rowLocation = row && row.length > 4 ? row[4]?.toString() : '';
+        const rowCoinType = row && row.length > 5 ? row[5]?.toString() : '';
+        
+        console.log(`Personal portfolio Row ${i}: Symbol = "${rowSymbol}", Location = "${rowLocation}", CoinType = "${rowCoinType}", Asset = "${row[0]}"`);
+        
+        // Match by original asset data to identify the specific asset
+        if (row && row.length > 5 && 
+            rowSymbol === searchSymbol &&
+            rowLocation === searchLocation &&
+            rowCoinType === searchCoinType) {
           rowIndexToEdit = i;
+          console.log(`Found matching Personal portfolio asset at row ${rowIndexToEdit + 1}`);
           break;
         }
       }
 
       if (rowIndexToEdit === -1) {
+        console.log(`No Personal portfolio asset found with symbol: ${searchSymbol}, location: ${searchLocation}, coinType: ${searchCoinType}`);
         return {
           success: false,
-          error: `Asset ${editData.symbol} not found in Personal portfolio`
+          error: `Asset with symbol ${searchSymbol}, location ${searchLocation}, and type ${searchCoinType} not found in Personal portfolio`
         };
       }
 

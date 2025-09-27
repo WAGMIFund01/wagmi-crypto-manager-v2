@@ -43,7 +43,8 @@ export async function PUT(request: Request) {
         riskLevel: riskLevel || 'Medium',
         location: location || 'Exchange',
         coinType: coinType || 'Altcoin',
-        thesis: thesis || ''
+        thesis: thesis || '',
+        originalAsset: originalAsset
       });
     } else {
       // Default to WAGMI Fund
