@@ -153,7 +153,7 @@ export default function PerformanceDashboard() {
       {/* Slow Operations */}
       {slowOperations.length > 0 && (
         <div className="mb-6">
-          <h3 className="text-lg font-semibold text-white mb-3">Slow Operations (>1s)</h3>
+          <h3 className="text-lg font-semibold text-white mb-3">Slow Operations (&gt;1s)</h3>
           <div className="bg-gray-800 rounded-lg overflow-hidden">
             <div className="overflow-x-auto">
               <table className="w-full">
