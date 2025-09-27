@@ -23,10 +23,15 @@ interface Investor {
 interface InvestorsProps {
   isPrivacyMode?: boolean;
   onRefresh?: () => void; // Changed from number to () => void
-  dataSource?: 'wagmi-fund' | 'personal-portfolio';
+  dataSource?: 'wagmi-fund' | 'personal-portfolio' | 'performance-dashboard';
 }
 
 export default function Investors({ isPrivacyMode = false, onRefresh, dataSource = 'wagmi-fund' }: InvestorsProps) {
+  // Performance dashboard doesn't use this component
+  if (dataSource === 'performance-dashboard') {
+    return null;
+  }
+
   const [investors, setInvestors] = useState<Investor[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);

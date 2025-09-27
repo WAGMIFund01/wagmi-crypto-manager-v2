@@ -6,6 +6,7 @@ import UniversalNavbar from '@/components/UniversalNavbar';
 import PortfolioOverview from '@/components/tabs/PortfolioOverview';
 import Analytics from '@/components/tabs/Analytics';
 import Investors from '@/components/tabs/Investors';
+import PerformanceDashboard from '@/components/PerformanceDashboard';
 import { COLORS } from '@/shared/constants/colors';
 
 interface Session {
@@ -28,7 +29,7 @@ interface DashboardClientProps {
     lastUpdated: string;
   } | null;
   hasError: boolean;
-  dataSource?: 'wagmi-fund' | 'personal-portfolio';
+  dataSource?: 'wagmi-fund' | 'personal-portfolio' | 'performance-dashboard';
 }
 
 export default function DashboardClient({ session, kpiData: initialKpiData, hasError, dataSource = 'wagmi-fund' }: DashboardClientProps) {
@@ -46,6 +47,7 @@ export default function DashboardClient({ session, kpiData: initialKpiData, hasE
   console.log('DashboardClient - initialKpiData:', initialKpiData);
   console.log('DashboardClient - kpiData state:', kpiData);
   console.log('DashboardClient - dataSource:', dataSource);
+  console.log('DashboardClient - activeTab:', activeTab);
 
   // Ensure kpiData is set correctly on mount
   useEffect(() => {
@@ -62,6 +64,8 @@ export default function DashboardClient({ session, kpiData: initialKpiData, hasE
     const tab = searchParams.get('tab');
     const allowedTabs = dataSource === 'personal-portfolio' 
       ? ['portfolio'] 
+      : dataSource === 'performance-dashboard'
+      ? ['performance']
       : ['portfolio', 'analytics', 'investors'];
     
     if (tab && allowedTabs.includes(tab)) {
@@ -69,6 +73,18 @@ export default function DashboardClient({ session, kpiData: initialKpiData, hasE
     } else if (dataSource === 'personal-portfolio' && tab && !allowedTabs.includes(tab)) {
       // Force portfolio tab for Personal Portfolio if invalid tab is requested
       setActiveTab('portfolio');
+    } else if (dataSource === 'performance-dashboard' && tab && !allowedTabs.includes(tab)) {
+      // Force performance tab for Performance Dashboard if invalid tab is requested
+      setActiveTab('performance');
+    } else if (!tab) {
+      // Set default tab when no tab parameter is present
+      if (dataSource === 'personal-portfolio') {
+        setActiveTab('portfolio');
+      } else if (dataSource === 'performance-dashboard') {
+        setActiveTab('performance');
+      } else {
+        setActiveTab('portfolio'); // Default for WAGMI Fund
+      }
     }
   }, [searchParams, dataSource]);
 
@@ -77,9 +93,12 @@ export default function DashboardClient({ session, kpiData: initialKpiData, hasE
     const devSessionData = sessionStorage.getItem('devSession');
     const devMode = sessionStorage.getItem('isDevMode');
     
+    console.log('Auth check - devMode:', devMode, 'devSessionData:', devSessionData ? 'exists' : 'null', 'session:', session ? 'exists' : 'null');
+    
     if (devMode === 'true' && devSessionData) {
       try {
         const parsedDevSession = JSON.parse(devSessionData);
+        console.log('Setting dev session:', parsedDevSession);
         setDevSession(parsedDevSession);
         setIsDevMode(true);
         setIsCheckingAuth(false);
@@ -94,6 +113,7 @@ export default function DashboardClient({ session, kpiData: initialKpiData, hasE
 
     // Regular OAuth session checks
     if (!session) {
+      console.log('No session found, redirecting to /');
       router.push('/');
       return;
     }
@@ -118,6 +138,8 @@ export default function DashboardClient({ session, kpiData: initialKpiData, hasE
     // Validate tab access based on dataSource
     const allowedTabs = dataSource === 'personal-portfolio' 
       ? ['portfolio'] 
+      : dataSource === 'performance-dashboard'
+      ? ['performance']
       : ['portfolio', 'analytics', 'investors'];
     
     if (!allowedTabs.includes(tabId)) {
@@ -244,15 +266,30 @@ export default function DashboardClient({ session, kpiData: initialKpiData, hasE
 
   // Render the appropriate tab content
   const renderTabContent = () => {
+    console.log('renderTabContent - activeTab:', activeTab, 'dataSource:', dataSource);
     switch (activeTab) {
       case 'portfolio':
+        console.log('Rendering PortfolioOverview');
         return <PortfolioOverview onRefresh={triggerDataRefresh} isPrivacyMode={isPrivacyMode} dataSource={dataSource} />;
       case 'analytics':
+        console.log('Rendering Analytics');
         return <Analytics onRefresh={triggerDataRefresh} dataSource={dataSource} />;
       case 'investors':
+        console.log('Rendering Investors');
         return <Investors isPrivacyMode={isPrivacyMode} onRefresh={triggerDataRefresh} dataSource={dataSource} />;
+      case 'performance':
+        console.log('Rendering PerformanceDashboard');
+        return <PerformanceDashboard />;
       default:
-        return <PortfolioOverview onRefresh={triggerDataRefresh} isPrivacyMode={isPrivacyMode} dataSource={dataSource} />;
+        console.log('Default case - dataSource:', dataSource);
+        // Default behavior based on dataSource
+        if (dataSource === 'performance-dashboard') {
+          console.log('Default: Rendering PerformanceDashboard');
+          return <PerformanceDashboard />;
+        } else {
+          console.log('Default: Rendering PortfolioOverview');
+          return <PortfolioOverview onRefresh={triggerDataRefresh} isPrivacyMode={isPrivacyMode} dataSource={dataSource} />;
+        }
     }
   };
 

@@ -20,7 +20,7 @@ interface UniversalNavbarProps {
   } | null;
   hasError?: boolean;
   onKpiRefresh?: () => Promise<void>;
-  dataSource?: 'wagmi-fund' | 'personal-portfolio';
+  dataSource?: 'wagmi-fund' | 'personal-portfolio' | 'performance-dashboard';
 }
 
 export default function UniversalNavbar({ 
@@ -566,8 +566,12 @@ export default function UniversalNavbar({
           {/* Left - Navigation Tabs */}
           <nav className="flex space-x-8">
             {[
-              { id: 'portfolio', label: 'Portfolio Overview' },
-              ...(dataSource === 'personal-portfolio' ? [] : [
+              ...(dataSource === 'performance-dashboard' ? [
+                { id: 'performance', label: 'Performance Dashboard' }
+              ] : dataSource === 'personal-portfolio' ? [
+                { id: 'portfolio', label: 'Portfolio Overview' }
+              ] : [
+                { id: 'portfolio', label: 'Portfolio Overview' },
                 { id: 'analytics', label: 'Analytics' },
                 { id: 'investors', label: 'Investors' }
               ])
@@ -599,7 +603,8 @@ export default function UniversalNavbar({
             ))}
           </nav>
 
-          {/* Right - KPI Ribbon */}
+          {/* Right - KPI Ribbon (hidden for performance dashboard) */}
+          {dataSource !== 'performance-dashboard' && (
           <div className="flex items-center space-x-6">
             {hasError ? (
               /* Error State */
@@ -687,6 +692,7 @@ export default function UniversalNavbar({
               </>
             )}
           </div>
+          )}
         </div>
         
         </div>

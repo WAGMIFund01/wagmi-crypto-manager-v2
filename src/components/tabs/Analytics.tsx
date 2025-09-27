@@ -34,10 +34,15 @@ interface AnalyticsData {
 
 interface AnalyticsProps {
   onRefresh?: () => void;
-  dataSource?: 'wagmi-fund' | 'personal-portfolio';
+  dataSource?: 'wagmi-fund' | 'personal-portfolio' | 'performance-dashboard';
 }
 
 export default function Analytics({ onRefresh, dataSource = 'wagmi-fund' }: AnalyticsProps) {
+  // Performance dashboard doesn't use this component
+  if (dataSource === 'performance-dashboard') {
+    return null;
+  }
+
   const [analyticsData, setAnalyticsData] = useState<AnalyticsData | null>(null);
   const [performanceData, setPerformanceData] = useState<PerformanceData[]>([]);
   const [loading, setLoading] = useState(true);
@@ -334,7 +339,7 @@ export default function Analytics({ onRefresh, dataSource = 'wagmi-fund' }: Anal
                     <div className="w-full bg-gray-700 rounded-full h-2">
                       <div 
                         className="h-2 rounded-full transition-all duration-300"
-                        style={{ 
+        style={{ 
                           width: `${percentage}%`,
                           backgroundColor: color
                         }}
