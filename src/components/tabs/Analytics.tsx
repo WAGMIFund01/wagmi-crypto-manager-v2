@@ -38,10 +38,6 @@ interface AnalyticsProps {
 }
 
 export default function Analytics({ onRefresh, dataSource = 'wagmi-fund' }: AnalyticsProps) {
-  // Performance dashboard doesn't use this component
-  if (dataSource === 'performance-dashboard') {
-    return null;
-  }
 
   const [analyticsData, setAnalyticsData] = useState<AnalyticsData | null>(null);
   const [performanceData, setPerformanceData] = useState<PerformanceData[]>([]);
@@ -221,6 +217,11 @@ export default function Analytics({ onRefresh, dataSource = 'wagmi-fund' }: Anal
         <p className="text-gray-400">No analytics data available</p>
       </div>
     );
+  }
+
+  // Performance dashboard doesn't use this component
+  if (dataSource === 'performance-dashboard') {
+    return null;
   }
 
   return (

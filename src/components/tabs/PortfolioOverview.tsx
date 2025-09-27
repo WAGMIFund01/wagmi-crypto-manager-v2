@@ -19,10 +19,6 @@ interface PortfolioOverviewProps {
 }
 
 export default function PortfolioOverview({ className, onRefresh, isPrivacyMode = false, dataSource = 'wagmi-fund' }: PortfolioOverviewProps) {
-  // Performance dashboard doesn't use this component
-  if (dataSource === 'performance-dashboard') {
-    return null;
-  }
 
   const [assets, setAssets] = useState<PortfolioAsset[]>([]);
   const [loading, setLoading] = useState(true);
@@ -375,6 +371,11 @@ export default function PortfolioOverview({ className, onRefresh, isPrivacyMode 
     'NFT': COLORS.assetType.nft
   };
 
+
+  // Performance dashboard doesn't use this component
+  if (dataSource === 'performance-dashboard') {
+    return null;
+  }
 
   return (
     <div className={`${className} space-y-6`}>

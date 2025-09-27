@@ -27,10 +27,6 @@ interface InvestorsProps {
 }
 
 export default function Investors({ isPrivacyMode = false, onRefresh, dataSource = 'wagmi-fund' }: InvestorsProps) {
-  // Performance dashboard doesn't use this component
-  if (dataSource === 'performance-dashboard') {
-    return null;
-  }
 
   const [investors, setInvestors] = useState<Investor[]>([]);
   const [loading, setLoading] = useState(true);
@@ -258,6 +254,11 @@ export default function Investors({ isPrivacyMode = false, onRefresh, dataSource
         />
       </div>
     );
+  }
+
+  // Performance dashboard doesn't use this component
+  if (dataSource === 'performance-dashboard') {
+    return null;
   }
 
   if (error) {
