@@ -1171,14 +1171,30 @@ export class SheetsAdapter {
         };
       }
 
-      // Delete the row
-      await this.sheets.spreadsheets.batchUpdate({
+      // Get the Personal portfolio sheet ID (similar to WAGMI Fund method)
+      const spreadsheet = await this.sheets.spreadsheets.get({
+        spreadsheetId: this.sheetId,
+      });
+      
+      const personalPortfolioSheet = spreadsheet.data.sheets?.find(
+        sheet => sheet.properties?.title === 'Personal portfolio'
+      );
+      
+      if (!personalPortfolioSheet || !personalPortfolioSheet.properties?.sheetId) {
+        throw new Error('Personal portfolio sheet not found or missing sheet ID');
+      }
+      
+      const actualSheetId = personalPortfolioSheet.properties.sheetId;
+      console.log(`Found Personal portfolio sheet ID: ${actualSheetId}`);
+      
+      // Delete the row using the correct sheet ID
+      const deleteRequest = {
         spreadsheetId: this.sheetId,
         requestBody: {
           requests: [{
             deleteDimension: {
               range: {
-                sheetId: 0, // Assuming Personal portfolio is the first sheet
+                sheetId: actualSheetId, // Use the actual sheet ID, not 0
                 dimension: 'ROWS',
                 startIndex: rowIndexToRemove,
                 endIndex: rowIndexToRemove + 1
@@ -1186,7 +1202,13 @@ export class SheetsAdapter {
             }
           }]
         }
-      });
+      };
+      
+      console.log('Personal portfolio delete request:', JSON.stringify(deleteRequest, null, 2));
+      
+      const deleteResponse = await this.sheets.spreadsheets.batchUpdate(deleteRequest);
+      
+      console.log('Personal portfolio delete operation response:', deleteResponse.data);
 
       console.log(`Asset ${symbol} removed from Personal portfolio successfully`);
       return {
