@@ -44,9 +44,8 @@ export default function ModuleSelectionPage() {
             className="flex-1 max-w-sm"
           />
           <ModuleCard 
-            title="Developer Module"
-            route="/developer"
-            isComingSoon={true}
+            title="Performance Dashboard"
+            route="/performance-dashboard"
             className="flex-1 max-w-sm"
           />
         </div>
@@ -67,9 +66,8 @@ export default function ModuleSelectionPage() {
           </div>
           <div className="flex justify-center">
             <ModuleCard 
-              title="Developer Module"
-              route="/developer"
-              isComingSoon={true}
+              title="Performance Dashboard"
+              route="/performance-dashboard"
               className="max-w-sm"
             />
           </div>
@@ -86,9 +84,8 @@ export default function ModuleSelectionPage() {
             route="/personal-portfolio"
           />
           <ModuleCard 
-            title="Developer Module"
-            route="/developer"
-            isComingSoon={true}
+            title="Performance Dashboard"
+            route="/performance-dashboard"
           />
         </div>
       </div>
