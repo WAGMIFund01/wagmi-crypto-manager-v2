@@ -1,5 +1,6 @@
 import { config } from './config';
 import { google } from 'googleapis';
+import { trackOperation } from './performance-monitor';
 
 export interface Investor {
   investor_id: string;
@@ -165,7 +166,7 @@ export class SheetsAdapter {
    * Get all portfolio assets from the Portfolio Overview sheet
    */
   async getPortfolioData(): Promise<PortfolioAsset[]> {
-    try {
+    return trackOperation('getPortfolioData', async () => {
       await this.initializeServiceAccount();
       
       if (!this.sheets) {
@@ -233,11 +234,7 @@ export class SheetsAdapter {
 
       console.log(`Google Sheets portfolio data extracted: ${portfolioAssets.length} assets`);
       return portfolioAssets;
-
-    } catch (error) {
-      console.error('Error fetching portfolio data:', error);
-      throw new Error('Failed to fetch portfolio data');
-    }
+    }, { sheetId: this.sheetId, range: 'Portfolio Overview!A:M' });
   }
 
   /**
@@ -1165,7 +1162,7 @@ export class SheetsAdapter {
    * Get Personal Portfolio data
    */
   async getPersonalPortfolioData(): Promise<PortfolioAsset[]> {
-    try {
+    return trackOperation('getPersonalPortfolioData', async () => {
       if (!this.isServiceAccountInitialized) {
         await this.initializeServiceAccount();
       }
@@ -1213,10 +1210,7 @@ export class SheetsAdapter {
       }
       
       return assets;
-    } catch (error) {
-      console.error('Error fetching Personal Portfolio data:', error);
-      throw error;
-    }
+    }, { sheetId: this.sheetId, range: 'Personal portfolio!A:M' });
   }
 
   /**
@@ -1228,7 +1222,7 @@ export class SheetsAdapter {
     totalAUM: number;
     lastUpdated: string;
   }> {
-    try {
+    return trackOperation('getPersonalPortfolioKpiFromKpisTab', async () => {
       if (!this.isServiceAccountInitialized) {
         await this.initializeServiceAccount();
       }
@@ -1256,10 +1250,7 @@ export class SheetsAdapter {
         totalAUM,
         lastUpdated
       };
-    } catch (error) {
-      console.error('Error fetching Personal Portfolio KPI data from KPIs tab:', error);
-      throw error;
-    }
+    }, { sheetId: this.sheetId, range: 'KPIs!B8:B9' });
   }
 }
 

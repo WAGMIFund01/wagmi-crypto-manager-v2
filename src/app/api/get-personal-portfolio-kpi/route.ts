@@ -1,11 +1,12 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { sheetsAdapter } from '@/lib/sheetsAdapter';
 import logger from '@/lib/logger';
+import { trackOperation } from '@/lib/performance-monitor';
 
 export async function GET(request: NextRequest) {
   const requestId = crypto.randomUUID();
   
-  try {
+  return trackOperation('api-get-personal-portfolio-kpi', async () => {
     logger.info('Fetching personal portfolio KPI data', { requestId });
     
     // Get Personal Portfolio AUM from KPIs tab (cell A8)
@@ -20,8 +21,7 @@ export async function GET(request: NextRequest) {
       success: true,
       ...kpiData
     });
-
-  } catch (error) {
+  }, { requestId }).catch(error => {
     logger.error('Error fetching personal portfolio KPI data', error instanceof Error ? error : new Error('Unknown error'), { 
       requestId
     });
@@ -30,5 +30,5 @@ export async function GET(request: NextRequest) {
       success: false,
       error: 'Failed to fetch personal portfolio KPI data'
     }, { status: 500 });
-  }
+  });
 }
