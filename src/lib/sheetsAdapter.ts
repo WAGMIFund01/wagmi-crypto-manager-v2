@@ -1113,7 +1113,7 @@ export class SheetsAdapter {
   /**
    * Remove an asset from the Personal portfolio
    */
-  async removePersonalAsset(symbol: string): Promise<{ success: boolean; error?: string }> {
+  async removePersonalAsset(symbol: string, location?: string, coinType?: string): Promise<{ success: boolean; error?: string }> {
     try {
       console.log(`Removing asset ${symbol} from Personal portfolio...`);
       
@@ -1133,20 +1133,41 @@ export class SheetsAdapter {
       
       const rows = response.data.values || [];
       
-      // Find the row index of the asset to remove
+      // Find the row index of the asset to remove using multi-criteria matching
       let rowIndexToRemove = -1;
+      console.log(`Looking for asset with symbol: ${symbol.toUpperCase()}`);
+      console.log(`Total rows in Personal portfolio sheet: ${rows.length}`);
+      
+      const searchSymbol = symbol.toUpperCase();
+      const searchLocation = location || '';
+      const searchCoinType = coinType || '';
+      
+      console.log(`Searching for Personal portfolio asset to remove - Symbol: "${searchSymbol}", Location: "${searchLocation}", CoinType: "${searchCoinType}"`);
+      
       for (let i = 1; i < rows.length; i++) {
         const row = rows[i];
-        if (row && row.length > 1 && row[1]?.toString().toUpperCase() === symbol.toUpperCase()) {
+        const rowSymbol = row && row.length > 1 ? row[1]?.toString().toUpperCase() : '';
+        const rowLocation = row && row.length > 4 ? row[4]?.toString() : '';
+        const rowCoinType = row && row.length > 5 ? row[5]?.toString() : '';
+        
+        console.log(`Personal portfolio Row ${i}: Symbol = "${rowSymbol}", Location = "${rowLocation}", CoinType = "${rowCoinType}", Asset = "${row[0]}"`);
+        
+        // Match by symbol + location + coinType to identify the specific asset
+        if (row && row.length > 5 && 
+            rowSymbol === searchSymbol &&
+            rowLocation === searchLocation &&
+            rowCoinType === searchCoinType) {
           rowIndexToRemove = i;
+          console.log(`Found matching Personal portfolio asset to remove at row ${rowIndexToRemove + 1}`);
           break;
         }
       }
 
       if (rowIndexToRemove === -1) {
+        console.log(`No Personal portfolio asset found with symbol: ${searchSymbol}, location: ${searchLocation}, coinType: ${searchCoinType}`);
         return {
           success: false,
-          error: `Asset ${symbol} not found in Personal portfolio`
+          error: `Asset with symbol ${searchSymbol}, location ${searchLocation}, and type ${searchCoinType} not found in Personal portfolio`
         };
       }
 

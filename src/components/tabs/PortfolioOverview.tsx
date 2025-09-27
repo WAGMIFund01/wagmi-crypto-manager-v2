@@ -165,8 +165,8 @@ export default function PortfolioOverview({ className, onRefresh, isPrivacyMode 
     }
   };
 
-  const handleRemoveAsset = async (symbol: string) => {
-    console.log('Delete button clicked for symbol:', symbol);
+  const handleRemoveAsset = async (asset: PortfolioAsset) => {
+    console.log('Delete button clicked for asset:', asset);
     
     // Prevent multiple simultaneous deletion attempts
     if (removingAsset) {
@@ -174,17 +174,26 @@ export default function PortfolioOverview({ className, onRefresh, isPrivacyMode 
       return;
     }
     
-    if (!confirm(`Are you sure you want to remove ${symbol} from the portfolio?`)) {
+    if (!confirm(`Are you sure you want to remove ${asset.symbol} from the portfolio?`)) {
       console.log('User cancelled deletion');
       return;
     }
 
     console.log('User confirmed deletion, starting removal process...');
-    setRemovingAsset(symbol);
+    setRemovingAsset(asset.symbol);
     try {
-      console.log('Making API call to remove asset:', symbol);
-      const response = await fetch(`/api/remove-asset?symbol=${encodeURIComponent(symbol)}&dataSource=${dataSource}`, {
+      console.log('Making API call to remove asset:', asset.symbol);
+      const response = await fetch(`/api/remove-asset`, {
         method: 'DELETE',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          symbol: asset.symbol,
+          location: asset.location,
+          coinType: asset.coinType,
+          dataSource: dataSource
+        }),
       });
 
       console.log('API response status:', response.status);
@@ -457,7 +466,7 @@ export default function PortfolioOverview({ className, onRefresh, isPrivacyMode 
                         variant="icon"
                         theme="red"
                         size="sm"
-                        onClick={() => handleRemoveAsset(asset.symbol)}
+                        onClick={() => handleRemoveAsset(asset)}
                         disabled={removingAsset === asset.symbol}
                         loading={removingAsset === asset.symbol}
                         title="Remove asset"
@@ -616,7 +625,7 @@ export default function PortfolioOverview({ className, onRefresh, isPrivacyMode 
                         variant="icon"
                         theme="red"
                         size="sm"
-                        onClick={() => handleRemoveAsset(asset.symbol)}
+                        onClick={() => handleRemoveAsset(asset)}
                         disabled={removingAsset === asset.symbol}
                         loading={removingAsset === asset.symbol}
                         title="Remove asset"

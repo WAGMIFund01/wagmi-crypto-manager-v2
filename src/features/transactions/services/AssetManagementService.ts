@@ -104,7 +104,7 @@ export class AssetManagementService {
   /**
    * Remove an asset from the portfolio
    */
-  async removeAsset(symbol: string, dataSource?: 'wagmi-fund' | 'personal-portfolio'): Promise<AssetManagementResult> {
+  async removeAsset(symbol: string, dataSource?: 'wagmi-fund' | 'personal-portfolio', location?: string, coinType?: string): Promise<AssetManagementResult> {
     try {
       if (!symbol || symbol.trim().length === 0) {
         return {
@@ -116,7 +116,7 @@ export class AssetManagementService {
 
       // Remove the asset using the appropriate SheetsAdapter method
       if (dataSource === 'personal-portfolio') {
-        await sheetsAdapter.removePersonalAsset(symbol.toUpperCase());
+        await sheetsAdapter.removePersonalAsset(symbol.toUpperCase(), location, coinType);
       } else {
         // Default to WAGMI Fund
         await sheetsAdapter.removePortfolioAsset(symbol.toUpperCase());

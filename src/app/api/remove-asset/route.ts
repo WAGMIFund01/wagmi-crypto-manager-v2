@@ -5,11 +5,10 @@ export async function DELETE(request: Request) {
   try {
     console.log('=== REMOVE ASSET API CALLED ===');
     
-    const { searchParams } = new URL(request.url);
-    const symbol = searchParams.get('symbol');
-    const dataSource = searchParams.get('dataSource') as 'wagmi-fund' | 'personal-portfolio' | null;
+    const body = await request.json();
+    const { symbol, location, coinType, dataSource } = body;
 
-    console.log('Remove asset request for symbol:', symbol);
+    console.log('Remove asset request:', { symbol, location, coinType, dataSource });
 
     if (!symbol || symbol.trim().length === 0) {
       console.log('ERROR: Symbol parameter missing');
@@ -49,7 +48,7 @@ export async function DELETE(request: Request) {
 
     // Remove the asset
     console.log('Calling assetManagementService.removeAsset with:', symbol.trim(), 'dataSource:', dataSource);
-    const result = await assetManagementService.removeAsset(symbol.trim(), dataSource || 'wagmi-fund');
+    const result = await assetManagementService.removeAsset(symbol.trim(), dataSource || 'wagmi-fund', location, coinType);
     console.log('AssetManagementService result:', result);
 
     if (result.success) {
