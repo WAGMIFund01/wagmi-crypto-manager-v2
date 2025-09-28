@@ -662,10 +662,14 @@ export class SheetsAdapter {
       
       console.log('Full delete request:', JSON.stringify(deleteRequest, null, 2));
       
+      // CRITICAL: Log the exact sheet being targeted
+      console.log(`🚨 DELETE OPERATION TARGETING SHEET: "${portfolioSheet.properties?.title}" (ID: ${actualSheetId})`);
+      console.log(`🚨 ROW BEING DELETED: ${rowIndexToRemove} in "${portfolioSheet.properties?.title}" sheet`);
+      
       const deleteResponse = await this.sheets.spreadsheets.batchUpdate(deleteRequest);
 
       console.log('Delete operation response:', deleteResponse.data);
-      console.log(`Asset ${symbol} removed successfully from row ${rowIndexToRemove}`);
+      console.log(`Asset ${symbol} removed successfully from row ${rowIndexToRemove} in "${portfolioSheet.properties?.title}" sheet`);
       
       // Verify the asset was actually removed
       console.log('Verifying asset removal...');
@@ -1205,6 +1209,10 @@ export class SheetsAdapter {
       };
       
       console.log('Personal portfolio delete request:', JSON.stringify(deleteRequest, null, 2));
+      
+      // CRITICAL: Log the exact sheet being targeted
+      console.log(`🚨 PERSONAL PORTFOLIO DELETE OPERATION TARGETING SHEET: "${personalPortfolioSheet.properties?.title}" (ID: ${actualSheetId})`);
+      console.log(`🚨 ROW BEING DELETED: ${rowIndexToRemove + 1} in "${personalPortfolioSheet.properties?.title}" sheet`);
       
       const deleteResponse = await this.sheets.spreadsheets.batchUpdate(deleteRequest);
       
