@@ -47,6 +47,23 @@ export class SheetsAdapter {
   }
 
   /**
+   * Get sheet metadata for debugging purposes
+   */
+  async getSheetMetadata() {
+    if (!this.isServiceAccountInitialized) {
+      await this.initializeServiceAccount();
+    }
+
+    if (!this.sheets) {
+      throw new Error('Google Sheets API client not initialized');
+    }
+
+    return await this.sheets.spreadsheets.get({
+      spreadsheetId: this.sheetId,
+    });
+  }
+
+  /**
    * Initialize Google Sheets API with Service Account authentication
    */
   private async initializeServiceAccount(): Promise<void> {

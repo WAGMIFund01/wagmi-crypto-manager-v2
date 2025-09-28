@@ -9,9 +9,7 @@ export async function GET() {
     const { sheetsAdapter } = await import('@/lib/sheetsAdapter');
     
     // Get sheet metadata to see all sheets and their IDs
-    const spreadsheet = await sheetsAdapter.sheets?.spreadsheets.get({
-      spreadsheetId: sheetsAdapter.sheetId,
-    });
+    const spreadsheet = await sheetsAdapter.getSheetMetadata();
     
     if (!spreadsheet?.data?.sheets) {
       return NextResponse.json({
