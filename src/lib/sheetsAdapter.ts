@@ -661,6 +661,11 @@ export class SheetsAdapter {
       const actualSheetId = portfolioSheet.properties.sheetId;
       console.log(`Found Portfolio Overview sheet ID: ${actualSheetId}`);
       
+      // CRITICAL SAFETY CHECK: Prevent targeting sheetId 0 (Investors sheet)
+      if (actualSheetId === 0) {
+        throw new Error('CRITICAL ERROR: Portfolio Overview sheet has sheetId 0, which would target Investors sheet. This is a safety block to prevent accidental investor data deletion.');
+      }
+      
       const deleteRequest = {
         spreadsheetId: this.sheetId,
         requestBody: {
@@ -1207,6 +1212,11 @@ export class SheetsAdapter {
       
       const actualSheetId = personalPortfolioSheet.properties.sheetId;
       console.log(`Found Personal portfolio sheet ID: ${actualSheetId}`);
+      
+      // CRITICAL SAFETY CHECK: Prevent targeting sheetId 0 (Investors sheet)
+      if (actualSheetId === 0) {
+        throw new Error('CRITICAL ERROR: Personal portfolio sheet has sheetId 0, which would target Investors sheet. This is a safety block to prevent accidental investor data deletion.');
+      }
       
       // Delete the row using the correct sheet ID
       const deleteRequest = {
