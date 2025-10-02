@@ -27,7 +27,7 @@ interface AnalyticsData {
     value: number;
   }>;
   riskDistribution: Record<string, number>;
-  chainDistribution: Record<string, number>;
+  locationDistribution: Record<string, number>;
   assetTypeDistribution: Record<string, number>;
 }
 
@@ -147,8 +147,8 @@ export default function Analytics({ onRefresh, dataSource = 'wagmi-fund' }: Anal
       return acc;
     }, {} as Record<string, number>);
 
-    const chainDistribution = assets.reduce((acc, asset) => {
-      acc[asset.chain] = (acc[asset.chain] || 0) + (asset.quantity * asset.currentPrice);
+    const locationDistribution = assets.reduce((acc, asset) => {
+      acc[asset.location] = (acc[asset.location] || 0) + (asset.quantity * asset.currentPrice);
       return acc;
     }, {} as Record<string, number>);
 
@@ -168,7 +168,7 @@ export default function Analytics({ onRefresh, dataSource = 'wagmi-fund' }: Anal
       topPerformers,
       worstPerformers,
       riskDistribution,
-      chainDistribution,
+      locationDistribution,
       assetTypeDistribution
     };
   };
@@ -247,7 +247,7 @@ export default function Analytics({ onRefresh, dataSource = 'wagmi-fund' }: Anal
       {/* Portfolio Distribution */}
       <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-4 md:gap-6">
         <LocationDistributionCard
-          data={analyticsData.chainDistribution}
+          data={analyticsData.locationDistribution}
           totalValue={analyticsData.totalValue}
           formatValue={formatCurrency}
         />
