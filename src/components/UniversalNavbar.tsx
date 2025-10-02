@@ -461,7 +461,7 @@ export default function UniversalNavbar({
               {[
                 { id: 'portfolio', label: 'Portfolio' },
                 ...(dataSource === 'personal-portfolio' ? [] : [
-                  { id: 'analytics', label: 'Analytics' },
+                  { id: 'analytics', label: 'Performance' },
                   { id: 'investors', label: 'Investors' }
                 ])
               ].map((tab) => (
@@ -603,7 +603,7 @@ export default function UniversalNavbar({
                 { id: 'portfolio', label: 'Portfolio Overview' }
               ] : [
                 { id: 'portfolio', label: 'Portfolio Overview' },
-                { id: 'analytics', label: 'Analytics' },
+                { id: 'analytics', label: 'Performance' },
                 { id: 'investors', label: 'Investors' }
               ])
             ].map((tab) => (
