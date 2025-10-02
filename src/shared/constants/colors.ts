@@ -89,6 +89,27 @@ export const COLORS = {
     default: '#6B7280',
   },
 
+  // Location colors (wallets, platforms, exchanges)
+  location: {
+    'phantom wallet': '#9945FF',      // Solana purple
+    'orca lp': '#00D1FF',             // Orca blue
+    'metamask': '#F6851B',            // MetaMask orange
+    'ledger': '#000000',              // Ledger black (will show as dark gray)
+    'binance': '#F3BA2F',             // Binance yellow
+    'coinbase': '#0052FF',            // Coinbase blue
+    'kraken': '#5741D9',              // Kraken purple
+    'raydium': '#C03FD5',             // Raydium purple
+    'jupiter': '#00D4AA',             // Jupiter teal
+    'drift': '#9945FF',               // Drift purple
+    'marinade': '#FF5F00',            // Marinade orange
+    'kamino': '#4CAF50',              // Kamino green
+    'meteora': '#6366F1',             // Meteora indigo
+    'uniswap': '#FF007A',             // Uniswap pink
+    'curve': '#40649F',               // Curve blue
+    'aave': '#B6509E',                // Aave purple
+    default: '#6B7280',               // Gray for unknown locations
+  },
+
   // Component theme colors
   theme: {
     green: {
