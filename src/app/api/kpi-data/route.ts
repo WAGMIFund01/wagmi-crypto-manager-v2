@@ -6,9 +6,9 @@ export async function GET(request: Request) {
     const { searchParams } = new URL(request.url);
     const forceRefresh = searchParams.get('force') === 'true';
     
-    console.log('🔍 DEBUG - /api/kpi-data endpoint called, forceRefresh:', forceRefresh);
-    const kpiData = await fetchKPIData(forceRefresh);
-    console.log('🔍 DEBUG - fetchKPIData returned:', kpiData);
+    console.log('🔍 /api/kpi-data endpoint called, forceRefresh:', forceRefresh, '(note: no longer using cache)');
+    const kpiData = await fetchKPIData();
+    console.log('✅ fetchKPIData returned:', kpiData);
     
     if (!kpiData) {
       console.log('🔍 DEBUG - kpiData is null/undefined');
