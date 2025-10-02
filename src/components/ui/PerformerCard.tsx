@@ -1,6 +1,6 @@
 import React from 'react';
-import { WagmiCard } from './WagmiCard';
-import { CardHeader } from './CardHeader';
+import WagmiCard from './WagmiCard';
+import CardHeader from './CardHeader';
 
 interface Performer {
   symbol: string;
