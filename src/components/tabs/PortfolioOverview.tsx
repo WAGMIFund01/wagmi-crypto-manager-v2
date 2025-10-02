@@ -412,8 +412,25 @@ export default function PortfolioOverview({ className, onRefresh, isPrivacyMode 
   const totalValue = assets.reduce((sum, asset) => sum + (asset.quantity * asset.currentPrice), 0);
 
   // Color palettes for different chart types
-  // Use centralized chart colors
-  const assetColors = Object.values(COLORS.chart);
+  // Map asset names to brand-specific colors
+  const assetColors = useMemo(() => {
+    const colors: Record<string, string> = {};
+    const uniqueAssets = Object.keys(assetDistribution);
+    
+    uniqueAssets.forEach(assetName => {
+      // Normalize asset name for lookup (lowercase, remove spaces)
+      const normalizedName = assetName.toLowerCase().replace(/\s+/g, '');
+      
+      // Try to find matching brand color
+      const brandColor = (COLORS.assetBrands as Record<string, string>)[normalizedName] 
+        || (COLORS.assetBrands as Record<string, string>)[assetName.toLowerCase()]
+        || (COLORS.assetBrands as Record<string, string>)['default'];
+      
+      colors[assetName] = brandColor;
+    });
+    
+    return colors;
+  }, [assetDistribution]);
   
   // Risk colors - map to proper case
   const riskColors = {

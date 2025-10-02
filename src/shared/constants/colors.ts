@@ -56,6 +56,83 @@ export const COLORS = {
     decenary: '#EC4899',
   },
 
+  // Asset-specific brand colors (for Breakdown by Asset chart)
+  assetBrands: {
+    // Major assets
+    'bitcoin': '#F7931A',       // Bitcoin orange
+    'btc': '#F7931A',
+    'ethereum': '#627EEA',      // Ethereum blue
+    'eth': '#627EEA',
+    'solana': '#9945FF',        // Solana purple
+    'sol': '#9945FF',
+    'bnb': '#F3BA2F',           // Binance yellow
+    'xrp': '#23292F',           // Ripple black/dark
+    'cardano': '#0033AD',       // Cardano blue
+    'ada': '#0033AD',
+    'avalanche': '#E84142',     // Avalanche red
+    'avax': '#E84142',
+    'polygon': '#8247E5',       // Polygon purple
+    'matic': '#8247E5',
+    'polkadot': '#E6007A',      // Polkadot pink
+    'dot': '#E6007A',
+    
+    // Stablecoins
+    'usdc': '#2775CA',          // USDC blue
+    'usdt': '#26A17B',          // Tether green
+    'dai': '#F5AC37',           // DAI gold
+    'usdd': '#1E3A8A',          // USDD blue
+    
+    // Memecoins & Popular tokens
+    'dogecoin': '#C3A634',      // Dogecoin gold
+    'doge': '#C3A634',
+    'shiba': '#FFA409',         // Shiba orange
+    'shib': '#FFA409',
+    'pepe': '#3D9944',          // Pepe green
+    'bonk': '#F5A623',          // Bonk orange
+    'wif': '#FF6B9D',           // WIF pink
+    'popcat': '#FFB347',        // Popcat orange
+    
+    // DeFi tokens
+    'uniswap': '#FF007A',       // Uniswap pink
+    'uni': '#FF007A',
+    'aave': '#B6509E',          // Aave purple
+    'curve': '#40649F',         // Curve blue
+    'crv': '#40649F',
+    'compound': '#00D395',      // Compound teal
+    'comp': '#00D395',
+    'maker': '#1AAB9B',         // Maker teal
+    'mkr': '#1AAB9B',
+    
+    // Solana ecosystem
+    'jto': '#00D4AA',           // Jupiter teal (JTO = Jupiter governance)
+    'jupiter': '#00D4AA',
+    'jup': '#00D4AA',
+    'raydium': '#C03FD5',       // Raydium purple
+    'ray': '#C03FD5',
+    'orca': '#00D1FF',          // Orca blue
+    'bonk': '#F5A623',          // Bonk orange
+    'drift': '#9945FF',         // Drift purple
+    'marinade': '#FF5F00',      // Marinade orange
+    'mnde': '#FF5F00',
+    'kamino': '#4CAF50',        // Kamino green
+    'pyth': '#6C50DB',          // Pyth purple
+    'jito': '#00E7A9',          // Jito teal
+    
+    // Altcoins
+    'chainlink': '#2A5ADA',     // Chainlink blue
+    'link': '#2A5ADA',
+    'litecoin': '#345D9D',      // Litecoin blue
+    'ltc': '#345D9D',
+    'render': '#FF0099',        // Render pink
+    'rndr': '#FF0099',
+    'near': '#000000',          // NEAR black
+    'cosmos': '#2E3148',        // Cosmos dark blue
+    'atom': '#2E3148',
+    
+    // Default fallback
+    'default': '#6B7280',       // Gray for unknown assets
+  },
+
   // Risk level colors
   risk: {
     high: '#EF4444',       // Red for high risk
