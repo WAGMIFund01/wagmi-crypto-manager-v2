@@ -30,6 +30,7 @@ export default async function DashboardPage() {
       session={session}
       kpiData={transformedKpiData}
       hasError={hasError}
+      dataSource="wagmi-fund"
     />
   );
 }

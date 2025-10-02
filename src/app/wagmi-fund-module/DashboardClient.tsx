@@ -49,13 +49,13 @@ export default function DashboardClient({ session, kpiData: initialKpiData, hasE
   console.log('DashboardClient - dataSource:', dataSource);
   console.log('DashboardClient - activeTab:', activeTab);
 
-  // Ensure kpiData is set correctly on mount and when initialKpiData changes
+  // Ensure kpiData is always synced with initialKpiData
+  // This handles both initial mount and subsequent server-side updates
   useEffect(() => {
-    if (initialKpiData) {
-      console.log('Setting kpiData from initialKpiData:', initialKpiData);
-      setKpiData(initialKpiData);
-    }
-  }, [initialKpiData]);
+    console.log('KPI sync effect triggered - initialKpiData:', initialKpiData, 'current kpiData:', kpiData);
+    // Always update if initialKpiData changes, even if it's null
+    setKpiData(initialKpiData);
+  }, [initialKpiData]); // Removed kpiData from dependencies to prevent loops
 
   // Data source is now passed as a prop from the parent component
 
