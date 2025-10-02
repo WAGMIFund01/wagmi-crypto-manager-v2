@@ -312,15 +312,6 @@ export default function Analytics({ onRefresh, dataSource = 'wagmi-fund' }: Anal
       {/* Performance Charts Section */}
       {performanceData.length > 0 && (
         <div className="mt-8">
-          <h3 
-            className="text-xl font-bold mb-6"
-              style={{ 
-                color: '#00FF95',
-                textShadow: '0 0 10px rgba(0, 255, 149, 0.3)'
-              }}
-            >
-            Historical Performance Analysis
-            </h3>
           <PerformanceCharts data={performanceData} />
         </div>
       )}

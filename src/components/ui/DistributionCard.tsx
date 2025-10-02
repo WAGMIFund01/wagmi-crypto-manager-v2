@@ -101,7 +101,7 @@ export const LocationDistributionCard: React.FC<{
     title="Location Distribution"
     data={data}
     totalValue={totalValue}
-    colorMap={COLORS.chart}
+    colorMap={COLORS.chain}
     formatValue={formatValue}
     className={className}
   />

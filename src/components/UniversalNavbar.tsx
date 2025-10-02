@@ -300,16 +300,17 @@ export default function UniversalNavbar({
   return (
     <header style={{ backgroundColor: '#1A1A1A' }}>
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        {/* Mobile Layout */}
+        {/* Mobile Layout - Optimized */}
         <div className="md:hidden">
-          {/* Mobile Row 1 - Brand */}
-          <div className="flex justify-center items-center py-4">
+          {/* Mobile Header - Brand + Controls */}
+          <div className="flex justify-between items-center py-3">
+            {/* Brand */}
             <h1 
               className="font-bold cursor-pointer"
               onClick={() => router.push('/module-selection')}
               style={{ 
                 color: '#00FF95',
-                fontSize: '28px',
+                fontSize: '24px',
                 lineHeight: '1.2',
                 textShadow: '0 0 25px rgba(0, 255, 149, 0.6), 0 0 50px rgba(0, 255, 149, 0.4), 0 0 75px rgba(0, 255, 149, 0.2)',
                 letterSpacing: '0.05em'
@@ -317,79 +318,81 @@ export default function UniversalNavbar({
             >
               WAGMI
             </h1>
+            
+            {/* Controls */}
+            <div className="flex items-center space-x-2">
+              {/* Module Selector Button - Mobile */}
+              <WagmiButton
+                onClick={() => router.push('/module-selection')}
+                variant="outline"
+                theme="green"
+                size="icon"
+                icon={
+                  <svg fill="currentColor" viewBox="0 0 24 24" className="w-3 h-3">
+                    <path d="M3 13h2v-2H3v2zm0 4h2v-2H3v2zm0-8h2V7H3v2zm4 4h14v-2H7v2zm0 4h14v-2H7v2zM7 7v2h14V7H7z"/>
+                  </svg>
+                }
+                title="Module Selector"
+              />
+              
+              {/* Refresh Icon */}
+              <WagmiButton
+                onClick={handleRetryKPI}
+                disabled={isRetrying}
+                variant="outline"
+                theme="green"
+                size="icon"
+                icon={<RefreshIcon className="w-3 h-3" />}
+                loading={isRetrying}
+                title="Refresh prices & data"
+              />
+
+              {/* Privacy Toggle */}
+              <WagmiButton
+                onClick={() => {
+                  const newPrivacyMode = !isPrivacyMode;
+                  setIsPrivacyMode(newPrivacyMode);
+                  onPrivacyModeChange?.(newPrivacyMode);
+                }}
+                variant={isPrivacyMode ? "primary" : "outline"}
+                theme="green"
+                size="icon"
+                icon={
+                  isPrivacyMode ? (
+                    <svg fill="currentColor" viewBox="0 0 24 24">
+                      <path d="M12 4.5C7 4.5 2.73 7.61 1 12c1.73 4.39 6 7.5 11 7.5s9.27-3.11 11-7.5c-1.73-4.39-6-7.5-11-7.5zM12 17c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5-5 5zm0-8c-1.66 0-3 1.34-3 3s1.34 3 3 3 3-1.34 3-3-1.34-3-3-3z"/>
+                      <path d="M2 2l20 20" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/>
+                    </svg>
+                  ) : (
+                    <svg fill="currentColor" viewBox="0 0 24 24">
+                      <path d="M12 4.5C7 4.5 2.73 7.61 1 12c1.73 4.39 6 7.5 11 7.5s9.27-3.11 11-7.5c-1.73-4.39-6-7.5-11-7.5zM12 17c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5-5 5zm0-8c-1.66 0-3 1.34-3 3s1.34 3 3 3 3-1.34 3-3-1.34-3-3-3z"/>
+                    </svg>
+                  )
+                }
+                title={isPrivacyMode ? 'Show Data' : 'Privacy Mode'}
+              />
+
+              {/* Exit Dev Mode Button */}
+              <WagmiButton
+                onClick={handleSignOut}
+                variant="outline"
+                theme="green"
+                size="icon"
+                icon={
+                  <svg fill="currentColor" viewBox="0 0 24 24">
+                    <path d="M17 7l-1.41 1.41L18.17 11H8v2h10.17l-2.58 2.58L17 17l5-5zM4 5h8V3H4c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h8v-2H4V5z"/>
+                  </svg>
+                }
+                title="Exit Dev Mode"
+              />
+            </div>
           </div>
           
-          {/* Mobile Row 2 - Controls */}
-          <div className="flex justify-center items-center space-x-3 pb-4">
-            {/* Last Updated Timestamp - Mobile */}
+          {/* Mobile Timestamp */}
+          <div className="flex justify-center pb-3">
             <p style={{ color: '#A0A0A0', fontSize: '11px' }}>
               Last updated: {lastUpdatedTimestamp ? formatTimestampForDisplay(lastUpdatedTimestamp) : 'Unknown'}
             </p>
-            
-            {/* Module Selector Button - Mobile */}
-            <WagmiButton
-              onClick={() => router.push('/module-selection')}
-              variant="outline"
-              theme="green"
-              size="icon"
-              icon={
-                <svg fill="currentColor" viewBox="0 0 24 24" className="w-3 h-3">
-                  <path d="M3 13h2v-2H3v2zm0 4h2v-2H3v2zm0-8h2V7H3v2zm4 4h14v-2H7v2zm0 4h14v-2H7v2zM7 7v2h14V7H7z"/>
-                </svg>
-              }
-              title="Module Selector"
-            />
-            
-            {/* Refresh Icon */}
-            <WagmiButton
-              onClick={handleRetryKPI}
-              disabled={isRetrying}
-              variant="outline"
-              theme="green"
-              size="icon"
-              icon={<RefreshIcon className="w-3 h-3" />}
-              loading={isRetrying}
-              title="Refresh prices & data"
-            />
-
-            {/* Privacy Toggle */}
-            <WagmiButton
-              onClick={() => {
-                const newPrivacyMode = !isPrivacyMode;
-                setIsPrivacyMode(newPrivacyMode);
-                onPrivacyModeChange?.(newPrivacyMode);
-              }}
-              variant={isPrivacyMode ? "primary" : "outline"}
-              theme="green"
-              size="icon"
-              icon={
-                isPrivacyMode ? (
-                  <svg fill="currentColor" viewBox="0 0 24 24">
-                    <path d="M12 4.5C7 4.5 2.73 7.61 1 12c1.73 4.39 6 7.5 11 7.5s9.27-3.11 11-7.5c-1.73-4.39-6-7.5-11-7.5zM12 17c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5-5 5zm0-8c-1.66 0-3 1.34-3 3s1.34 3 3 3 3-1.34 3-3-1.34-3-3-3z"/>
-                    <path d="M2 2l20 20" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/>
-                  </svg>
-                ) : (
-                  <svg fill="currentColor" viewBox="0 0 24 24">
-                    <path d="M12 4.5C7 4.5 2.73 7.61 1 12c1.73 4.39 6 7.5 11 7.5s9.27-3.11 11-7.5c-1.73-4.39-6-7.5-11-7.5zM12 17c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5-5 5zm0-8c-1.66 0-3 1.34-3 3s1.34 3 3 3 3-1.34 3-3-1.34-3-3-3z"/>
-                  </svg>
-                )
-              }
-              title={isPrivacyMode ? 'Show Data' : 'Privacy Mode'}
-            />
-
-            {/* Exit Dev Mode Button */}
-            <WagmiButton
-              onClick={handleSignOut}
-              variant="outline"
-              theme="green"
-              size="icon"
-              icon={
-                <svg fill="currentColor" viewBox="0 0 24 24">
-                  <path d="M17 7l-1.41 1.41L18.17 11H8v2h10.17l-2.58 2.58L17 17l5-5zM4 5h8V3H4c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h8v-2H4V5z"/>
-                </svg>
-              }
-              title="Exit Dev Mode"
-            />
           </div>
           
           {/* Mobile Row 3 - KPI Ribbon */}
