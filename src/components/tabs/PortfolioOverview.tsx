@@ -559,52 +559,34 @@ export default function PortfolioOverview({ className, onRefresh, isPrivacyMode 
             <table className="w-full table-fixed">
             <thead className="bg-gray-900/50">
               <tr>
-                <th className="w-32">
-                  <SortableHeader sortKey="assetName" currentSort={sortConfig} onSort={handleSort} align="left">
-                    Asset
-                  </SortableHeader>
-                </th>
-                <th className="w-20">
-                  <SortableHeader sortKey="chain" currentSort={sortConfig} onSort={handleSort} align="left">
-                    Chain
-                  </SortableHeader>
-                </th>
-                <th className="w-16">
-                  <SortableHeader sortKey="riskLevel" currentSort={sortConfig} onSort={handleSort} align="left">
-                    Risk
-                  </SortableHeader>
-                </th>
-                <th className="w-24">
-                  <SortableHeader sortKey="location" currentSort={sortConfig} onSort={handleSort} align="left">
-                    Location
-                  </SortableHeader>
-                </th>
-                <th className="w-20">
-                  <SortableHeader sortKey="coinType" currentSort={sortConfig} onSort={handleSort} align="left">
-                    Type
-                  </SortableHeader>
-                </th>
-                <th className="w-24">
-                  <SortableHeader sortKey="quantity" currentSort={sortConfig} onSort={handleSort} align="right">
-                    Quantity
-                  </SortableHeader>
-                </th>
-                <th className="w-20">
-                  <SortableHeader sortKey="currentPrice" currentSort={sortConfig} onSort={handleSort} align="right">
-                    Price
-                  </SortableHeader>
-                </th>
-                <th className="w-20">
-                  <SortableHeader sortKey="priceChange24h" currentSort={sortConfig} onSort={handleSort} align="right">
-                    24h Change
-                  </SortableHeader>
-                </th>
-                <th className="w-24">
-                  <SortableHeader sortKey="totalValue" currentSort={sortConfig} onSort={handleSort} align="right">
-                    Value
-                  </SortableHeader>
-                </th>
-                <th className="w-24 text-center sticky right-0 bg-gray-900/95 backdrop-blur-sm z-10 border-l border-gray-700">
+                <SortableHeader sortKey="assetName" currentSort={sortConfig} onSort={handleSort} align="left" className="w-32">
+                  Asset
+                </SortableHeader>
+                <SortableHeader sortKey="chain" currentSort={sortConfig} onSort={handleSort} align="left" className="w-20">
+                  Chain
+                </SortableHeader>
+                <SortableHeader sortKey="riskLevel" currentSort={sortConfig} onSort={handleSort} align="left" className="w-16">
+                  Risk
+                </SortableHeader>
+                <SortableHeader sortKey="location" currentSort={sortConfig} onSort={handleSort} align="left" className="w-24">
+                  Location
+                </SortableHeader>
+                <SortableHeader sortKey="coinType" currentSort={sortConfig} onSort={handleSort} align="left" className="w-20">
+                  Type
+                </SortableHeader>
+                <SortableHeader sortKey="quantity" currentSort={sortConfig} onSort={handleSort} align="right" className="w-24">
+                  Quantity
+                </SortableHeader>
+                <SortableHeader sortKey="currentPrice" currentSort={sortConfig} onSort={handleSort} align="right" className="w-20">
+                  Price
+                </SortableHeader>
+                <SortableHeader sortKey="priceChange24h" currentSort={sortConfig} onSort={handleSort} align="right" className="w-20">
+                  24h Change
+                </SortableHeader>
+                <SortableHeader sortKey="totalValue" currentSort={sortConfig} onSort={handleSort} align="right" className="w-24">
+                  Value
+                </SortableHeader>
+                <th className="w-24 text-center sticky right-0 bg-gray-900/95 backdrop-blur-sm z-10 border-l border-gray-700 px-6 py-3">
                   <WagmiText variant="label" color="muted">Actions</WagmiText>
                 </th>
               </tr>
