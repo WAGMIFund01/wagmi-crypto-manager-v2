@@ -300,6 +300,53 @@ export default function PortfolioOverview({ className, onRefresh, isPrivacyMode 
     };
   };
 
+  // Calculate distributions and colors - Must be before early returns to comply with React Hooks rules
+  const calculateDistribution = useMemo(() => (groupBy: keyof PortfolioAsset) => {
+    const groups: { [key: string]: number } = {};
+    assets.forEach(asset => {
+      const value = asset[groupBy];
+      if (value !== undefined && value !== null) {
+        const key = value.toString();
+        groups[key] = (groups[key] || 0) + asset.totalValue;
+      }
+    });
+    return groups;
+  }, [assets]);
+
+  const assetDistribution = useMemo(() => calculateDistribution('assetName'), [calculateDistribution]);
+  const detailedRiskDistribution = useMemo(() => assets.reduce((acc, asset) => {
+    acc[asset.riskLevel] = (acc[asset.riskLevel] || 0) + (asset.quantity * asset.currentPrice);
+    return acc;
+  }, {} as Record<string, number>), [assets]);
+
+  const locationDistribution = useMemo(() => calculateDistribution('location'), [calculateDistribution]);
+  const assetTypeDistribution = useMemo(() => assets.reduce((acc, asset) => {
+    acc[asset.coinType] = (acc[asset.coinType] || 0) + (asset.quantity * asset.currentPrice);
+    return acc;
+  }, {} as Record<string, number>), [assets]);
+
+  const totalValue = useMemo(() => assets.reduce((sum, asset) => sum + (asset.quantity * asset.currentPrice), 0), [assets]);
+
+  // Map asset names to brand-specific colors
+  const assetColors = useMemo(() => {
+    const colors: Record<string, string> = {};
+    const uniqueAssets = Object.keys(assetDistribution);
+    
+    uniqueAssets.forEach(assetName => {
+      // Normalize asset name for lookup (lowercase, remove spaces)
+      const normalizedName = assetName.toLowerCase().replace(/\s+/g, '');
+      
+      // Try to find matching brand color
+      const brandColor = (COLORS.assetBrands as Record<string, string>)[normalizedName] 
+        || (COLORS.assetBrands as Record<string, string>)[assetName.toLowerCase()]
+        || (COLORS.assetBrands as Record<string, string>)['default'];
+      
+      colors[assetName] = brandColor;
+    });
+    
+    return colors;
+  }, [assetDistribution]);
+
   if (loading) {
     return (
       <div className={`${className} space-y-6`}>
@@ -373,86 +420,7 @@ export default function PortfolioOverview({ className, onRefresh, isPrivacyMode 
     );
   }
 
-  const totalPortfolioValue = assets.reduce((sum, asset) => sum + asset.totalValue, 0);
-
-  // Calculate distributions for charts
-  // Calculate distributions and colors BEFORE any early returns
-  const calculateDistribution = useMemo(() => (groupBy: keyof PortfolioAsset) => {
-    const groups: { [key: string]: number } = {};
-    assets.forEach(asset => {
-      const value = asset[groupBy];
-      if (value !== undefined && value !== null) {
-        const key = value.toString();
-        groups[key] = (groups[key] || 0) + asset.totalValue;
-      }
-    });
-    return groups;
-  }, [assets]);
-
-  const assetDistribution = useMemo(() => calculateDistribution('assetName'), [calculateDistribution]);
-  const riskDistribution = useMemo(() => calculateDistribution('riskLevel'), [calculateDistribution]);
-  const locationDistribution = useMemo(() => calculateDistribution('location'), [calculateDistribution]);
-  const typeDistribution = useMemo(() => calculateDistribution('coinType'), [calculateDistribution]);
-
-  // Calculate detailed distributions for the new cards
-  const detailedRiskDistribution = useMemo(() => assets.reduce((acc, asset) => {
-    acc[asset.riskLevel] = (acc[asset.riskLevel] || 0) + (asset.quantity * asset.currentPrice);
-    return acc;
-  }, {} as Record<string, number>), [assets]);
-
-  const chainDistribution = useMemo(() => assets.reduce((acc, asset) => {
-    acc[asset.chain] = (acc[asset.chain] || 0) + (asset.quantity * asset.currentPrice);
-    return acc;
-  }, {} as Record<string, number>), [assets]);
-
-  const assetTypeDistribution = useMemo(() => assets.reduce((acc, asset) => {
-    acc[asset.coinType] = (acc[asset.coinType] || 0) + (asset.quantity * asset.currentPrice);
-    return acc;
-  }, {} as Record<string, number>), [assets]);
-
-  const totalValue = useMemo(() => assets.reduce((sum, asset) => sum + (asset.quantity * asset.currentPrice), 0), [assets]);
-
-  // Color palettes for different chart types
-  // Map asset names to brand-specific colors
-  const assetColors = useMemo(() => {
-    const colors: Record<string, string> = {};
-    const uniqueAssets = Object.keys(assetDistribution);
-    
-    uniqueAssets.forEach(assetName => {
-      // Normalize asset name for lookup (lowercase, remove spaces)
-      const normalizedName = assetName.toLowerCase().replace(/\s+/g, '');
-      
-      // Try to find matching brand color
-      const brandColor = (COLORS.assetBrands as Record<string, string>)[normalizedName] 
-        || (COLORS.assetBrands as Record<string, string>)[assetName.toLowerCase()]
-        || (COLORS.assetBrands as Record<string, string>)['default'];
-      
-      colors[assetName] = brandColor;
-    });
-    
-    return colors;
-  }, [assetDistribution]);
-  
-  // Risk colors - map to proper case
-  const riskColors = {
-    'High': COLORS.risk.high,
-    'Medium': COLORS.risk.medium,
-    'Low': COLORS.risk.low,
-    'Degen': COLORS.risk.degen,
-    'None': COLORS.risk.none
-  };
-  
-  const locationColors = Object.values(COLORS.chart);
-  
-  // Asset type colors - map to proper case
-  const typeColors = {
-    'Memecoin': COLORS.assetType.memecoin,
-    'Major': COLORS.assetType.major,
-    'Altcoin': COLORS.assetType.altcoin,
-    'Stablecoin': COLORS.assetType.stablecoin,
-    'DeFi': COLORS.assetType.defi,
-    'NFT': COLORS.assetType.nft
-  };
+  // No duplicate logic needed - all distributions calculated above before early returns
 
 
   // Performance dashboard doesn't use this component
