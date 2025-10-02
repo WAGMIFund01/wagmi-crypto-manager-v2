@@ -2,8 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { PortfolioAsset } from '@/lib/sheetsAdapter';
-import { WagmiCard, WagmiSpinner, WagmiButton, RiskDistributionCard, LocationDistributionCard, AssetTypeDistributionCard } from '@/components/ui';
-import { COLORS } from '@/shared/constants/colors';
+import { WagmiSpinner, WagmiButton, PerformerCard, RiskDistributionCard, LocationDistributionCard, AssetTypeDistributionCard } from '@/components/ui';
 import PerformanceCharts from '@/components/charts/PerformanceCharts';
 import { fetchPerformanceData, PerformanceData } from '@/services/performanceDataService';
 
@@ -229,65 +228,20 @@ export default function Analytics({ onRefresh, dataSource = 'wagmi-fund' }: Anal
 
       {/* Performance Analysis */}
       <div className="grid grid-cols-1 xl:grid-cols-2 gap-4 md:gap-6">
-        {/* Top Performers */}
-        <WagmiCard variant="default" theme="green" size="lg">
-          <div className="pt-2 pb-4 px-4 md:pt-3 md:pb-6 md:px-6">
-            <h3 className="text-lg font-semibold mb-2" style={{ color: COLORS.text.primary }}>Top Performers (24h)</h3>
-            <div className="space-y-2 md:space-y-3">
-              {analyticsData.topPerformers.map((asset, index) => (
-                <div key={asset.symbol} className="flex items-center justify-between p-2 md:p-3 bg-gray-800/50 rounded-lg">
-                  <div className="flex items-center space-x-2 md:space-x-3 min-w-0 flex-1">
-                    <div className="w-6 h-6 md:w-8 md:h-8 bg-green-600 rounded-full flex items-center justify-center text-white text-xs md:text-sm font-bold flex-shrink-0">
-                      {index + 1}
-                    </div>
-                    <div className="min-w-0 flex-1">
-                      <div className="text-white font-medium text-sm md:text-base truncate">{asset.symbol}</div>
-                      <div className="text-gray-400 text-xs md:text-sm truncate">{asset.name}</div>
-                    </div>
-                  </div>
-                  <div className="text-right flex-shrink-0 ml-2">
-                    <div className="text-green-400 font-medium text-sm md:text-base">
-                      {formatPercentage(asset.returnPercentage)}
-                    </div>
-                    <div className="text-gray-400 text-xs md:text-sm">
-                      {formatCurrency(asset.value)}
-                    </div>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </div>
-        </WagmiCard>
-
-        {/* Worst Performers */}
-        <WagmiCard variant="default" theme="green" size="lg">
-          <div className="pt-2 pb-4 px-4 md:pt-3 md:pb-6 md:px-6">
-            <h3 className="text-lg font-semibold mb-2" style={{ color: COLORS.text.primary }}>Worst Performers (24h)</h3>
-            <div className="space-y-2 md:space-y-3">
-              {analyticsData.worstPerformers.map((asset, index) => (
-                <div key={asset.symbol} className="flex items-center justify-between p-2 md:p-3 bg-gray-800/50 rounded-lg">
-                  <div className="flex items-center space-x-2 md:space-x-3 min-w-0 flex-1">
-                    <div className="w-6 h-6 md:w-8 md:h-8 bg-red-600 rounded-full flex items-center justify-center text-white text-xs md:text-sm font-bold flex-shrink-0">
-                      {index + 1}
-                    </div>
-                    <div className="min-w-0 flex-1">
-                      <div className="text-white font-medium text-sm md:text-base truncate">{asset.symbol}</div>
-                      <div className="text-gray-400 text-xs md:text-sm truncate">{asset.name}</div>
-                    </div>
-                  </div>
-                  <div className="text-right flex-shrink-0 ml-2">
-                    <div className="text-red-400 font-medium text-sm md:text-base">
-                      {formatPercentage(asset.returnPercentage)}
-                    </div>
-                    <div className="text-gray-400 text-xs md:text-sm">
-                      {formatCurrency(asset.value)}
-                    </div>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </div>
-        </WagmiCard>
+        <PerformerCard
+          title="Top Performers (24h)"
+          performers={analyticsData.topPerformers}
+          type="top"
+          formatPercentage={formatPercentage}
+          formatCurrency={formatCurrency}
+        />
+        <PerformerCard
+          title="Worst Performers (24h)"
+          performers={analyticsData.worstPerformers}
+          type="worst"
+          formatPercentage={formatPercentage}
+          formatCurrency={formatCurrency}
+        />
       </div>
 
       {/* Portfolio Distribution */}

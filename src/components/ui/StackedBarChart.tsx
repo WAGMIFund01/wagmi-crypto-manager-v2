@@ -14,7 +14,7 @@ interface StackedBarChartProps {
   headerButton?: React.ReactNode;
 }
 
-export default function StackedBarChart({
+const StackedBarChart = React.memo(function StackedBarChart({
   title,
   data,
   colors,
@@ -122,4 +122,6 @@ export default function StackedBarChart({
       </div>
     </WagmiCard>
   );
-}
+});
+
+export default StackedBarChart;

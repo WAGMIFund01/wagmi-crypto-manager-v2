@@ -28,6 +28,10 @@ export {
 // Distribution Components
 export { default as DistributionCard, RiskDistributionCard, LocationDistributionCard, AssetTypeDistributionCard } from './DistributionCard';
 
+// Card Components
+export { default as CardHeader } from './CardHeader';
+export { default as PerformerCard } from './PerformerCard';
+
 // Loading Components
 export { 
   Skeleton, 

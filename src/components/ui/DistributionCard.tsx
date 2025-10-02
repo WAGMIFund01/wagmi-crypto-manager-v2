@@ -20,7 +20,7 @@ interface DistributionCardProps {
   className?: string;
 }
 
-export default function DistributionCard({
+const DistributionCard = React.memo(function DistributionCard({
   title,
   data,
   totalValue,
@@ -72,7 +72,9 @@ export default function DistributionCard({
       </div>
     </WagmiCard>
   );
-}
+});
+
+export default DistributionCard;
 
 // Pre-configured distribution card variants
 export const RiskDistributionCard: React.FC<{

@@ -1,13 +1,16 @@
 'use client';
 
 import { useRouter, useSearchParams, usePathname } from 'next/navigation';
-import { useEffect, useState } from 'react';
+import { useEffect, useState, lazy, Suspense } from 'react';
 import UniversalNavbar from '@/components/UniversalNavbar';
-import PortfolioOverview from '@/components/tabs/PortfolioOverview';
-import Analytics from '@/components/tabs/Analytics';
-import Investors from '@/components/tabs/Investors';
-import PerformanceDashboard from '@/components/PerformanceDashboard';
+import { WagmiSpinner } from '@/components/ui';
 import { COLORS } from '@/shared/constants/colors';
+
+// Lazy load tab components for better performance
+const PortfolioOverview = lazy(() => import('@/components/tabs/PortfolioOverview'));
+const Analytics = lazy(() => import('@/components/tabs/Analytics'));
+const Investors = lazy(() => import('@/components/tabs/Investors'));
+const PerformanceDashboard = lazy(() => import('@/components/PerformanceDashboard'));
 
 interface Session {
   user?: {
@@ -308,7 +311,13 @@ export default function DashboardClient({ session, kpiData: initialKpiData, hasE
 
       {/* Main Content */}
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        {renderTabContent()}
+        <Suspense fallback={
+          <div className="flex items-center justify-center min-h-[400px]">
+            <WagmiSpinner size="lg" />
+          </div>
+        }>
+          {renderTabContent()}
+        </Suspense>
       </main>
     </div>
   );
