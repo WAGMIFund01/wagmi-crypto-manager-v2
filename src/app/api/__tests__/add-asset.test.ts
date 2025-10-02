@@ -62,7 +62,10 @@ describe('/api/add-asset', () => {
     expect(response.status).toBe(200)
     expect(result.success).toBe(true)
     expect(result.message).toBe(mockResponse.message)
-    expect(assetManagementService.addAsset).toHaveBeenCalledWith(assetData)
+    expect(assetManagementService.addAsset).toHaveBeenCalledWith({
+      ...assetData,
+      dataSource: 'wagmi-fund'
+    })
   })
 
   it('should handle validation errors', async () => {
