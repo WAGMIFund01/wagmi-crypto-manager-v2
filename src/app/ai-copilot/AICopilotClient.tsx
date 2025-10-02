@@ -28,21 +28,42 @@ export default function AICopilotClient({ session }: AICopilotClientProps) {
 
   // Check for dev mode
   useEffect(() => {
-    const devModeEnabled = process.env.NODE_ENV === 'development' && 
-                          (process.env.NEXT_PUBLIC_DEV_MODE === 'true' || 
-                           typeof window !== 'undefined' && window.localStorage.getItem('devMode') === 'true');
-    setIsDevMode(devModeEnabled);
+    // Check for dev mode session (same pattern as other modules)
+    const devSessionData = sessionStorage.getItem('devSession');
+    const devMode = sessionStorage.getItem('isDevMode');
+    
+    console.log('AI Copilot - Auth check - devMode:', devMode, 'devSessionData:', devSessionData ? 'exists' : 'null', 'session:', session ? 'exists' : 'null');
+    
+    if (devMode === 'true' && devSessionData) {
+      try {
+        const parsedDevSession = JSON.parse(devSessionData);
+        console.log('AI Copilot - Setting dev session:', parsedDevSession);
+        setDevSession(parsedDevSession);
+        setIsDevMode(true);
+        setIsCheckingAuth(false);
+        return; // Skip OAuth session checks in dev mode
+      } catch (error) {
+        console.error('Error parsing dev session:', error);
+        // Clear invalid dev session
+        sessionStorage.removeItem('devSession');
+        sessionStorage.removeItem('isDevMode');
+      }
+    }
 
-    if (devModeEnabled && !session) {
-      setDevSession({
-        user: {
-          email: 'dev@example.com',
-          name: 'Dev User',
-          role: 'manager' as const
-        }
-      } as any);
+    // Regular OAuth session checks
+    if (!session) {
+      console.log('AI Copilot - No session found, redirecting to /login');
+      setIsCheckingAuth(false);
+      return;
     }
     
+    if (session.user?.role === 'unauthorized') {
+      console.log('AI Copilot - Unauthorized role, redirecting to /login');
+      setIsCheckingAuth(false);
+      return;
+    }
+
+    console.log('AI Copilot - Valid session found');
     setIsCheckingAuth(false);
   }, [session]);
 
