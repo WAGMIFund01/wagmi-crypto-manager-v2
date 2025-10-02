@@ -92,6 +92,7 @@ export const COLORS = {
   // Location colors (wallets, platforms, exchanges)
   location: {
     'phantom wallet': '#9945FF',      // Solana purple
+    'phantom': '#9945FF',             // Phantom (same as Phantom wallet)
     'orca lp': '#00D1FF',             // Orca blue
     'metamask': '#F6851B',            // MetaMask orange
     'ledger': '#000000',              // Ledger black (will show as dark gray)
@@ -100,6 +101,7 @@ export const COLORS = {
     'kraken': '#5741D9',              // Kraken purple
     'raydium': '#C03FD5',             // Raydium purple
     'jupiter': '#00D4AA',             // Jupiter teal
+    'jupiter staked': '#00D4AA',      // Jupiter staked (same as Jupiter)
     'drift': '#9945FF',               // Drift purple
     'marinade': '#FF5F00',            // Marinade orange
     'kamino': '#4CAF50',              // Kamino green
@@ -107,6 +109,10 @@ export const COLORS = {
     'uniswap': '#FF007A',             // Uniswap pink
     'curve': '#40649F',               // Curve blue
     'aave': '#B6509E',                // Aave purple
+    'hypercore staked': '#00FFA3',    // HyperCore Staked (Hyperliquid green)
+    'hypercore vault': '#00FFA3',     // HyperCore Vault (same as HyperCore Staked)
+    'hypercore': '#00FFA3',           // HyperCore (same as HyperCore Staked)
+    'rabby': '#8B7AFF',               // Rabby (Rabby Wallet brand purple)
     default: '#6B7280',               // Gray for unknown locations
   },
 
