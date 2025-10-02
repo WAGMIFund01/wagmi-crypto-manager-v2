@@ -376,7 +376,8 @@ export default function PortfolioOverview({ className, onRefresh, isPrivacyMode 
   const totalPortfolioValue = assets.reduce((sum, asset) => sum + asset.totalValue, 0);
 
   // Calculate distributions for charts
-  const calculateDistribution = (groupBy: keyof PortfolioAsset) => {
+  // Calculate distributions and colors BEFORE any early returns
+  const calculateDistribution = useMemo(() => (groupBy: keyof PortfolioAsset) => {
     const groups: { [key: string]: number } = {};
     assets.forEach(asset => {
       const value = asset[groupBy];
@@ -386,30 +387,30 @@ export default function PortfolioOverview({ className, onRefresh, isPrivacyMode 
       }
     });
     return groups;
-  };
+  }, [assets]);
 
-  const assetDistribution = calculateDistribution('assetName');
-  const riskDistribution = calculateDistribution('riskLevel');
-  const locationDistribution = calculateDistribution('location');
-  const typeDistribution = calculateDistribution('coinType');
+  const assetDistribution = useMemo(() => calculateDistribution('assetName'), [calculateDistribution]);
+  const riskDistribution = useMemo(() => calculateDistribution('riskLevel'), [calculateDistribution]);
+  const locationDistribution = useMemo(() => calculateDistribution('location'), [calculateDistribution]);
+  const typeDistribution = useMemo(() => calculateDistribution('coinType'), [calculateDistribution]);
 
   // Calculate detailed distributions for the new cards
-  const detailedRiskDistribution = assets.reduce((acc, asset) => {
+  const detailedRiskDistribution = useMemo(() => assets.reduce((acc, asset) => {
     acc[asset.riskLevel] = (acc[asset.riskLevel] || 0) + (asset.quantity * asset.currentPrice);
     return acc;
-  }, {} as Record<string, number>);
+  }, {} as Record<string, number>), [assets]);
 
-  const chainDistribution = assets.reduce((acc, asset) => {
+  const chainDistribution = useMemo(() => assets.reduce((acc, asset) => {
     acc[asset.chain] = (acc[asset.chain] || 0) + (asset.quantity * asset.currentPrice);
     return acc;
-  }, {} as Record<string, number>);
+  }, {} as Record<string, number>), [assets]);
 
-  const assetTypeDistribution = assets.reduce((acc, asset) => {
+  const assetTypeDistribution = useMemo(() => assets.reduce((acc, asset) => {
     acc[asset.coinType] = (acc[asset.coinType] || 0) + (asset.quantity * asset.currentPrice);
     return acc;
-  }, {} as Record<string, number>);
+  }, {} as Record<string, number>), [assets]);
 
-  const totalValue = assets.reduce((sum, asset) => sum + (asset.quantity * asset.currentPrice), 0);
+  const totalValue = useMemo(() => assets.reduce((sum, asset) => sum + (asset.quantity * asset.currentPrice), 0), [assets]);
 
   // Color palettes for different chart types
   // Map asset names to brand-specific colors
