@@ -362,11 +362,6 @@ export default function PortfolioOverview({ className, onRefresh, isPrivacyMode 
     return acc;
   }, {} as Record<string, number>);
 
-  const locationDistribution = assets.reduce((acc, asset) => {
-    acc[asset.location] = (acc[asset.location] || 0) + (asset.quantity * asset.currentPrice);
-    return acc;
-  }, {} as Record<string, number>);
-
   const totalValue = assets.reduce((sum, asset) => sum + (asset.quantity * asset.currentPrice), 0);
 
   // Color palettes for different chart types
