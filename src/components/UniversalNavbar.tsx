@@ -326,6 +326,20 @@ export default function UniversalNavbar({
               Last updated: {lastUpdatedTimestamp ? formatTimestampForDisplay(lastUpdatedTimestamp) : 'Unknown'}
             </p>
             
+            {/* Module Selector Button - Mobile */}
+            <WagmiButton
+              onClick={() => router.push('/module-selection')}
+              variant="outline"
+              theme="green"
+              size="icon"
+              icon={
+                <svg fill="currentColor" viewBox="0 0 24 24" className="w-3 h-3">
+                  <path d="M3 13h2v-2H3v2zm0 4h2v-2H3v2zm0-8h2V7H3v2zm4 4h14v-2H7v2zm0 4h14v-2H7v2zM7 7v2h14V7H7z"/>
+                </svg>
+              }
+              title="Module Selector"
+            />
+            
             {/* Refresh Icon */}
             <WagmiButton
               onClick={handleRetryKPI}
@@ -505,6 +519,20 @@ export default function UniversalNavbar({
             <p className="mr-8" style={{ color: '#A0A0A0', fontSize: '12px' }}>
               Last updated: {lastUpdatedTimestamp ? formatTimestampForDisplay(lastUpdatedTimestamp) : 'Unknown'}
             </p>
+            
+            {/* Module Selector Button - Desktop */}
+            <WagmiButton
+              onClick={() => router.push('/module-selection')}
+              variant="outline"
+              theme="green"
+              size="icon"
+              icon={
+                <svg fill="currentColor" viewBox="0 0 24 24" className="w-3 h-3">
+                  <path d="M3 13h2v-2H3v2zm0 4h2v-2H3v2zm0-8h2V7H3v2zm4 4h14v-2H7v2zm0 4h14v-2H7v2zM7 7v2h14V7H7z"/>
+                </svg>
+              }
+              title="Module Selector"
+            />
             
             {/* Refresh Icon */}
             <WagmiButton
