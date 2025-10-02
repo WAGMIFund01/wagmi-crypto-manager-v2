@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { PortfolioAsset } from '@/lib/sheetsAdapter';
-import { WagmiCard, WagmiSpinner, WagmiButton } from '@/components/ui';
+import { WagmiCard, WagmiSpinner, WagmiButton, RiskDistributionCard, LocationDistributionCard, AssetTypeDistributionCard } from '@/components/ui';
 import { COLORS } from '@/shared/constants/colors';
 import PerformanceCharts from '@/components/charts/PerformanceCharts';
 import { fetchPerformanceData, PerformanceData } from '@/services/performanceDataService';
@@ -291,99 +291,22 @@ export default function Analytics({ onRefresh, dataSource = 'wagmi-fund' }: Anal
       </div>
 
       {/* Portfolio Distribution */}
-      <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4 md:gap-6">
-        {/* Risk Distribution */}
-        <WagmiCard variant="default" theme="green" size="lg">
-          <div className="p-6">
-            <h3 className="text-lg font-semibold text-white mb-4">Risk Distribution</h3>
-            <div className="space-y-3">
-              {Object.entries(analyticsData.riskDistribution).map(([risk, value]) => {
-                const percentage = (value / analyticsData.totalValue) * 100;
-                const color = (COLORS.risk as any)[risk.toLowerCase()] || '#6B7280';
-                return (
-                  <div key={risk} className="space-y-2">
-                    <div className="flex justify-between text-sm">
-                      <span className="text-gray-300">{risk}</span>
-                      <span className="text-white font-medium">{formatCurrency(value)}</span>
-                    </div>
-                    <div className="w-full bg-gray-700 rounded-full h-2">
-                      <div 
-                        className="h-2 rounded-full transition-all duration-300"
-                        style={{ 
-                          width: `${percentage}%`,
-                          backgroundColor: color
-                        }}
-                      />
-                    </div>
-                    <div className="text-xs text-gray-400">{percentage.toFixed(1)}%</div>
-                  </div>
-                );
-              })}
-            </div>
-          </div>
-        </WagmiCard>
-
-        {/* Chain Distribution */}
-        <WagmiCard variant="default" theme="green" size="lg">
-          <div className="p-6">
-            <h3 className="text-lg font-semibold text-white mb-4">Chain Distribution</h3>
-            <div className="space-y-3">
-              {Object.entries(analyticsData.chainDistribution).map(([chain, value]) => {
-                const percentage = (value / analyticsData.totalValue) * 100;
-                const color = (COLORS.chain as any)[chain.toLowerCase()] || '#6B7280';
-                return (
-                  <div key={chain} className="space-y-2">
-                    <div className="flex justify-between text-sm">
-                      <span className="text-gray-300">{chain}</span>
-                      <span className="text-white font-medium">{formatCurrency(value)}</span>
-                    </div>
-                    <div className="w-full bg-gray-700 rounded-full h-2">
-                      <div 
-                        className="h-2 rounded-full transition-all duration-300"
-        style={{ 
-                          width: `${percentage}%`,
-                          backgroundColor: color
-                        }}
-                      />
-                    </div>
-                    <div className="text-xs text-gray-400">{percentage.toFixed(1)}%</div>
-                  </div>
-                );
-              })}
-            </div>
-          </div>
-        </WagmiCard>
-
-        {/* Asset Type Distribution */}
-        <WagmiCard variant="default" theme="green" size="lg">
-          <div className="p-6">
-            <h3 className="text-lg font-semibold text-white mb-4">Asset Type Distribution</h3>
-            <div className="space-y-3">
-              {Object.entries(analyticsData.assetTypeDistribution).map(([type, value]) => {
-                const percentage = (value / analyticsData.totalValue) * 100;
-                const color = (COLORS.assetType as any)[type.toLowerCase()] || '#6B7280';
-                return (
-                  <div key={type} className="space-y-2">
-                    <div className="flex justify-between text-sm">
-                      <span className="text-gray-300">{type}</span>
-                      <span className="text-white font-medium">{formatCurrency(value)}</span>
-                    </div>
-                    <div className="w-full bg-gray-700 rounded-full h-2">
-                      <div 
-                        className="h-2 rounded-full transition-all duration-300"
-          style={{ 
-                          width: `${percentage}%`,
-                          backgroundColor: color
-                        }}
-                      />
-                    </div>
-                    <div className="text-xs text-gray-400">{percentage.toFixed(1)}%</div>
-                  </div>
-                );
-              })}
-            </div>
-          </div>
-        </WagmiCard>
+      <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-4 md:gap-6">
+        <RiskDistributionCard
+          data={analyticsData.riskDistribution}
+          totalValue={analyticsData.totalValue}
+          formatValue={formatCurrency}
+        />
+        <LocationDistributionCard
+          data={analyticsData.chainDistribution}
+          totalValue={analyticsData.totalValue}
+          formatValue={formatCurrency}
+        />
+        <AssetTypeDistributionCard
+          data={analyticsData.assetTypeDistribution}
+          totalValue={analyticsData.totalValue}
+          formatValue={formatCurrency}
+        />
       </div>
 
       {/* Performance Charts Section */}

@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect, useMemo } from 'react';
 import { PortfolioAsset } from '@/lib/sheetsAdapter';
-import { StackedBarChart, WagmiCard, WagmiSpinner, WagmiText, WagmiButton } from '@/components/ui';
+import { StackedBarChart, WagmiCard, WagmiSpinner, WagmiText, WagmiButton, RiskDistributionCard, LocationDistributionCard, AssetTypeDistributionCard, DistributionCardSkeleton, ChartSkeleton, Skeleton } from '@/components/ui';
 import SortableHeader from '@/components/ui/SortableHeader';
 import AssetSearchModal from '@/features/transactions/components/AssetSearchModal';
 import AddAssetForm from '@/features/transactions/components/AddAssetForm';
@@ -302,14 +302,61 @@ export default function PortfolioOverview({ className, onRefresh, isPrivacyMode 
 
   if (loading) {
     return (
-      <div className={`${className} flex items-center justify-center min-h-96`}>
-        <WagmiSpinner 
-          size="lg" 
-          theme="green" 
-          text="Loading portfolio data..." 
-          showText={true} 
-          centered={true}
-        />
+      <div className={`${className} space-y-6`}>
+        {/* Portfolio Breakdown Charts Skeleton */}
+        <div className="grid grid-cols-1 gap-6">
+          <ChartSkeleton />
+        </div>
+
+        {/* Portfolio Distribution Cards Skeleton */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-4 md:gap-6">
+          <DistributionCardSkeleton />
+          <DistributionCardSkeleton />
+          <DistributionCardSkeleton />
+        </div>
+
+        {/* Assets Table Skeleton */}
+        <div className="border border-gray-700 rounded-lg bg-gray-800/50 overflow-hidden">
+          <div className="px-6 py-4 border-b border-gray-700 flex justify-between items-center">
+            <Skeleton height="1.5rem" width="150px" />
+            <Skeleton height="2.5rem" width="100px" />
+          </div>
+          <div className="p-4">
+            <div className="space-y-3">
+              {Array.from({ length: 5 }).map((_, i) => (
+                <div key={i} className="bg-gray-800/50 rounded-lg p-4">
+                  <div className="flex justify-between items-start mb-3">
+                    <div className="flex items-center space-x-3">
+                      <Skeleton height="2rem" width="2rem" rounded />
+                      <div>
+                        <Skeleton height="1rem" width="80px" className="mb-1" />
+                        <Skeleton height="0.875rem" width="120px" />
+                      </div>
+                    </div>
+                    <div className="text-right">
+                      <Skeleton height="1.25rem" width="100px" className="mb-1" />
+                      <Skeleton height="0.875rem" width="80px" />
+                    </div>
+                  </div>
+                  <div className="grid grid-cols-3 gap-4">
+                    <div>
+                      <Skeleton height="0.75rem" width="40px" className="mb-1" />
+                      <Skeleton height="1rem" width="60px" />
+                    </div>
+                    <div>
+                      <Skeleton height="0.75rem" width="50px" className="mb-1" />
+                      <Skeleton height="1rem" width="80px" />
+                    </div>
+                    <div>
+                      <Skeleton height="0.75rem" width="30px" className="mb-1" />
+                      <Skeleton height="1rem" width="70px" />
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
       </div>
     );
   }
@@ -409,99 +456,22 @@ export default function PortfolioOverview({ className, onRefresh, isPrivacyMode 
       </div>
 
       {/* Portfolio Distribution Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4 md:gap-6">
-        {/* Risk Distribution */}
-        <WagmiCard variant="default" theme="green" size="lg">
-          <div className="p-6">
-            <h3 className="text-lg font-semibold text-white mb-4">Risk Distribution</h3>
-            <div className="space-y-3">
-              {Object.entries(detailedRiskDistribution).map(([risk, value]) => {
-                const percentage = totalValue > 0 ? (value / totalValue) * 100 : 0;
-                const color = (COLORS.risk as any)[risk.toLowerCase()] || '#6B7280';
-                return (
-                  <div key={risk} className="space-y-2">
-                    <div className="flex justify-between text-sm">
-                      <span className="text-gray-300">{risk}</span>
-                      <span className="text-white font-medium">{formatCurrency(value)}</span>
-                    </div>
-                    <div className="w-full bg-gray-700 rounded-full h-2">
-                      <div 
-                        className="h-2 rounded-full transition-all duration-300"
-                        style={{ 
-                          width: `${percentage}%`,
-                          backgroundColor: color
-                        }}
-                      />
-                    </div>
-                    <div className="text-xs text-gray-400">{percentage.toFixed(1)}%</div>
-                  </div>
-                );
-              })}
-            </div>
-          </div>
-        </WagmiCard>
-
-        {/* Location Distribution */}
-        <WagmiCard variant="default" theme="green" size="lg">
-          <div className="p-6">
-            <h3 className="text-lg font-semibold text-white mb-4">Location Distribution</h3>
-            <div className="space-y-3">
-              {Object.entries(locationDistribution).map(([location, value]) => {
-                const percentage = totalValue > 0 ? (value / totalValue) * 100 : 0;
-                const color = (COLORS.chart as any)[location.toLowerCase()] || '#6B7280';
-                return (
-                  <div key={location} className="space-y-2">
-                    <div className="flex justify-between text-sm">
-                      <span className="text-gray-300">{location}</span>
-                      <span className="text-white font-medium">{formatCurrency(value)}</span>
-                    </div>
-                    <div className="w-full bg-gray-700 rounded-full h-2">
-                      <div 
-                        className="h-2 rounded-full transition-all duration-300"
-                        style={{ 
-                          width: `${percentage}%`,
-                          backgroundColor: color
-                        }}
-                      />
-                    </div>
-                    <div className="text-xs text-gray-400">{percentage.toFixed(1)}%</div>
-                  </div>
-                );
-              })}
-            </div>
-          </div>
-        </WagmiCard>
-
-        {/* Asset Type Distribution */}
-        <WagmiCard variant="default" theme="green" size="lg">
-          <div className="p-6">
-            <h3 className="text-lg font-semibold text-white mb-4">Asset Type Distribution</h3>
-            <div className="space-y-3">
-              {Object.entries(assetTypeDistribution).map(([type, value]) => {
-                const percentage = totalValue > 0 ? (value / totalValue) * 100 : 0;
-                const color = (COLORS.assetType as any)[type.toLowerCase()] || '#6B7280';
-                return (
-                  <div key={type} className="space-y-2">
-                    <div className="flex justify-between text-sm">
-                      <span className="text-gray-300">{type}</span>
-                      <span className="text-white font-medium">{formatCurrency(value)}</span>
-                    </div>
-                    <div className="w-full bg-gray-700 rounded-full h-2">
-                      <div 
-                        className="h-2 rounded-full transition-all duration-300"
-                        style={{ 
-                          width: `${percentage}%`,
-                          backgroundColor: color
-                        }}
-                      />
-                    </div>
-                    <div className="text-xs text-gray-400">{percentage.toFixed(1)}%</div>
-                  </div>
-                );
-              })}
-            </div>
-          </div>
-        </WagmiCard>
+      <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-4 md:gap-6">
+        <RiskDistributionCard
+          data={detailedRiskDistribution}
+          totalValue={totalValue}
+          formatValue={formatCurrency}
+        />
+        <LocationDistributionCard
+          data={locationDistribution}
+          totalValue={totalValue}
+          formatValue={formatCurrency}
+        />
+        <AssetTypeDistributionCard
+          data={assetTypeDistribution}
+          totalValue={totalValue}
+          formatValue={formatCurrency}
+        />
       </div>
 
       {/* Assets Table */}
