@@ -457,11 +457,6 @@ export default function PortfolioOverview({ className, onRefresh, isPrivacyMode 
 
       {/* Portfolio Distribution Cards */}
       <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-4 md:gap-6">
-        <RiskDistributionCard
-          data={detailedRiskDistribution}
-          totalValue={totalValue}
-          formatValue={formatCurrency}
-        />
         <LocationDistributionCard
           data={locationDistribution}
           totalValue={totalValue}
@@ -469,6 +464,11 @@ export default function PortfolioOverview({ className, onRefresh, isPrivacyMode 
         />
         <AssetTypeDistributionCard
           data={assetTypeDistribution}
+          totalValue={totalValue}
+          formatValue={formatCurrency}
+        />
+        <RiskDistributionCard
+          data={detailedRiskDistribution}
           totalValue={totalValue}
           formatValue={formatCurrency}
         />

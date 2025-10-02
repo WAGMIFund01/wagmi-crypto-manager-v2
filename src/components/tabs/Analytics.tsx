@@ -292,11 +292,6 @@ export default function Analytics({ onRefresh, dataSource = 'wagmi-fund' }: Anal
 
       {/* Portfolio Distribution */}
       <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-4 md:gap-6">
-        <RiskDistributionCard
-          data={analyticsData.riskDistribution}
-          totalValue={analyticsData.totalValue}
-          formatValue={formatCurrency}
-        />
         <LocationDistributionCard
           data={analyticsData.chainDistribution}
           totalValue={analyticsData.totalValue}
@@ -304,6 +299,11 @@ export default function Analytics({ onRefresh, dataSource = 'wagmi-fund' }: Anal
         />
         <AssetTypeDistributionCard
           data={analyticsData.assetTypeDistribution}
+          totalValue={analyticsData.totalValue}
+          formatValue={formatCurrency}
+        />
+        <RiskDistributionCard
+          data={analyticsData.riskDistribution}
           totalValue={analyticsData.totalValue}
           formatValue={formatCurrency}
         />
