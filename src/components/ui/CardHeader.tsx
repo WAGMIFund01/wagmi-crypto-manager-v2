@@ -20,10 +20,10 @@ export const CardHeader: React.FC<CardHeaderProps> = ({
   theme = 'default',
   className = '',
 }) => {
-  const getTitleColor = () => {
+  const getTitleColor = (): string => {
     switch (theme) {
       case 'green':
-        return COLORS.primary;
+        return typeof COLORS.primary === 'string' ? COLORS.primary : COLORS.primary.green;
       case 'gray':
         return COLORS.text.secondary;
       default:
