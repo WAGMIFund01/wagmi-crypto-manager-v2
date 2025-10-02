@@ -110,7 +110,6 @@ export const COLORS = {
     'raydium': '#C03FD5',       // Raydium purple
     'ray': '#C03FD5',
     'orca': '#00D1FF',          // Orca blue
-    'bonk': '#F5A623',          // Bonk orange
     'drift': '#9945FF',         // Drift purple
     'marinade': '#FF5F00',      // Marinade orange
     'mnde': '#FF5F00',
