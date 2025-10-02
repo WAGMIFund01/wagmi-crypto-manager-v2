@@ -217,15 +217,15 @@ Generate investor updates that read like they came from an experienced, convicti
       // Build comprehensive prompt
       let prompt = this.getSystemPrompt() + '\n\n';
 
-      // Add conversation history (limit to last 10 messages to save tokens)
+      // Add conversation history (limit to last 15 messages to save tokens)
       if (request.conversationHistory.length > 0) {
-        prompt += 'Previous conversation:\n';
-        const recentMessages = request.conversationHistory.slice(-10); // Only last 10 messages
+        prompt += 'Previous conversation (includes all feedback and discussions):\n';
+        const recentMessages = request.conversationHistory.slice(-15); // Last 15 messages
         recentMessages.forEach(msg => {
           if (msg.role !== 'system') {
-            // Truncate very long messages
-            const content = msg.content.length > 500 
-              ? msg.content.substring(0, 500) + '...'
+            // Only truncate extremely long messages (>2000 chars) to preserve feedback details
+            const content = msg.content.length > 2000 
+              ? msg.content.substring(0, 2000) + '... [truncated]'
               : msg.content;
             prompt += `${msg.role}: ${content}\n`;
           }
@@ -257,7 +257,16 @@ Generate investor updates that read like they came from an experienced, convicti
       }
 
       // Request generation
-      prompt += 'Please generate a professional draft investor report based on the provided context. If you need more information to create a comprehensive report, please ask specific follow-up questions at the end.';
+      prompt += `TASK: Generate a professional draft investor report based on the provided context.
+
+CRITICAL INSTRUCTIONS:
+1. If there is a "Previous conversation" section above, READ IT CAREFULLY
+2. Incorporate ALL feedback, suggestions, and discussions from the conversation
+3. The conversation shows what the user wants added, changed, or emphasized
+4. Apply those changes directly to the report - don't just acknowledge them
+5. If you need more information to create a comprehensive report, ask specific follow-up questions at the end.
+
+Generate the full, updated report now:`;
 
       console.log(`🔍 Total prompt length: ${prompt.length} chars (~${Math.round(prompt.length/4)} tokens)`);
 
