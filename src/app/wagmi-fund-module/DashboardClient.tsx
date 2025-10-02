@@ -4,7 +4,7 @@ import { useRouter, useSearchParams, usePathname } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import UniversalNavbar from '@/components/UniversalNavbar';
 import PortfolioOverview from '@/components/tabs/PortfolioOverview';
-import Analytics from '@/components/tabs/Analytics';
+import Performance from '@/components/tabs/Performance';
 import Investors from '@/components/tabs/Investors';
 import PerformanceDashboard from '@/components/PerformanceDashboard';
 import { COLORS } from '@/shared/constants/colors';
@@ -66,7 +66,7 @@ export default function DashboardClient({ session, kpiData: initialKpiData, hasE
       ? ['portfolio'] 
       : dataSource === 'performance-dashboard'
       ? ['performance']
-      : ['portfolio', 'analytics', 'investors'];
+      : ['portfolio', 'performance', 'investors'];
     
     if (tab && allowedTabs.includes(tab)) {
       setActiveTab(tab);
@@ -140,7 +140,7 @@ export default function DashboardClient({ session, kpiData: initialKpiData, hasE
       ? ['portfolio'] 
       : dataSource === 'performance-dashboard'
       ? ['performance']
-      : ['portfolio', 'analytics', 'investors'];
+      : ['portfolio', 'performance', 'investors'];
     
     if (!allowedTabs.includes(tabId)) {
       console.warn(`Tab ${tabId} not allowed for ${dataSource} module`);
@@ -267,29 +267,26 @@ export default function DashboardClient({ session, kpiData: initialKpiData, hasE
   // Render the appropriate tab content
   const renderTabContent = () => {
     console.log('renderTabContent - activeTab:', activeTab, 'dataSource:', dataSource);
+    
+    // Special handling for performance-dashboard dataSource
+    if (dataSource === 'performance-dashboard') {
+      console.log('Rendering PerformanceDashboard');
+      return <PerformanceDashboard />;
+    }
+    
     switch (activeTab) {
       case 'portfolio':
         console.log('Rendering PortfolioOverview');
         return <PortfolioOverview onRefresh={triggerDataRefresh} isPrivacyMode={isPrivacyMode} dataSource={dataSource} />;
-      case 'analytics':
-        console.log('Rendering Analytics');
-        return <Analytics onRefresh={triggerDataRefresh} dataSource={dataSource} />;
+      case 'performance':
+        console.log('Rendering Performance');
+        return <Performance onRefresh={triggerDataRefresh} dataSource={dataSource} />;
       case 'investors':
         console.log('Rendering Investors');
         return <Investors isPrivacyMode={isPrivacyMode} onRefresh={triggerDataRefresh} dataSource={dataSource} />;
-      case 'performance':
-        console.log('Rendering PerformanceDashboard');
-        return <PerformanceDashboard />;
       default:
-        console.log('Default case - dataSource:', dataSource);
-        // Default behavior based on dataSource
-        if (dataSource === 'performance-dashboard') {
-          console.log('Default: Rendering PerformanceDashboard');
-          return <PerformanceDashboard />;
-        } else {
-          console.log('Default: Rendering PortfolioOverview');
-          return <PortfolioOverview onRefresh={triggerDataRefresh} isPrivacyMode={isPrivacyMode} dataSource={dataSource} />;
-        }
+        console.log('Default case - Rendering PortfolioOverview');
+        return <PortfolioOverview onRefresh={triggerDataRefresh} isPrivacyMode={isPrivacyMode} dataSource={dataSource} />;
     }
   };
 

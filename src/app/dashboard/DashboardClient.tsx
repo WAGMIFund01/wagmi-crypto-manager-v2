@@ -4,7 +4,7 @@ import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import UniversalNavbar from '@/components/UniversalNavbar';
 import PortfolioOverview from '@/components/tabs/PortfolioOverview';
-import Analytics from '@/components/tabs/Analytics';
+import Performance from '@/components/tabs/Performance';
 import Investors from '@/components/tabs/Investors';
 
 interface Session {
@@ -111,8 +111,8 @@ export default function DashboardClient({ session, kpiData, hasError }: Dashboar
     switch (activeTab) {
       case 'portfolio':
         return <PortfolioOverview isPrivacyMode={isPrivacyMode} />;
-      case 'analytics':
-        return <Analytics />;
+      case 'performance':
+        return <Performance />;
       case 'investors':
         return <Investors />;
       default:

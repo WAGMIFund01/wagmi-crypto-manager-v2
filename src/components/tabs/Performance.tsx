@@ -2,12 +2,12 @@
 
 import { useState, useEffect } from 'react';
 import { PortfolioAsset } from '@/lib/sheetsAdapter';
-import { WagmiCard, WagmiSpinner, WagmiButton, RiskDistributionCard, LocationDistributionCard, AssetTypeDistributionCard } from '@/components/ui';
+import { WagmiCard, WagmiSpinner, WagmiButton } from '@/components/ui';
 import { COLORS } from '@/shared/constants/colors';
 import PerformanceCharts from '@/components/charts/PerformanceCharts';
 import { fetchPerformanceData, PerformanceData } from '@/services/performanceDataService';
 
-interface AnalyticsData {
+interface PerformanceAnalyticsData {
   totalValue: number;
   totalInvested: number;
   totalReturn: number;
@@ -32,30 +32,30 @@ interface AnalyticsData {
   assetTypeDistribution: Record<string, number>;
 }
 
-interface AnalyticsProps {
+interface PerformanceProps {
   onRefresh?: () => void;
   dataSource?: 'wagmi-fund' | 'personal-portfolio' | 'performance-dashboard';
 }
 
-export default function Analytics({ onRefresh, dataSource = 'wagmi-fund' }: AnalyticsProps) {
+export default function Performance({ onRefresh, dataSource = 'wagmi-fund' }: PerformanceProps) {
 
-  const [analyticsData, setAnalyticsData] = useState<AnalyticsData | null>(null);
+  const [performanceAnalyticsData, setPerformanceAnalyticsData] = useState<PerformanceAnalyticsData | null>(null);
   const [performanceData, setPerformanceData] = useState<PerformanceData[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    fetchAnalyticsData();
+    fetchPerformanceAnalyticsData();
   }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
   // Refresh when onRefresh callback changes (triggered by parent)
   useEffect(() => {
     if (onRefresh) {
-      fetchAnalyticsData();
+      fetchPerformanceAnalyticsData();
     }
   }, [onRefresh]);
 
-  const fetchAnalyticsData = async () => {
+  const fetchPerformanceAnalyticsData = async () => {
     try {
       setLoading(true);
       setError(null);
@@ -73,22 +73,22 @@ export default function Analytics({ onRefresh, dataSource = 'wagmi-fund' }: Anal
       const portfolioData = await portfolioResponse.json();
       
       if (portfolioData.success && portfolioData.assets) {
-        const analytics = calculateAnalytics(portfolioData.assets);
-        setAnalyticsData(analytics);
+        const analytics = calculatePerformanceAnalytics(portfolioData.assets);
+        setPerformanceAnalyticsData(analytics);
       } else {
         throw new Error('Failed to fetch portfolio data');
       }
       
       setPerformanceData(perfData);
     } catch (err) {
-      console.error('Error fetching analytics data:', err);
-      setError(err instanceof Error ? err.message : 'Failed to load analytics');
+      console.error('Error fetching performance data:', err);
+      setError(err instanceof Error ? err.message : 'Failed to load performance data');
     } finally {
       setLoading(false);
     }
   };
 
-  const calculateAnalytics = (assets: PortfolioAsset[]): AnalyticsData => {
+  const calculatePerformanceAnalytics = (assets: PortfolioAsset[]): PerformanceAnalyticsData => {
     const totalValue = assets.reduce((sum, asset) => sum + (asset.quantity * asset.currentPrice), 0);
     const totalInvested = assets.reduce((sum, asset) => {
       // Assuming initial investment was at a lower price - this would need historical data
@@ -200,7 +200,7 @@ export default function Analytics({ onRefresh, dataSource = 'wagmi-fund' }: Anal
       <div className="text-center py-8">
         <p className="text-red-400 mb-4">{error}</p>
         <WagmiButton 
-          onClick={fetchAnalyticsData}
+          onClick={fetchPerformanceAnalyticsData}
           variant="primary"
           theme="green"
           size="md"
@@ -211,10 +211,10 @@ export default function Analytics({ onRefresh, dataSource = 'wagmi-fund' }: Anal
     );
   }
 
-  if (!analyticsData) {
+  if (!performanceAnalyticsData) {
     return (
       <div className="text-center py-8">
-        <p className="text-gray-400">No analytics data available</p>
+        <p className="text-gray-400">No performance data available</p>
       </div>
     );
   }
@@ -234,7 +234,7 @@ export default function Analytics({ onRefresh, dataSource = 'wagmi-fund' }: Anal
           <div className="pt-2 pb-4 px-4 md:pt-3 md:pb-6 md:px-6">
             <h3 className="text-lg font-semibold mb-2" style={{ color: COLORS.text.primary }}>Top Performers (24h)</h3>
             <div className="space-y-2 md:space-y-3">
-              {analyticsData.topPerformers.map((asset, index) => (
+              {performanceAnalyticsData.topPerformers.map((asset, index) => (
                 <div key={asset.symbol} className="flex items-center justify-between p-2 md:p-3 bg-gray-800/50 rounded-lg">
                   <div className="flex items-center space-x-2 md:space-x-3 min-w-0 flex-1">
                     <div className="w-6 h-6 md:w-8 md:h-8 bg-green-600 rounded-full flex items-center justify-center text-white text-xs md:text-sm font-bold flex-shrink-0">
@@ -264,7 +264,7 @@ export default function Analytics({ onRefresh, dataSource = 'wagmi-fund' }: Anal
           <div className="pt-2 pb-4 px-4 md:pt-3 md:pb-6 md:px-6">
             <h3 className="text-lg font-semibold mb-2" style={{ color: COLORS.text.primary }}>Worst Performers (24h)</h3>
             <div className="space-y-2 md:space-y-3">
-              {analyticsData.worstPerformers.map((asset, index) => (
+              {performanceAnalyticsData.worstPerformers.map((asset, index) => (
                 <div key={asset.symbol} className="flex items-center justify-between p-2 md:p-3 bg-gray-800/50 rounded-lg">
                   <div className="flex items-center space-x-2 md:space-x-3 min-w-0 flex-1">
                     <div className="w-6 h-6 md:w-8 md:h-8 bg-red-600 rounded-full flex items-center justify-center text-white text-xs md:text-sm font-bold flex-shrink-0">
@@ -290,25 +290,6 @@ export default function Analytics({ onRefresh, dataSource = 'wagmi-fund' }: Anal
         </WagmiCard>
       </div>
 
-      {/* Portfolio Distribution */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-4 md:gap-6">
-        <LocationDistributionCard
-          data={analyticsData.chainDistribution}
-          totalValue={analyticsData.totalValue}
-          formatValue={formatCurrency}
-        />
-        <AssetTypeDistributionCard
-          data={analyticsData.assetTypeDistribution}
-          totalValue={analyticsData.totalValue}
-          formatValue={formatCurrency}
-        />
-        <RiskDistributionCard
-          data={analyticsData.riskDistribution}
-          totalValue={analyticsData.totalValue}
-          formatValue={formatCurrency}
-        />
-      </div>
-
       {/* Performance Charts Section */}
       {performanceData.length > 0 && (
         <div className="mt-8">
@@ -318,3 +299,4 @@ export default function Analytics({ onRefresh, dataSource = 'wagmi-fund' }: Anal
     </div>
   );
 }
+
