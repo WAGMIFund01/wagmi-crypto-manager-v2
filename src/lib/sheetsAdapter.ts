@@ -238,7 +238,8 @@ export class SheetsAdapter {
   }
 
   /**
-   * Get all investors from the Investors sheet
+   * Get KPI data from the KPIs sheet (WAGMI Fund)
+   * Uses authenticated Google Sheets API for reliability
    */
   async getKpiData(): Promise<{
     totalInvestors: number;
@@ -246,6 +247,7 @@ export class SheetsAdapter {
     totalAUM: number;
     cumulativeReturn: number;
     monthlyReturn: number;
+    lastUpdated: string;
   }> {
     try {
       await this.initializeServiceAccount();
@@ -272,19 +274,47 @@ export class SheetsAdapter {
         totalAUM: number;
         cumulativeReturn: number;
         monthlyReturn: number;
+        lastUpdated: string;
       } = {
         totalInvestors: 0,
         totalInvested: 0,
         totalAUM: 0,
         cumulativeReturn: 0,
         monthlyReturn: 0,
+        lastUpdated: '',
       };
 
-      // Process all rows (Google Sheets data doesn't include header in rows)
-      for (const row of rows) {
+      // Process all rows
+      for (let i = 0; i < rows.length; i++) {
+        const row = rows[i];
         if (row && row.length >= 2) {
           const metricName = row[0]?.toString() || '';
           const value = row[1];
+          
+          // Special handling for "Last Updated" - check if this is the metric name row
+          if (metricName && metricName.toLowerCase().trim() === 'last updated') {
+            console.log('🔍 Found "Last Updated" metric name row at index:', i);
+            
+            // Check if the value is in the next row (common pattern in this sheet)
+            if (i + 1 < rows.length) {
+              const nextRow = rows[i + 1];
+              const nextRowValue = nextRow && nextRow.length >= 2 ? nextRow[1] : null;
+              console.log('🔍 Next row value:', nextRowValue);
+              
+              if (nextRowValue !== undefined && nextRowValue !== null && nextRowValue !== '') {
+                kpiData.lastUpdated = nextRowValue.toString();
+                console.log('🔍 Using next row value for lastUpdated:', kpiData.lastUpdated);
+                continue; // Skip processing the next row since we've already used it
+              }
+            }
+            
+            // Fallback to current row value if next row doesn't have it
+            if (value !== undefined && value !== null && value !== '') {
+              kpiData.lastUpdated = value.toString();
+              console.log('🔍 Using current row value for lastUpdated:', kpiData.lastUpdated);
+            }
+            continue;
+          }
           
           if (metricName && value !== undefined && value !== '') {
             // Map the metric names to our expected format
@@ -310,10 +340,10 @@ export class SheetsAdapter {
         }
       }
 
-      console.log('Google Sheets KPI data extracted:', kpiData);
+      console.log('✅ Google Sheets KPI data extracted:', kpiData);
       return kpiData;
     } catch (error) {
-      console.error('Error fetching KPI data:', error);
+      console.error('❌ Error fetching KPI data:', error);
       throw new Error('Failed to fetch KPI data');
     }
   }
