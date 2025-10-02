@@ -103,7 +103,11 @@ export default function AICopilot({ onReportGenerated }: AICopilotProps) {
           question: userMessage,
           context: enhancedContext,
           provider: 'gemini',
-          hasExistingDraft: !!reportDraft
+          hasExistingDraft: !!reportDraft,
+          conversationHistory: messages.map(msg => ({
+            role: msg.role,
+            content: msg.content
+          }))
         }),
       });
 

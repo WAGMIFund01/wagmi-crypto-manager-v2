@@ -3,7 +3,7 @@ import { aiService } from '@/lib/aiService';
 
 export async function POST(request: Request) {
   try {
-    const { question, context, provider, hasExistingDraft } = await request.json();
+    const { question, context, provider, hasExistingDraft, conversationHistory } = await request.json();
     
     if (!question) {
       return NextResponse.json({
@@ -12,10 +12,15 @@ export async function POST(request: Request) {
       }, { status: 400 });
     }
 
-    const result = await aiService.askFollowUpQuestion(question, context || {}, provider);
+    const result = await aiService.askFollowUpQuestion(
+      question, 
+      context || {}, 
+      provider,
+      conversationHistory
+    );
     
     // Detect if the question is feedback/suggestion that should update the report
-    const isFeedbackPattern = /add|include|change|update|modify|remove|improve|enhance|focus|emphasize|mention|discuss/i;
+    const isFeedbackPattern = /add|include|change|update|modify|remove|improve|enhance|focus|emphasize|mention|discuss|make.*more|make.*less|shorten|expand|succinct/i;
     const suggestRegeneration = hasExistingDraft && isFeedbackPattern.test(question);
     
     return NextResponse.json({

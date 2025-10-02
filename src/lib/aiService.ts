@@ -389,15 +389,77 @@ Generate investor updates that read like they came from an experienced, convicti
     }
   }
 
-  async askFollowUpQuestion(question: string, context: ReportContext, provider?: 'openai' | 'gemini' | 'claude'): Promise<AIGenerateReportResponse> {
-    // Use the generation method with a simple question
-    return this.generateReportDraft({
-      context,
-      conversationHistory: [
-        { role: 'user', content: `Please provide more details about: ${question}` }
-      ],
-      provider
-    });
+  async askFollowUpQuestion(
+    question: string, 
+    context: ReportContext, 
+    provider?: 'openai' | 'gemini' | 'claude',
+    conversationHistory?: Array<{ role: string; content: string }>
+  ): Promise<AIGenerateReportResponse> {
+    // This method handles conversational questions and feedback - NOT full report generation
+    // It should respond conversationally about changes, not output full reports
+    
+    if (!this.gemini) {
+      return {
+        success: false,
+        error: 'Gemini API key not configured',
+        provider: 'gemini'
+      };
+    }
+
+    try {
+      const model = this.gemini.getGenerativeModel({ 
+        model: 'models/gemini-2.5-flash'
+      });
+
+      // Build a conversational prompt focused on discussing changes, not generating full reports
+      let prompt = `You are an AI assistant helping to refine an investor report for the WAGMI Fund.
+
+IMPORTANT RULES:
+1. NEVER output a full report in chat - only discuss specific changes, additions, or edits
+2. When the user asks for changes (e.g., "add commentary on X"), provide ONLY the new content/section you would add
+3. Explain WHERE in the report you would place this new content (e.g., "I would add this to the Macro Overview section, right after the discussion on...")
+4. Keep responses focused and conversational - show the specific paragraph or section
+5. After providing the proposed change, ask: "Would you like me to refine this further, or shall I update the draft?"
+6. DO NOT include the entire report in your response - ONLY the specific new/changed content
+7. Format proposed content clearly (use markdown, bullets, or clear paragraph breaks)
+
+Current portfolio context summary:
+${this.summarizePortfolioData(context.currentPortfolio)}
+`;
+
+      // Add conversation history for context
+      if (conversationHistory && conversationHistory.length > 0) {
+        prompt += '\n\nPrevious conversation:\n';
+        const recentMessages = conversationHistory.slice(-6); // Last 6 messages for context
+        recentMessages.forEach(msg => {
+          if (msg.role !== 'system') {
+            prompt += `${msg.role === 'user' ? 'User' : 'Assistant'}: ${msg.content.substring(0, 300)}${msg.content.length > 300 ? '...' : ''}\n`;
+          }
+        });
+      }
+
+      prompt += `\n\nUser's current question/feedback: ${question}
+
+Respond conversationally. If they're asking for additions/changes, show ONLY the specific new content and where it goes. Keep it focused and helpful.`;
+
+      const result = await model.generateContent(prompt);
+      const response = await result.response;
+      const text = response.text();
+
+      return {
+        success: true,
+        draft: text,
+        provider: 'gemini'
+      };
+
+    } catch (error) {
+      console.error('Gemini API error:', error);
+      return {
+        success: false,
+        error: error instanceof Error ? error.message : 'Unknown error',
+        provider: 'gemini'
+      };
+    }
   }
 
   // Get list of available providers
