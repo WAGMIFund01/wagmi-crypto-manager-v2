@@ -3,6 +3,7 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { Send, Bot, User, FileText, Download, Upload, X, Copy, Check } from 'lucide-react';
 import { reportContextService } from '@/lib/reportContextService';
+import * as pdfjsLib from 'pdfjs-dist';
 
 interface ConversationMessage {
   id: string;
@@ -193,23 +194,49 @@ export default function AICopilot({ onReportGenerated }: AICopilotProps) {
     }
   };
 
+  const extractTextFromPDF = async (file: File): Promise<string> => {
+    // Set worker source for PDF.js
+    pdfjsLib.GlobalWorkerOptions.workerSrc = `//cdnjs.cloudflare.com/ajax/libs/pdf.js/${pdfjsLib.version}/pdf.worker.min.js`;
+
+    const arrayBuffer = await file.arrayBuffer();
+    const pdf = await pdfjsLib.getDocument({ data: arrayBuffer }).promise;
+    
+    let fullText = '';
+    
+    // Extract text from each page
+    for (let pageNum = 1; pageNum <= pdf.numPages; pageNum++) {
+      const page = await pdf.getPage(pageNum);
+      const textContent = await page.getTextContent();
+      const pageText = textContent.items
+        .map((item: any) => item.str)
+        .join(' ');
+      fullText += pageText + '\n\n';
+    }
+    
+    return fullText.trim();
+  };
+
   const handleUploadReport = async () => {
     if (!uploadFile) return;
 
     try {
-      // Check file type
       const fileExtension = uploadFile.name.toLowerCase().split('.').pop();
-      if (!['txt', 'md', 'markdown'].includes(fileExtension || '')) {
-        addMessage('assistant', '⚠️ Only text files (.txt, .md) are currently supported. Please copy your report content into a text file and try again.');
+      let content = '';
+
+      // Handle different file types
+      if (fileExtension === 'pdf') {
+        addMessage('assistant', '📄 Reading PDF file...');
+        content = await extractTextFromPDF(uploadFile);
+      } else if (['txt', 'md', 'markdown'].includes(fileExtension || '')) {
+        content = await uploadFile.text();
+      } else {
+        addMessage('assistant', '⚠️ Only PDF, TXT, and Markdown files are supported. Please convert your file and try again.');
         return;
       }
-
-      // Read text content
-      const content = await uploadFile.text();
       
       // Validate content isn't empty
       if (!content.trim()) {
-        addMessage('assistant', '⚠️ The file appears to be empty. Please check the file and try again.');
+        addMessage('assistant', '⚠️ No text could be extracted from the file. Please check the file and try again.');
         return;
       }
 
@@ -223,10 +250,10 @@ export default function AICopilot({ onReportGenerated }: AICopilotProps) {
       setUploadedReports(prev => [...prev, newReport]);
       setUploadFile(null);
       setShowUploadModal(false);
-      addMessage('assistant', `✅ Uploaded "${uploadFile.name}" (${Math.round(content.length / 4)} tokens). I'll use this as context for generating reports in your house style.`);
+      addMessage('assistant', `✅ Uploaded "${uploadFile.name}" (${Math.round(content.length / 4)} tokens). I'll use this as context for generating reports in your house style. Note: Charts and images are ignored - only text is extracted.`);
     } catch (error) {
       console.error('File upload error:', error);
-      addMessage('assistant', `❌ Error reading file: ${error instanceof Error ? error.message : 'Unknown error'}. Please make sure it's a valid text file.`);
+      addMessage('assistant', `❌ Error reading file: ${error instanceof Error ? error.message : 'Unknown error'}. Please make sure it's a valid file.`);
     }
   };
 
@@ -570,16 +597,16 @@ export default function AICopilot({ onReportGenerated }: AICopilotProps) {
             
             <div className="mb-4">
               <label className="block text-sm font-medium text-gray-300 mb-2">
-                Select a report file (TXT or Markdown only)
+                Select a report file (PDF, TXT, or Markdown)
               </label>
               <input
                 type="file"
-                accept=".txt,.md,.markdown"
+                accept=".pdf,.txt,.md,.markdown"
                 onChange={handleFileUpload}
                 className="block w-full text-sm text-gray-400 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-blue-900/20 file:text-blue-400 hover:file:bg-blue-900/40"
               />
               <p className="text-xs text-gray-500 mt-2">
-                💡 Tip: If your report is in PDF or Word, copy the text and save it as a .txt file first.
+                💡 Note: PDFs will have text extracted (charts/images ignored).
               </p>
             </div>
 
