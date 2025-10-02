@@ -424,7 +424,7 @@ IMPORTANT RULES:
 7. Format proposed content clearly (use markdown, bullets, or clear paragraph breaks)
 
 Current portfolio context summary:
-${this.summarizePortfolioData(context.currentPortfolio)}
+${this.summarizePortfolioData(context.currentPortfolioData)}
 `;
 
       // Add conversation history for context
