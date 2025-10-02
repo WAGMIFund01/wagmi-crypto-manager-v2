@@ -362,6 +362,11 @@ export default function PortfolioOverview({ className, onRefresh, isPrivacyMode 
     return acc;
   }, {} as Record<string, number>);
 
+  const locationDistribution = assets.reduce((acc, asset) => {
+    acc[asset.location] = (acc[asset.location] || 0) + (asset.quantity * asset.currentPrice);
+    return acc;
+  }, {} as Record<string, number>);
+
   const totalValue = assets.reduce((sum, asset) => sum + (asset.quantity * asset.currentPrice), 0);
 
   // Color palettes for different chart types
@@ -404,12 +409,6 @@ export default function PortfolioOverview({ className, onRefresh, isPrivacyMode 
           title="Breakdown by Asset"
           data={assetDistribution}
           colors={assetColors}
-          formatValue={formatCurrency}
-        />
-        <StackedBarChart
-          title="Breakdown by Risk"
-          data={riskDistribution}
-          colors={riskColors}
           formatValue={formatCurrency}
         />
         <StackedBarChart
@@ -459,18 +458,18 @@ export default function PortfolioOverview({ className, onRefresh, isPrivacyMode 
           </div>
         </WagmiCard>
 
-        {/* Chain Distribution */}
+        {/* Location Distribution */}
         <WagmiCard variant="default" theme="green" size="lg">
           <div className="p-6">
-            <h3 className="text-lg font-semibold text-white mb-4">Chain Distribution</h3>
+            <h3 className="text-lg font-semibold text-white mb-4">Location Distribution</h3>
             <div className="space-y-3">
-              {Object.entries(chainDistribution).map(([chain, value]) => {
+              {Object.entries(locationDistribution).map(([location, value]) => {
                 const percentage = totalValue > 0 ? (value / totalValue) * 100 : 0;
-                const color = (COLORS.chain as any)[chain.toLowerCase()] || '#6B7280';
+                const color = (COLORS.chart as any)[location.toLowerCase()] || '#6B7280';
                 return (
-                  <div key={chain} className="space-y-2">
+                  <div key={location} className="space-y-2">
                     <div className="flex justify-between text-sm">
-                      <span className="text-gray-300">{chain}</span>
+                      <span className="text-gray-300">{location}</span>
                       <span className="text-white font-medium">{formatCurrency(value)}</span>
                     </div>
                     <div className="w-full bg-gray-700 rounded-full h-2">
