@@ -127,6 +127,15 @@ export const COLORS = {
     'near': '#000000',          // NEAR black
     'cosmos': '#2E3148',        // Cosmos dark blue
     'atom': '#2E3148',
+    'aura': '#9D4EDD',          // Aura purple/violet
+    'hyperliquid': '#00FFA3',   // Hyperliquid bright green
+    'hype': '#00FFA3',
+    'jitostakesol': '#00E7A9',  // Jito teal (same as Jito)
+    'jitosol': '#00E7A9',
+    'purr': '#FF69B4',          // Purr hot pink (cat theme)
+    'mystery': '#9370DB',       // Mystery medium purple (mysterious vibe)
+    'alright': '#4169E1',       // Alright royal blue
+    'alrightbuddy': '#4169E1',  // Alright buddy royal blue
     
     // Default fallback
     'default': '#6B7280',       // Gray for unknown assets
