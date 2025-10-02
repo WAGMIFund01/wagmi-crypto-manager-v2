@@ -22,13 +22,6 @@ interface UploadedReport {
   date: string;
 }
 
-interface AIProvider {
-  id: string;
-  name: string;
-  available: boolean;
-  isFree: boolean;
-}
-
 export default function AICopilot({ onReportGenerated }: AICopilotProps) {
   const [messages, setMessages] = useState<ConversationMessage[]>([]);
   const [inputValue, setInputValue] = useState('');
@@ -38,8 +31,7 @@ export default function AICopilot({ onReportGenerated }: AICopilotProps) {
   const [uploadedReports, setUploadedReports] = useState<UploadedReport[]>([]);
   const [showUploadModal, setShowUploadModal] = useState(false);
   const [uploadFile, setUploadFile] = useState<File | null>(null);
-  const [selectedProvider, setSelectedProvider] = useState<string>('gemini');
-  const [availableProviders, setAvailableProviders] = useState<AIProvider[]>([]);
+  // Removed provider selection - using Gemini only
   const [copiedToClipboard, setCopiedToClipboard] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
@@ -51,26 +43,7 @@ export default function AICopilot({ onReportGenerated }: AICopilotProps) {
     scrollToBottom();
   }, [messages]);
 
-  // Fetch available AI providers on mount
-  useEffect(() => {
-    const fetchProviders = async () => {
-      try {
-        const response = await fetch('/api/ai-copilot/providers');
-        const data = await response.json();
-        if (data.success) {
-          setAvailableProviders(data.providers);
-          // Set default provider to first available one
-          const firstAvailable = data.providers.find((p: AIProvider) => p.available);
-          if (firstAvailable) {
-            setSelectedProvider(firstAvailable.id);
-          }
-        }
-      } catch (error) {
-        console.error('Error fetching AI providers:', error);
-      }
-    };
-    fetchProviders();
-  }, []);
+  // Removed provider fetching - using Gemini only
 
   const addMessage = (role: 'user' | 'assistant', content: string) => {
     const newMessage: ConversationMessage = {
@@ -102,7 +75,7 @@ export default function AICopilot({ onReportGenerated }: AICopilotProps) {
         body: JSON.stringify({
           question: userMessage,
           context,
-          provider: selectedProvider
+          provider: 'gemini'
         }),
       });
 
@@ -186,7 +159,7 @@ export default function AICopilot({ onReportGenerated }: AICopilotProps) {
             content: msg.content
           })),
           newDetails: inputValue,
-          provider: selectedProvider
+          provider: 'gemini'
         }),
       });
 
@@ -256,30 +229,8 @@ export default function AICopilot({ onReportGenerated }: AICopilotProps) {
           <div className="flex items-center space-x-2">
             <Bot className="h-6 w-6 text-green-400" />
             <h2 className="text-lg font-semibold text-white">AI Report Assistant</h2>
+            <span className="text-xs text-gray-500 bg-gray-800 px-2 py-1 rounded">Powered by Gemini</span>
           </div>
-          
-          {/* AI Provider Selector */}
-          {availableProviders.length > 0 && (
-            <div className="flex items-center space-x-2">
-              <label htmlFor="ai-provider" className="text-sm text-gray-400">AI Model:</label>
-              <select
-                id="ai-provider"
-                value={selectedProvider}
-                onChange={(e) => setSelectedProvider(e.target.value)}
-                className="px-2 py-1 text-sm bg-gray-800 border border-gray-600 text-gray-200 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500"
-              >
-                {availableProviders.map((provider) => (
-                  <option 
-                    key={provider.id} 
-                    value={provider.id}
-                    disabled={!provider.available}
-                  >
-                    {provider.name} {provider.isFree && '(Free)'} {!provider.available && '(Not configured)'}
-                  </option>
-                ))}
-              </select>
-            </div>
-          )}
         </div>
         <div className="flex space-x-2">
           <button
@@ -324,8 +275,8 @@ export default function AICopilot({ onReportGenerated }: AICopilotProps) {
               <div
                 className={`flex-shrink-0 w-8 h-8 rounded-full flex items-center justify-center ${
                   message.role === 'user'
-                    ? 'bg-blue-600 text-white'
-                    : 'bg-gray-100 text-gray-400'
+                    ? 'bg-green-600 text-white'
+                    : 'bg-gray-700 text-green-400'
                 }`}
               >
                 {message.role === 'user' ? (
@@ -337,8 +288,8 @@ export default function AICopilot({ onReportGenerated }: AICopilotProps) {
               <div
                 className={`px-4 py-2 rounded-lg ${
                   message.role === 'user'
-                    ? 'bg-blue-600 text-white'
-                    : 'bg-gray-100 text-white'
+                    ? 'bg-green-600 text-white'
+                    : 'bg-gray-700 text-gray-100'
                 }`}
               >
                 <p className="text-sm whitespace-pre-wrap">{message.content}</p>
@@ -454,9 +405,9 @@ export default function AICopilot({ onReportGenerated }: AICopilotProps) {
               </button>
             </div>
           </div>
-          <div className="bg-gray-800 border rounded-lg p-3 max-h-40 overflow-y-auto">
-            <pre className="text-sm text-gray-700 whitespace-pre-wrap">{reportDraft}</pre>
-          </div>
+            <div className="bg-gray-800 border border-gray-700 rounded-lg p-3 max-h-40 overflow-y-auto">
+              <pre className="text-sm text-gray-200 whitespace-pre-wrap">{reportDraft}</pre>
+            </div>
         </div>
       )}
 
