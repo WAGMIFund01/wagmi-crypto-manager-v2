@@ -463,6 +463,7 @@ Generate investor updates that read like they came from an experienced, convicti
   private summarizePortfolioData(portfolioData: any): string {
     // Summarize portfolio data to reduce token usage while keeping key details
     const assets = portfolioData.assets || [];
+    const kpiMetrics = portfolioData.kpiMetrics;
     const totalValue = assets.reduce((sum: number, asset: any) => sum + (asset.totalValue || 0), 0);
     
     // Sort by value descending
@@ -537,6 +538,29 @@ Significant Holdings (>5%): ${significantHoldings.length} positions
 Minor Holdings (<5%): ${minorHoldings.length} positions
 Minor Holdings Total Value: $${minorHoldingsValue.toFixed(2)}
 
+FUND PERFORMANCE METRICS (KPI Data):`;
+
+    if (kpiMetrics) {
+      summary += `
+Total Investors: ${kpiMetrics.totalInvestors}
+Total Invested: $${kpiMetrics.totalInvested?.toLocaleString()}
+Total AUM: $${kpiMetrics.totalAUM?.toLocaleString()}
+Cumulative Return: ${kpiMetrics.cumulativeReturn?.toFixed(2)}%
+Monthly Return (MoM): ${kpiMetrics.monthlyReturn?.toFixed(2)}%
+Last Updated: ${kpiMetrics.lastUpdated}
+
+BENCHMARK CONTEXT:
+- "Total" benchmark typically refers to total crypto market cap performance
+- "Total-3" benchmark typically refers to top 3 cryptos (BTC, ETH, and third largest) performance
+- Use these cumulative and monthly return figures for performance comparison in your report
+`;
+    } else {
+      summary += `
+(KPI metrics not available for this report)
+`;
+    }
+
+    summary += `
 SIGNIFICANT HOLDINGS (>5% of portfolio, with full thesis):
 `;
 

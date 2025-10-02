@@ -31,17 +31,32 @@ class ReportContextService {
    */
   async getCurrentPortfolioData(): Promise<any> {
     try {
-      // Fetch portfolio data - pass it through RAW to preserve all fields
-      const portfolioResponse = await fetch('/api/get-portfolio-data');
+      // Fetch both portfolio data and KPI data
+      const [portfolioResponse, kpiResponse] = await Promise.all([
+        fetch('/api/get-portfolio-data'),
+        fetch('/api/kpi-data')
+      ]);
+      
       const portfolioData = await portfolioResponse.json();
+      const kpiData = await kpiResponse.json();
 
       if (!portfolioData.success) {
         console.error('Failed to fetch portfolio data');
         return null;
       }
 
-      // Return the raw portfolio data with all fields intact
-      return portfolioData;
+      // Combine portfolio data with KPI metrics for complete context
+      return {
+        ...portfolioData,
+        kpiMetrics: kpiData.success ? {
+          totalInvestors: kpiData.totalInvestors,
+          totalInvested: kpiData.totalInvested,
+          totalAUM: kpiData.totalAUM,
+          cumulativeReturn: kpiData.cumulativeReturn,
+          monthlyReturn: kpiData.monthlyReturn,
+          lastUpdated: kpiData.lastUpdated
+        } : null
+      };
     } catch (error) {
       console.error('Error fetching portfolio context:', error);
       return null;
