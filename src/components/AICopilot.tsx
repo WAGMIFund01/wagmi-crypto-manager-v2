@@ -33,6 +33,11 @@ export default function AICopilot({ onReportGenerated }: AICopilotProps) {
   const [uploadFile, setUploadFile] = useState<File | null>(null);
   // Removed provider selection - using Gemini only
   const [copiedToClipboard, setCopiedToClipboard] = useState(false);
+  const [pendingRegeneration, setPendingRegeneration] = useState<{
+    feedback: string;
+    context: any;
+  } | null>(null);
+  const [isRegenerating, setIsRegenerating] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
   const scrollToBottom = () => {
@@ -64,8 +69,30 @@ export default function AICopilot({ onReportGenerated }: AICopilotProps) {
     setIsLoading(true);
 
     try {
+      // Check if user is responding to regeneration prompt
+      const isConfirmingRegeneration = pendingRegeneration && 
+        (userMessage.toLowerCase().includes('yes') || 
+         userMessage.toLowerCase().includes('update') ||
+         userMessage.toLowerCase().includes('regenerate'));
+
+      if (isConfirmingRegeneration && pendingRegeneration) {
+        // User confirmed - regenerate report silently
+        await handleRegenerateReport(pendingRegeneration.feedback, pendingRegeneration.context);
+        setPendingRegeneration(null);
+        return;
+      }
+
       // Get current portfolio context
       const context = await reportContextService.prepareReportContext();
+      
+      // Add uploaded reports to context
+      const enhancedContext = {
+        ...context,
+        previousReports: [
+          ...context.previousReports,
+          ...uploadedReports.map(report => `${report.name} (${report.date})\n${report.content}`)
+        ]
+      };
       
       const response = await fetch('/api/ai-copilot/ask-question', {
         method: 'POST',
@@ -74,19 +101,30 @@ export default function AICopilot({ onReportGenerated }: AICopilotProps) {
         },
         body: JSON.stringify({
           question: userMessage,
-          context,
-          provider: 'gemini'
+          context: enhancedContext,
+          provider: 'gemini',
+          hasExistingDraft: !!reportDraft
         }),
       });
 
       const data = await response.json();
 
       if (data.success) {
-        addMessage('assistant', data.draft || 'I need more information to help you.');
+        const aiResponse = data.draft || 'I need more information to help you.';
+        addMessage('assistant', aiResponse);
+
+        // Check if AI suggests updating the report
+        if (data.suggestRegeneration && reportDraft) {
+          setPendingRegeneration({
+            feedback: userMessage,
+            context: enhancedContext
+          });
+          addMessage('assistant', '💡 Would you like me to update the report draft with these changes? Just say "yes" to regenerate!');
+        }
       } else {
         // Handle quota exceeded errors with helpful messaging
         if (data.error?.includes('quota exceeded')) {
-          addMessage('assistant', `🚫 OpenAI API quota exceeded. Please check your billing at https://platform.openai.com/usage or try again later.`);
+          addMessage('assistant', `🚫 API quota exceeded. Please try again later.`);
         } else {
           addMessage('assistant', `Error: ${data.error}`);
         }
@@ -95,6 +133,52 @@ export default function AICopilot({ onReportGenerated }: AICopilotProps) {
       addMessage('assistant', 'Sorry, I encountered an error. Please try again.');
     } finally {
       setIsLoading(false);
+    }
+  };
+
+  const handleRegenerateReport = async (feedback: string, context: any) => {
+    setIsRegenerating(true);
+    try {
+      addMessage('assistant', '🔄 Updating your report draft...');
+
+      const response = await fetch('/api/ai-copilot/generate-report', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          context,
+          conversationHistory: messages.map(msg => ({
+            role: msg.role,
+            content: msg.content
+          })),
+          newDetails: feedback,
+          provider: 'gemini'
+        }),
+      });
+
+      const data = await response.json();
+
+      if (data.success && data.draft) {
+        // Update the report draft state - this will trigger UI re-render
+        setReportDraft(data.draft);
+        addMessage('assistant', '✅ Report draft has been updated with your feedback! Scroll down to see the updated version.');
+        onReportGenerated?.(data.draft);
+        
+        // Scroll to show the updated draft after a brief delay
+        setTimeout(() => {
+          const draftElement = document.querySelector('[data-report-draft]');
+          if (draftElement) {
+            draftElement.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+          }
+        }, 500);
+      } else {
+        addMessage('assistant', 'Sorry, I encountered an error while updating the report. Please try again.');
+      }
+    } catch (error) {
+      addMessage('assistant', 'Sorry, I encountered an error while updating the report. Please try again.');
+    } finally {
+      setIsRegenerating(false);
     }
   };
 
@@ -376,13 +460,19 @@ export default function AICopilot({ onReportGenerated }: AICopilotProps) {
 
       {/* Report Draft */}
       {reportDraft && (
-        <div className="p-4 border-t border-gray-700 bg-gray-900">
+        <div className="p-4 border-t border-gray-700 bg-gray-900" data-report-draft>
           <div className="flex items-center justify-between mb-2">
-            <h3 className="text-sm font-medium text-white">Report Draft:</h3>
+            <div className="flex items-center space-x-2">
+              <h3 className="text-sm font-medium text-white">Report Draft:</h3>
+              {isRegenerating && (
+                <span className="text-xs text-green-400 animate-pulse">Updating...</span>
+              )}
+            </div>
             <div className="flex space-x-2">
               <button
                 onClick={handleCopyDraft}
                 className="flex items-center space-x-1 text-sm text-gray-400 hover:text-gray-800 transition-colors"
+                disabled={isRegenerating}
               >
                 {copiedToClipboard ? (
                   <>
@@ -399,13 +489,16 @@ export default function AICopilot({ onReportGenerated }: AICopilotProps) {
               <button
                 onClick={handleDownloadDraft}
                 className="flex items-center space-x-1 text-sm text-gray-400 hover:text-gray-800"
+                disabled={isRegenerating}
               >
                 <Download className="h-4 w-4" />
                 <span>Download</span>
               </button>
             </div>
           </div>
-            <div className="bg-gray-800 border border-gray-700 rounded-lg p-3 max-h-40 overflow-y-auto">
+            <div className={`bg-gray-800 border rounded-lg p-3 max-h-40 overflow-y-auto transition-all ${
+              isRegenerating ? 'border-green-500 animate-pulse' : 'border-gray-700'
+            }`}>
               <pre className="text-sm text-gray-200 whitespace-pre-wrap">{reportDraft}</pre>
             </div>
         </div>

@@ -3,7 +3,7 @@ import { aiService } from '@/lib/aiService';
 
 export async function POST(request: Request) {
   try {
-    const { question, context, provider } = await request.json();
+    const { question, context, provider, hasExistingDraft } = await request.json();
     
     if (!question) {
       return NextResponse.json({
@@ -14,7 +14,14 @@ export async function POST(request: Request) {
 
     const result = await aiService.askFollowUpQuestion(question, context || {}, provider);
     
-    return NextResponse.json(result);
+    // Detect if the question is feedback/suggestion that should update the report
+    const isFeedbackPattern = /add|include|change|update|modify|remove|improve|enhance|focus|emphasize|mention|discuss/i;
+    const suggestRegeneration = hasExistingDraft && isFeedbackPattern.test(question);
+    
+    return NextResponse.json({
+      ...result,
+      suggestRegeneration
+    });
 
   } catch (error) {
     console.error('AI copilot ask question error:', error);
