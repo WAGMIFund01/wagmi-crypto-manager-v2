@@ -197,7 +197,22 @@ export default function AICopilot({ onReportGenerated }: AICopilotProps) {
     if (!uploadFile) return;
 
     try {
+      // Check file type
+      const fileExtension = uploadFile.name.toLowerCase().split('.').pop();
+      if (!['txt', 'md', 'markdown'].includes(fileExtension || '')) {
+        addMessage('assistant', '⚠️ Only text files (.txt, .md) are currently supported. Please copy your report content into a text file and try again.');
+        return;
+      }
+
+      // Read text content
       const content = await uploadFile.text();
+      
+      // Validate content isn't empty
+      if (!content.trim()) {
+        addMessage('assistant', '⚠️ The file appears to be empty. Please check the file and try again.');
+        return;
+      }
+
       const newReport: UploadedReport = {
         id: Date.now().toString(),
         name: uploadFile.name,
@@ -208,9 +223,10 @@ export default function AICopilot({ onReportGenerated }: AICopilotProps) {
       setUploadedReports(prev => [...prev, newReport]);
       setUploadFile(null);
       setShowUploadModal(false);
-      addMessage('assistant', `I've uploaded "${uploadFile.name}" and will use it as context for future report generation.`);
+      addMessage('assistant', `✅ Uploaded "${uploadFile.name}" (${Math.round(content.length / 4)} tokens). I'll use this as context for generating reports in your house style.`);
     } catch (error) {
-      addMessage('assistant', 'Sorry, I couldn\'t read the file. Please try again.');
+      console.error('File upload error:', error);
+      addMessage('assistant', `❌ Error reading file: ${error instanceof Error ? error.message : 'Unknown error'}. Please make sure it's a valid text file.`);
     }
   };
 
@@ -553,32 +569,38 @@ export default function AICopilot({ onReportGenerated }: AICopilotProps) {
             </div>
             
             <div className="mb-4">
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                Select a report file (TXT, PDF, DOC, DOCX)
+              <label className="block text-sm font-medium text-gray-300 mb-2">
+                Select a report file (TXT or Markdown only)
               </label>
               <input
                 type="file"
-                accept=".txt,.pdf,.doc,.docx"
+                accept=".txt,.md,.markdown"
                 onChange={handleFileUpload}
-                className="block w-full text-sm text-gray-400 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-blue-900/20 file:text-blue-700 hover:file:bg-blue-100"
+                className="block w-full text-sm text-gray-400 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-blue-900/20 file:text-blue-400 hover:file:bg-blue-900/40"
               />
+              <p className="text-xs text-gray-500 mt-2">
+                💡 Tip: If your report is in PDF or Word, copy the text and save it as a .txt file first.
+              </p>
             </div>
 
             {uploadFile && (
-              <div className="mb-4 p-3 bg-gray-900 rounded">
-                <p className="text-sm text-gray-700">
-                  Selected: <span className="font-medium">{uploadFile.name}</span>
+              <div className="mb-4 p-3 bg-gray-900 rounded border border-gray-700">
+                <p className="text-sm text-gray-300">
+                  Selected: <span className="font-medium text-white">{uploadFile.name}</span>
                 </p>
-                <p className="text-xs text-gray-400">
-                  Size: {(uploadFile.size / 1024).toFixed(1)} KB
+                <p className="text-xs text-gray-500">
+                  Size: {(uploadFile.size / 1024).toFixed(1)} KB (~{Math.round(uploadFile.size / 4)} tokens)
                 </p>
               </div>
             )}
 
             <div className="flex justify-end space-x-3">
               <button
-                onClick={() => setShowUploadModal(false)}
-                className="px-4 py-2 text-sm font-medium text-gray-700 bg-gray-100 rounded-md hover:bg-gray-200"
+                onClick={() => {
+                  setShowUploadModal(false);
+                  setUploadFile(null);
+                }}
+                className="px-4 py-2 text-sm font-medium text-gray-300 bg-gray-700 rounded-md hover:bg-gray-600 border border-gray-600"
               >
                 Cancel
               </button>
