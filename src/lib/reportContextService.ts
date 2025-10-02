@@ -31,21 +31,71 @@ class ReportContextService {
    */
   async getCurrentPortfolioData(): Promise<any> {
     try {
-      // Fetch both portfolio data and KPI data
-      const [portfolioResponse, kpiResponse] = await Promise.all([
+      // Fetch portfolio data, KPI data, and performance benchmark data
+      const [portfolioResponse, kpiResponse, performanceResponse] = await Promise.all([
         fetch('/api/get-portfolio-data'),
-        fetch('/api/kpi-data')
+        fetch('/api/kpi-data'),
+        fetch('/api/get-performance-data')
       ]);
       
       const portfolioData = await portfolioResponse.json();
       const kpiData = await kpiResponse.json();
+      const performanceData = await performanceResponse.json();
 
       if (!portfolioData.success) {
         console.error('Failed to fetch portfolio data');
         return null;
       }
 
-      // Combine portfolio data with KPI metrics for complete context
+      // Get latest performance data and historical trends
+      let performanceMetrics = null;
+      if (performanceData.success && performanceData.data && performanceData.data.length > 0) {
+        const data = performanceData.data;
+        const latestMonth = data[data.length - 1];
+        
+        // Get last 3 months for context
+        const recentMonths = data.slice(-3);
+        
+        performanceMetrics = {
+          latest: {
+            month: latestMonth.month,
+            endingAUM: latestMonth.endingAUM,
+            wagmiMoM: latestMonth.wagmiMoM,
+            totalMoM: latestMonth.totalMoM,
+            total3MoM: latestMonth.total3MoM,
+            wagmiCumulative: latestMonth.wagmiCumulative,
+            totalCumulative: latestMonth.totalCumulative,
+            total3Cumulative: latestMonth.total3Cumulative,
+            // Calculate outperformance
+            outperformanceMoM: {
+              vsTotal: latestMonth.wagmiMoM - latestMonth.totalMoM,
+              vsTotal3: latestMonth.wagmiMoM - latestMonth.total3MoM
+            },
+            outperformanceCumulative: {
+              vsTotal: latestMonth.wagmiCumulative - latestMonth.totalCumulative,
+              vsTotal3: latestMonth.wagmiCumulative - latestMonth.total3Cumulative
+            }
+          },
+          recentHistory: recentMonths.map((month: any) => ({
+            month: month.month,
+            wagmiMoM: month.wagmiMoM,
+            totalMoM: month.totalMoM,
+            total3MoM: month.total3MoM,
+            wagmiCumulative: month.wagmiCumulative,
+            totalCumulative: month.totalCumulative,
+            total3Cumulative: month.total3Cumulative
+          })),
+          allTimeHistory: data.map((month: any) => ({
+            month: month.month,
+            endingAUM: month.endingAUM,
+            wagmiCumulative: month.wagmiCumulative,
+            totalCumulative: month.totalCumulative,
+            total3Cumulative: month.total3Cumulative
+          }))
+        };
+      }
+
+      // Combine portfolio data with KPI metrics and performance benchmarks
       return {
         ...portfolioData,
         kpiMetrics: kpiData.success ? {
@@ -55,7 +105,8 @@ class ReportContextService {
           cumulativeReturn: kpiData.cumulativeReturn,
           monthlyReturn: kpiData.monthlyReturn,
           lastUpdated: kpiData.lastUpdated
-        } : null
+        } : null,
+        performanceMetrics
       };
     } catch (error) {
       console.error('Error fetching portfolio context:', error);

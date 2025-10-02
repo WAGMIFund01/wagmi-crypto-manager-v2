@@ -464,6 +464,7 @@ Generate investor updates that read like they came from an experienced, convicti
     // Summarize portfolio data to reduce token usage while keeping key details
     const assets = portfolioData.assets || [];
     const kpiMetrics = portfolioData.kpiMetrics;
+    const performanceMetrics = portfolioData.performanceMetrics;
     const totalValue = assets.reduce((sum: number, asset: any) => sum + (asset.totalValue || 0), 0);
     
     // Sort by value descending
@@ -548,15 +549,52 @@ Total AUM: $${kpiMetrics.totalAUM?.toLocaleString()}
 Cumulative Return: ${kpiMetrics.cumulativeReturn?.toFixed(2)}%
 Monthly Return (MoM): ${kpiMetrics.monthlyReturn?.toFixed(2)}%
 Last Updated: ${kpiMetrics.lastUpdated}
-
-BENCHMARK CONTEXT:
-- "Total" benchmark typically refers to total crypto market cap performance
-- "Total-3" benchmark typically refers to top 3 cryptos (BTC, ETH, and third largest) performance
-- Use these cumulative and monthly return figures for performance comparison in your report
 `;
     } else {
       summary += `
 (KPI metrics not available for this report)
+`;
+    }
+
+    summary += `
+PERFORMANCE VS BENCHMARKS (Historical Data):`;
+
+    if (performanceMetrics && performanceMetrics.latest) {
+      const latest = performanceMetrics.latest;
+      summary += `
+
+LATEST MONTH (${latest.month}):
+- WAGMI Fund MoM Return: ${latest.wagmiMoM?.toFixed(2)}%
+- Total Benchmark MoM: ${latest.totalMoM?.toFixed(2)}%
+- Total-3 Benchmark MoM: ${latest.total3MoM?.toFixed(2)}%
+- WAGMI Outperformance vs Total: ${latest.outperformanceMoM.vsTotal > 0 ? '+' : ''}${latest.outperformanceMoM.vsTotal?.toFixed(2)} pp
+- WAGMI Outperformance vs Total-3: ${latest.outperformanceMoM.vsTotal3 > 0 ? '+' : ''}${latest.outperformanceMoM.vsTotal3?.toFixed(2)} pp
+
+CUMULATIVE PERFORMANCE (Since Inception):
+- WAGMI Fund: ${latest.wagmiCumulative?.toFixed(2)}%
+- Total Benchmark: ${latest.totalCumulative?.toFixed(2)}%
+- Total-3 Benchmark: ${latest.total3Cumulative?.toFixed(2)}%
+- WAGMI Outperformance vs Total: ${latest.outperformanceCumulative.vsTotal > 0 ? '+' : ''}${latest.outperformanceCumulative.vsTotal?.toFixed(2)} pp
+- WAGMI Outperformance vs Total-3: ${latest.outperformanceCumulative.vsTotal3 > 0 ? '+' : ''}${latest.outperformanceCumulative.vsTotal3?.toFixed(2)} pp
+
+RECENT 3-MONTH TREND:`;
+      
+      performanceMetrics.recentHistory.forEach((month: any) => {
+        summary += `
+  ${month.month}: WAGMI ${month.wagmiMoM?.toFixed(2)}% | Total ${month.totalMoM?.toFixed(2)}% | Total-3 ${month.total3MoM?.toFixed(2)}%`;
+      });
+
+      summary += `
+
+BENCHMARK DEFINITIONS:
+- "Total" = Total crypto market cap weighted performance (all cryptocurrencies)
+- "Total-3" = Top 3 cryptos by market cap (typically BTC, ETH, and third largest like SOL or BNB)
+- Use these figures to show how WAGMI fund performed vs the broader market
+- "pp" means percentage points (e.g., if WAGMI is +28% and Total is +16%, outperformance is +12 pp)
+`;
+    } else {
+      summary += `
+(Benchmark performance data not available for this report)
 `;
     }
 
