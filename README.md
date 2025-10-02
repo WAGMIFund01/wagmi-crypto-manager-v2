@@ -232,6 +232,23 @@ Make sure to set all required environment variables in your deployment platform:
 4. Ensure mobile responsiveness
 5. Submit a pull request
 
+## 📚 Documentation
+
+Comprehensive documentation is available in the `/docs` directory:
+
+- **[Documentation Index](docs/README.md)** - Start here for all documentation
+- **Guides** - Setup and deployment instructions
+  - [Deployment Guide](docs/guides/DEPLOYMENT_GUIDE.md)
+  - [Google Sheets Setup](docs/guides/GOOGLE-SHEETS-SETUP.md)
+  - [Onboarding Guide](docs/guides/ONBOARDING.md)
+- **Reports** - Technical audits and analysis
+  - [Testing Audit Report](docs/reports/TESTING_AUDIT_REPORT.md)
+  - [Testing Improvements Summary](docs/reports/TESTING_IMPROVEMENTS_SUMMARY.md)
+  - [UI Audit Report](docs/reports/UI_AUDIT_REPORT.md)
+- **API Documentation** - [API_DOCUMENTATION.md](API_DOCUMENTATION.md)
+- **Component Documentation** - [COMPONENT_DOCUMENTATION.md](COMPONENT_DOCUMENTATION.md)
+- **Design System** - [WAGMI_DESIGN_SYSTEM_OVERVIEW.md](WAGMI_DESIGN_SYSTEM_OVERVIEW.md)
+
 ## 📄 License
 This project is proprietary software. All rights reserved.
 
