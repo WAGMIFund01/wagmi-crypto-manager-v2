@@ -399,23 +399,11 @@ export default function PortfolioOverview({ className, onRefresh, isPrivacyMode 
     <div className={`${className} space-y-6`}>
 
       {/* Portfolio Breakdown Charts */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+      <div className="grid grid-cols-1 gap-6">
         <StackedBarChart
           title="Breakdown by Asset"
           data={assetDistribution}
           colors={assetColors}
-          formatValue={formatCurrency}
-        />
-        <StackedBarChart
-          title="Breakdown by Location"
-          data={locationDistribution}
-          colors={locationColors}
-          formatValue={formatCurrency}
-        />
-        <StackedBarChart
-          title="Breakdown by Type"
-          data={typeDistribution}
-          colors={typeColors}
           formatValue={formatCurrency}
         />
       </div>
