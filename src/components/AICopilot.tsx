@@ -249,24 +249,24 @@ export default function AICopilot({ onReportGenerated }: AICopilotProps) {
   };
 
   return (
-    <div className="flex flex-col h-full bg-white rounded-lg shadow-lg">
+    <div className="flex flex-col h-full bg-gray-900 rounded-lg border border-gray-700 shadow-xl">
       {/* Header */}
-      <div className="flex items-center justify-between p-4 border-b border-gray-200">
+      <div className="flex items-center justify-between p-4 border-b border-gray-700 bg-gray-900/50">
         <div className="flex items-center space-x-4">
           <div className="flex items-center space-x-2">
-            <Bot className="h-6 w-6 text-blue-600" />
-            <h2 className="text-lg font-semibold text-gray-900">AI Copilot</h2>
+            <Bot className="h-6 w-6 text-green-400" />
+            <h2 className="text-lg font-semibold text-white">AI Report Assistant</h2>
           </div>
           
           {/* AI Provider Selector */}
           {availableProviders.length > 0 && (
             <div className="flex items-center space-x-2">
-              <label htmlFor="ai-provider" className="text-sm text-gray-600">AI Model:</label>
+              <label htmlFor="ai-provider" className="text-sm text-gray-400">AI Model:</label>
               <select
                 id="ai-provider"
                 value={selectedProvider}
                 onChange={(e) => setSelectedProvider(e.target.value)}
-                className="px-2 py-1 text-sm border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="px-2 py-1 text-sm bg-gray-800 border border-gray-600 text-gray-200 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500"
               >
                 {availableProviders.map((provider) => (
                   <option 
@@ -284,7 +284,7 @@ export default function AICopilot({ onReportGenerated }: AICopilotProps) {
         <div className="flex space-x-2">
           <button
             onClick={() => setShowUploadModal(true)}
-            className="flex items-center space-x-1 px-3 py-1.5 bg-green-600 text-white rounded-md hover:bg-green-700 text-sm"
+            className="flex items-center space-x-1 px-3 py-1.5 bg-green-600 text-white rounded-md hover:bg-green-700 transition-colors text-sm"
           >
             <Upload className="h-4 w-4" />
             <span>Upload Report</span>
@@ -292,7 +292,7 @@ export default function AICopilot({ onReportGenerated }: AICopilotProps) {
           <button
             onClick={handleGenerateReport}
             disabled={isLoading}
-            className="flex items-center space-x-1 px-3 py-1.5 bg-blue-600 text-white rounded-md hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed text-sm"
+            className="flex items-center space-x-1 px-3 py-1.5 bg-green-600 text-white rounded-md hover:bg-green-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors text-sm"
           >
             <FileText className="h-4 w-4" />
             <span>Generate Report</span>
@@ -303,7 +303,7 @@ export default function AICopilot({ onReportGenerated }: AICopilotProps) {
       {/* Messages */}
       <div className="flex-1 overflow-y-auto p-4 space-y-4">
         {messages.length === 0 && (
-          <div className="text-center text-gray-500 py-8">
+          <div className="text-center text-gray-400 py-8">
             <Bot className="h-12 w-12 mx-auto mb-4 text-gray-300" />
             <p className="text-lg font-medium">Welcome to AI Copilot</p>
             <p className="text-sm">I can help you generate investor reports and answer questions about your portfolio.</p>
@@ -325,7 +325,7 @@ export default function AICopilot({ onReportGenerated }: AICopilotProps) {
                 className={`flex-shrink-0 w-8 h-8 rounded-full flex items-center justify-center ${
                   message.role === 'user'
                     ? 'bg-blue-600 text-white'
-                    : 'bg-gray-100 text-gray-600'
+                    : 'bg-gray-100 text-gray-400'
                 }`}
               >
                 {message.role === 'user' ? (
@@ -338,7 +338,7 @@ export default function AICopilot({ onReportGenerated }: AICopilotProps) {
                 className={`px-4 py-2 rounded-lg ${
                   message.role === 'user'
                     ? 'bg-blue-600 text-white'
-                    : 'bg-gray-100 text-gray-900'
+                    : 'bg-gray-100 text-white'
                 }`}
               >
                 <p className="text-sm whitespace-pre-wrap">{message.content}</p>
@@ -353,7 +353,7 @@ export default function AICopilot({ onReportGenerated }: AICopilotProps) {
         {isLoading && (
           <div className="flex justify-start">
             <div className="flex items-start space-x-2">
-              <div className="flex-shrink-0 w-8 h-8 rounded-full bg-gray-100 text-gray-600 flex items-center justify-center">
+              <div className="flex-shrink-0 w-8 h-8 rounded-full bg-gray-100 text-gray-400 flex items-center justify-center">
                 <Bot className="h-4 w-4" />
               </div>
               <div className="px-4 py-2 rounded-lg bg-gray-100">
@@ -372,19 +372,19 @@ export default function AICopilot({ onReportGenerated }: AICopilotProps) {
 
       {/* Uploaded Reports Section */}
       {uploadedReports.length > 0 && (
-        <div className="p-4 border-t border-gray-200 bg-gray-50">
+        <div className="p-4 border-t border-gray-700 bg-gray-900">
           <div className="flex items-start justify-between mb-2">
-            <h3 className="text-sm font-medium text-gray-900">Uploaded Reports:</h3>
-            <div className="text-xs text-gray-600 bg-blue-50 px-2 py-1 rounded">
+            <h3 className="text-sm font-medium text-white">Uploaded Reports:</h3>
+            <div className="text-xs text-gray-400 bg-blue-900/20 px-2 py-1 rounded">
               ℹ️ Reports are summarized to save tokens
             </div>
           </div>
           <div className="space-y-2">
             {uploadedReports.map((report) => (
-              <div key={report.id} className="flex items-center justify-between p-2 bg-white rounded border">
+              <div key={report.id} className="flex items-center justify-between p-2 bg-gray-800 rounded border">
                 <div className="flex-1">
-                  <p className="text-sm font-medium text-gray-900">{report.name}</p>
-                  <p className="text-xs text-gray-500">
+                  <p className="text-sm font-medium text-white">{report.name}</p>
+                  <p className="text-xs text-gray-400">
                     Uploaded: {report.date} • ~{Math.round(report.content.length / 4)} tokens
                   </p>
                 </div>
@@ -398,7 +398,7 @@ export default function AICopilot({ onReportGenerated }: AICopilotProps) {
             ))}
           </div>
           {uploadedReports.some(r => r.content.length > 8000) && (
-            <div className="mt-2 p-2 bg-yellow-50 border border-yellow-200 rounded text-xs text-yellow-800">
+            <div className="mt-2 p-2 bg-yellow-900/20 border border-yellow-700 rounded text-xs text-yellow-300">
               ⚠️ Some reports are large. They&apos;ll be automatically summarized to avoid token limits.
             </div>
           )}
@@ -407,14 +407,14 @@ export default function AICopilot({ onReportGenerated }: AICopilotProps) {
 
       {/* Follow-up Questions */}
       {followUpQuestions.length > 0 && (
-        <div className="p-4 border-t border-gray-200 bg-gray-50">
-          <h3 className="text-sm font-medium text-gray-900 mb-2">Follow-up Questions:</h3>
+        <div className="p-4 border-t border-gray-700 bg-gray-900">
+          <h3 className="text-sm font-medium text-white mb-2">Follow-up Questions:</h3>
           <div className="space-y-1">
             {followUpQuestions.map((question, index) => (
               <button
                 key={index}
                 onClick={() => handleFollowUpQuestion(question)}
-                className="block w-full text-left text-sm text-blue-600 hover:text-blue-800 hover:bg-blue-50 p-2 rounded"
+                className="block w-full text-left text-sm text-blue-600 hover:text-blue-300 hover:bg-blue-900/20 p-2 rounded"
               >
                 {question}
               </button>
@@ -425,13 +425,13 @@ export default function AICopilot({ onReportGenerated }: AICopilotProps) {
 
       {/* Report Draft */}
       {reportDraft && (
-        <div className="p-4 border-t border-gray-200 bg-gray-50">
+        <div className="p-4 border-t border-gray-700 bg-gray-900">
           <div className="flex items-center justify-between mb-2">
-            <h3 className="text-sm font-medium text-gray-900">Report Draft:</h3>
+            <h3 className="text-sm font-medium text-white">Report Draft:</h3>
             <div className="flex space-x-2">
               <button
                 onClick={handleCopyDraft}
-                className="flex items-center space-x-1 text-sm text-gray-600 hover:text-gray-800 transition-colors"
+                className="flex items-center space-x-1 text-sm text-gray-400 hover:text-gray-800 transition-colors"
               >
                 {copiedToClipboard ? (
                   <>
@@ -447,21 +447,21 @@ export default function AICopilot({ onReportGenerated }: AICopilotProps) {
               </button>
               <button
                 onClick={handleDownloadDraft}
-                className="flex items-center space-x-1 text-sm text-gray-600 hover:text-gray-800"
+                className="flex items-center space-x-1 text-sm text-gray-400 hover:text-gray-800"
               >
                 <Download className="h-4 w-4" />
                 <span>Download</span>
               </button>
             </div>
           </div>
-          <div className="bg-white border rounded-lg p-3 max-h-40 overflow-y-auto">
+          <div className="bg-gray-800 border rounded-lg p-3 max-h-40 overflow-y-auto">
             <pre className="text-sm text-gray-700 whitespace-pre-wrap">{reportDraft}</pre>
           </div>
         </div>
       )}
 
       {/* Input */}
-      <div className="p-4 border-t border-gray-200">
+      <div className="p-4 border-t border-gray-700">
         <div className="flex space-x-2">
           <input
             type="text"
@@ -485,12 +485,12 @@ export default function AICopilot({ onReportGenerated }: AICopilotProps) {
       {/* Upload Modal */}
       {showUploadModal && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-          <div className="bg-white rounded-lg p-6 w-full max-w-md mx-4">
+          <div className="bg-gray-800 rounded-lg p-6 w-full max-w-md mx-4">
             <div className="flex items-center justify-between mb-4">
-              <h3 className="text-lg font-semibold text-gray-900">Upload Previous Report</h3>
+              <h3 className="text-lg font-semibold text-white">Upload Previous Report</h3>
               <button
                 onClick={() => setShowUploadModal(false)}
-                className="text-gray-400 hover:text-gray-600"
+                className="text-gray-400 hover:text-gray-400"
               >
                 <X className="h-5 w-5" />
               </button>
@@ -504,16 +504,16 @@ export default function AICopilot({ onReportGenerated }: AICopilotProps) {
                 type="file"
                 accept=".txt,.pdf,.doc,.docx"
                 onChange={handleFileUpload}
-                className="block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100"
+                className="block w-full text-sm text-gray-400 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-blue-900/20 file:text-blue-700 hover:file:bg-blue-100"
               />
             </div>
 
             {uploadFile && (
-              <div className="mb-4 p-3 bg-gray-50 rounded">
+              <div className="mb-4 p-3 bg-gray-900 rounded">
                 <p className="text-sm text-gray-700">
                   Selected: <span className="font-medium">{uploadFile.name}</span>
                 </p>
-                <p className="text-xs text-gray-500">
+                <p className="text-xs text-gray-400">
                   Size: {(uploadFile.size / 1024).toFixed(1)} KB
                 </p>
               </div>
