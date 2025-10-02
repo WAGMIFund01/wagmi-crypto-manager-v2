@@ -69,10 +69,11 @@ export const COLORS = {
   assetType: {
     memecoin: '#8B5CF6',   // Purple for memecoin
     major: '#00FF95',      // Green for major coins
-    altcoin: '#3B82F6',    // Blue for altcoins
-    stablecoin: '#6B7280', // Gray for stablecoins
+    altcoin: '#F59E0B',    // Amber/Orange for altcoins
+    stablecoin: '#2775CA', // USDC blue for stablecoins
     defi: '#FF6B35',       // Orange for DeFi
     nft: '#EC4899',        // Pink for NFT
+    perp: '#A855F7',       // Lighter purple for perps (distinct from memecoin)
   },
 
   // Chain colors
