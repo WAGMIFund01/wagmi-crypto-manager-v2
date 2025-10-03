@@ -28,7 +28,20 @@ export default function AICopilot({ onReportGenerated }: AICopilotProps) {
   const [isLoading, setIsLoading] = useState(false);
   const [reportDraft, setReportDraft] = useState<string>('');
   const [followUpQuestions, setFollowUpQuestions] = useState<string[]>([]);
-  const [uploadedReports, setUploadedReports] = useState<UploadedReport[]>([]);
+  const [uploadedReports, setUploadedReports] = useState<UploadedReport[]>(() => {
+    // Load from localStorage on mount
+    if (typeof window !== 'undefined') {
+      const saved = localStorage.getItem('ai-knowledge-base');
+      if (saved) {
+        try {
+          return JSON.parse(saved);
+        } catch (e) {
+          console.error('Failed to parse knowledge base:', e);
+        }
+      }
+    }
+    return [];
+  });
   const [showUploadModal, setShowUploadModal] = useState(false);
   const [reportName, setReportName] = useState<string>('');
   const [reportContent, setReportContent] = useState<string>('');
@@ -44,6 +57,13 @@ export default function AICopilot({ onReportGenerated }: AICopilotProps) {
   useEffect(() => {
     scrollToBottom();
   }, [messages]);
+
+  // Persist knowledge base to localStorage
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      localStorage.setItem('ai-knowledge-base', JSON.stringify(uploadedReports));
+    }
+  }, [uploadedReports]);
 
   // Removed provider fetching - using Gemini only
 
