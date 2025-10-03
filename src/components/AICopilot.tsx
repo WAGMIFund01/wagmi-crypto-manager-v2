@@ -34,10 +34,6 @@ export default function AICopilot({ onReportGenerated }: AICopilotProps) {
   const [uploadFile, setUploadFile] = useState<File | null>(null);
   // Removed provider selection - using Gemini only
   const [copiedToClipboard, setCopiedToClipboard] = useState(false);
-  const [pendingRegeneration, setPendingRegeneration] = useState<{
-    feedback: string;
-    context: any;
-  } | null>(null);
   const [isRegenerating, setIsRegenerating] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
@@ -70,16 +66,22 @@ export default function AICopilot({ onReportGenerated }: AICopilotProps) {
     setIsLoading(true);
 
     try {
-      // Check if user is responding to regeneration prompt
-      const isConfirmingRegeneration = pendingRegeneration && 
-        (userMessage.toLowerCase().includes('yes') || 
-         userMessage.toLowerCase().includes('update') ||
-         userMessage.toLowerCase().includes('regenerate'));
+      // Check if user is explicitly requesting regeneration/refresh
+      const isRegenerationRequest = reportDraft && 
+        /\b(refresh|regenerate|update|redo|remake|rewrite).*\b(draft|report)\b|\b(draft|report).*\b(refresh|regenerate|update|redo|remake|rewrite)\b/i.test(userMessage);
 
-      if (isConfirmingRegeneration && pendingRegeneration) {
-        // User confirmed - regenerate report silently
-        await handleRegenerateReport(pendingRegeneration.feedback, pendingRegeneration.context);
-        setPendingRegeneration(null);
+      if (isRegenerationRequest) {
+        // User explicitly requested regeneration - do it immediately
+        const context = await reportContextService.prepareReportContext();
+        const enhancedContext = {
+          ...context,
+          previousReports: [
+            ...context.previousReports,
+            ...uploadedReports.map(report => `${report.name} (${report.date})\n${report.content}`)
+          ]
+        };
+        
+        await handleRegenerateReport(userMessage, enhancedContext);
         return;
       }
 
@@ -117,15 +119,6 @@ export default function AICopilot({ onReportGenerated }: AICopilotProps) {
       if (data.success) {
         const aiResponse = data.draft || 'I need more information to help you.';
         addMessage('assistant', aiResponse);
-
-        // Check if AI suggests updating the report
-        if (data.suggestRegeneration && reportDraft) {
-          setPendingRegeneration({
-            feedback: userMessage,
-            context: enhancedContext
-          });
-          addMessage('assistant', '💡 Would you like me to update the report draft with these changes? Just say "yes" to regenerate!');
-        }
       } else {
         // Handle quota exceeded errors with helpful messaging
         if (data.error?.includes('quota exceeded')) {

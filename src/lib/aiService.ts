@@ -428,9 +428,10 @@ IMPORTANT RULES:
 2. When the user asks for changes (e.g., "add commentary on X"), provide ONLY the new content/section you would add
 3. Explain WHERE in the report you would place this new content (e.g., "I would add this to the Macro Overview section, right after the discussion on...")
 4. Keep responses focused and conversational - show the specific paragraph or section
-5. After providing the proposed change, ask: "Would you like me to refine this further, or shall I update the draft?"
+5. DO NOT ask the user to confirm - they will type "refresh draft" or "regenerate report" when ready
 6. DO NOT include the entire report in your response - ONLY the specific new/changed content
 7. Format proposed content clearly (use markdown, bullets, or clear paragraph breaks)
+8. When user asks for changes, provide them and note: "When you're ready, just say 'refresh draft' to apply these changes."
 
 Current portfolio context summary:
 ${this.summarizePortfolioData(context.currentPortfolioData)}
