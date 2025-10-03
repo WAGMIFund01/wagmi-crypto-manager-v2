@@ -192,10 +192,15 @@ export default function AICopilot({ onReportGenerated }: AICopilotProps) {
     return new Promise((resolve, reject) => {
       const fileReader = new FileReader();
       
+      // Add timeout to prevent infinite loading
+      const timeout = setTimeout(() => {
+        reject(new Error('PDF extraction timeout - file may be too large or corrupted'));
+      }, 30000); // 30 second timeout
+      
       fileReader.onload = async function() {
         try {
-          // Set worker source for PDF.js
-          pdfjsLib.GlobalWorkerOptions.workerSrc = `//cdnjs.cloudflare.com/ajax/libs/pdf.js/${pdfjsLib.version}/pdf.worker.min.js`;
+          // Set worker source for PDF.js - use unpkg as it's more reliable
+          pdfjsLib.GlobalWorkerOptions.workerSrc = `https://unpkg.com/pdfjs-dist@${pdfjsLib.version}/build/pdf.worker.min.js`;
 
           const typedArray = new Uint8Array(this.result as ArrayBuffer);
           const pdf = await pdfjsLib.getDocument({ data: typedArray }).promise;
@@ -212,13 +217,16 @@ export default function AICopilot({ onReportGenerated }: AICopilotProps) {
             fullText += pageText + '\n\n';
           }
           
+          clearTimeout(timeout);
           resolve(fullText.trim());
         } catch (error) {
-          reject(error);
+          clearTimeout(timeout);
+          reject(error instanceof Error ? error : new Error('Failed to extract text from PDF'));
         }
       };
       
       fileReader.onerror = function() {
+        clearTimeout(timeout);
         reject(new Error('Failed to read PDF file'));
       };
       
