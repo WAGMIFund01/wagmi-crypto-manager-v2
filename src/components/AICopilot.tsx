@@ -3,7 +3,6 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { Send, Bot, User, FileText, Download, Upload, X, Copy, Check } from 'lucide-react';
 import { reportContextService } from '@/lib/reportContextService';
-import * as pdfjsLib from 'pdfjs-dist';
 
 interface ConversationMessage {
   id: string;
@@ -31,8 +30,8 @@ export default function AICopilot({ onReportGenerated }: AICopilotProps) {
   const [followUpQuestions, setFollowUpQuestions] = useState<string[]>([]);
   const [uploadedReports, setUploadedReports] = useState<UploadedReport[]>([]);
   const [showUploadModal, setShowUploadModal] = useState(false);
-  const [uploadFile, setUploadFile] = useState<File | null>(null);
-  const [isUploading, setIsUploading] = useState(false);
+  const [reportName, setReportName] = useState<string>('');
+  const [reportContent, setReportContent] = useState<string>('');
   // Removed provider selection - using Gemini only
   const [copiedToClipboard, setCopiedToClipboard] = useState(false);
   const [isRegenerating, setIsRegenerating] = useState(false);
@@ -181,102 +180,30 @@ export default function AICopilot({ onReportGenerated }: AICopilotProps) {
     }
   };
 
-  const handleFileUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const file = event.target.files?.[0];
-    if (file) {
-      setUploadFile(file);
+  // Removed handleFileUpload - now using direct text input
+
+
+
+  const handleUploadReport = () => {
+    if (!reportName.trim() || !reportContent.trim()) {
+      addMessage('assistant', '⚠️ Please provide both a report name and content.');
+      return;
     }
-  };
 
-  const extractTextFromPDF = async (file: File): Promise<string> => {
-    return new Promise((resolve, reject) => {
-      const fileReader = new FileReader();
-      
-      // Add timeout to prevent infinite loading
-      const timeout = setTimeout(() => {
-        reject(new Error('PDF extraction timeout - file may be too large or corrupted'));
-      }, 30000); // 30 second timeout
-      
-      fileReader.onload = async function() {
-        try {
-          // Set worker source for PDF.js - use unpkg as it's more reliable
-          pdfjsLib.GlobalWorkerOptions.workerSrc = `https://unpkg.com/pdfjs-dist@${pdfjsLib.version}/build/pdf.worker.min.js`;
+    const newReport: UploadedReport = {
+      id: Date.now().toString(),
+      name: reportName.trim(),
+      content: reportContent.trim(),
+      date: new Date().toISOString().split('T')[0]
+    };
 
-          const typedArray = new Uint8Array(this.result as ArrayBuffer);
-          const pdf = await pdfjsLib.getDocument({ data: typedArray }).promise;
-          
-          let fullText = '';
-          
-          // Extract text from each page
-          for (let pageNum = 1; pageNum <= pdf.numPages; pageNum++) {
-            const page = await pdf.getPage(pageNum);
-            const textContent = await page.getTextContent();
-            const pageText = textContent.items
-              .map((item: any) => item.str)
-              .join(' ');
-            fullText += pageText + '\n\n';
-          }
-          
-          clearTimeout(timeout);
-          resolve(fullText.trim());
-        } catch (error) {
-          clearTimeout(timeout);
-          reject(error instanceof Error ? error : new Error('Failed to extract text from PDF'));
-        }
-      };
-      
-      fileReader.onerror = function() {
-        clearTimeout(timeout);
-        reject(new Error('Failed to read PDF file'));
-      };
-      
-      fileReader.readAsArrayBuffer(file);
-    });
-  };
-
-  const handleUploadReport = async () => {
-    if (!uploadFile) return;
-
-    setIsUploading(true);
+    setUploadedReports(prev => [...prev, newReport]);
+    addMessage('assistant', `✅ Added "${reportName.trim()}" to knowledge base (${Math.round(reportContent.length / 4)} tokens). I'll use this to match your writing style in future reports.`);
     
-    try {
-      const fileExtension = uploadFile.name.toLowerCase().split('.').pop();
-      let content = '';
-
-      // Handle different file types
-      if (fileExtension === 'pdf') {
-        content = await extractTextFromPDF(uploadFile);
-      } else if (['txt', 'md', 'markdown'].includes(fileExtension || '')) {
-        content = await uploadFile.text();
-      } else {
-        addMessage('assistant', '⚠️ Only PDF, TXT, and Markdown files are supported. Please convert your file and try again.');
-        return;
-      }
-      
-      // Validate content isn't empty
-      if (!content.trim()) {
-        addMessage('assistant', '⚠️ No text could be extracted from the file. Please check the file and try again.');
-        return;
-      }
-
-      const newReport: UploadedReport = {
-        id: Date.now().toString(),
-        name: uploadFile.name,
-        content,
-        date: new Date().toISOString().split('T')[0]
-      };
-
-      setUploadedReports(prev => [...prev, newReport]);
-      addMessage('assistant', `✅ Uploaded "${uploadFile.name}" (${Math.round(content.length / 4)} tokens). I'll use this as context for generating reports in your house style. Note: Charts and images are ignored - only text is extracted.`);
-    } catch (error) {
-      console.error('File upload error:', error);
-      addMessage('assistant', `❌ Error reading file: ${error instanceof Error ? error.message : 'Unknown error'}. Please make sure it's a valid file.`);
-    } finally {
-      // Always close modal and reset state after upload attempt
-      setIsUploading(false);
-      setUploadFile(null);
-      setShowUploadModal(false);
-    }
+    // Reset form and close modal
+    setReportName('');
+    setReportContent('');
+    setShowUploadModal(false);
   };
 
   const removeUploadedReport = (id: string) => {
@@ -391,7 +318,7 @@ export default function AICopilot({ onReportGenerated }: AICopilotProps) {
             className="relative flex items-center space-x-1 px-3 py-1.5 bg-green-600 text-white rounded-md hover:bg-green-700 transition-colors text-sm"
           >
             <Upload className="h-4 w-4" />
-            <span>Upload Report</span>
+            <span>Add to Knowledge Base</span>
             {uploadedReports.length > 0 && (
               <span className="absolute -top-1 -right-1 h-5 w-5 bg-blue-500 text-white text-xs rounded-full flex items-center justify-center font-bold">
                 {uploadedReports.length}
@@ -485,7 +412,7 @@ export default function AICopilot({ onReportGenerated }: AICopilotProps) {
           <div className="flex items-start justify-between mb-3">
             <h3 className="text-sm font-semibold text-white flex items-center gap-2">
               <FileText className="h-4 w-4 text-blue-400" />
-              Uploaded Context Reports ({uploadedReports.length})
+              Knowledge Base ({uploadedReports.length})
             </h3>
             <div className="text-xs text-gray-400 bg-blue-900/20 px-2 py-1 rounded">
               ℹ️ Reports are summarized to save tokens
@@ -516,7 +443,7 @@ export default function AICopilot({ onReportGenerated }: AICopilotProps) {
             </div>
           )}
           <div className="mt-2 text-xs text-gray-500 italic">
-            💡 These reports help the AI match your writing style and report structure
+            💡 The AI analyzes these reports to match your writing style, tone, and structure
           </div>
         </div>
       )}
@@ -622,7 +549,7 @@ export default function AICopilot({ onReportGenerated }: AICopilotProps) {
             <div className="flex items-center justify-between mb-4">
               <h3 className="text-lg font-semibold text-white flex items-center gap-2">
                 <Upload className="h-5 w-5 text-blue-400" />
-                Upload Previous Report
+                Add Report to Knowledge Base
               </h3>
               <button
                 onClick={() => setShowUploadModal(false)}
@@ -634,51 +561,44 @@ export default function AICopilot({ onReportGenerated }: AICopilotProps) {
             
             {uploadedReports.length > 0 && (
               <div className="mb-4 p-3 bg-blue-900/20 border border-blue-700 rounded text-sm text-blue-300">
-                ℹ️ You already have {uploadedReports.length} report{uploadedReports.length > 1 ? 's' : ''} uploaded. You can upload more for additional context.
+                ℹ️ You have {uploadedReports.length} report{uploadedReports.length > 1 ? 's' : ''} in your knowledge base. The AI uses these to match your writing style and structure.
               </div>
             )}
             
             <div className="mb-4">
               <label className="block text-sm font-medium text-gray-300 mb-2">
-                Select a report file (PDF, TXT, or Markdown)
+                Report Name
               </label>
               <input
-                type="file"
-                accept=".pdf,.txt,.md,.markdown"
-                onChange={handleFileUpload}
-                className="block w-full text-sm text-gray-400 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-blue-900/20 file:text-blue-400 hover:file:bg-blue-900/40 cursor-pointer"
+                type="text"
+                placeholder="e.g., WAGMI Fund Update August 2025"
+                value={reportName}
+                onChange={(e) => setReportName(e.target.value)}
+                className="w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded-md text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500"
               />
-              <p className="text-xs text-gray-500 mt-2">
-                💡 Note: PDFs will have text extracted (charts/images ignored).
-              </p>
             </div>
 
-            {uploadFile && (
-              <div className="mb-4 p-3 bg-gray-900 rounded border border-gray-700">
-                <p className="text-sm text-gray-300">
-                  Selected: <span className="font-medium text-white">{uploadFile.name}</span>
-                </p>
-                <p className="text-xs text-gray-500">
-                  Size: {(uploadFile.size / 1024).toFixed(1)} KB (~{Math.round(uploadFile.size / 4)} tokens)
-                </p>
-                {isUploading && (
-                  <div className="mt-2 flex items-center gap-2 text-xs text-blue-400">
-                    <div className="w-3 h-3 border-2 border-blue-400 border-t-transparent rounded-full animate-spin"></div>
-                    <span>
-                      {uploadFile.name.toLowerCase().endsWith('.pdf') 
-                        ? 'Extracting text from PDF...' 
-                        : 'Reading file...'}
-                    </span>
-                  </div>
-                )}
-              </div>
-            )}
+            <div className="mb-4">
+              <label className="block text-sm font-medium text-gray-300 mb-2">
+                Report Content
+              </label>
+              <textarea
+                placeholder="Paste your report content here... The AI will learn from this to match your style, tone, and structure in future reports."
+                value={reportContent}
+                onChange={(e) => setReportContent(e.target.value)}
+                className="w-full h-64 px-3 py-2 bg-gray-700 border border-gray-600 rounded-md text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 resize-none font-mono text-sm"
+              />
+              <p className="text-xs text-gray-500 mt-2">
+                💡 Copy and paste your report content. The AI will use this as a style reference (~{Math.round(reportContent.length / 4)} tokens).
+              </p>
+            </div>
 
             <div className="flex justify-end space-x-3">
               <button
                 onClick={() => {
                   setShowUploadModal(false);
-                  setUploadFile(null);
+                  setReportName('');
+                  setReportContent('');
                 }}
                 className="px-4 py-2 text-sm font-medium text-gray-300 bg-gray-700 rounded-md hover:bg-gray-600 border border-gray-600"
               >
@@ -686,17 +606,11 @@ export default function AICopilot({ onReportGenerated }: AICopilotProps) {
               </button>
               <button
                 onClick={handleUploadReport}
-                disabled={!uploadFile || isUploading}
+                disabled={!reportName.trim() || !reportContent.trim()}
                 className="px-4 py-2 text-sm font-medium text-white bg-green-600 rounded-md hover:bg-green-700 disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
               >
-                {isUploading ? (
-                  <>
-                    <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
-                    <span>Processing...</span>
-                  </>
-                ) : (
-                  'Upload Report'
-                )}
+                <FileText className="h-4 w-4" />
+                Add to Knowledge Base
               </button>
             </div>
           </div>
