@@ -32,6 +32,7 @@ export default function AICopilot({ onReportGenerated }: AICopilotProps) {
   const [uploadedReports, setUploadedReports] = useState<UploadedReport[]>([]);
   const [showUploadModal, setShowUploadModal] = useState(false);
   const [uploadFile, setUploadFile] = useState<File | null>(null);
+  const [isUploading, setIsUploading] = useState(false);
   // Removed provider selection - using Gemini only
   const [copiedToClipboard, setCopiedToClipboard] = useState(false);
   const [isRegenerating, setIsRegenerating] = useState(false);
@@ -228,13 +229,14 @@ export default function AICopilot({ onReportGenerated }: AICopilotProps) {
   const handleUploadReport = async () => {
     if (!uploadFile) return;
 
+    setIsUploading(true);
+    
     try {
       const fileExtension = uploadFile.name.toLowerCase().split('.').pop();
       let content = '';
 
       // Handle different file types
       if (fileExtension === 'pdf') {
-        addMessage('assistant', '📄 Reading PDF file...');
         content = await extractTextFromPDF(uploadFile);
       } else if (['txt', 'md', 'markdown'].includes(fileExtension || '')) {
         content = await uploadFile.text();
@@ -257,12 +259,15 @@ export default function AICopilot({ onReportGenerated }: AICopilotProps) {
       };
 
       setUploadedReports(prev => [...prev, newReport]);
-      setUploadFile(null);
-      setShowUploadModal(false);
       addMessage('assistant', `✅ Uploaded "${uploadFile.name}" (${Math.round(content.length / 4)} tokens). I'll use this as context for generating reports in your house style. Note: Charts and images are ignored - only text is extracted.`);
     } catch (error) {
       console.error('File upload error:', error);
       addMessage('assistant', `❌ Error reading file: ${error instanceof Error ? error.message : 'Unknown error'}. Please make sure it's a valid file.`);
+    } finally {
+      // Always close modal and reset state after upload attempt
+      setIsUploading(false);
+      setUploadFile(null);
+      setShowUploadModal(false);
     }
   };
 
@@ -648,6 +653,16 @@ export default function AICopilot({ onReportGenerated }: AICopilotProps) {
                 <p className="text-xs text-gray-500">
                   Size: {(uploadFile.size / 1024).toFixed(1)} KB (~{Math.round(uploadFile.size / 4)} tokens)
                 </p>
+                {isUploading && (
+                  <div className="mt-2 flex items-center gap-2 text-xs text-blue-400">
+                    <div className="w-3 h-3 border-2 border-blue-400 border-t-transparent rounded-full animate-spin"></div>
+                    <span>
+                      {uploadFile.name.toLowerCase().endsWith('.pdf') 
+                        ? 'Extracting text from PDF...' 
+                        : 'Reading file...'}
+                    </span>
+                  </div>
+                )}
               </div>
             )}
 
@@ -663,10 +678,17 @@ export default function AICopilot({ onReportGenerated }: AICopilotProps) {
               </button>
               <button
                 onClick={handleUploadReport}
-                disabled={!uploadFile}
-                className="px-4 py-2 text-sm font-medium text-white bg-green-600 rounded-md hover:bg-green-700 disabled:opacity-50 disabled:cursor-not-allowed"
+                disabled={!uploadFile || isUploading}
+                className="px-4 py-2 text-sm font-medium text-white bg-green-600 rounded-md hover:bg-green-700 disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
               >
-                Upload Report
+                {isUploading ? (
+                  <>
+                    <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                    <span>Processing...</span>
+                  </>
+                ) : (
+                  'Upload Report'
+                )}
               </button>
             </div>
           </div>
