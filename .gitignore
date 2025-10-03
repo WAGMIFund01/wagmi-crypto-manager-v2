@@ -10,6 +10,8 @@
 !README.md
 !DEVELOPER-HANDOVER-NOTES.md
 !QUICK-START-GUIDE.md
+!docs/interactive-regeneration-test-plan.md
+!docs/interactive-regeneration-test-results.md
 
 # Test files
 test-*
