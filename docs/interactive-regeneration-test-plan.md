@@ -88,8 +88,8 @@ const content = msg.content.length > 2000
 **Expected:**
 - ✅ AI responds discussing HOW to make it succinct (e.g., "I would shorten the Executive Summary by focusing on...")
 - ✅ AI does NOT output full report in chat
-- ✅ AI asks: "Would you like me to refine this further, or shall I update the draft?"
-- ✅ `suggestRegeneration` triggered (check network tab)
+- ✅ AI mentions: "When you're ready, just say 'refresh draft' to apply these changes."
+- ✅ Draft is NOT updated yet (user has control)
 
 **Actual test on your system:**
 ```
@@ -104,7 +104,7 @@ AI expected response:
 For example, the Executive Summary would become:
 [Shows ONLY the new concise summary paragraph]
 
-Would you like me to update the draft with these changes?"
+When you're ready, just say 'refresh draft' to apply these changes."
 ```
 
 ---
@@ -123,18 +123,19 @@ Would you like me to update the draft with these changes?"
   On [date], approximately $X million in BTC long positions were liquidated...
   [2-3 sentences of analysis]
   ```
-- ✅ Asks: "Would you like me to refine this further, or shall I update the draft?"
+- ✅ AI mentions: "When you're ready, just say 'refresh draft' to apply these changes."
 - ✅ NO full report in chat
+- ✅ Draft is NOT updated yet
 
 ---
 
-### **TEST 4: Confirmation and Regeneration**
+### **TEST 4: Direct Regeneration Command**
 **Steps:**
-1. After receiving AI's proposed change, type: "Yes, update the draft"
+1. After receiving AI's proposed changes, type: "refresh draft"
 2. Send message
 
 **Expected:**
-- ✅ `isConfirmingRegeneration` triggers (contains "yes" and "update")
+- ✅ `isRegenerationRequest` triggers (contains "refresh" and "draft")
 - ✅ `handleRegenerateReport` called silently
 - ✅ Loading indicator appears on Report Draft box (pulsing green border with "Updating..." label)
 - ✅ AI responds in chat: "✅ Report draft has been updated!"
@@ -148,15 +149,19 @@ Would you like me to update the draft with these changes?"
 
 ---
 
-### **TEST 5: Alternative Confirmation Phrases**
+### **TEST 5: Alternative Regeneration Phrases**
 Test these variations trigger regeneration:
-- "yes"
-- "update it"
-- "regenerate"
-- "regenerate the report"
-- "yes please update"
+- "refresh draft"
+- "regenerate report"
+- "update draft"
+- "update report"
+- "redo report"
+- "remake draft"
+- "rewrite report"
+- "report refresh"
+- "draft regenerate"
 
-**Expected:** All should trigger `handleRegenerateReport`
+**Expected:** All should trigger `handleRegenerateReport` immediately
 
 ---
 
@@ -164,10 +169,10 @@ Test these variations trigger regeneration:
 **Steps:**
 1. Generate initial report
 2. Request change #1: "Make it more succinct"
-3. Confirm: "Yes, update"
+3. Type: "refresh draft"
 4. Wait for draft to update
 5. Request change #2: "Add more detail on ETH holdings"
-6. Confirm: "Update it"
+6. Type: "update report"
 7. Wait for draft to update
 
 **Expected:**
@@ -177,41 +182,41 @@ Test these variations trigger regeneration:
 
 ---
 
-### **TEST 7: Rejection/Iteration on Proposed Change**
+### **TEST 7: Iteration on Proposed Change**
 **Steps:**
 1. Request change: "Add Bitcoin commentary"
 2. AI proposes paragraph
-3. Instead of confirming, say: "Can you make that commentary more bullish?"
+3. Instead of regenerating, say: "Can you make that commentary more bullish?"
 4. AI revises the proposed content
-5. Confirm: "Yes, update"
+5. Type: "regenerate report"
 
 **Expected:**
-- ✅ AI refines the SAME section without regenerating draft yet
-- ✅ Only after "yes, update" does draft get updated
+- ✅ AI refines the SAME section without regenerating draft initially
+- ✅ Only after "regenerate report" does draft get updated
 - ✅ Final draft contains the revised (bullish) version
 
 ---
 
-### **TEST 8: Edge Case - Conversation Without Confirmation**
+### **TEST 8: Edge Case - Conversation Without Regeneration**
 **Steps:**
 1. Request change: "Add macro commentary"
 2. AI proposes content
-3. DON'T confirm - instead ask: "What's the current portfolio value?"
+3. DON'T regenerate - instead ask: "What's the current portfolio value?"
 
 **Expected:**
 - ✅ AI answers the question conversationally
 - ✅ Draft is NOT updated (no regeneration triggered)
-- ✅ Previous proposed change is still "pending"
+- ✅ Can still type "refresh draft" later to apply previous proposed change
 
 ---
 
-### **TEST 9: Multiple Changes Before Confirmation**
+### **TEST 9: Multiple Changes Before Regeneration**
 **Steps:**
 1. Request: "Make it more succinct"
 2. AI responds
-3. DON'T confirm - instead say: "Also add Bitcoin commentary"
+3. DON'T regenerate - instead say: "Also add Bitcoin commentary"
 4. AI responds
-5. Confirm: "Yes, update the draft"
+5. Type: "refresh draft"
 
 **Expected:**
 - ✅ Regeneration includes BOTH instructions (succinct + Bitcoin commentary)
