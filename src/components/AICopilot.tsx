@@ -375,10 +375,15 @@ export default function AICopilot({ onReportGenerated }: AICopilotProps) {
         <div className="flex space-x-2">
           <button
             onClick={() => setShowUploadModal(true)}
-            className="flex items-center space-x-1 px-3 py-1.5 bg-green-600 text-white rounded-md hover:bg-green-700 transition-colors text-sm"
+            className="relative flex items-center space-x-1 px-3 py-1.5 bg-green-600 text-white rounded-md hover:bg-green-700 transition-colors text-sm"
           >
             <Upload className="h-4 w-4" />
             <span>Upload Report</span>
+            {uploadedReports.length > 0 && (
+              <span className="absolute -top-1 -right-1 h-5 w-5 bg-blue-500 text-white text-xs rounded-full flex items-center justify-center font-bold">
+                {uploadedReports.length}
+              </span>
+            )}
           </button>
           <button
             onClick={handleGenerateReport}
@@ -463,25 +468,29 @@ export default function AICopilot({ onReportGenerated }: AICopilotProps) {
 
       {/* Uploaded Reports Section */}
       {uploadedReports.length > 0 && (
-        <div className="p-4 border-t border-gray-700 bg-gray-900">
-          <div className="flex items-start justify-between mb-2">
-            <h3 className="text-sm font-medium text-white">Uploaded Reports:</h3>
+        <div className="p-4 border-t border-gray-700 bg-gray-900/50">
+          <div className="flex items-start justify-between mb-3">
+            <h3 className="text-sm font-semibold text-white flex items-center gap-2">
+              <FileText className="h-4 w-4 text-blue-400" />
+              Uploaded Context Reports ({uploadedReports.length})
+            </h3>
             <div className="text-xs text-gray-400 bg-blue-900/20 px-2 py-1 rounded">
               ℹ️ Reports are summarized to save tokens
             </div>
           </div>
           <div className="space-y-2">
             {uploadedReports.map((report) => (
-              <div key={report.id} className="flex items-center justify-between p-2 bg-gray-800 rounded border">
-                <div className="flex-1">
-                  <p className="text-sm font-medium text-white">{report.name}</p>
+              <div key={report.id} className="flex items-center justify-between p-3 bg-gray-800 rounded-lg border border-gray-700 hover:border-gray-600 transition-colors group">
+                <div className="flex-1 min-w-0">
+                  <p className="text-sm font-medium text-white truncate">{report.name}</p>
                   <p className="text-xs text-gray-400">
-                    Uploaded: {report.date} • ~{Math.round(report.content.length / 4)} tokens
+                    📅 {report.date} • 📊 ~{Math.round(report.content.length / 4)} tokens
                   </p>
                 </div>
                 <button
                   onClick={() => removeUploadedReport(report.id)}
-                  className="p-1 text-red-600 hover:text-red-800"
+                  className="ml-3 p-2 text-red-400 hover:text-red-300 hover:bg-red-900/20 rounded transition-colors"
+                  title="Remove this report"
                 >
                   <X className="h-4 w-4" />
                 </button>
@@ -489,10 +498,13 @@ export default function AICopilot({ onReportGenerated }: AICopilotProps) {
             ))}
           </div>
           {uploadedReports.some(r => r.content.length > 8000) && (
-            <div className="mt-2 p-2 bg-yellow-900/20 border border-yellow-700 rounded text-xs text-yellow-300">
+            <div className="mt-3 p-2 bg-yellow-900/20 border border-yellow-700 rounded text-xs text-yellow-300">
               ⚠️ Some reports are large. They&apos;ll be automatically summarized to avoid token limits.
             </div>
           )}
+          <div className="mt-2 text-xs text-gray-500 italic">
+            💡 These reports help the AI match your writing style and report structure
+          </div>
         </div>
       )}
 
@@ -593,16 +605,25 @@ export default function AICopilot({ onReportGenerated }: AICopilotProps) {
       {/* Upload Modal */}
       {showUploadModal && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-          <div className="bg-gray-800 rounded-lg p-6 w-full max-w-md mx-4">
+          <div className="bg-gray-800 rounded-lg p-6 w-full max-w-md mx-4 border border-gray-700">
             <div className="flex items-center justify-between mb-4">
-              <h3 className="text-lg font-semibold text-white">Upload Previous Report</h3>
+              <h3 className="text-lg font-semibold text-white flex items-center gap-2">
+                <Upload className="h-5 w-5 text-blue-400" />
+                Upload Previous Report
+              </h3>
               <button
                 onClick={() => setShowUploadModal(false)}
-                className="text-gray-400 hover:text-gray-400"
+                className="text-gray-400 hover:text-gray-200 transition-colors"
               >
                 <X className="h-5 w-5" />
               </button>
             </div>
+            
+            {uploadedReports.length > 0 && (
+              <div className="mb-4 p-3 bg-blue-900/20 border border-blue-700 rounded text-sm text-blue-300">
+                ℹ️ You already have {uploadedReports.length} report{uploadedReports.length > 1 ? 's' : ''} uploaded. You can upload more for additional context.
+              </div>
+            )}
             
             <div className="mb-4">
               <label className="block text-sm font-medium text-gray-300 mb-2">
@@ -612,7 +633,7 @@ export default function AICopilot({ onReportGenerated }: AICopilotProps) {
                 type="file"
                 accept=".pdf,.txt,.md,.markdown"
                 onChange={handleFileUpload}
-                className="block w-full text-sm text-gray-400 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-blue-900/20 file:text-blue-400 hover:file:bg-blue-900/40"
+                className="block w-full text-sm text-gray-400 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-blue-900/20 file:text-blue-400 hover:file:bg-blue-900/40 cursor-pointer"
               />
               <p className="text-xs text-gray-500 mt-2">
                 💡 Note: PDFs will have text extracted (charts/images ignored).
