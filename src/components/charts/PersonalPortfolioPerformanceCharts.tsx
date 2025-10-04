@@ -3,7 +3,7 @@
 import { useState } from 'react';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
 import { WagmiButton, WagmiCard } from '@/components/ui';
-import { getSpacing, getStandardCardStyle } from '@/shared/utils/standardization';
+import { getStandardCardStyle } from '@/shared/utils/standardization';
 import { PersonalPortfolioPerformanceData } from '@/shared/types/performance';
 
 interface PersonalPortfolioPerformanceChartsProps {

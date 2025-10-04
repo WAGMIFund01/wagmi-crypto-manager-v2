@@ -3,7 +3,8 @@
 import { useState, useEffect } from 'react';
 import { WagmiSpinner, WagmiButton } from '@/components/ui';
 import PersonalPortfolioPerformanceCharts from '@/components/charts/PersonalPortfolioPerformanceCharts';
-import { fetchPersonalPortfolioPerformanceData, PersonalPortfolioPerformanceData } from '@/services/personalPortfolioPerformanceDataService';
+import { fetchPersonalPortfolioPerformanceData } from '@/services/personalPortfolioPerformanceDataService';
+import { PersonalPortfolioPerformanceData } from '@/shared/types/performance';
 
 interface PersonalPortfolioAnalyticsProps {
   onRefresh?: () => void;

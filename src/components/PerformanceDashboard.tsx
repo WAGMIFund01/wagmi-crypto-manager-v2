@@ -1,7 +1,6 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { PerformanceSummary } from '@/lib/performance-monitor';
 import { PerformanceDashboardData } from '@/shared/types/performance';
 
 export default function PerformanceDashboard() {
