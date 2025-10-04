@@ -4,17 +4,7 @@ import { useState } from 'react';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
 import { WagmiButton, WagmiCard } from '@/components/ui';
 import { getSpacing, getStandardCardStyle } from '@/shared/utils/standardization';
-
-interface PersonalPortfolioPerformanceData {
-  month: string;
-  endingAUM: number;
-  personalMoM: number;
-  totalMoM: number;
-  total3MoM: number;
-  personalCumulative: number;
-  totalCumulative: number;
-  total3Cumulative: number;
-}
+import { PersonalPortfolioPerformanceData } from '@/shared/types/performance';
 
 interface PersonalPortfolioPerformanceChartsProps {
   data: PersonalPortfolioPerformanceData[];

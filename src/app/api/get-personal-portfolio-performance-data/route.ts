@@ -2,17 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import logger from '@/lib/logger';
 import errorMonitor from '@/lib/errorMonitor';
 import { withApiMiddleware } from '@/lib/apiMiddleware';
-
-export interface PersonalPortfolioPerformanceData {
-  month: string;
-  endingAUM: number;
-  personalMoM: number;
-  totalMoM: number;
-  total3MoM: number;
-  personalCumulative: number;
-  totalCumulative: number;
-  total3Cumulative: number;
-}
+import { PersonalPortfolioPerformanceData } from '@/shared/types/performance';
 
 async function getPersonalPortfolioPerformanceDataHandler(req: NextRequest) {
   try {
@@ -24,7 +14,7 @@ async function getPersonalPortfolioPerformanceDataHandler(req: NextRequest) {
     // Fetch from the "Personal portfolio historical" sheet
     const url = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?sheet=Personal%20portfolio%20historical&tqx=out:json`;
     
-    console.log('🔍 Fetching personal portfolio performance data from:', url);
+    // Fetching personal portfolio performance data from Google Sheets
     
     const response = await fetch(url, {
       method: 'GET',

@@ -2,15 +2,10 @@
 
 import { useState, useEffect } from 'react';
 import { PerformanceSummary } from '@/lib/performance-monitor';
-
-interface PerformanceData {
-  summary: PerformanceSummary;
-  slowOperations: any[];
-  allMetrics: any[];
-}
+import { PerformanceDashboardData } from '@/shared/types/performance';
 
 export default function PerformanceDashboard() {
-  const [data, setData] = useState<PerformanceData | null>(null);
+  const [data, setData] = useState<PerformanceDashboardData | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [autoRefresh, setAutoRefresh] = useState(false);
