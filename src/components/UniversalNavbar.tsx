@@ -460,8 +460,8 @@ export default function UniversalNavbar({
             <nav className="flex space-x-4 sm:space-x-6 overflow-x-auto w-full justify-center">
               {[
                 { id: 'portfolio', label: 'Portfolio' },
+                { id: 'analytics', label: 'Performance' },
                 ...(dataSource === 'personal-portfolio' ? [] : [
-                  { id: 'analytics', label: 'Performance' },
                   { id: 'investors', label: 'Investors' }
                 ])
               ].map((tab) => (
@@ -600,7 +600,8 @@ export default function UniversalNavbar({
               ...(dataSource === 'performance-dashboard' ? [
                 { id: 'performance', label: 'Performance Dashboard' }
               ] : dataSource === 'personal-portfolio' ? [
-                { id: 'portfolio', label: 'Portfolio Overview' }
+                { id: 'portfolio', label: 'Portfolio Overview' },
+                { id: 'analytics', label: 'Performance' }
               ] : [
                 { id: 'portfolio', label: 'Portfolio Overview' },
                 { id: 'analytics', label: 'Performance' },
