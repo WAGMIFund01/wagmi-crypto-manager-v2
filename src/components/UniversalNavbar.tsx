@@ -462,7 +462,8 @@ export default function UniversalNavbar({
                 { id: 'portfolio', label: 'Portfolio' },
                 { id: 'analytics', label: 'Performance' },
                 ...(dataSource === 'personal-portfolio' ? [] : [
-                  { id: 'investors', label: 'Investors' }
+                  { id: 'investors', label: 'Investors' },
+                  { id: 'ai-copilot', label: 'AI Copilot' }
                 ])
               ].map((tab) => (
                 <button
@@ -605,7 +606,8 @@ export default function UniversalNavbar({
               ] : [
                 { id: 'portfolio', label: 'Portfolio Overview' },
                 { id: 'analytics', label: 'Performance' },
-                { id: 'investors', label: 'Investors' }
+                { id: 'investors', label: 'Investors' },
+                { id: 'ai-copilot', label: 'AI Copilot' }
               ])
             ].map((tab) => (
               <button

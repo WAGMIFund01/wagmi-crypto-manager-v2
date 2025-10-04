@@ -12,6 +12,7 @@ const Analytics = lazy(() => import('@/components/tabs/Analytics'));
 const PersonalPortfolioAnalytics = lazy(() => import('@/components/tabs/PersonalPortfolioAnalytics'));
 const Investors = lazy(() => import('@/components/tabs/Investors'));
 const PerformanceDashboard = lazy(() => import('@/components/PerformanceDashboard'));
+const AICopilot = lazy(() => import('@/components/AICopilot'));
 
 interface Session {
   user?: {
@@ -70,7 +71,7 @@ export default function DashboardClient({ session, kpiData: initialKpiData, hasE
       ? ['portfolio', 'analytics'] 
       : dataSource === 'performance-dashboard'
       ? ['performance']
-      : ['portfolio', 'analytics', 'investors'];
+      : ['portfolio', 'analytics', 'investors', 'ai-copilot'];
     
     if (tab && allowedTabs.includes(tab)) {
       setActiveTab(tab);
@@ -144,7 +145,7 @@ export default function DashboardClient({ session, kpiData: initialKpiData, hasE
       ? ['portfolio', 'analytics'] 
       : dataSource === 'performance-dashboard'
       ? ['performance']
-      : ['portfolio', 'analytics', 'investors'];
+      : ['portfolio', 'analytics', 'investors', 'ai-copilot'];
     
     if (!allowedTabs.includes(tabId)) {
       console.warn(`Tab ${tabId} not allowed for ${dataSource} module`);
@@ -289,6 +290,9 @@ export default function DashboardClient({ session, kpiData: initialKpiData, hasE
       case 'performance':
         console.log('Rendering PerformanceDashboard');
         return <PerformanceDashboard />;
+      case 'ai-copilot':
+        console.log('Rendering AICopilot');
+        return <AICopilot />;
       default:
         console.log('Default case - dataSource:', dataSource);
         // Default behavior based on dataSource
