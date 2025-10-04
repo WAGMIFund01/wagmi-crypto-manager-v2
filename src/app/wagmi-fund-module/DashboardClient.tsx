@@ -67,7 +67,7 @@ export default function DashboardClient({ session, kpiData: initialKpiData, hasE
   useEffect(() => {
     const tab = searchParams.get('tab');
     const allowedTabs = dataSource === 'personal-portfolio' 
-      ? ['portfolio'] 
+      ? ['portfolio', 'analytics'] 
       : dataSource === 'performance-dashboard'
       ? ['performance']
       : ['portfolio', 'analytics', 'investors'];
