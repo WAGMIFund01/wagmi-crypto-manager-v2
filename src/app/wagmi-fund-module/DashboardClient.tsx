@@ -9,6 +9,7 @@ import { COLORS } from '@/shared/constants/colors';
 // Lazy load tab components for better performance
 const PortfolioOverview = lazy(() => import('@/components/tabs/PortfolioOverview'));
 const Analytics = lazy(() => import('@/components/tabs/Analytics'));
+const PersonalPortfolioAnalytics = lazy(() => import('@/components/tabs/PersonalPortfolioAnalytics'));
 const Investors = lazy(() => import('@/components/tabs/Investors'));
 const PerformanceDashboard = lazy(() => import('@/components/PerformanceDashboard'));
 
@@ -276,7 +277,12 @@ export default function DashboardClient({ session, kpiData: initialKpiData, hasE
         return <PortfolioOverview onRefresh={triggerDataRefresh} isPrivacyMode={isPrivacyMode} dataSource={dataSource} />;
       case 'analytics':
         console.log('Rendering Analytics');
-        return <Analytics onRefresh={triggerDataRefresh} dataSource={dataSource} />;
+        // Use PersonalPortfolioAnalytics for personal portfolio, Analytics for WAGMI fund
+        if (dataSource === 'personal-portfolio') {
+          return <PersonalPortfolioAnalytics onRefresh={triggerDataRefresh} />;
+        } else {
+          return <Analytics onRefresh={triggerDataRefresh} dataSource={dataSource} />;
+        }
       case 'investors':
         console.log('Rendering Investors');
         return <Investors isPrivacyMode={isPrivacyMode} onRefresh={triggerDataRefresh} dataSource={dataSource} />;
