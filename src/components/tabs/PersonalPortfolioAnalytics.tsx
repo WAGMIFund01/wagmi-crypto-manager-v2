@@ -30,7 +30,7 @@ export default function PersonalPortfolioAnalytics({ onRefresh }: PersonalPortfo
       setLoading(true);
       setError(null);
       
-      // Fetch personal portfolio performance data
+      // Fetch personal portfolio performance data from Personal portfolio historical sheet
       const perfData = await fetchPersonalPortfolioPerformanceData();
       setPerformanceData(perfData);
     } catch (err) {

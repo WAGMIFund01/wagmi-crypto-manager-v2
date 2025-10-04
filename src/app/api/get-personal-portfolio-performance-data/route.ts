@@ -62,49 +62,58 @@ async function getPersonalPortfolioPerformanceDataHandler(req: NextRequest) {
     const rows = data.table.rows;
     const performanceData: PersonalPortfolioPerformanceData[] = [];
 
-    // Process data rows - data starts from row 0 (Oct-2024)
-    // Based on the image description, the structure is:
-    // Column B: Date (month)
-    // Column G: Ending AUM (WAGMI section)
-    // Column H: MoM Return (WAGMI section)
-    // Column I: Cumulative Return (WAGMI section) - but has #DIV/0! errors
-    // Column K: MoM return (Total section)
-    // Column L: Cumulative Return (Total section)
-    // Column N: MoM return (Total 3 section)
-    // Column O: Cumulative Return (Total 3 section)
-
+    // Process data rows - use same logic as WAGMI performance data
     for (let i = 0; i < rows.length; i++) {
       const row = rows[i];
-      if (!row.c || row.c.length === 0) continue;
+      if (!row.c || row.c.length < 17) continue; // Ensure we have enough columns
 
-      const month = row.c[1]?.v; // Column B (Date)
-      const endingAUM = row.c[6]?.v; // Column G (Ending AUM)
-      const personalMoM = row.c[7]?.v; // Column H (Personal MoM)
-      const totalMoM = row.c[10]?.v; // Column K (Total MoM)
-      const total3MoM = row.c[13]?.v; // Column N (Total 3 MoM)
-      const personalCumulative = row.c[8]?.v; // Column I (Personal Cumulative)
-      const totalCumulative = row.c[11]?.v; // Column L (Total Cumulative)
-      const total3Cumulative = row.c[14]?.v; // Column O (Total 3 Cumulative)
+      // Extract data from specific columns (same structure as WAGMI)
+      const monthCell = row.c[1]; // Column B - Date
+      const endingAUM = row.c[6]?.v; // Column G - Ending AUM
+      const personalMoM = row.c[7]?.v; // Column H - Personal MoM Return
+      const personalCumulative = row.c[8]?.v; // Column I - Personal Cumulative Return
+      const totalMoM = row.c[11]?.v; // Column L - MoM return (Total)
+      const totalCumulative = row.c[12]?.v; // Column M - Cumulative Return (Total)
+      const total3MoM = row.c[15]?.v; // Column P - MoM return (Total 3)
+      const total3Cumulative = row.c[16]?.v; // Column Q - Cumulative Return (Total 3)
 
-      // Skip rows with missing essential data
-      if (!month || endingAUM === undefined || personalMoM === undefined) {
+      // Skip rows with no month data (future months or empty rows)
+      if (!monthCell?.f) continue;
+
+      // Use the formatted value from Google Sheets (e.g., " Oct-2024")
+      const formattedMonth = monthCell.f.trim();
+      
+      // Skip future months - only process current and historical data
+      const currentDate = new Date();
+      const currentYear = currentDate.getFullYear();
+      const currentMonth = currentDate.getMonth();
+      
+      // Parse the month from the formatted string (e.g., "Oct-2024")
+      const monthMatch = formattedMonth.match(/(\w{3})-(\d{4})/);
+      if (!monthMatch) continue;
+      
+      const monthName = monthMatch[1];
+      const year = parseInt(monthMatch[2]);
+      
+      const monthNames = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 
+                         'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+      const monthIndex = monthNames.indexOf(monthName);
+      
+      // Skip future months
+      if (year > currentYear || (year === currentYear && monthIndex > currentMonth)) {
         continue;
       }
 
-      // Handle #DIV/0! errors by setting to 0 or null
-      const safePersonalCumulative = (personalCumulative === '#DIV/0!' || personalCumulative === null) ? 0 : personalCumulative;
-      const safeTotalCumulative = (totalCumulative === '#DIV/0!' || totalCumulative === null) ? 0 : totalCumulative;
-      const safeTotal3Cumulative = (total3Cumulative === '#DIV/0!' || total3Cumulative === null) ? 0 : total3Cumulative;
-
       performanceData.push({
-        month: month.toString(),
+        month: formattedMonth,
         endingAUM: parseFloat(endingAUM) || 0,
-        personalMoM: parseFloat(personalMoM) || 0,
-        totalMoM: parseFloat(totalMoM) || 0,
-        total3MoM: parseFloat(total3MoM) || 0,
-        personalCumulative: parseFloat(safePersonalCumulative) || 0,
-        totalCumulative: parseFloat(safeTotalCumulative) || 0,
-        total3Cumulative: parseFloat(safeTotal3Cumulative) || 0,
+        // Convert decimal percentages to percentage values (0.285 -> 28.5)
+        personalMoM: (parseFloat(personalMoM) || 0) * 100,
+        totalMoM: (parseFloat(totalMoM) || 0) * 100,
+        total3MoM: (parseFloat(total3MoM) || 0) * 100,
+        personalCumulative: (parseFloat(personalCumulative) || 0) * 100,
+        totalCumulative: (parseFloat(totalCumulative) || 0) * 100,
+        total3Cumulative: (parseFloat(total3Cumulative) || 0) * 100,
       });
     }
 
