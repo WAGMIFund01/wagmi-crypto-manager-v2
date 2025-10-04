@@ -31,7 +31,7 @@ export default function ModuleSelectionPage() {
 
       {/* Module Cards */}
       <div className="w-full max-w-6xl">
-        {/* Desktop: Four cards in a row */}
+        {/* Desktop: Three cards in a row */}
         <div className="hidden lg:flex lg:justify-center lg:space-x-8">
           <ModuleCard 
             title="WAGMI Fund Module"
@@ -46,11 +46,6 @@ export default function ModuleSelectionPage() {
           <ModuleCard 
             title="Performance Dashboard"
             route="/performance-dashboard"
-            className="flex-1 max-w-sm"
-          />
-          <ModuleCard 
-            title="AI Copilot"
-            route="/ai-copilot"
             className="flex-1 max-w-sm"
           />
         </div>
@@ -74,9 +69,9 @@ export default function ModuleSelectionPage() {
           />
         </div>
 
-        {/* Tablet: Two cards on first row, two centered on second row */}
+        {/* Tablet: Three cards in a row */}
         <div className="hidden sm:block md:hidden">
-          <div className="flex justify-center space-x-8 mb-8">
+          <div className="flex justify-center space-x-8">
             <ModuleCard 
               title="WAGMI Fund Module"
               route="/wagmi-fund-module"
@@ -87,17 +82,10 @@ export default function ModuleSelectionPage() {
               route="/personal-portfolio"
               className="flex-1 max-w-sm"
             />
-          </div>
-          <div className="flex justify-center space-x-8">
             <ModuleCard 
               title="Performance Dashboard"
               route="/performance-dashboard"
-              className="max-w-sm"
-            />
-            <ModuleCard 
-              title="AI Copilot"
-              route="/ai-copilot"
-              className="max-w-sm"
+              className="flex-1 max-w-sm"
             />
           </div>
         </div>
@@ -115,10 +103,6 @@ export default function ModuleSelectionPage() {
           <ModuleCard 
             title="Performance Dashboard"
             route="/performance-dashboard"
-          />
-          <ModuleCard 
-            title="AI Copilot"
-            route="/ai-copilot"
           />
         </div>
       </div>
