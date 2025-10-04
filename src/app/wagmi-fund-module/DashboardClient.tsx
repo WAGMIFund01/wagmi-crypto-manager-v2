@@ -141,7 +141,7 @@ export default function DashboardClient({ session, kpiData: initialKpiData, hasE
   const handleTabChange = (tabId: string) => {
     // Validate tab access based on dataSource
     const allowedTabs = dataSource === 'personal-portfolio' 
-      ? ['portfolio'] 
+      ? ['portfolio', 'analytics'] 
       : dataSource === 'performance-dashboard'
       ? ['performance']
       : ['portfolio', 'analytics', 'investors'];
