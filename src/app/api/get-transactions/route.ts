@@ -1,4 +1,5 @@
 import { NextResponse } from 'next/server';
+import { sheetsAdapter } from '@/lib/sheetsAdapter';
 
 export async function POST(request: Request) {
   try {
@@ -12,51 +13,14 @@ export async function POST(request: Request) {
       }, { status: 400 });
     }
 
-    // Check if Google Sheets endpoint is configured
-    if (!process.env.GOOGLE_SHEETS_ENDPOINT) {
-      return NextResponse.json({
-        success: false,
-        error: 'Transaction data service is not yet configured. Please contact the administrator.',
-        errorCode: 'SERVICE_NOT_CONFIGURED'
-      }, { status: 503 });
-    }
+    // Use new SheetsAdapter method
+    const transactions = await sheetsAdapter.getTransactions(investorId.toUpperCase());
 
-    // Fetch transaction data using Google Sheets API
-    try {
-      const response = await fetch(process.env.GOOGLE_SHEETS_ENDPOINT, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/x-www-form-urlencoded',
-        },
-        body: `action=getTransactions&investorId=${encodeURIComponent(investorId.toUpperCase())}`,
-      });
-
-      if (!response.ok) {
-        console.error('Google Sheets API HTTP error:', response.status, response.statusText);
-        throw new Error(`Google Sheets API error: ${response.status}`);
-      }
-
-      const data = await response.json();
-      console.log('Google Sheets API response:', data);
-
-      if (data.success && data.transactions) {
-        return NextResponse.json({
-          success: true,
-          transactions: data.transactions
-        });
-      } else {
-        console.error('Google Sheets API returned error:', data);
-        throw new Error(data.error || 'Unknown error from Google Sheets API');
-      }
-
-    } catch (apiError) {
-      console.error('Google Sheets API error:', apiError);
-      return NextResponse.json({
-        success: false,
-        error: 'Unable to connect to transaction database. Please try again later.',
-        errorCode: 'EXTERNAL_SERVICE_ERROR'
-      }, { status: 502 });
-    }
+    return NextResponse.json({
+      success: true,
+      transactions: transactions,
+      source: 'SheetsAdapter.getTransactions()'
+    });
 
   } catch (error: unknown) {
     console.error('Error fetching transaction data:', error);
