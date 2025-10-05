@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { google } from 'googleapis';
+import { sheetsAdapter } from '@/lib/sheetsAdapter';
 import { config } from '@/lib/config';
 
 // Simple mapping for testing - we'll start with just AURA
@@ -11,55 +11,7 @@ const SYMBOL_TO_COINGECKO_ID: Record<string, string> = {
 
 export async function POST(request: NextRequest) {
   try {
-    const serviceAccountEmail = process.env.GOOGLE_SERVICE_ACCOUNT_EMAIL;
-    const privateKey = process.env.GOOGLE_PRIVATE_KEY;
-    const sheetId = process.env.GOOGLE_SHEET_ID || '1h04nkcnQmxaFml8RubIGmPgffMiyoEIg350ryjXK0tM';
-
-    if (!serviceAccountEmail || !privateKey) {
-      return NextResponse.json({
-        success: false,
-        error: 'Missing Google Sheets API credentials'
-      }, { status: 503 });
-    }
-
-    // Create authentication
-    const auth = new google.auth.GoogleAuth({
-      credentials: {
-        client_email: serviceAccountEmail,
-        private_key: privateKey.replace(/\\n/g, '\n'),
-      },
-      scopes: ['https://www.googleapis.com/auth/spreadsheets'],
-    });
-
-    const sheets = google.sheets({ version: 'v4', auth });
-
-    // Step 1: Read current portfolio data to find AURA
-    const portfolioResponse = await sheets.spreadsheets.values.get({
-      spreadsheetId: sheetId,
-      range: 'Portfolio Overview!A:J',
-    });
-
-    const rows = portfolioResponse.data.values;
-    if (!rows || rows.length < 2) {
-      return NextResponse.json({
-        success: false,
-        error: 'No data found in Portfolio Overview sheet'
-      }, { status: 404 });
-    }
-
-    // Find AURA row (assuming Symbol is in column B)
-    const auraRowIndex = rows.findIndex((row, idx) => 
-      idx > 0 && row[1]?.toString().toUpperCase() === 'AURA'
-    );
-
-    if (auraRowIndex === -1) {
-      return NextResponse.json({
-        success: false,
-        error: 'AURA asset not found in sheet'
-      }, { status: 404 });
-    }
-
-    // Step 2: Fetch AURA price from CoinGecko
+    // Step 1: Fetch AURA price from CoinGecko
     const coinGeckoResponse = await fetch(
       'https://api.coingecko.com/api/v3/simple/price?ids=aura-network&vs_currencies=usd',
       {
@@ -84,38 +36,20 @@ export async function POST(request: NextRequest) {
       }, { status: 502 });
     }
 
-    // Step 3: Update the price in Google Sheets
-    // Current price is column H (index 7), Last Price Update is column J (index 9)
-    const currentPriceRange = `Portfolio Overview!H${auraRowIndex + 1}`;
-    const lastUpdateRange = `Portfolio Overview!J${auraRowIndex + 1}`;
-    const currentTimestamp = new Date().toISOString();
-
-    // Update both cells
-    await sheets.spreadsheets.values.batchUpdate({
-      spreadsheetId: sheetId,
-      requestBody: {
-        valueInputOption: 'RAW',
-        data: [
-          {
-            range: currentPriceRange,
-            values: [[newPrice]]
-          },
-          {
-            range: lastUpdateRange,
-            values: [[currentTimestamp]]
-          }
-        ]
-      }
-    });
+    // Step 2: Use new SheetsAdapter method to update AURA price
+    // For now, we'll use a placeholder 24h change (this would normally come from CoinGecko)
+    const priceChange24h = 0; // This should be fetched from CoinGecko in a real implementation
+    
+    await sheetsAdapter.updateAssetPrice('AURA', newPrice, priceChange24h, false); // false = WAGMI Fund
 
     return NextResponse.json({
       success: true,
-      message: 'Successfully updated AURA price',
+      message: 'Successfully updated AURA price using SheetsAdapter',
       asset: 'AURA',
-      oldPrice: rows[auraRowIndex][7] || 'Unknown',
       newPrice: newPrice,
-      timestamp: currentTimestamp,
-      updatedCells: 2
+      priceChange24h: priceChange24h,
+      timestamp: new Date().toISOString(),
+      source: 'SheetsAdapter.updateAssetPrice()'
     });
 
   } catch (error) {
