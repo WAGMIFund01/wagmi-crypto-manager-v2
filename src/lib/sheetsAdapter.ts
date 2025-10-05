@@ -1313,26 +1313,33 @@ export class SheetsAdapter {
   // ============================================================================
 
   /**
-   * Update price for a single asset in Portfolio Overview sheet
-   * 
+   * Update price for a single asset in Portfolio Overview or Personal Portfolio sheet
+   *
    * @param symbol - Asset symbol (e.g., 'BTC', 'ETH')
    * @param price - New price value
    * @param timestamp - ISO timestamp of when price was fetched
-   * @param priceChange24h - Optional 24-hour price change percentage
-   * 
+   * @param priceChange24h - 24-hour price change percentage (REQUIRED)
+   * @param isPersonalPortfolio - If true, updates Personal portfolio sheet, otherwise Portfolio Overview
+   *
    * @example
-   * await sheetsAdapter.updateAssetPrice('BTC', 45000, '2024-10-05T10:30:00Z', 2.5);
+   * // Update WAGMI Fund portfolio
+   * await sheetsAdapter.updateAssetPrice('BTC', 45000, '2024-10-05T10:30:00Z', 2.5, false);
+   * 
+   * // Update Personal Portfolio
+   * await sheetsAdapter.updateAssetPrice('ETH', 2500, '2024-10-05T10:30:00Z', -1.2, true);
    */
   async updateAssetPrice(
     symbol: string,
     price: number,
     timestamp: string,
-    priceChange24h?: number
+    priceChange24h: number,
+    isPersonalPortfolio: boolean = false
   ): Promise<{ success: boolean; error?: string }> {
     return trackOperation('updateAssetPrice', async () => {
       try {
-        console.log(`📝 Updating price for ${symbol}: $${price}`);
-        
+        const portfolioType = isPersonalPortfolio ? 'Personal Portfolio' : 'WAGMI Fund';
+        console.log(`📝 Updating price for ${symbol} in ${portfolioType}: $${price} (${priceChange24h >= 0 ? '+' : ''}${priceChange24h}%)`);
+
         if (!this.isServiceAccountInitialized) {
           await this.initializeServiceAccount();
         }
@@ -1341,10 +1348,14 @@ export class SheetsAdapter {
           throw new Error('Google Sheets API client not initialized');
         }
 
+        // Determine which sheet to use
+        const sheetName = isPersonalPortfolio ? 'Personal portfolio' : 'Portfolio Overview';
+        const range = `${sheetName}!A:M`;
+
         // Get current portfolio data to find the asset row
         const response = await this.sheets.spreadsheets.values.get({
           spreadsheetId: this.sheetId,
-          range: 'Portfolio Overview!A:M'
+          range: range
         });
 
         const rows = response.data.values || [];
@@ -1360,32 +1371,28 @@ export class SheetsAdapter {
         }
 
         if (rowIndex === -1) {
-          console.error(`❌ Asset ${symbol} not found in Portfolio Overview`);
+          console.error(`❌ Asset ${symbol} not found in ${sheetName}`);
           return {
             success: false,
-            error: `Asset ${symbol} not found`
+            error: `Asset ${symbol} not found in ${portfolioType}`
           };
         }
 
-        // Prepare batch update for price, timestamp, and optional 24h change
+        // Prepare batch update for price, timestamp, and 24h change (all required)
         const updates: { range: string; values: any[][] }[] = [
           {
-            range: `Portfolio Overview!H${rowIndex}`, // Column H: Current Price
+            range: `${sheetName}!H${rowIndex}`, // Column H: Current Price
             values: [[price]]
           },
           {
-            range: `Portfolio Overview!J${rowIndex}`, // Column J: Last Price Update
+            range: `${sheetName}!J${rowIndex}`, // Column J: Last Price Update
             values: [[timestamp]]
+          },
+          {
+            range: `${sheetName}!L${rowIndex}`, // Column L: 24h Change
+            values: [[priceChange24h]]
           }
         ];
-
-        // Add 24h price change if provided
-        if (priceChange24h !== undefined) {
-          updates.push({
-            range: `Portfolio Overview!L${rowIndex}`, // Column L: 24h Change
-            values: [[priceChange24h]]
-          });
-        }
 
         // Execute batch update
         await this.sheets.spreadsheets.values.batchUpdate({
@@ -1396,7 +1403,7 @@ export class SheetsAdapter {
           }
         });
 
-        console.log(`✅ Successfully updated price for ${symbol}`);
+        console.log(`✅ Successfully updated price for ${symbol} in ${portfolioType}`);
         return { success: true };
 
       } catch (error) {
@@ -1406,27 +1413,37 @@ export class SheetsAdapter {
           error: error instanceof Error ? error.message : 'Unknown error'
         };
       }
-    }, { symbol, price, timestamp });
+    }, { symbol, price, timestamp, priceChange24h, isPersonalPortfolio });
   }
 
   /**
    * Update prices for multiple assets at once (batch operation)
    * More efficient than calling updateAssetPrice multiple times
-   * 
+   *
    * @param updates - Array of price updates
-   * 
+   * @param isPersonalPortfolio - If true, updates Personal portfolio sheet, otherwise Portfolio Overview
+   *
    * @example
+   * // Update WAGMI Fund portfolio
    * await sheetsAdapter.batchUpdatePrices([
    *   { symbol: 'BTC', price: 45000, timestamp: '2024-10-05T10:30:00Z', priceChange24h: 2.5 },
    *   { symbol: 'ETH', price: 2500, timestamp: '2024-10-05T10:30:00Z', priceChange24h: -1.2 }
-   * ]);
+   * ], false);
+   * 
+   * // Update Personal Portfolio
+   * await sheetsAdapter.batchUpdatePrices([
+   *   { symbol: 'SOL', price: 150, timestamp: '2024-10-05T10:30:00Z', priceChange24h: 5.0 }
+   * ], true);
    */
-  async batchUpdatePrices(updates: Array<{
-    symbol: string;
-    price: number;
-    timestamp: string;
-    priceChange24h?: number;
-  }>): Promise<{
+  async batchUpdatePrices(
+    updates: Array<{
+      symbol: string;
+      price: number;
+      timestamp: string;
+      priceChange24h: number; // REQUIRED
+    }>,
+    isPersonalPortfolio: boolean = false
+  ): Promise<{
     success: boolean;
     successCount: number;
     failedCount: number;
@@ -1434,8 +1451,9 @@ export class SheetsAdapter {
   }> {
     return trackOperation('batchUpdatePrices', async () => {
       try {
-        console.log(`📝 Batch updating prices for ${updates.length} assets`);
-        
+        const portfolioType = isPersonalPortfolio ? 'Personal Portfolio' : 'WAGMI Fund';
+        console.log(`📝 Batch updating prices for ${updates.length} assets in ${portfolioType}`);
+
         if (!this.isServiceAccountInitialized) {
           await this.initializeServiceAccount();
         }
@@ -1444,14 +1462,18 @@ export class SheetsAdapter {
           throw new Error('Google Sheets API client not initialized');
         }
 
+        // Determine which sheet to use
+        const sheetName = isPersonalPortfolio ? 'Personal portfolio' : 'Portfolio Overview';
+        const range = `${sheetName}!A:M`;
+
         // Get current portfolio data once (more efficient than multiple reads)
         const response = await this.sheets.spreadsheets.values.get({
           spreadsheetId: this.sheetId,
-          range: 'Portfolio Overview!A:M'
+          range: range
         });
 
         const rows = response.data.values || [];
-        
+
         // Build a map of symbol -> row index for quick lookup
         const symbolToRowIndex = new Map<string, number>();
         for (let i = 1; i < rows.length; i++) {
@@ -1471,32 +1493,30 @@ export class SheetsAdapter {
 
         for (const update of updates) {
           const rowIndex = symbolToRowIndex.get(update.symbol.toUpperCase());
-          
+
           if (!rowIndex) {
-            console.warn(`⚠️ Asset ${update.symbol} not found, skipping`);
-            errors.push({ symbol: update.symbol, error: 'Asset not found' });
+            console.warn(`⚠️ Asset ${update.symbol} not found in ${sheetName}, skipping`);
+            errors.push({ symbol: update.symbol, error: `Asset not found in ${portfolioType}` });
             continue;
           }
 
           // Add price update
           batchUpdates.push({
-            range: `Portfolio Overview!H${rowIndex}`, // Column H: Current Price
+            range: `${sheetName}!H${rowIndex}`, // Column H: Current Price
             values: [[update.price]]
           });
 
           // Add timestamp update
           batchUpdates.push({
-            range: `Portfolio Overview!J${rowIndex}`, // Column J: Last Price Update
+            range: `${sheetName}!J${rowIndex}`, // Column J: Last Price Update
             values: [[update.timestamp]]
           });
 
-          // Add 24h change if provided
-          if (update.priceChange24h !== undefined) {
-            batchUpdates.push({
-              range: `Portfolio Overview!L${rowIndex}`, // Column L: 24h Change
-              values: [[update.priceChange24h]]
-            });
-          }
+          // Add 24h change (always required now)
+          batchUpdates.push({
+            range: `${sheetName}!L${rowIndex}`, // Column L: 24h Change
+            values: [[update.priceChange24h]]
+          });
 
           successCount++;
         }
@@ -1512,8 +1532,8 @@ export class SheetsAdapter {
           });
         }
 
-        console.log(`✅ Batch update complete: ${successCount} successful, ${errors.length} failed`);
-        
+        console.log(`✅ Batch update complete for ${portfolioType}: ${successCount} successful, ${errors.length} failed`);
+
         return {
           success: errors.length === 0,
           successCount,
@@ -1530,94 +1550,9 @@ export class SheetsAdapter {
           errors: [{ symbol: 'ALL', error: error instanceof Error ? error.message : 'Unknown error' }]
         };
       }
-    }, { updateCount: updates.length });
+    }, { updateCount: updates.length, isPersonalPortfolio });
   }
 
-  /**
-   * Update 24-hour price changes for all assets
-   * Typically called after fetching latest price data from CoinGecko
-   * 
-   * @param changes - Array of 24h price changes
-   * 
-   * @example
-   * await sheetsAdapter.updatePriceChanges([
-   *   { symbol: 'BTC', priceChange24h: 2.5 },
-   *   { symbol: 'ETH', priceChange24h: -1.2 }
-   * ]);
-   */
-  async updatePriceChanges(changes: Array<{
-    symbol: string;
-    priceChange24h: number;
-  }>): Promise<{ success: boolean; error?: string }> {
-    return trackOperation('updatePriceChanges', async () => {
-      try {
-        console.log(`📝 Updating 24h price changes for ${changes.length} assets`);
-        
-        if (!this.isServiceAccountInitialized) {
-          await this.initializeServiceAccount();
-        }
-
-        if (!this.sheets) {
-          throw new Error('Google Sheets API client not initialized');
-        }
-
-        // Get current portfolio data
-        const response = await this.sheets.spreadsheets.values.get({
-          spreadsheetId: this.sheetId,
-          range: 'Portfolio Overview!A:M'
-        });
-
-        const rows = response.data.values || [];
-        
-        // Build symbol -> row index map
-        const symbolToRowIndex = new Map<string, number>();
-        for (let i = 1; i < rows.length; i++) {
-          const row = rows[i];
-          if (row && row.length > 1) {
-            const symbol = row[1]?.toString().toUpperCase();
-            if (symbol) {
-              symbolToRowIndex.set(symbol, i + 1);
-            }
-          }
-        }
-
-        // Prepare batch updates for all 24h changes
-        const batchUpdates: { range: string; values: any[][] }[] = [];
-
-        for (const change of changes) {
-          const rowIndex = symbolToRowIndex.get(change.symbol.toUpperCase());
-          
-          if (rowIndex) {
-            batchUpdates.push({
-              range: `Portfolio Overview!L${rowIndex}`, // Column L: 24h Change
-              values: [[change.priceChange24h]]
-            });
-          }
-        }
-
-        // Execute batch update
-        if (batchUpdates.length > 0) {
-          await this.sheets.spreadsheets.values.batchUpdate({
-            spreadsheetId: this.sheetId,
-            requestBody: {
-              valueInputOption: 'USER_ENTERED',
-              data: batchUpdates
-            }
-          });
-        }
-
-        console.log(`✅ Updated 24h price changes for ${batchUpdates.length} assets`);
-        return { success: true };
-
-      } catch (error) {
-        console.error('❌ Error updating price changes:', error);
-        return {
-          success: false,
-          error: error instanceof Error ? error.message : 'Unknown error'
-        };
-      }
-    }, { changeCount: changes.length });
-  }
 
   /**
    * Update the "Last Updated" timestamp in the KPIs sheet
@@ -1675,19 +1610,26 @@ export class SheetsAdapter {
 
   /**
    * Get 24-hour price changes for all assets
-   * 
+   *
+   * @param isPersonalPortfolio - If true, reads from Personal portfolio sheet, otherwise Portfolio Overview
    * @returns Array of symbols with their 24h price changes
-   * 
+   *
    * @example
-   * const changes = await sheetsAdapter.get24HourChanges();
+   * // Get WAGMI Fund 24h changes
+   * const changes = await sheetsAdapter.get24HourChanges(false);
    * // Returns: [{ symbol: 'BTC', priceChange24h: 2.5 }, ...]
+   * 
+   * // Get Personal Portfolio 24h changes
+   * const personalChanges = await sheetsAdapter.get24HourChanges(true);
    */
-  async get24HourChanges(): Promise<Array<{
+  async get24HourChanges(isPersonalPortfolio: boolean = false): Promise<Array<{
     symbol: string;
     priceChange24h: number;
   }>> {
     return trackOperation('get24HourChanges', async () => {
       try {
+        const portfolioType = isPersonalPortfolio ? 'Personal Portfolio' : 'WAGMI Fund';
+        
         if (!this.isServiceAccountInitialized) {
           await this.initializeServiceAccount();
         }
@@ -1696,10 +1638,14 @@ export class SheetsAdapter {
           throw new Error('Google Sheets API client not initialized');
         }
 
+        // Determine which sheet to use
+        const sheetName = isPersonalPortfolio ? 'Personal portfolio' : 'Portfolio Overview';
+        const range = `${sheetName}!B:L`;
+
         // Read symbol (B) and 24h change (L) columns
         const response = await this.sheets.spreadsheets.values.get({
           spreadsheetId: this.sheetId,
-          range: 'Portfolio Overview!B:L'
+          range: range
         });
 
         const rows = response.data.values || [];
@@ -1711,21 +1657,21 @@ export class SheetsAdapter {
           if (row && row.length >= 11) { // Need at least columns B through L
             const symbol = row[0]?.toString(); // Column B (index 0 in B:L range)
             const priceChange24h = parseFloat(row[10]) || 0; // Column L (index 10 in B:L range)
-            
+
             if (symbol) {
               changes.push({ symbol, priceChange24h });
             }
           }
         }
 
-        console.log(`✅ Retrieved 24h changes for ${changes.length} assets`);
+        console.log(`✅ Retrieved 24h changes for ${changes.length} assets in ${portfolioType}`);
         return changes;
 
       } catch (error) {
         console.error('❌ Error getting 24h changes:', error);
         throw new Error('Failed to get 24-hour price changes');
       }
-    }, { sheetId: this.sheetId });
+    }, { sheetId: this.sheetId, isPersonalPortfolio });
   }
 
   /**
