@@ -1,16 +1,19 @@
-import { NextRequest, NextResponse } from 'next/server';
+import { NextResponse } from 'next/server';
 import { sheetsAdapter } from '@/lib/sheetsAdapter';
 
-export async function POST(request: NextRequest) {
+export async function POST() {
   try {
+    // Generate current timestamp
+    const timestamp = new Date().toISOString();
+    
     // Use new SheetsAdapter method
-    await sheetsAdapter.updateKpiTimestamp(false); // false = WAGMI Fund
+    await sheetsAdapter.updateKpiTimestamp(timestamp, false); // false = WAGMI Fund
 
     return NextResponse.json({
       success: true,
       message: 'KPI timestamp updated successfully using SheetsAdapter',
-      timestamp: new Date().toISOString(),
-      source: 'SheetsAdapter.updateKpiTimestamp(false)'
+      timestamp: timestamp,
+      source: 'SheetsAdapter.updateKpiTimestamp(timestamp, false)'
     });
 
   } catch (error) {

@@ -1,15 +1,8 @@
-import { NextRequest, NextResponse } from 'next/server';
+import { NextResponse } from 'next/server';
 import { sheetsAdapter } from '@/lib/sheetsAdapter';
 import { config } from '@/lib/config';
 
-// Simple mapping for testing - we'll start with just AURA
-const SYMBOL_TO_COINGECKO_ID: Record<string, string> = {
-  'AURA': 'aura-network',
-  'ETH': 'ethereum',
-  'SOL': 'solana'
-};
-
-export async function POST(request: NextRequest) {
+export async function POST() {
   try {
     // Step 1: Fetch AURA price from CoinGecko
     const coinGeckoResponse = await fetch(
