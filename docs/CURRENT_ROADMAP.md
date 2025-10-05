@@ -127,7 +127,46 @@ interface ApiResponse<T> {
 
 ## 📅 Future Phases
 
-### Phase 2: AI Copilot Enhancement (NEXT UP)
+### Phase 2: Liquidity Pool Profitability Calculation (NEW 🆕)
+**Priority**: HIGH  
+**Timeline**: 2-3 weeks
+
+#### Objectives
+- Calculate profitability for liquidity pool positions
+- Track impermanent loss vs. holding strategy
+- Provide detailed LP position analytics
+- Support multiple DEX protocols
+
+#### Deliverables
+1. **LP Profitability Service** (`/services/lpProfitabilityService.ts`)
+   - Calculate current LP position value
+   - Compare vs. holding strategy (impermanent loss)
+   - Track fees earned over time
+   - Support for multiple pool types (Uniswap V2/V3, Curve, etc.)
+
+2. **API Endpoints**
+   - `/api/lp-positions/calculate-profitability` - Calculate LP profitability
+   - `/api/lp-positions/get-positions` - Get all LP positions
+   - `/api/lp-positions/track-fees` - Track accumulated fees
+
+3. **UI Components**
+   - LP Position Card with profitability metrics
+   - Impermanent loss calculator
+   - Fee earnings timeline chart
+   - Comparison view (LP vs. Hold strategy)
+
+4. **Data Schema**
+   - LP position tracking in Google Sheets
+   - Historical price data for IL calculation
+   - Fee accumulation tracking
+
+#### Success Metrics
+- [ ] Accurate IL calculation for major DEX protocols
+- [ ] Real-time profitability updates
+- [ ] Clear visualization of LP performance
+- [ ] Integration with existing portfolio views
+
+### Phase 3: AI Copilot Enhancement
 **Priority**: HIGH  
 **Timeline**: 1-2 weeks
 
@@ -142,7 +181,7 @@ interface ApiResponse<T> {
 3. Quick analysis UI component
 4. Enhanced context preparation for focused queries
 
-### Phase 3: Performance & Scalability
+### Phase 4: Performance & Scalability
 **Priority**: MEDIUM  
 **Timeline**: 2-3 weeks
 
@@ -158,7 +197,7 @@ interface ApiResponse<T> {
 3. Code splitting and lazy loading
 4. Performance monitoring dashboard
 
-### Phase 4: Enterprise Features
+### Phase 5: Enterprise Features
 **Priority**: MEDIUM  
 **Timeline**: 3-4 weeks
 
