@@ -285,7 +285,7 @@ export default function UniversalNavbar({
             </div>
           </div>
           <div className="flex items-center justify-between h-16 py-3" style={{ borderBottom: '1px solid #333' }}>
-            <nav className="flex space-x-8">
+            <nav aria-label="Loading navigation" className="flex space-x-8">
               <div style={{ color: '#A0A0A0', fontSize: '14px' }}>Loading navigation...</div>
             </nav>
             <div className="flex items-center space-x-6">
@@ -457,7 +457,7 @@ export default function UniversalNavbar({
           
           {/* Mobile Row 4 - Navigation Tabs */}
           <div className="flex justify-center items-center py-3" style={{ borderTop: '1px solid #333' }}>
-            <nav className="flex space-x-4 sm:space-x-6 overflow-x-auto w-full justify-center">
+            <nav aria-label="Mobile navigation" className="flex space-x-4 sm:space-x-6 overflow-x-auto w-full justify-center">
               {[
                 { id: 'portfolio', label: 'Portfolio' },
                 { id: 'analytics', label: 'Performance' },
@@ -596,7 +596,7 @@ export default function UniversalNavbar({
         {/* Row 2 - Navigation Tabs + KPI Ribbon */}
         <div className="flex items-center justify-between h-16 py-3" style={{ borderBottom: '1px solid #333' }}>
           {/* Left - Navigation Tabs */}
-          <nav className="flex space-x-8">
+          <nav aria-label="Desktop navigation" className="flex space-x-8">
             {[
               ...(dataSource === 'performance-dashboard' ? [
                 { id: 'performance', label: 'Performance Dashboard' }
