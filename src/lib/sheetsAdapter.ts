@@ -1781,11 +1781,11 @@ export class SheetsAdapter {
           throw new Error('Google Sheets API client not initialized');
         }
 
-        // Read from Transactions sheet (assuming it exists)
-        // Adjust sheet name and range based on your actual structure
+        // Read from Transactions sheet
+        // Structure: A=transaction_id, B=investor_id, C=type, D=amount, E=date, F=note
         const response = await this.sheets.spreadsheets.values.get({
           spreadsheetId: this.sheetId,
-          range: 'Transactions!A:E' // Adjust range as needed
+          range: 'Transactions!A:F' // Read all columns A through F
         });
 
         const rows = response.data.values || [];
@@ -1798,18 +1798,18 @@ export class SheetsAdapter {
 
         const normalizedInvestorId = investorId.toUpperCase().trim();
 
-        // Process rows, filtering by investor ID
+        // Process rows, filtering by investor ID (Column B)
         for (let i = 1; i < rows.length; i++) {
           const row = rows[i];
-          if (row && row.length >= 5) {
-            const rowInvestorId = row[0]?.toString().toUpperCase().trim();
+          if (row && row.length >= 6) { // Need at least 6 columns (A-F)
+            const rowInvestorId = row[1]?.toString().toUpperCase().trim(); // Column B = investor_id
             
             if (rowInvestorId === normalizedInvestorId) {
               transactions.push({
-                date: row[1]?.toString() || '',
-                type: row[2]?.toString() || '',
-                amount: parseFloat(row[3]) || 0,
-                description: row[4]?.toString() || ''
+                date: row[4]?.toString() || '', // Column E = date
+                type: row[2]?.toString() || '', // Column C = type
+                amount: parseFloat(row[3]) || 0, // Column D = amount
+                description: row[5]?.toString() || '' // Column F = note
               });
             }
           }
@@ -1903,7 +1903,7 @@ export class SheetsAdapter {
           const year = parseInt(monthMatch[2]);
           const monthIndex = monthNames.indexOf(monthName);
 
-          // Skip future months
+          // Skip future months (but include current month)
           if (year > currentYear || (year === currentYear && monthIndex > currentMonth)) {
             continue;
           }
@@ -2016,7 +2016,7 @@ export class SheetsAdapter {
           const year = parseInt(monthMatch[2]);
           const monthIndex = monthNames.indexOf(monthName);
 
-          // Skip future months
+          // Skip future months (but include current month)
           if (year > currentYear || (year === currentYear && monthIndex > currentMonth)) {
             continue;
           }
