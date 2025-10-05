@@ -1867,6 +1867,13 @@ export class SheetsAdapter {
         });
 
         const rows = response.data.values || [];
+        console.log(`📊 DEBUG: Read ${rows.length} rows from MoM performance sheet`);
+        if (rows.length > 0) {
+          console.log(`📊 DEBUG: First row:`, rows[0]);
+          if (rows.length > 1) {
+            console.log(`📊 DEBUG: Second row:`, rows[1]);
+          }
+        }
         const performanceData: Array<{
           month: string;
           endingAUM: number;
@@ -1888,23 +1895,34 @@ export class SheetsAdapter {
         // Process data rows (skip header row at index 0)
         for (let i = 1; i < rows.length; i++) {
           const row = rows[i];
-          if (!row || row.length < 17) continue; // Need columns B through Q
+          if (!row || row.length < 16) continue; // Need columns B through Q (16 columns)
 
           // Column B (index 0 in B:Q range) - Month
           const monthValue = row[0];
           if (!monthValue) continue;
 
-          // Parse month string (e.g., "Oct-2024")
-          const monthStr = monthValue.toString().trim();
-          const monthMatch = monthStr.match(/(\w{3})-(\d{4})/);
-          if (!monthMatch) continue;
+          // Convert Excel serial number to date
+          const excelSerialNumber = parseFloat(monthValue.toString());
+          if (isNaN(excelSerialNumber)) {
+            console.log(`📊 DEBUG: Not a number: "${monthValue}"`);
+            continue;
+          }
 
-          const monthName = monthMatch[1];
-          const year = parseInt(monthMatch[2]);
-          const monthIndex = monthNames.indexOf(monthName);
+          // Excel serial number to JavaScript date
+          // Excel epoch is 1900-01-01, but Excel incorrectly treats 1900 as a leap year
+          // So we need to adjust: Excel date - 25569 (days between 1900-01-01 and 1970-01-01)
+          const jsDate = new Date((excelSerialNumber - 25569) * 86400 * 1000);
+          const year = jsDate.getFullYear();
+          const month = jsDate.getMonth(); // 0-based
+          const monthName = monthNames[month];
+          
+          console.log(`📊 DEBUG: Excel serial: ${excelSerialNumber}, JS date: ${jsDate.toISOString()}, year: ${year}, month: ${month} (${monthName})`);
 
           // Skip future months (but include current month)
-          if (year > currentYear || (year === currentYear && monthIndex > currentMonth)) {
+          const isFuture = year > currentYear || (year === currentYear && month > currentMonth);
+          console.log(`📊 DEBUG: isFuture: ${isFuture} (currentYear: ${currentYear}, currentMonth: ${currentMonth})`);
+          if (isFuture) {
+            console.log(`📊 DEBUG: Skipping future month: ${year}-${monthName}`);
             continue;
           }
 
@@ -1918,6 +1936,9 @@ export class SheetsAdapter {
           const total3MoM = (parseFloat(row[14]) || 0) * 100; // Column P - convert to percentage
           const total3Cumulative = (parseFloat(row[15]) || 0) * 100; // Column Q - convert to percentage
 
+          // Create month string for return value
+          const monthStr = `${monthName}-${year}`;
+          
           performanceData.push({
             month: monthStr,
             endingAUM,
@@ -2001,23 +2022,34 @@ export class SheetsAdapter {
         // Process data rows (skip header row at index 0)
         for (let i = 1; i < rows.length; i++) {
           const row = rows[i];
-          if (!row || row.length < 17) continue; // Need columns B through Q
+          if (!row || row.length < 16) continue; // Need columns B through Q (16 columns)
 
           // Column B (index 0 in B:Q range) - Month
           const monthValue = row[0];
           if (!monthValue) continue;
 
-          // Parse month string (e.g., "Oct-2024")
-          const monthStr = monthValue.toString().trim();
-          const monthMatch = monthStr.match(/(\w{3})-(\d{4})/);
-          if (!monthMatch) continue;
+          // Convert Excel serial number to date
+          const excelSerialNumber = parseFloat(monthValue.toString());
+          if (isNaN(excelSerialNumber)) {
+            console.log(`📊 DEBUG: Not a number: "${monthValue}"`);
+            continue;
+          }
 
-          const monthName = monthMatch[1];
-          const year = parseInt(monthMatch[2]);
-          const monthIndex = monthNames.indexOf(monthName);
+          // Excel serial number to JavaScript date
+          // Excel epoch is 1900-01-01, but Excel incorrectly treats 1900 as a leap year
+          // So we need to adjust: Excel date - 25569 (days between 1900-01-01 and 1970-01-01)
+          const jsDate = new Date((excelSerialNumber - 25569) * 86400 * 1000);
+          const year = jsDate.getFullYear();
+          const month = jsDate.getMonth(); // 0-based
+          const monthName = monthNames[month];
+          
+          console.log(`📊 DEBUG: Excel serial: ${excelSerialNumber}, JS date: ${jsDate.toISOString()}, year: ${year}, month: ${month} (${monthName})`);
 
           // Skip future months (but include current month)
-          if (year > currentYear || (year === currentYear && monthIndex > currentMonth)) {
+          const isFuture = year > currentYear || (year === currentYear && month > currentMonth);
+          console.log(`📊 DEBUG: isFuture: ${isFuture} (currentYear: ${currentYear}, currentMonth: ${currentMonth})`);
+          if (isFuture) {
+            console.log(`📊 DEBUG: Skipping future month: ${year}-${monthName}`);
             continue;
           }
 
@@ -2031,6 +2063,9 @@ export class SheetsAdapter {
           const total3MoM = (parseFloat(row[14]) || 0) * 100; // Column P - convert to percentage
           const total3Cumulative = (parseFloat(row[15]) || 0) * 100; // Column Q - convert to percentage
 
+          // Create month string for return value
+          const monthStr = `${monthName}-${year}`;
+          
           performanceData.push({
             month: monthStr,
             endingAUM,
