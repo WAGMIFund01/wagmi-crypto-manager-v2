@@ -10,6 +10,8 @@ export default defineConfig({
     setupFiles: ['./src/test/setup.ts'],
     include: ['src/**/*.{test,spec}.{js,ts,jsx,tsx}'],
     exclude: ['node_modules', 'dist', '.next'],
+    // Mobile testing configuration
+    testTimeout: 15000, // Increased for mobile testing
     // Ensure React 18 is properly configured for testing
     environmentOptions: {
       jsdom: {
@@ -19,7 +21,6 @@ export default defineConfig({
       }
     },
     // Add test timeout and retry configuration
-    testTimeout: 10000,
     hookTimeout: 10000,
     // Force development mode for testing
     env: {
