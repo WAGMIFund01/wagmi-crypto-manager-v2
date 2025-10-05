@@ -1559,7 +1559,7 @@ export class SheetsAdapter {
    * Called after price updates to show when data was last refreshed
    * 
    * @param timestamp - ISO timestamp string
-   * @param isPersonalPortfolio - If true, updates personal portfolio timestamp (B9), otherwise WAGMI fund (B2)
+   * @param isPersonalPortfolio - If true, updates personal portfolio timestamp (B9), otherwise WAGMI fund (B7)
    * 
    * @example
    * await sheetsAdapter.updateKpiTimestamp(new Date().toISOString(), false);
@@ -1581,9 +1581,9 @@ export class SheetsAdapter {
         }
 
         // Determine which cell to update based on portfolio type
-        // B2 = WAGMI Fund "Last Updated"
-        // B9 = Personal Portfolio "Last Updated"
-        const cell = isPersonalPortfolio ? 'B9' : 'B2';
+        // B7 = WAGMI Fund navbar timestamp (FIXED: was B2)
+        // B9 = Personal Portfolio navbar timestamp
+        const cell = isPersonalPortfolio ? 'B9' : 'B7';
         const range = `KPIs!${cell}`;
 
         await this.sheets.spreadsheets.values.update({
@@ -1606,6 +1606,86 @@ export class SheetsAdapter {
         };
       }
     }, { timestamp, isPersonalPortfolio });
+  }
+
+  /**
+   * Get the last updated timestamp for WAGMI Fund from KPIs sheet (cell B7)
+   * Used by UniversalNavbar to display when data was last refreshed
+   * 
+   * @returns Timestamp string or null if not found
+   * 
+   * @example
+   * const timestamp = await sheetsAdapter.getWagmiTimestamp();
+   * // Returns: "10/05/2024, 14:30:00"
+   */
+  async getWagmiTimestamp(): Promise<string | null> {
+    return trackOperation('getWagmiTimestamp', async () => {
+      try {
+        if (!this.isServiceAccountInitialized) {
+          await this.initializeServiceAccount();
+        }
+
+        if (!this.sheets) {
+          throw new Error('Google Sheets API client not initialized');
+        }
+
+        // Read cell B7 from KPIs sheet
+        const response = await this.sheets.spreadsheets.values.get({
+          spreadsheetId: this.sheetId,
+          range: 'KPIs!B7'
+        });
+
+        const values = response.data.values;
+        const timestamp = values && values[0] && values[0][0] ? values[0][0].toString() : null;
+
+        console.log(`✅ Retrieved WAGMI timestamp: ${timestamp}`);
+        return timestamp;
+
+      } catch (error) {
+        console.error('❌ Error getting WAGMI timestamp:', error);
+        return null;
+      }
+    }, { sheetId: this.sheetId });
+  }
+
+  /**
+   * Get the last updated timestamp for Personal Portfolio from KPIs sheet (cell B9)
+   * Used by UniversalNavbar to display when data was last refreshed
+   * 
+   * @returns Timestamp string or null if not found
+   * 
+   * @example
+   * const timestamp = await sheetsAdapter.getPersonalPortfolioTimestamp();
+   * // Returns: "10/05/2024, 14:30:00"
+   */
+  async getPersonalPortfolioTimestamp(): Promise<string | null> {
+    return trackOperation('getPersonalPortfolioTimestamp', async () => {
+      try {
+        if (!this.isServiceAccountInitialized) {
+          await this.initializeServiceAccount();
+        }
+
+        if (!this.sheets) {
+          throw new Error('Google Sheets API client not initialized');
+        }
+
+        // Read cell B9 from KPIs sheet
+        const response = await this.sheets.spreadsheets.values.get({
+          spreadsheetId: this.sheetId,
+          range: 'KPIs!B9'
+        });
+
+        const values = response.data.values;
+        const timestamp = values && values[0] && values[0][0] ? values[0][0].toString() : null;
+
+        console.log(`✅ Retrieved Personal Portfolio timestamp: ${timestamp}`);
+        return timestamp;
+
+      } catch (error) {
+        console.error('❌ Error getting Personal Portfolio timestamp:', error);
+        return null;
+      }
+    }, { sheetId: this.sheetId });
   }
 
   /**
