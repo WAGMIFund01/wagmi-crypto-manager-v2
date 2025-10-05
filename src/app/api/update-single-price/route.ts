@@ -32,8 +32,9 @@ export async function POST() {
     // Step 2: Use new SheetsAdapter method to update AURA price
     // For now, we'll use a placeholder 24h change (this would normally come from CoinGecko)
     const priceChange24h = 0; // This should be fetched from CoinGecko in a real implementation
+    const timestamp = new Date().toISOString();
     
-    await sheetsAdapter.updateAssetPrice('AURA', newPrice, priceChange24h, false); // false = WAGMI Fund
+    await sheetsAdapter.updateAssetPrice('AURA', newPrice, timestamp, priceChange24h, false); // false = WAGMI Fund
 
     return NextResponse.json({
       success: true,
