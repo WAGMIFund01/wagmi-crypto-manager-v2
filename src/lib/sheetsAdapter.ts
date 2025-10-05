@@ -1748,27 +1748,28 @@ export class SheetsAdapter {
   }
 
   /**
-   * Get performance data from MoM performance sheet
-   * Returns monthly performance metrics
+   * Get WAGMI Fund historical performance data from "MoM performance" sheet
+   * Returns monthly performance metrics for WAGMI Fund
    * 
    * @returns Array of monthly performance data
    * 
    * @example
-   * const performance = await sheetsAdapter.getPerformanceData();
+   * const performance = await sheetsAdapter.getWagmiHistoricalPerformance();
+   * // Returns: [{ month: 'Oct-2024', endingAUM: 6264.09, wagmiMoM: 28.5, ... }, ...]
    */
-  async getPerformanceData(): Promise<Array<{
+  async getWagmiHistoricalPerformance(): Promise<Array<{
     month: string;
     endingAUM: number;
-    personalMoM: number;
+    wagmiMoM: number;
     totalMoM: number;
     total3MoM: number;
-    personalCumulative: number;
+    wagmiCumulative: number;
     totalCumulative: number;
     total3Cumulative: number;
   }>> {
-    return trackOperation('getPerformanceData', async () => {
+    return trackOperation('getWagmiHistoricalPerformance', async () => {
       try {
-        console.log('📝 Fetching performance data from MoM performance sheet');
+        console.log('📝 Fetching WAGMI Fund historical performance from MoM performance sheet');
         
         if (!this.isServiceAccountInitialized) {
           await this.initializeServiceAccount();
@@ -1778,10 +1779,123 @@ export class SheetsAdapter {
           throw new Error('Google Sheets API client not initialized');
         }
 
-        // Read from MoM performance sheet
+        // Read from MoM performance sheet - columns B (month), G-I (WAGMI), L-M (Total), P-Q (Total3)
         const response = await this.sheets.spreadsheets.values.get({
           spreadsheetId: this.sheetId,
-          range: 'MoM performance!A:H', // Adjust based on actual structure
+          range: 'MoM performance!B:Q',
+          valueRenderOption: 'UNFORMATTED_VALUE'
+        });
+
+        const rows = response.data.values || [];
+        const performanceData: Array<{
+          month: string;
+          endingAUM: number;
+          wagmiMoM: number;
+          totalMoM: number;
+          total3MoM: number;
+          wagmiCumulative: number;
+          totalCumulative: number;
+          total3Cumulative: number;
+        }> = [];
+
+        // Get current date for filtering future months
+        const currentDate = new Date();
+        const currentYear = currentDate.getFullYear();
+        const currentMonth = currentDate.getMonth();
+        const monthNames = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 
+                           'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+
+        // Process data rows (skip header row at index 0)
+        for (let i = 1; i < rows.length; i++) {
+          const row = rows[i];
+          if (!row || row.length < 17) continue; // Need columns B through Q
+
+          // Column B (index 0 in B:Q range) - Month
+          const monthValue = row[0];
+          if (!monthValue) continue;
+
+          // Parse month string (e.g., "Oct-2024")
+          const monthStr = monthValue.toString().trim();
+          const monthMatch = monthStr.match(/(\w{3})-(\d{4})/);
+          if (!monthMatch) continue;
+
+          const monthName = monthMatch[1];
+          const year = parseInt(monthMatch[2]);
+          const monthIndex = monthNames.indexOf(monthName);
+
+          // Skip future months
+          if (year > currentYear || (year === currentYear && monthIndex > currentMonth)) {
+            continue;
+          }
+
+          // Extract performance data from correct columns
+          // In B:Q range: G=index 5, H=6, I=7, L=10, M=11, P=14, Q=15
+          const endingAUM = parseFloat(row[5]) || 0; // Column G
+          const wagmiMoM = (parseFloat(row[6]) || 0) * 100; // Column H - convert to percentage
+          const wagmiCumulative = (parseFloat(row[7]) || 0) * 100; // Column I - convert to percentage
+          const totalMoM = (parseFloat(row[10]) || 0) * 100; // Column L - convert to percentage
+          const totalCumulative = (parseFloat(row[11]) || 0) * 100; // Column M - convert to percentage
+          const total3MoM = (parseFloat(row[14]) || 0) * 100; // Column P - convert to percentage
+          const total3Cumulative = (parseFloat(row[15]) || 0) * 100; // Column Q - convert to percentage
+
+          performanceData.push({
+            month: monthStr,
+            endingAUM,
+            wagmiMoM,
+            totalMoM,
+            total3MoM,
+            wagmiCumulative,
+            totalCumulative,
+            total3Cumulative
+          });
+        }
+
+        console.log(`✅ Retrieved WAGMI historical performance for ${performanceData.length} months`);
+        return performanceData;
+
+      } catch (error) {
+        console.error('❌ Error fetching WAGMI historical performance:', error);
+        throw new Error('Failed to fetch WAGMI historical performance data');
+      }
+    }, { sheetId: this.sheetId });
+  }
+
+  /**
+   * Get Personal Portfolio historical performance data from "Personal portfolio historical" sheet
+   * Returns monthly performance metrics for Personal Portfolio
+   * 
+   * @returns Array of monthly performance data
+   * 
+   * @example
+   * const performance = await sheetsAdapter.getPersonalPortfolioHistoricalPerformance();
+   * // Returns: [{ month: 'Oct-2024', endingAUM: 6264.09, personalMoM: 28.5, ... }, ...]
+   */
+  async getPersonalPortfolioHistoricalPerformance(): Promise<Array<{
+    month: string;
+    endingAUM: number;
+    personalMoM: number;
+    totalMoM: number;
+    total3MoM: number;
+    personalCumulative: number;
+    totalCumulative: number;
+    total3Cumulative: number;
+  }>> {
+    return trackOperation('getPersonalPortfolioHistoricalPerformance', async () => {
+      try {
+        console.log('📝 Fetching Personal Portfolio historical performance from Personal portfolio historical sheet');
+        
+        if (!this.isServiceAccountInitialized) {
+          await this.initializeServiceAccount();
+        }
+
+        if (!this.sheets) {
+          throw new Error('Google Sheets API client not initialized');
+        }
+
+        // Read from Personal portfolio historical sheet - same structure as WAGMI
+        const response = await this.sheets.spreadsheets.values.get({
+          spreadsheetId: this.sheetId,
+          range: 'Personal portfolio historical!B:Q',
           valueRenderOption: 'UNFORMATTED_VALUE'
         });
 
@@ -1797,29 +1911,64 @@ export class SheetsAdapter {
           total3Cumulative: number;
         }> = [];
 
-        // Process data rows (skip header)
+        // Get current date for filtering future months
+        const currentDate = new Date();
+        const currentYear = currentDate.getFullYear();
+        const currentMonth = currentDate.getMonth();
+        const monthNames = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 
+                           'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+
+        // Process data rows (skip header row at index 0)
         for (let i = 1; i < rows.length; i++) {
           const row = rows[i];
-          if (row && row.length >= 8) {
-            performanceData.push({
-              month: row[0]?.toString() || '',
-              endingAUM: parseFloat(row[1]) || 0,
-              personalMoM: parseFloat(row[2]) || 0,
-              totalMoM: parseFloat(row[3]) || 0,
-              total3MoM: parseFloat(row[4]) || 0,
-              personalCumulative: parseFloat(row[5]) || 0,
-              totalCumulative: parseFloat(row[6]) || 0,
-              total3Cumulative: parseFloat(row[7]) || 0
-            });
+          if (!row || row.length < 17) continue; // Need columns B through Q
+
+          // Column B (index 0 in B:Q range) - Month
+          const monthValue = row[0];
+          if (!monthValue) continue;
+
+          // Parse month string (e.g., "Oct-2024")
+          const monthStr = monthValue.toString().trim();
+          const monthMatch = monthStr.match(/(\w{3})-(\d{4})/);
+          if (!monthMatch) continue;
+
+          const monthName = monthMatch[1];
+          const year = parseInt(monthMatch[2]);
+          const monthIndex = monthNames.indexOf(monthName);
+
+          // Skip future months
+          if (year > currentYear || (year === currentYear && monthIndex > currentMonth)) {
+            continue;
           }
+
+          // Extract performance data from correct columns
+          // In B:Q range: G=index 5, H=6, I=7, L=10, M=11, P=14, Q=15
+          const endingAUM = parseFloat(row[5]) || 0; // Column G
+          const personalMoM = (parseFloat(row[6]) || 0) * 100; // Column H - convert to percentage
+          const personalCumulative = (parseFloat(row[7]) || 0) * 100; // Column I - convert to percentage
+          const totalMoM = (parseFloat(row[10]) || 0) * 100; // Column L - convert to percentage
+          const totalCumulative = (parseFloat(row[11]) || 0) * 100; // Column M - convert to percentage
+          const total3MoM = (parseFloat(row[14]) || 0) * 100; // Column P - convert to percentage
+          const total3Cumulative = (parseFloat(row[15]) || 0) * 100; // Column Q - convert to percentage
+
+          performanceData.push({
+            month: monthStr,
+            endingAUM,
+            personalMoM,
+            totalMoM,
+            total3MoM,
+            personalCumulative,
+            totalCumulative,
+            total3Cumulative
+          });
         }
 
-        console.log(`✅ Retrieved performance data for ${performanceData.length} months`);
+        console.log(`✅ Retrieved Personal Portfolio historical performance for ${performanceData.length} months`);
         return performanceData;
 
       } catch (error) {
-        console.error('❌ Error fetching performance data:', error);
-        throw new Error('Failed to fetch performance data');
+        console.error('❌ Error fetching Personal Portfolio historical performance:', error);
+        throw new Error('Failed to fetch Personal Portfolio historical performance data');
       }
     }, { sheetId: this.sheetId });
   }
