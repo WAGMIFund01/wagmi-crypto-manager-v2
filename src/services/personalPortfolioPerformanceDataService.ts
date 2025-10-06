@@ -13,7 +13,8 @@ const fallbackData: PersonalPortfolioPerformanceData[] = [
     total3MoM: 3.75,
     personalCumulative: 28.5,
     totalCumulative: 11.59,
-    total3Cumulative: 3.75
+    total3Cumulative: 3.75,
+    investment: 3109.91
   }
 ];
 
