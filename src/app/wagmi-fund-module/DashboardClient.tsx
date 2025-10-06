@@ -211,12 +211,12 @@ export default function DashboardClient({ session, kpiData: initialKpiData, hasE
         let transformedKpiData;
         
         if (dataSource === 'personal-portfolio') {
-          // Personal Portfolio: Only show AUM and lastUpdated
+          // Personal Portfolio: Show AUM, MoM, Cumulative, and lastUpdated
           transformedKpiData = {
             activeInvestors: undefined, // Will be hidden by UniversalNavbar
             totalAUM: `$${freshKpiData.totalAUM.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`,
-            cumulativeReturn: undefined, // Will be hidden by UniversalNavbar
-            monthOnMonth: undefined, // Will be hidden by UniversalNavbar
+            cumulativeReturn: `${freshKpiData.cumulativeReturn >= 0 ? '+' : ''}${freshKpiData.cumulativeReturn.toFixed(1)}%`,
+            monthOnMonth: `${freshKpiData.monthlyReturn >= 0 ? '+' : ''}${freshKpiData.monthlyReturn.toFixed(1)}%`,
             lastUpdated: freshKpiData.lastUpdated
           };
         } else {
