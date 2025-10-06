@@ -149,8 +149,8 @@ export function InvestorLoginForm() {
       sessionStorage.setItem('householdSession', JSON.stringify(mockSession));
       sessionStorage.setItem('isHouseholdMode', 'true');
       
-      // Redirect directly to personal portfolio
-      router.push('/personal-portfolio');
+      // Redirect to household personal portfolio page
+      router.push('/personal-portfolio-household');
     } else {
       setHouseholdError('Invalid password. Please try again.');
     }
