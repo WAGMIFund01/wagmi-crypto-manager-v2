@@ -10,13 +10,14 @@ import { COLORS } from '@/shared/constants/colors';
 const PortfolioOverview = lazy(() => import('@/components/tabs/PortfolioOverview'));
 const Analytics = lazy(() => import('@/components/tabs/Analytics'));
 const PersonalPortfolioAnalytics = lazy(() => import('@/components/tabs/PersonalPortfolioAnalytics'));
+const HouseholdAnalytics = lazy(() => import('@/components/tabs/HouseholdAnalytics'));
 const Investors = lazy(() => import('@/components/tabs/Investors'));
 const PerformanceDashboard = lazy(() => import('@/components/PerformanceDashboard'));
 const AICopilot = lazy(() => import('@/components/AICopilot'));
 
 interface Session {
   user?: {
-    role?: "manager" | "investor" | "unauthorized";
+    role?: "manager" | "investor" | "household" | "unauthorized";
     email?: string | null;
     name?: string | null;
     image?: string | null;
@@ -35,9 +36,10 @@ interface DashboardClientProps {
   } | null;
   hasError: boolean;
   dataSource?: 'wagmi-fund' | 'personal-portfolio' | 'performance-dashboard' | 'household';
+  isHouseholdLogin?: boolean; // New prop to indicate household login access
 }
 
-export default function DashboardClient({ session, kpiData: initialKpiData, hasError, dataSource = 'wagmi-fund' }: DashboardClientProps) {
+export default function DashboardClient({ session, kpiData: initialKpiData, hasError, dataSource = 'wagmi-fund', isHouseholdLogin = false }: DashboardClientProps) {
   const router = useRouter();
   const searchParams = useSearchParams();
   const pathname = usePathname();
@@ -136,10 +138,25 @@ export default function DashboardClient({ session, kpiData: initialKpiData, hasE
       return;
     }
     
+    
     if (session.user?.role !== 'manager') {
       // Redirect non-manager users to investor page or homepage
       router.push('/');
       return;
+    }
+    
+    // Create household session for Google Auth users (like DEV access)
+    if (typeof window !== 'undefined') {
+      const householdSession = {
+        user: {
+          email: 'household@wagmi.com',
+          name: 'Household User',
+          role: 'household'
+        },
+        expires: new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString() // 24 hours
+      };
+      sessionStorage.setItem('householdSession', JSON.stringify(householdSession));
+      sessionStorage.setItem('isHouseholdMode', 'true');
     }
     
     setIsCheckingAuth(false);
@@ -291,9 +308,10 @@ export default function DashboardClient({ session, kpiData: initialKpiData, hasE
         console.log('Rendering PortfolioOverview');
         return <PortfolioOverview onRefresh={triggerDataRefresh} isPrivacyMode={isPrivacyMode} dataSource={dataSource} refreshKey={refreshCounter} />;
       case 'analytics':
-        console.log('Rendering Analytics');
-        // Use PersonalPortfolioAnalytics for personal portfolio and household, Analytics for WAGMI fund
-        if (dataSource === 'personal-portfolio' || dataSource === 'household') {
+        // Use different analytics components based on data source
+        if (dataSource === 'household') {
+          return <HouseholdAnalytics onRefresh={triggerDataRefresh} refreshKey={refreshCounter} />;
+        } else if (dataSource === 'personal-portfolio') {
           return <PersonalPortfolioAnalytics onRefresh={triggerDataRefresh} refreshKey={refreshCounter} />;
         } else {
           return <Analytics onRefresh={triggerDataRefresh} dataSource={dataSource} refreshKey={refreshCounter} />;
@@ -331,6 +349,11 @@ export default function DashboardClient({ session, kpiData: initialKpiData, hasE
         hasError={hasError}
         onKpiRefresh={handleKpiRefresh}
         dataSource={dataSource}
+        showModuleSelector={
+          dataSource === 'household' 
+            ? (isDevMode || (!!session && !isHouseholdLogin)) // Show for household only if dev mode or Google Auth (not household login)
+            : true // Show for all other dataSources
+        }
       />
 
       {/* Main Content */}

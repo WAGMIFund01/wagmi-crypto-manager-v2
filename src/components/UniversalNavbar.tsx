@@ -21,6 +21,7 @@ interface UniversalNavbarProps {
   hasError?: boolean;
   onKpiRefresh?: () => Promise<void>;
   dataSource?: 'wagmi-fund' | 'personal-portfolio' | 'performance-dashboard' | 'household';
+  showModuleSelector?: boolean; // New prop to control module selector visibility
 }
 
 export default function UniversalNavbar({ 
@@ -30,7 +31,8 @@ export default function UniversalNavbar({
   kpiData = null, 
   hasError = false,
   onKpiRefresh,
-  dataSource = 'wagmi-fund'
+  dataSource = 'wagmi-fund',
+  showModuleSelector = true
 }: UniversalNavbarProps) {
   const router = useRouter();
   const [isPrivacyMode, setIsPrivacyMode] = useState(false);
@@ -321,8 +323,8 @@ export default function UniversalNavbar({
             
             {/* Controls */}
             <div className="flex items-center space-x-2">
-              {/* Module Selector Button - Mobile (hidden for household) */}
-              {dataSource !== 'household' && (
+              {/* Module Selector Button - Mobile */}
+              {showModuleSelector && (
                 <WagmiButton
                   onClick={() => router.push('/module-selection')}
                   variant="outline"
@@ -425,7 +427,7 @@ export default function UniversalNavbar({
                     {formattedKpiData.totalAUM}
                   </div>
                 </div>
-                {dataSource !== 'personal-portfolio' && formattedKpiData.cumulativeReturn && (
+                {formattedKpiData.cumulativeReturn && (
                   <div className="text-center">
                     <div style={{ color: '#A0A0A0', fontSize: '10px' }}>Return</div>
                     <div 
@@ -439,7 +441,7 @@ export default function UniversalNavbar({
                     </div>
                   </div>
                 )}
-                {dataSource !== 'personal-portfolio' && formattedKpiData.monthOnMonth && (
+                {formattedKpiData.monthOnMonth && (
                   <div className="text-center">
                     <div style={{ color: '#A0A0A0', fontSize: '10px' }}>MoM</div>
                     <div 
@@ -528,8 +530,8 @@ export default function UniversalNavbar({
               Last updated: {lastUpdatedTimestamp ? formatTimestampForDisplay(lastUpdatedTimestamp) : 'Unknown'}
             </p>
             
-            {/* Module Selector Button - Desktop (hidden for household) */}
-            {dataSource !== 'household' && (
+            {/* Module Selector Button - Desktop */}
+            {showModuleSelector && (
               <WagmiButton
                 onClick={() => router.push('/module-selection')}
                 variant="outline"

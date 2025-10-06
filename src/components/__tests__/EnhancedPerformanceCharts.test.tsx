@@ -48,25 +48,41 @@ const mockWagmiPerformanceData = [
 const mockPersonalPortfolioData = [
   {
     month: '2024-01',
-    endingAUM: 500000,
-    personalMoM: 6.5,
-    personalCumulative: 6.5,
-    totalMoM: 3.1,
-    totalCumulative: 3.1,
-    total3MoM: 2.8,
-    total3Cumulative: 2.8
+    endingAUM: 50000,
+    personalMoM: 3.5,
+    personalCumulative: 3.5,
+    totalMoM: 2.8,
+    totalCumulative: 2.8,
+    total3MoM: 2.2,
+    total3Cumulative: 2.2,
+    investment: 25000
   },
   {
     month: '2024-02',
-    endingAUM: 520000,
+    endingAUM: 52000,
     personalMoM: 4.0,
-    personalCumulative: 10.7,
-    totalMoM: 2.9,
+    personalCumulative: 7.6,
+    totalMoM: 3.2,
     totalCumulative: 6.1,
+    total3MoM: 2.8,
+    total3Cumulative: 5.1,
+    investment: 26000
+  },
+  {
+    month: '2024-03',
+    endingAUM: 54000,
+    personalMoM: 3.8,
+    personalCumulative: 11.7,
+    totalMoM: 2.9,
+    totalCumulative: 9.2,
     total3MoM: 2.5,
-    total3Cumulative: 5.4
+    total3Cumulative: 7.8,
+    investment: 27000
   }
 ];
+
+// Mock data for household module (same as personal portfolio)
+const mockHouseholdData = mockPersonalPortfolioData;
 
 // Mock WagmiButton and WagmiCard
 vi.mock('@/components/ui', () => ({

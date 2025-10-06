@@ -40,12 +40,20 @@ export default defineConfig({
       ],
       thresholds: {
         global: {
-          branches: 70,
-          functions: 70,
-          lines: 70,
-          statements: 70,
+          branches: 75,
+          functions: 75,
+          lines: 75,
+          statements: 75,
         },
       },
+      // Include specific directories for better coverage
+      include: [
+        'src/components/**/*.{ts,tsx}',
+        'src/app/**/*.{ts,tsx}',
+        'src/lib/**/*.{ts,tsx}',
+        'src/features/**/*.{ts,tsx}',
+        'src/services/**/*.{ts,tsx}',
+      ],
     },
   },
   resolve: {

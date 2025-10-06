@@ -122,12 +122,15 @@ export default function EnhancedPerformanceCharts({
           : (dataPoint as PerformanceData).wagmiMoM
       ) : 0;
       
+      // Determine the title based on chart mode
+      const title = chartMode === 'investment' ? 'Net Investment' : 'Ending AUM';
+      
       return (
         <div className="bg-gray-800 border border-gray-600 rounded-lg p-4 shadow-lg min-w-[200px]">
           <p className="text-white font-medium mb-2 text-sm">{label}</p>
           <div className="space-y-1">
             <p className="text-green-400 font-semibold">
-              Ending AUM: {formatCurrency(value)}
+              {title}: {formatCurrency(value)}
             </p>
             <p className="text-gray-300 text-xs">
               MoM Performance: {momPerformance >= 0 ? '+' : ''}{momPerformance.toFixed(2)}%
@@ -201,9 +204,9 @@ export default function EnhancedPerformanceCharts({
         primary: 'investment',
         total: 'investment',
         total3: 'investment',
-        primaryName: 'Personal Portfolio Investment',
-        totalName: 'Investment',
-        total3Name: 'Investment',
+        primaryName: 'Personal Portfolio Net Investment',
+        totalName: 'Net Investment',
+        total3Name: 'Net Investment',
         formatValue: formatCurrency
       };
     } else {
@@ -335,7 +338,7 @@ export default function EnhancedPerformanceCharts({
                   size="sm"
                   className="flex-shrink-0 min-w-[120px] touch-manipulation"
                 >
-                  Investment
+                  Net Investment
                 </WagmiButton>
               )}
             </div>
@@ -436,7 +439,7 @@ export default function EnhancedPerformanceCharts({
                   <Bar 
                     dataKey="investment" 
                     fill="#00FF95"
-                    name="Investment"
+                    name="Net Investment"
                     radius={[4, 4, 0, 0]}
                   />
                 ) : (

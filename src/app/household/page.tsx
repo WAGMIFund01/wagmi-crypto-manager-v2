@@ -93,6 +93,7 @@ export default function HouseholdPage() {
       kpiData={kpiData} 
       hasError={hasError}
       dataSource="household"
+      isHouseholdLogin={true}
     />
   );
 }

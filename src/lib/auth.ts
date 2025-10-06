@@ -42,7 +42,7 @@ export const authOptions: NextAuthOptions = {
     },
     async session({ session, token }) {
       if (token) {
-        session.user.role = token.role as 'manager' | 'investor';
+        session.user.role = token.role as 'manager' | 'investor' | 'household';
         session.user.investorId = token.investorId as string | undefined;
       }
       return session;

@@ -1987,13 +1987,16 @@ export class SheetsAdapter {
           // Excel epoch is December 30, 1899 (not January 1, 1900)
           // Excel incorrectly treats 1900 as a leap year, so we need to account for this
           // The correct conversion: Excel date - 25569 (days between 1899-12-30 and 1970-01-01)
-          // But we need to subtract 1 more day due to Excel's leap year bug
-          const jsDate = new Date((excelSerialNumber - 25569 - 1) * 86400 * 1000);
-          const year = jsDate.getFullYear();
-          const month = jsDate.getMonth(); // 0-based
+          const jsDate = new Date((excelSerialNumber - 25569) * 86400 * 1000);
+          
+          // The Excel dates represent the last day of the month, but we want to display the month
+          // So we need to add 1 day to get to the next month, then use that month
+          const nextMonthDate = new Date(jsDate.getTime() + 24 * 60 * 60 * 1000); // Add 1 day
+          const year = nextMonthDate.getFullYear();
+          const month = nextMonthDate.getMonth(); // 0-based
           const monthName = monthNames[month];
           
-          console.log(`📊 DEBUG: Excel serial: ${excelSerialNumber}, JS date: ${jsDate.toISOString()}, year: ${year}, month: ${month} (${monthName})`);
+          console.log(`📊 DEBUG: Excel serial: ${excelSerialNumber}, JS date: ${jsDate.toISOString()}, corrected date: ${nextMonthDate.toISOString()}, year: ${year}, month: ${month} (${monthName})`);
 
           // Skip future months (but include current month)
           const isFuture = year > currentYear || (year === currentYear && month > currentMonth);
@@ -2118,13 +2121,16 @@ export class SheetsAdapter {
           // Excel epoch is December 30, 1899 (not January 1, 1900)
           // Excel incorrectly treats 1900 as a leap year, so we need to account for this
           // The correct conversion: Excel date - 25569 (days between 1899-12-30 and 1970-01-01)
-          // But we need to subtract 1 more day due to Excel's leap year bug
-          const jsDate = new Date((excelSerialNumber - 25569 - 1) * 86400 * 1000);
-          const year = jsDate.getFullYear();
-          const month = jsDate.getMonth(); // 0-based
+          const jsDate = new Date((excelSerialNumber - 25569) * 86400 * 1000);
+          
+          // The Excel dates represent the last day of the month, but we want to display the month
+          // So we need to add 1 day to get to the next month, then use that month
+          const nextMonthDate = new Date(jsDate.getTime() + 24 * 60 * 60 * 1000); // Add 1 day
+          const year = nextMonthDate.getFullYear();
+          const month = nextMonthDate.getMonth(); // 0-based
           const monthName = monthNames[month];
           
-          console.log(`📊 DEBUG: Excel serial: ${excelSerialNumber}, JS date: ${jsDate.toISOString()}, year: ${year}, month: ${month} (${monthName})`);
+          console.log(`📊 DEBUG: Excel serial: ${excelSerialNumber}, JS date: ${jsDate.toISOString()}, corrected date: ${nextMonthDate.toISOString()}, year: ${year}, month: ${month} (${monthName})`);
 
           // Skip future months (but include current month)
           const isFuture = year > currentYear || (year === currentYear && month > currentMonth);
