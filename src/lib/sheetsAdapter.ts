@@ -2144,7 +2144,8 @@ export class SheetsAdapter {
           // In A:Z range: D=index 3, G=index 6, H=7, I=8, L=11, M=12, P=15, Q=16
           const investment = parseFloat(row[3]) || 0; // Column D - Investment data
           const endingAUM = parseFloat(row[6]) || 0; // Column G - Personal Portfolio historical data
-          const personalMoM = (parseFloat(row[7]) || 0) * 100; // Column H - convert to percentage
+          const personalMoM = (parseFloat(row[7]) || 0) * 100; // Column H - MoM Return, convert to percentage
+          const personalCumulative = (parseFloat(row[8]) || 0) * 100; // Column I - Cumulative Return, convert to percentage
           const totalMoM = (parseFloat(row[11]) || 0) * 100; // Column L - convert to percentage
           const totalCumulative = (parseFloat(row[12]) || 0) * 100; // Column M - convert to percentage
           const total3MoM = (parseFloat(row[15]) || 0) * 100; // Column P - convert to percentage
@@ -2159,18 +2160,17 @@ export class SheetsAdapter {
             personalMoM,
             totalMoM,
             total3MoM,
-            personalCumulative: 0, // Will be calculated below
+            personalCumulative, // Read directly from Column I
             totalCumulative,
             total3Cumulative,
             investment
           });
         }
 
-        // Calculate cumulative returns for personal portfolio
-        let personalCumulative = 0;
-        for (let i = 0; i < performanceData.length; i++) {
-          personalCumulative += performanceData[i].personalMoM;
-          performanceData[i].personalCumulative = personalCumulative;
+        // Log the final cumulative return for verification (now reading directly from Column I)
+        if (performanceData.length > 0) {
+          const latestMonth = performanceData[performanceData.length - 1];
+          console.log(`📈 Personal Portfolio Cumulative Return (from Column I): ${latestMonth.personalCumulative.toFixed(2)}% (${latestMonth.month})`);
         }
 
         console.log(`✅ Retrieved Personal Portfolio historical performance for ${performanceData.length} months`);
