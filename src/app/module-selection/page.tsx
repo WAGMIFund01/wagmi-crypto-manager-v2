@@ -31,8 +31,8 @@ export default function ModuleSelectionPage() {
 
       {/* Module Cards */}
       <div className="w-full max-w-6xl">
-        {/* Desktop: Three cards in a row */}
-        <div className="hidden lg:flex lg:justify-center lg:space-x-8">
+        {/* Desktop: Four cards in a row */}
+        <div className="hidden lg:flex lg:justify-center lg:space-x-6">
           <ModuleCard 
             title="WAGMI Fund Module"
             route="/wagmi-fund-module"
@@ -44,14 +44,19 @@ export default function ModuleSelectionPage() {
             className="flex-1 max-w-sm"
           />
           <ModuleCard 
+            title="Household Module"
+            route="/household"
+            className="flex-1 max-w-sm"
+          />
+          <ModuleCard 
             title="Performance Dashboard"
             route="/performance-dashboard"
             className="flex-1 max-w-sm"
           />
         </div>
 
-        {/* Desktop: Three cards in a row for medium screens */}
-        <div className="hidden md:flex lg:hidden md:justify-center md:space-x-8">
+        {/* Desktop: Four cards in a row for medium screens */}
+        <div className="hidden md:flex lg:hidden md:justify-center md:space-x-6">
           <ModuleCard 
             title="WAGMI Fund Module"
             route="/wagmi-fund-module"
@@ -63,15 +68,20 @@ export default function ModuleSelectionPage() {
             className="flex-1 max-w-sm"
           />
           <ModuleCard 
+            title="Household Module"
+            route="/household"
+            className="flex-1 max-w-sm"
+          />
+          <ModuleCard 
             title="Performance Dashboard"
             route="/performance-dashboard"
             className="flex-1 max-w-sm"
           />
         </div>
 
-        {/* Tablet: Three cards in a row */}
+        {/* Tablet: Four cards in a row */}
         <div className="hidden sm:block md:hidden">
-          <div className="flex justify-center space-x-8">
+          <div className="flex justify-center space-x-6">
             <ModuleCard 
               title="WAGMI Fund Module"
               route="/wagmi-fund-module"
@@ -80,6 +90,11 @@ export default function ModuleSelectionPage() {
             <ModuleCard 
               title="Personal Portfolio Module"
               route="/personal-portfolio"
+              className="flex-1 max-w-sm"
+            />
+            <ModuleCard 
+              title="Household Module"
+              route="/household"
               className="flex-1 max-w-sm"
             />
             <ModuleCard 
@@ -99,6 +114,10 @@ export default function ModuleSelectionPage() {
           <ModuleCard 
             title="Personal Portfolio Module"
             route="/personal-portfolio"
+          />
+          <ModuleCard 
+            title="Household Module"
+            route="/household"
           />
           <ModuleCard 
             title="Performance Dashboard"

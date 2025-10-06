@@ -34,7 +34,7 @@ interface DashboardClientProps {
     lastUpdated: string;
   } | null;
   hasError: boolean;
-  dataSource?: 'wagmi-fund' | 'personal-portfolio' | 'performance-dashboard';
+  dataSource?: 'wagmi-fund' | 'personal-portfolio' | 'performance-dashboard' | 'household';
 }
 
 export default function DashboardClient({ session, kpiData: initialKpiData, hasError, dataSource = 'wagmi-fund' }: DashboardClientProps) {
@@ -71,6 +71,8 @@ export default function DashboardClient({ session, kpiData: initialKpiData, hasE
       ? ['portfolio', 'analytics'] 
       : dataSource === 'performance-dashboard'
       ? ['performance']
+      : dataSource === 'household'
+      ? ['analytics'] // Only analytics tab for household (no portfolio asset table)
       : ['portfolio', 'analytics', 'investors', 'ai-copilot'];
     
     if (tab && allowedTabs.includes(tab)) {
@@ -81,12 +83,17 @@ export default function DashboardClient({ session, kpiData: initialKpiData, hasE
     } else if (dataSource === 'performance-dashboard' && tab && !allowedTabs.includes(tab)) {
       // Force performance tab for Performance Dashboard if invalid tab is requested
       setActiveTab('performance');
+    } else if (dataSource === 'household' && tab && !allowedTabs.includes(tab)) {
+      // Force analytics tab for Household if invalid tab is requested
+      setActiveTab('analytics');
     } else if (!tab) {
       // Set default tab when no tab parameter is present
       if (dataSource === 'personal-portfolio') {
         setActiveTab('portfolio');
       } else if (dataSource === 'performance-dashboard') {
         setActiveTab('performance');
+      } else if (dataSource === 'household') {
+        setActiveTab('analytics');
       } else {
         setActiveTab('portfolio'); // Default for WAGMI Fund
       }
@@ -145,6 +152,8 @@ export default function DashboardClient({ session, kpiData: initialKpiData, hasE
       ? ['portfolio', 'analytics'] 
       : dataSource === 'performance-dashboard'
       ? ['performance']
+      : dataSource === 'household'
+      ? ['analytics'] // Only analytics tab for household (no portfolio asset table)
       : ['portfolio', 'analytics', 'investors', 'ai-copilot'];
     
     if (!allowedTabs.includes(tabId)) {
@@ -185,7 +194,7 @@ export default function DashboardClient({ session, kpiData: initialKpiData, hasE
       }
 
       // Then, determine API endpoint based on data source
-      const apiEndpoint = dataSource === 'personal-portfolio' 
+      const apiEndpoint = (dataSource === 'personal-portfolio' || dataSource === 'household')
         ? '/api/get-personal-portfolio-kpi' 
         : '/api/kpi-data?force=true';
       
@@ -210,8 +219,8 @@ export default function DashboardClient({ session, kpiData: initialKpiData, hasE
         // Transform the data based on data source
         let transformedKpiData;
         
-        if (dataSource === 'personal-portfolio') {
-          // Personal Portfolio: Show AUM, MoM, Cumulative, and lastUpdated
+        if (dataSource === 'personal-portfolio' || dataSource === 'household') {
+          // Personal Portfolio and Household: Show AUM, MoM, Cumulative, and lastUpdated
           transformedKpiData = {
             activeInvestors: undefined, // Will be hidden by UniversalNavbar
             totalAUM: `$${freshKpiData.totalAUM.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`,
@@ -283,8 +292,8 @@ export default function DashboardClient({ session, kpiData: initialKpiData, hasE
         return <PortfolioOverview onRefresh={triggerDataRefresh} isPrivacyMode={isPrivacyMode} dataSource={dataSource} refreshKey={refreshCounter} />;
       case 'analytics':
         console.log('Rendering Analytics');
-        // Use PersonalPortfolioAnalytics for personal portfolio, Analytics for WAGMI fund
-        if (dataSource === 'personal-portfolio') {
+        // Use PersonalPortfolioAnalytics for personal portfolio and household, Analytics for WAGMI fund
+        if (dataSource === 'personal-portfolio' || dataSource === 'household') {
           return <PersonalPortfolioAnalytics onRefresh={triggerDataRefresh} refreshKey={refreshCounter} />;
         } else {
           return <Analytics onRefresh={triggerDataRefresh} dataSource={dataSource} refreshKey={refreshCounter} />;

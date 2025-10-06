@@ -20,7 +20,7 @@ interface UniversalNavbarProps {
   } | null;
   hasError?: boolean;
   onKpiRefresh?: () => Promise<void>;
-  dataSource?: 'wagmi-fund' | 'personal-portfolio' | 'performance-dashboard';
+  dataSource?: 'wagmi-fund' | 'personal-portfolio' | 'performance-dashboard' | 'household';
 }
 
 export default function UniversalNavbar({ 
@@ -47,7 +47,7 @@ export default function UniversalNavbar({
     const fetchInitialTimestamp = async () => {
       try {
         console.log(`Fetching initial timestamp for ${dataSource}...`);
-        const timestampEndpoint = dataSource === 'personal-portfolio' 
+        const timestampEndpoint = (dataSource === 'personal-portfolio' || dataSource === 'household')
           ? '/api/get-personal-portfolio-timestamp' 
           : '/api/get-last-updated-timestamp';
           
@@ -84,7 +84,7 @@ export default function UniversalNavbar({
   // Function to fetch updated timestamp (can be called after updates)
   const fetchLastUpdatedTimestamp = async () => {
     try {
-      const timestampEndpoint = dataSource === 'personal-portfolio' 
+      const timestampEndpoint = (dataSource === 'personal-portfolio' || dataSource === 'household')
         ? '/api/get-personal-portfolio-timestamp' 
         : '/api/get-last-updated-timestamp';
         
@@ -105,7 +105,7 @@ export default function UniversalNavbar({
     try {
       // Step 1: Update KPI timestamp based on dataSource
       console.log(`Updating KPI timestamp for ${dataSource}...`);
-      const timestampEndpoint = dataSource === 'personal-portfolio' 
+      const timestampEndpoint = (dataSource === 'personal-portfolio' || dataSource === 'household')
         ? '/api/update-personal-portfolio-timestamp' 
         : '/api/update-kpi-timestamp';
         
@@ -321,31 +321,35 @@ export default function UniversalNavbar({
             
             {/* Controls */}
             <div className="flex items-center space-x-2">
-              {/* Module Selector Button - Mobile */}
-              <WagmiButton
-                onClick={() => router.push('/module-selection')}
-                variant="outline"
-                theme="green"
-                size="icon"
-                icon={
-                  <svg fill="currentColor" viewBox="0 0 24 24" className="w-3 h-3">
-                    <path d="M3 13h2v-2H3v2zm0 4h2v-2H3v2zm0-8h2V7H3v2zm4 4h14v-2H7v2zm0 4h14v-2H7v2zM7 7v2h14V7H7z"/>
-                  </svg>
-                }
-                title="Module Selector"
-              />
+              {/* Module Selector Button - Mobile (hidden for household) */}
+              {dataSource !== 'household' && (
+                <WagmiButton
+                  onClick={() => router.push('/module-selection')}
+                  variant="outline"
+                  theme="green"
+                  size="icon"
+                  icon={
+                    <svg fill="currentColor" viewBox="0 0 24 24" className="w-3 h-3">
+                      <path d="M3 13h2v-2H3v2zm0 4h2v-2H3v2zm0-8h2V7H3v2zm4 4h14v-2H7v2zm0 4h14v-2H7v2zM7 7v2h14V7H7z"/>
+                    </svg>
+                  }
+                  title="Module Selector"
+                />
+              )}
               
-              {/* Refresh Icon */}
-              <WagmiButton
-                onClick={handleRetryKPI}
-                disabled={isRetrying}
-                variant="outline"
-                theme="green"
-                size="icon"
-                icon={<RefreshIcon className="w-3 h-3" />}
-                loading={isRetrying}
-                title="Refresh prices & data"
-              />
+              {/* Refresh Icon (hidden for household) */}
+              {dataSource !== 'household' && (
+                <WagmiButton
+                  onClick={handleRetryKPI}
+                  disabled={isRetrying}
+                  variant="outline"
+                  theme="green"
+                  size="icon"
+                  icon={<RefreshIcon className="w-3 h-3" />}
+                  loading={isRetrying}
+                  title="Refresh prices & data"
+                />
+              )}
 
               {/* Privacy Toggle */}
               <WagmiButton
@@ -407,7 +411,7 @@ export default function UniversalNavbar({
               </div>
             ) : formattedKpiData ? (
               <div className="flex items-center space-x-4 text-center">
-                {dataSource !== 'personal-portfolio' && (
+                {dataSource !== 'personal-portfolio' && dataSource !== 'household' && (
                   <div className="text-center">
                     <div style={{ color: '#A0A0A0', fontSize: '10px' }}>Investors</div>
                     <div style={{ color: '#FFFFFF', fontSize: '14px', fontWeight: '600' }}>
@@ -459,9 +463,9 @@ export default function UniversalNavbar({
           <div className="flex justify-center items-center py-3" style={{ borderTop: '1px solid #333' }}>
             <nav aria-label="Mobile navigation" className="flex space-x-4 sm:space-x-6 overflow-x-auto w-full justify-center">
               {[
-                { id: 'portfolio', label: 'Portfolio' },
-                { id: 'analytics', label: 'Performance' },
-                ...(dataSource === 'personal-portfolio' ? [] : [
+                ...(dataSource === 'household' ? [] : [{ id: 'portfolio', label: 'Portfolio' }]),
+                { id: 'analytics', label: dataSource === 'household' ? 'Wifey Dashboard' : 'Performance' },
+                ...(dataSource === 'personal-portfolio' || dataSource === 'household' ? [] : [
                   { id: 'investors', label: 'Investors' },
                   { id: 'ai-copilot', label: 'AI Copilot' }
                 ])
@@ -524,31 +528,35 @@ export default function UniversalNavbar({
               Last updated: {lastUpdatedTimestamp ? formatTimestampForDisplay(lastUpdatedTimestamp) : 'Unknown'}
             </p>
             
-            {/* Module Selector Button - Desktop */}
-            <WagmiButton
-              onClick={() => router.push('/module-selection')}
-              variant="outline"
-              theme="green"
-              size="icon"
-              icon={
-                <svg fill="currentColor" viewBox="0 0 24 24" className="w-3 h-3">
-                  <path d="M3 13h2v-2H3v2zm0 4h2v-2H3v2zm0-8h2V7H3v2zm4 4h14v-2H7v2zm0 4h14v-2H7v2zM7 7v2h14V7H7z"/>
-                </svg>
-              }
-              title="Module Selector"
-            />
+            {/* Module Selector Button - Desktop (hidden for household) */}
+            {dataSource !== 'household' && (
+              <WagmiButton
+                onClick={() => router.push('/module-selection')}
+                variant="outline"
+                theme="green"
+                size="icon"
+                icon={
+                  <svg fill="currentColor" viewBox="0 0 24 24" className="w-3 h-3">
+                    <path d="M3 13h2v-2H3v2zm0 4h2v-2H3v2zm0-8h2V7H3v2zm4 4h14v-2H7v2zm0 4h14v-2H7v2zM7 7v2h14V7H7z"/>
+                  </svg>
+                }
+                title="Module Selector"
+              />
+            )}
             
-            {/* Refresh Icon */}
-            <WagmiButton
-              onClick={handleRetryKPI}
-              disabled={isRetrying}
-              variant="outline"
-              theme="green"
-              size="icon"
-              icon={<RefreshIcon className="w-3 h-3" />}
-              loading={isRetrying}
-              title="Refresh prices & data"
-            />
+            {/* Refresh Icon (hidden for household) */}
+            {dataSource !== 'household' && (
+              <WagmiButton
+                onClick={handleRetryKPI}
+                disabled={isRetrying}
+                variant="outline"
+                theme="green"
+                size="icon"
+                icon={<RefreshIcon className="w-3 h-3" />}
+                loading={isRetrying}
+                title="Refresh prices & data"
+              />
+            )}
 
             {/* Privacy Toggle - Eye Icon with Rounded Square */}
             <WagmiButton
@@ -600,6 +608,8 @@ export default function UniversalNavbar({
             {[
               ...(dataSource === 'performance-dashboard' ? [
                 { id: 'performance', label: 'Performance Dashboard' }
+              ] : dataSource === 'household' ? [
+                { id: 'analytics', label: 'Wifey Dashboard' }
               ] : dataSource === 'personal-portfolio' ? [
                 { id: 'portfolio', label: 'Portfolio Overview' },
                 { id: 'analytics', label: 'Performance' }
@@ -669,7 +679,7 @@ export default function UniversalNavbar({
               /* KPI Data - Four evenly spaced metrics */
               <>
                 {/* Active Investors - Only for WAGMI Fund */}
-                {dataSource !== 'personal-portfolio' && (
+                {dataSource !== 'personal-portfolio' && dataSource !== 'household' && (
                   <WagmiCard variant="ribbon" theme="green" size="sm">
                     <p className="text-xs font-normal text-gray-400 mb-1 uppercase tracking-wide">
                       Active Investors

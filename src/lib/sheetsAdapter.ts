@@ -1984,9 +1984,11 @@ export class SheetsAdapter {
           }
 
           // Excel serial number to JavaScript date
-          // Excel epoch is 1900-01-01, but Excel incorrectly treats 1900 as a leap year
-          // So we need to adjust: Excel date - 25569 (days between 1900-01-01 and 1970-01-01)
-          const jsDate = new Date((excelSerialNumber - 25569) * 86400 * 1000);
+          // Excel epoch is December 30, 1899 (not January 1, 1900)
+          // Excel incorrectly treats 1900 as a leap year, so we need to account for this
+          // The correct conversion: Excel date - 25569 (days between 1899-12-30 and 1970-01-01)
+          // But we need to subtract 1 more day due to Excel's leap year bug
+          const jsDate = new Date((excelSerialNumber - 25569 - 1) * 86400 * 1000);
           const year = jsDate.getFullYear();
           const month = jsDate.getMonth(); // 0-based
           const monthName = monthNames[month];
@@ -2113,9 +2115,11 @@ export class SheetsAdapter {
           }
 
           // Excel serial number to JavaScript date
-          // Excel epoch is 1900-01-01, but Excel incorrectly treats 1900 as a leap year
-          // So we need to adjust: Excel date - 25569 (days between 1900-01-01 and 1970-01-01)
-          const jsDate = new Date((excelSerialNumber - 25569) * 86400 * 1000);
+          // Excel epoch is December 30, 1899 (not January 1, 1900)
+          // Excel incorrectly treats 1900 as a leap year, so we need to account for this
+          // The correct conversion: Excel date - 25569 (days between 1899-12-30 and 1970-01-01)
+          // But we need to subtract 1 more day due to Excel's leap year bug
+          const jsDate = new Date((excelSerialNumber - 25569 - 1) * 86400 * 1000);
           const year = jsDate.getFullYear();
           const month = jsDate.getMonth(); // 0-based
           const monthName = monthNames[month];

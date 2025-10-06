@@ -14,7 +14,7 @@ interface AddAssetFormProps {
   onClose: () => void;
   onAssetAdded: () => void;
   selectedAsset?: AssetSearchResult | null;
-  dataSource?: 'wagmi-fund' | 'personal-portfolio';
+  dataSource?: 'wagmi-fund' | 'personal-portfolio' | 'household';
 }
 
 export default function AddAssetForm({ isOpen, onClose, onAssetAdded, selectedAsset: propSelectedAsset, dataSource = 'wagmi-fund' }: AddAssetFormProps) {

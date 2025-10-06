@@ -21,7 +21,7 @@ interface EditAssetFormProps {
     originalAsset: PortfolioAsset;
   }) => Promise<void>;
   onClose: () => void;
-  dataSource?: 'wagmi-fund' | 'personal-portfolio';
+  dataSource?: 'wagmi-fund' | 'personal-portfolio' | 'household';
 }
 
 export default function EditAssetForm({ isOpen, asset, onSave, onClose, dataSource = 'wagmi-fund' }: EditAssetFormProps) {

@@ -33,7 +33,7 @@ interface AnalyticsData {
 
 interface AnalyticsProps {
   onRefresh?: () => void;
-  dataSource?: 'wagmi-fund' | 'personal-portfolio' | 'performance-dashboard';
+  dataSource?: 'wagmi-fund' | 'personal-portfolio' | 'performance-dashboard' | 'household';
   refreshKey?: number;
 }
 
@@ -62,7 +62,7 @@ export default function Analytics({ onRefresh, dataSource = 'wagmi-fund', refres
       setError(null);
       
       // Fetch both portfolio data and performance data in parallel
-      const apiEndpoint = dataSource === 'personal-portfolio' 
+      const apiEndpoint = (dataSource === 'personal-portfolio' || dataSource === 'household')
         ? '/api/get-personal-portfolio-data' 
         : '/api/get-portfolio-data';
       

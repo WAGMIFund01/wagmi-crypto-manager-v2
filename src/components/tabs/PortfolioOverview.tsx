@@ -15,7 +15,7 @@ interface PortfolioOverviewProps {
   className?: string;
   onRefresh?: () => void;
   isPrivacyMode?: boolean;
-  dataSource?: 'wagmi-fund' | 'personal-portfolio' | 'performance-dashboard';
+  dataSource?: 'wagmi-fund' | 'personal-portfolio' | 'performance-dashboard' | 'household';
   refreshKey?: number;
 }
 
@@ -50,7 +50,7 @@ export default function PortfolioOverview({ className, onRefresh, isPrivacyMode 
       setError(null);
       
       // Use the correct API endpoint based on dataSource
-      const apiEndpoint = dataSource === 'personal-portfolio' 
+      const apiEndpoint = (dataSource === 'personal-portfolio' || dataSource === 'household')
         ? '/api/get-personal-portfolio-data' 
         : '/api/get-portfolio-data';
       

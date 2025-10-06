@@ -23,7 +23,7 @@ interface Investor {
 interface InvestorsProps {
   isPrivacyMode?: boolean;
   onRefresh?: () => void; // Changed from number to () => void
-  dataSource?: 'wagmi-fund' | 'personal-portfolio' | 'performance-dashboard';
+  dataSource?: 'wagmi-fund' | 'personal-portfolio' | 'performance-dashboard' | 'household';
   refreshKey?: number;
 }
 
