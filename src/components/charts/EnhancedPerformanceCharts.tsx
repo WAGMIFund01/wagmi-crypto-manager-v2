@@ -175,6 +175,7 @@ export default function EnhancedPerformanceCharts({
     return null;
   };
 
+
   // Get the appropriate data keys based on chart mode and data source
   const getDataKeys = () => {
     const isPersonalPortfolio = dataSource === 'personal-portfolio';
@@ -472,6 +473,7 @@ export default function EnhancedPerformanceCharts({
               </BarChart>
             </ResponsiveContainer>
           </div>
+          
         </div>
       </WagmiCard>
     </div>

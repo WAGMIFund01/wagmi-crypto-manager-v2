@@ -1,159 +1,287 @@
-// Mobile responsiveness testing utilities
-import { render, RenderOptions } from '@testing-library/react';
-import { ReactElement } from 'react';
+/**
+ * Mobile Testing Utilities
+ * 
+ * Comprehensive testing utilities for mobile responsiveness,
+ * touch interactions, and mobile-specific functionality.
+ */
 
-// Mobile viewport configurations
-export const MOBILE_VIEWPORTS = {
-  iphoneSE: { width: 375, height: 667 },
-  iphone12: { width: 390, height: 844 },
-  iphone12Pro: { width: 390, height: 844 },
-  iphone14Pro: { width: 393, height: 852 },
-  samsungGalaxy: { width: 360, height: 760 },
-  pixel5: { width: 393, height: 851 },
-  ipad: { width: 768, height: 1024 },
-  ipadPro: { width: 1024, height: 1366 },
+import { render, screen, fireEvent, waitFor } from '@testing-library/react';
+import { vi, expect } from 'vitest';
+
+// Mock viewport dimensions for different device types
+export const DEVICE_VIEWPORTS = {
+  mobile: { width: 375, height: 667 }, // iPhone SE
+  mobileLarge: { width: 414, height: 896 }, // iPhone 11 Pro Max
+  tablet: { width: 768, height: 1024 }, // iPad
+  tabletLarge: { width: 1024, height: 1366 }, // iPad Pro
+  desktop: { width: 1280, height: 720 }, // Desktop
+  desktopLarge: { width: 1920, height: 1080 }, // Large Desktop
 } as const;
 
-// Tablet viewport configurations
-export const TABLET_VIEWPORTS = {
-  ipad: { width: 768, height: 1024 },
-  ipadPro: { width: 1024, height: 1366 },
-  surfacePro: { width: 912, height: 1368 },
-} as const;
+// Mock touch events
+export const createTouchEvent = (clientX: number, clientY: number = 0) => ({
+  targetTouches: [{ clientX, clientY }],
+  preventDefault: vi.fn(),
+  stopPropagation: vi.fn(),
+});
 
-// Desktop viewport configurations
-export const DESKTOP_VIEWPORTS = {
-  laptop: { width: 1366, height: 768 },
-  desktop: { width: 1920, height: 1080 },
-  ultrawide: { width: 2560, height: 1440 },
-} as const;
 
-// Set viewport for testing
-export const setViewport = (width: number, height: number) => {
+// Test mobile breakpoints
+export const testMobileBreakpoints = async (component: React.ReactElement) => {
+  const results: Record<string, boolean> = {};
+  
+  for (const [device, viewport] of Object.entries(DEVICE_VIEWPORTS)) {
+    // Mock window.innerWidth and innerHeight
   Object.defineProperty(window, 'innerWidth', {
     writable: true,
     configurable: true,
-    value: width,
+      value: viewport.width,
   });
   Object.defineProperty(window, 'innerHeight', {
     writable: true,
     configurable: true,
-    value: height,
+      value: viewport.height,
   });
   
   // Trigger resize event
   window.dispatchEvent(new Event('resize'));
-};
-
-// Test mobile responsiveness
-export const testMobileResponsiveness = (
-  component: ReactElement,
-  viewport: { width: number; height: number },
-  options?: RenderOptions
-) => {
-  setViewport(viewport.width, viewport.height);
-  return render(component, options);
-};
-
-// Test breakpoint behavior
-export const testBreakpoints = (
-  component: ReactElement,
-  breakpoints: Array<{ name: string; width: number; height: number }>,
-  options?: RenderOptions
-) => {
-  const results: Array<{ breakpoint: string; result: any }> = [];
-  
-  breakpoints.forEach(({ name, width, height }) => {
-    setViewport(width, height);
-    const result = render(component, options);
-    results.push({ breakpoint: name, result });
-  });
+    
+    // Render component
+    const { unmount } = render(component);
+    
+    // Test if component renders without errors
+    try {
+      await waitFor(() => {
+        expect(screen.getByRole('main') || screen.getByTestId('component')).toBeInTheDocument();
+      });
+      results[device] = true;
+    } catch (error) {
+      results[device] = false;
+    }
+    
+    unmount();
+  }
   
   return results;
 };
 
-// Mobile-specific test helpers
-export const mobileTestHelpers = {
-  // Check if element is visible on mobile
-  isVisibleOnMobile: (element: HTMLElement) => {
-    const style = window.getComputedStyle(element);
-    return style.display !== 'none' && style.visibility !== 'hidden';
-  },
+// Test touch interactions
+export const testTouchInteractions = async (
+  component: React.ReactElement,
+  touchTargetSelector: string,
+  expectedBehavior: (element: HTMLElement) => void
+) => {
+  render(component);
   
-  // Check if element is hidden on mobile
-  isHiddenOnMobile: (element: HTMLElement) => {
-    const style = window.getComputedStyle(element);
-    return style.display === 'none' || style.visibility === 'hidden';
-  },
+  const touchTarget = screen.getByTestId(touchTargetSelector) || document.querySelector(touchTargetSelector);
+  expect(touchTarget).toBeInTheDocument();
   
-  // Check if element has mobile-specific classes
-  hasMobileClasses: (element: HTMLElement) => {
-    return element.classList.contains('sm:') || 
-           element.classList.contains('md:') || 
-           element.classList.contains('lg:') || 
-           element.classList.contains('xl:');
-  },
+  // Test touch start
+  const touchStartEvent = createTouchEvent(100, 100);
+  fireEvent.touchStart(touchTarget as Element, touchStartEvent);
   
-  // Check if element is responsive
-  isResponsive: (element: HTMLElement) => {
-    const style = window.getComputedStyle(element);
-    return style.width === '100%' || style.maxWidth !== 'none';
-  }
+  // Test touch move
+  const touchMoveEvent = createTouchEvent(150, 100);
+  fireEvent.touchMove(touchTarget as Element, touchMoveEvent);
+  
+  // Test touch end
+  const touchEndEvent = createTouchEvent(150, 100);
+  fireEvent.touchEnd(touchTarget as Element, touchEndEvent);
+  
+  // Verify expected behavior
+  await waitFor(() => {
+    expectedBehavior(touchTarget as HTMLElement);
+  });
 };
 
-// Common mobile test scenarios
-export const mobileTestScenarios = {
-  // Test navigation on mobile
-  testNavigation: (container: HTMLElement) => {
-    const nav = container.querySelector('nav');
-    const navItems = container.querySelectorAll('nav button, nav a');
-    
-    return {
-      hasNavigation: !!nav,
-      navItemCount: navItems.length,
-      isHorizontal: nav?.style.flexDirection === 'row' || nav?.classList.contains('flex'),
-      hasOverflow: container.scrollWidth > container.clientWidth
-    };
-  },
+
+// Test mobile navigation
+export const testMobileNavigation = async (component: React.ReactElement) => {
+  render(component);
   
-  // Test card layout on mobile
-  testCardLayout: (container: HTMLElement) => {
-    // WagmiCard renders as divs with specific classes, so we look for direct children or data-testid
-    const cards = container.querySelectorAll('[data-testid^="card-"], [class*="card"], .card, [class*="rounded"]');
-    
-    return {
-      cardCount: cards.length,
-      isStacked: Array.from(cards).every(card => {
-        const style = window.getComputedStyle(card);
-        return style.display === 'block' || style.display === 'flex';
-      }),
-      hasProperSpacing: Array.from(cards).every(card => {
-        const style = window.getComputedStyle(card);
-        return parseFloat(style.marginBottom) > 0 || parseFloat(style.marginTop) > 0 || 
-               parseFloat(style.paddingBottom) > 0 || parseFloat(style.paddingTop) > 0;
-      })
-    };
-  },
+  // Test mobile viewport
+  Object.defineProperty(window, 'innerWidth', {
+    writable: true,
+    configurable: true,
+    value: DEVICE_VIEWPORTS.mobile.width,
+  });
+  window.dispatchEvent(new Event('resize'));
   
-  // Test chart responsiveness
-  testChartResponsiveness: (container: HTMLElement) => {
-    // Look for chart containers and SVG elements (Recharts uses ResponsiveContainer)
-    const charts = container.querySelectorAll('[class*="chart"], [class*="recharts"], .chart, svg, [class*="responsive-container"]');
+  // Check if mobile navigation elements are present
+  const mobileNav = screen.queryByRole('navigation');
+  const mobileMenu = screen.queryByTestId('mobile-menu');
+  const hamburgerButton = screen.queryByTestId('hamburger-button');
+  
+  return {
+    hasMobileNav: !!mobileNav,
+    hasMobileMenu: !!mobileMenu,
+    hasHamburgerButton: !!hamburgerButton,
+  };
+};
+
+// Test responsive table behavior
+export const testResponsiveTable = async (component: React.ReactElement) => {
+  const results: Record<string, boolean> = {};
+  
+  for (const [device, viewport] of Object.entries(DEVICE_VIEWPORTS)) {
+    // Set viewport
+    Object.defineProperty(window, 'innerWidth', {
+      writable: true,
+      configurable: true,
+      value: viewport.width,
+    });
+    window.dispatchEvent(new Event('resize'));
     
-    return {
-      chartCount: charts.length,
-      isResponsive: charts.length === 0 || Array.from(charts).some(chart => {
-        const style = window.getComputedStyle(chart);
-        // In test environment, charts might not have computed dimensions, so we check for responsive classes
-        return style.width === '100%' || style.maxWidth !== 'none' || 
-               chart.classList.toString().includes('responsive') ||
-               chart.classList.toString().includes('w-full');
-      }),
-      hasProperHeight: charts.length === 0 || Array.from(charts).some(chart => {
-        const style = window.getComputedStyle(chart);
-        // Be more lenient in test environment
-        return parseFloat(style.height) >= 0;
-      })
-    };
+    render(component);
+    
+    // Check for table elements
+    const table = screen.queryByRole('table');
+    const mobileCards = screen.queryAllByTestId(/mobile-card/);
+    const desktopTable = screen.queryByTestId('desktop-table');
+    
+    const isMobile = viewport.width < 768;
+    
+    if (isMobile) {
+      // On mobile, should show cards instead of table
+      results[device] = mobileCards.length > 0 && !desktopTable;
+    } else {
+      // On desktop, should show table
+      results[device] = !!table || !!desktopTable;
+    }
   }
+  
+  return results;
+};
+
+// Test chart mobile optimization
+export const testChartMobileOptimization = async (component: React.ReactElement) => {
+  render(component);
+  
+  // Test mobile viewport
+  Object.defineProperty(window, 'innerWidth', {
+    writable: true,
+    configurable: true,
+    value: DEVICE_VIEWPORTS.mobile.width,
+  });
+  window.dispatchEvent(new Event('resize'));
+  
+  // Check for mobile-optimized chart elements
+  const chart = screen.queryByTestId('chart-container');
+  const mobileControls = screen.queryByTestId('mobile-chart-controls');
+  const swipeHint = screen.queryByText(/swipe/i);
+  
+  return {
+    hasChart: !!chart,
+    hasMobileControls: !!mobileControls,
+    hasSwipeHint: !!swipeHint,
+  };
+};
+
+// Test performance on mobile
+export const testMobilePerformance = async (component: React.ReactElement) => {
+  const startTime = performance.now();
+  
+  render(component);
+  
+  // Wait for component to fully render
+  await waitFor(() => {
+    expect(screen.getByRole('main') || screen.getByTestId('component')).toBeInTheDocument();
+  });
+  
+  const endTime = performance.now();
+  const renderTime = endTime - startTime;
+  
+  // Mobile should render within 100ms for good UX
+    return {
+    renderTime,
+    isPerformant: renderTime < 100,
+  };
+};
+
+// Test accessibility on mobile
+export const testMobileAccessibility = async (component: React.ReactElement) => {
+  render(component);
+  
+  // Test touch targets are at least 44px (Apple's recommendation)
+  const touchTargets = screen.getAllByRole('button');
+  const smallTargets = touchTargets.filter(target => {
+    const rect = target.getBoundingClientRect();
+    return rect.width < 44 || rect.height < 44;
+  });
+  
+  // Test for proper ARIA labels
+  const elementsWithoutLabels = screen.getAllByRole('button').filter(
+    element => !element.getAttribute('aria-label') && !element.textContent
+  );
+    
+    return {
+    hasProperTouchTargets: smallTargets.length === 0,
+    hasProperLabels: elementsWithoutLabels.length === 0,
+    touchTargetCount: touchTargets.length,
+    smallTargetCount: smallTargets.length,
+  };
+};
+
+// Comprehensive mobile test suite
+export const runMobileTestSuite = async (component: React.ReactElement) => {
+  const results = {
+    breakpoints: await testMobileBreakpoints(component),
+    navigation: await testMobileNavigation(component),
+    table: await testResponsiveTable(component),
+    chart: await testChartMobileOptimization(component),
+    performance: await testMobilePerformance(component),
+    accessibility: await testMobileAccessibility(component),
+  };
+  
+  return results;
+};
+
+// Mock mobile-specific APIs
+export const mockMobileAPIs = () => {
+  // Mock Touch API
+  global.Touch = class Touch {
+    constructor(init: TouchInit) {
+      Object.assign(this, init);
+    }
+  } as any;
+  
+  // Mock DeviceOrientationEvent
+  global.DeviceOrientationEvent = class DeviceOrientationEvent extends Event {
+    alpha: number | null = null;
+    beta: number | null = null;
+    gamma: number | null = null;
+    
+    constructor(type: string, eventInitDict?: DeviceOrientationEventInit) {
+      super(type, eventInitDict);
+    }
+  } as any;
+  
+  // Mock matchMedia for responsive queries
+  Object.defineProperty(window, 'matchMedia', {
+    writable: true,
+    value: vi.fn().mockImplementation(query => ({
+      matches: false,
+      media: query,
+      onchange: null,
+      addListener: vi.fn(),
+      removeListener: vi.fn(),
+      addEventListener: vi.fn(),
+      removeEventListener: vi.fn(),
+      dispatchEvent: vi.fn(),
+    })),
+  });
+};
+
+export default {
+  DEVICE_VIEWPORTS,
+  createTouchEvent,
+  testMobileBreakpoints,
+  testTouchInteractions,
+  testMobileNavigation,
+  testResponsiveTable,
+  testChartMobileOptimization,
+  testMobilePerformance,
+  testMobileAccessibility,
+  runMobileTestSuite,
+  mockMobileAPIs,
 };

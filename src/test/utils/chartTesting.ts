@@ -1,7 +1,7 @@
 // Chart-specific testing utilities
 import { render, RenderOptions, screen, fireEvent, waitFor } from '@testing-library/react';
 import { ReactElement } from 'react';
-import { MOBILE_VIEWPORTS, setViewport } from './mobileTesting';
+import { DEVICE_VIEWPORTS } from './mobileTesting';
 
 // Chart performance testing utilities
 export const chartPerformanceUtils = {
@@ -397,8 +397,20 @@ export const chartTestSuite = {
   },
 
   // Test mobile responsiveness
-  testMobileResponsiveness: async (component: ReactElement, viewport = MOBILE_VIEWPORTS.iphone12) => {
-    setViewport(viewport.width, viewport.height);
+  testMobileResponsiveness: async (component: ReactElement, viewport = DEVICE_VIEWPORTS.mobile) => {
+    // Set viewport dimensions
+    Object.defineProperty(window, 'innerWidth', {
+      writable: true,
+      configurable: true,
+      value: viewport.width,
+    });
+    Object.defineProperty(window, 'innerHeight', {
+      writable: true,
+      configurable: true,
+      value: viewport.height,
+    });
+    window.dispatchEvent(new Event('resize'));
+    
     const { container } = render(component);
     
     const charts = container.querySelectorAll('svg, [class*="recharts"]');
