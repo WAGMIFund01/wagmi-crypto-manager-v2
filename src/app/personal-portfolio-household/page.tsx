@@ -27,12 +27,12 @@ export default function PersonalPortfolioHouseholdPage() {
       setError(null);
       
       console.log('🔍 Fetching Personal Portfolio KPI data for household...');
-      const response = await fetch('/api/get-personal-portfolio-kpi-data');
+      const response = await fetch('/api/get-personal-portfolio-kpi');
       const data = await response.json();
       
       if (data.success) {
-        console.log('✅ Personal Portfolio KPI data fetched successfully:', data.data);
-        setKpiData(data.data);
+        console.log('✅ Personal Portfolio KPI data fetched successfully:', data);
+        setKpiData(data);
       } else {
         setError('Failed to fetch KPI data');
       }
