@@ -31,7 +31,8 @@ describe('SheetsAdapter Cumulative Return Data Accuracy', () => {
       }
     };
     
-    vi.mocked(require('googleapis').google.sheets).mockReturnValue(mockSheets);
+    const googleapis = await import('googleapis');
+    vi.mocked(googleapis.google.sheets).mockReturnValue(mockSheets);
   });
 
   describe('Personal Portfolio Cumulative Return', () => {
