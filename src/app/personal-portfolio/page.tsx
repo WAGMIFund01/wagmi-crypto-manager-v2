@@ -18,8 +18,8 @@ export default async function PersonalPortfolioPage() {
   const transformedKpiData = kpiData ? {
     activeInvestors: undefined, // Will be hidden by UniversalNavbar
     totalAUM: `$${kpiData.totalAUM.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`,
-    cumulativeReturn: undefined, // Will be hidden by UniversalNavbar
-    monthOnMonth: undefined, // Will be hidden by UniversalNavbar
+    cumulativeReturn: `${kpiData.cumulativeReturn >= 0 ? '+' : ''}${kpiData.cumulativeReturn.toFixed(1)}%`,
+    monthOnMonth: `${kpiData.monthlyReturn >= 0 ? '+' : ''}${kpiData.monthlyReturn.toFixed(1)}%`,
     lastUpdated: kpiData.lastUpdated
   } : null;
 

@@ -1340,6 +1340,8 @@ export class SheetsAdapter {
    */
   async getPersonalPortfolioKpiFromKpisTab(): Promise<{
     totalAUM: number;
+    monthlyReturn: number;
+    cumulativeReturn: number;
     lastUpdated: string;
   }> {
     return trackOperation('getPersonalPortfolioKpiFromKpisTab', async () => {
@@ -1351,10 +1353,10 @@ export class SheetsAdapter {
         throw new Error('Google Sheets API client not initialized');
       }
 
-      // Get specific cells: B8 (Total AUM - personal) and B9 (Last Updated - personal)
+      // Get specific cells: B8 (Total AUM - personal), B9 (Last Updated - personal), B10 (Monthly return - personal), B11 (Cummulative return - personal)
       const response = await this.sheets.spreadsheets.values.get({
         spreadsheetId: this.sheetId,
-        range: 'KPIs!B8:B9',
+        range: 'KPIs!B8:B11',
       });
 
       const rows = response.data.values || [];
@@ -1362,15 +1364,21 @@ export class SheetsAdapter {
       // Extract values from the response
       const totalAUMValue = rows[0] && rows[0][0] ? rows[0][0] : '0';
       const lastUpdatedValue = rows[1] && rows[1][0] ? rows[1][0] : new Date().toISOString();
+      const monthlyReturnValue = rows[2] && rows[2][0] ? rows[2][0] : '0';
+      const cumulativeReturnValue = rows[3] && rows[3][0] ? rows[3][0] : '0';
       
       const totalAUM = parseFloat(totalAUMValue.toString()) || 0;
+      const monthlyReturn = parseFloat(monthlyReturnValue.toString()) || 0;
+      const cumulativeReturn = parseFloat(cumulativeReturnValue.toString()) || 0;
       const lastUpdated = lastUpdatedValue.toString();
       
       return {
         totalAUM,
+        monthlyReturn,
+        cumulativeReturn,
         lastUpdated
       };
-    }, { sheetId: this.sheetId, range: 'KPIs!B8:B9' });
+    }, { sheetId: this.sheetId, range: 'KPIs!B8:B11' });
   }
 
   // ============================================================================
