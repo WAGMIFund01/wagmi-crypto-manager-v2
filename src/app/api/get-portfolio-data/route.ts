@@ -1,62 +1,34 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { sheetsAdapter } from '@/lib/sheetsAdapter';
 import logger from '@/lib/logger';
-import errorMonitor from '@/lib/errorMonitor';
-import { withApiMiddleware } from '@/lib/apiMiddleware';
-import { unstable_cache } from 'next/cache';
 
-// Create a cached version of the portfolio data fetching
-const getCachedPortfolioData = unstable_cache(
-  async () => {
-    return await sheetsAdapter.getPortfolioData();
-  },
-  ['portfolio-data'],
-  {
-    tags: ['portfolio-data'],
-    revalidate: 60 // 60 seconds
-  }
-);
-
-async function getPortfolioDataHandler(req: NextRequest) {
+export async function GET(request: NextRequest) {
+  const requestId = crypto.randomUUID();
+  
   try {
-    logger.info('Fetching portfolio data');
+    logger.info('Fetching WAGMI Fund portfolio data', { requestId });
     
-    // Use the cached version of portfolio data fetching
-    const portfolioAssets = await getCachedPortfolioData();
+    // Get WAGMI Fund data using sheetsAdapter method (direct, no caching)
+    const assets = await sheetsAdapter.getPortfolioData();
 
-    logger.info('Portfolio data fetched successfully', {
-      assetCount: portfolioAssets?.length || 0,
+    logger.info('WAGMI Fund portfolio data fetched successfully', { 
+      requestId, 
+      assetCount: assets.length 
     });
 
     return NextResponse.json({
       success: true,
-      assets: portfolioAssets
+      assets
     });
 
-  } catch (error: unknown) {
-    const errorMessage = 'Internal server error during portfolio data fetch';
+  } catch (error) {
+    logger.error('Error fetching WAGMI Fund portfolio data', error instanceof Error ? error : new Error('Unknown error'), { 
+      requestId
+    });
     
-    logger.error(errorMessage, error as Error, {
-      endpoint: '/api/get-portfolio-data',
-      errorType: 'portfolio_data_fetch_error',
-    });
-
-    // Record error in monitoring system
-    errorMonitor.recordError(error as Error, {
-      endpoint: '/api/get-portfolio-data',
-      additionalContext: {
-        operation: 'get_portfolio_data',
-        errorType: 'sheets_adapter_error',
-      },
-    });
-
     return NextResponse.json({
       success: false,
-      error: errorMessage,
-      errorCode: 'INTERNAL_SERVER_ERROR'
+      error: 'Failed to fetch WAGMI Fund portfolio data'
     }, { status: 500 });
   }
 }
-
-// Wrap with API middleware for logging and monitoring
-export const GET = withApiMiddleware(getPortfolioDataHandler);
