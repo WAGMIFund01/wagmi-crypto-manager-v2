@@ -466,7 +466,7 @@ export default function UniversalNavbar({
             <nav aria-label="Mobile navigation" className="flex space-x-4 sm:space-x-6 overflow-x-auto w-full justify-center">
               {[
                 ...(dataSource === 'household' ? [] : [{ id: 'portfolio', label: 'Portfolio' }]),
-                { id: 'analytics', label: dataSource === 'household' ? 'Wifey Dashboard' : 'Performance' },
+                { id: 'analytics', label: dataSource === 'household' ? 'Wifey Crypto Dashboard' : 'Performance' },
                 ...(dataSource === 'personal-portfolio' || dataSource === 'household' ? [] : [
                   { id: 'investors', label: 'Investors' },
                   { id: 'ai-copilot', label: 'AI Copilot' }
@@ -611,7 +611,7 @@ export default function UniversalNavbar({
               ...(dataSource === 'performance-dashboard' ? [
                 { id: 'performance', label: 'Performance Dashboard' }
               ] : dataSource === 'household' ? [
-                { id: 'analytics', label: 'Wifey Dashboard' }
+                { id: 'analytics', label: 'Wifey Crypto Dashboard' }
               ] : dataSource === 'personal-portfolio' ? [
                 { id: 'portfolio', label: 'Portfolio Overview' },
                 { id: 'analytics', label: 'Performance' }

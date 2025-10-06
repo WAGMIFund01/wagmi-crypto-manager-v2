@@ -104,7 +104,7 @@ describe('Household Module - Integration Tests', () => {
       );
       
       // Should show household-specific navigation
-      expect(screen.getByText('Wifey Dashboard')).toBeInTheDocument();
+      expect(screen.getByText('Wifey Crypto Dashboard')).toBeInTheDocument();
       
       // Should not show portfolio tab
       expect(screen.queryByText('Portfolio Overview')).not.toBeInTheDocument();

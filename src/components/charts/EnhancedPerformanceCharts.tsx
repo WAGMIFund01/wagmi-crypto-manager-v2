@@ -194,9 +194,9 @@ export default function EnhancedPerformanceCharts({
         primary: isPersonalPortfolio ? 'personalMoM' : 'wagmiMoM',
         total: 'totalMoM',
         total3: 'total3MoM',
-        primaryName: isPersonalPortfolio ? 'Personal Portfolio MoM' : 'WAGMI Fund MoM',
-        totalName: 'Total MoM',
-        total3Name: 'Total 3-Month MoM',
+        primaryName: isPersonalPortfolio ? 'Personal Portfolio' : 'WAGMI Fund MoM',
+        totalName: 'Total Benchmark (Total Crypto)',
+        total3Name: 'Total 3 Benchmark (Total Crypto ex BTC, ETH)',
         formatValue: formatPercentage
       };
     } else if (chartMode === 'investment') {
@@ -214,9 +214,9 @@ export default function EnhancedPerformanceCharts({
         primary: isPersonalPortfolio ? 'personalCumulative' : 'wagmiCumulative',
         total: 'totalCumulative',
         total3: 'total3Cumulative',
-        primaryName: isPersonalPortfolio ? 'Personal Portfolio Cumulative' : 'WAGMI Fund Cumulative',
-        totalName: 'Total Cumulative',
-        total3Name: 'Total 3-Month Cumulative',
+        primaryName: isPersonalPortfolio ? 'Personal Portfolio' : 'WAGMI Fund Cumulative',
+        totalName: 'Total Benchmark (Total Crypto)',
+        total3Name: 'Total 3 Benchmark (Total Crypto ex BTC, ETH)',
         formatValue: formatPercentage
       };
     }

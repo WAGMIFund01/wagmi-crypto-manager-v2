@@ -51,9 +51,9 @@ describe('UniversalNavbar - Comprehensive Tests', () => {
         />
       );
       
-      expect(screen.getByText('WAGMI')).toBeInTheDocument();
+      expect(screen.getAllByText('WAGMI')).toHaveLength(2); // Mobile and desktop versions
       expect(screen.getByText('Portfolio Overview')).toBeInTheDocument();
-      expect(screen.getByText('Performance')).toBeInTheDocument();
+      expect(screen.getAllByText('Performance')).toHaveLength(2); // Mobile and desktop versions
       expect(screen.getByText('Investors')).toBeInTheDocument();
       expect(screen.getByText('AI Copilot')).toBeInTheDocument();
     });
@@ -68,9 +68,9 @@ describe('UniversalNavbar - Comprehensive Tests', () => {
         />
       );
       
-      expect(screen.getByText('WAGMI')).toBeInTheDocument();
+      expect(screen.getAllByText('WAGMI')).toHaveLength(2); // Mobile and desktop versions
       expect(screen.getByText('Portfolio Overview')).toBeInTheDocument();
-      expect(screen.getByText('Performance')).toBeInTheDocument();
+      expect(screen.getAllByText('Performance')).toHaveLength(2); // Mobile and desktop versions
       expect(screen.queryByText('Investors')).not.toBeInTheDocument();
       expect(screen.queryByText('AI Copilot')).not.toBeInTheDocument();
     });
@@ -85,8 +85,8 @@ describe('UniversalNavbar - Comprehensive Tests', () => {
         />
       );
       
-      expect(screen.getByText('WAGMI')).toBeInTheDocument();
-      expect(screen.getByText('Wifey Dashboard')).toBeInTheDocument();
+      expect(screen.getAllByText('WAGMI')).toHaveLength(2); // Mobile and desktop versions
+      expect(screen.getAllByText('Wifey Crypto Dashboard')).toHaveLength(2); // Mobile and desktop versions
       expect(screen.queryByText('Portfolio Overview')).not.toBeInTheDocument();
     });
   });
@@ -321,7 +321,7 @@ describe('UniversalNavbar - Comprehensive Tests', () => {
         />
       );
       
-      expect(screen.getByText('WAGMI')).toBeInTheDocument();
+      expect(screen.getAllByText('WAGMI')).toHaveLength(2); // Mobile and desktop versions
     });
   });
 
@@ -368,7 +368,7 @@ describe('UniversalNavbar - Comprehensive Tests', () => {
         />
       );
       
-      expect(screen.getByText(/Last updated:/)).toBeInTheDocument();
+      expect(screen.getAllByText(/Last updated:/)).toHaveLength(2); // Mobile and desktop versions
     });
 
     it('shows relative time format', () => {
@@ -382,7 +382,7 @@ describe('UniversalNavbar - Comprehensive Tests', () => {
       );
       
       // Should show relative time like "5 minutes ago"
-      expect(screen.getByText(/ago/)).toBeInTheDocument();
+      expect(screen.getAllByText(/ago/)).toHaveLength(2); // Mobile and desktop versions
     });
   });
 
@@ -411,7 +411,7 @@ describe('UniversalNavbar - Comprehensive Tests', () => {
         />
       );
       
-      expect(screen.getByText('Wifey Dashboard')).toBeInTheDocument();
+      expect(screen.getAllByText('Wifey Crypto Dashboard')).toHaveLength(2); // Mobile and desktop versions
     });
   });
 });
