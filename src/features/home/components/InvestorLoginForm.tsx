@@ -6,7 +6,7 @@ import StandardModal from '@/components/ui/StandardModal';
 import WagmiButton from '@/components/ui/WagmiButton';
 import WagmiInput from '@/components/ui/WagmiInput';
 import WagmiAlert from '@/components/ui/WagmiAlert';
-import { ToolsIcon } from '@/components/ui/icons/WagmiIcons';
+import { ToolsIcon, BriefcaseIcon } from '@/components/ui/icons/WagmiIcons';
 import { signIn } from 'next-auth/react';
 // import { Button, Card, CardContent, CardHeader, CardTitle } from '@/shared/components';
 
@@ -281,8 +281,9 @@ export function InvestorLoginForm() {
             variant="outline"
             theme="green"
             size="lg"
+            icon={<BriefcaseIcon />}
+            title="Manager Access"
           >
-            Manager Access
           </WagmiButton>
     </div>
 
