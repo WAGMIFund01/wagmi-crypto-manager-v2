@@ -2055,6 +2055,7 @@ export class SheetsAdapter {
     personalCumulative: number;
     totalCumulative: number;
     total3Cumulative: number;
+    investment: number;
   }>> {
     return trackOperation('getPersonalPortfolioHistoricalPerformance', async () => {
       try {
@@ -2085,6 +2086,7 @@ export class SheetsAdapter {
           personalCumulative: number;
           totalCumulative: number;
           total3Cumulative: number;
+          investment: number;
         }> = [];
 
         // Get current date for filtering future months
@@ -2129,7 +2131,8 @@ export class SheetsAdapter {
           }
 
           // Extract performance data from correct columns
-          // In A:Z range: G=index 6, H=7, I=8, L=11, M=12, P=15, Q=16
+          // In A:Z range: D=index 3, G=index 6, H=7, I=8, L=11, M=12, P=15, Q=16
+          const investment = parseFloat(row[3]) || 0; // Column D - Investment data
           const endingAUM = parseFloat(row[6]) || 0; // Column G - Personal Portfolio historical data
           const personalMoM = (parseFloat(row[7]) || 0) * 100; // Column H - convert to percentage
           const totalMoM = (parseFloat(row[11]) || 0) * 100; // Column L - convert to percentage
@@ -2148,7 +2151,8 @@ export class SheetsAdapter {
             total3MoM,
             personalCumulative: 0, // Will be calculated below
             totalCumulative,
-            total3Cumulative
+            total3Cumulative,
+            investment
           });
         }
 

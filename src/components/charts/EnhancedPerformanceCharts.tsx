@@ -26,6 +26,7 @@ interface PersonalPortfolioPerformanceData {
   personalCumulative: number;
   totalCumulative: number;
   total3Cumulative: number;
+  investment: number;
 }
 
 interface EnhancedPerformanceChartsProps {
@@ -36,7 +37,7 @@ interface EnhancedPerformanceChartsProps {
 }
 
 type DurationFilter = '6M' | '1Y' | 'All';
-type ChartMode = 'aum' | 'mom' | 'cumulative';
+type ChartMode = 'aum' | 'mom' | 'cumulative' | 'investment';
 
 export default function EnhancedPerformanceCharts({ 
   data, 
@@ -195,6 +196,16 @@ export default function EnhancedPerformanceCharts({
         total3Name: 'Total 3-Month MoM',
         formatValue: formatPercentage
       };
+    } else if (chartMode === 'investment') {
+      return {
+        primary: 'investment',
+        total: 'investment',
+        total3: 'investment',
+        primaryName: 'Personal Portfolio Investment',
+        totalName: 'Investment',
+        total3Name: 'Investment',
+        formatValue: formatCurrency
+      };
     } else {
       return {
         primary: isPersonalPortfolio ? 'personalCumulative' : 'wagmiCumulative',
@@ -316,6 +327,17 @@ export default function EnhancedPerformanceCharts({
               >
                 Cumulative Return
               </WagmiButton>
+              {dataSource === 'personal-portfolio' && (
+                <WagmiButton
+                  onClick={() => setChartMode('investment')}
+                  variant={chartMode === 'investment' ? 'primary' : 'outline'}
+                  theme="green"
+                  size="sm"
+                  className="flex-shrink-0 min-w-[120px] touch-manipulation"
+                >
+                  Investment
+                </WagmiButton>
+              )}
             </div>
             
             {/* Duration Filter Buttons - Mobile Optimized */}
@@ -400,14 +422,21 @@ export default function EnhancedPerformanceCharts({
                 <YAxis 
                   stroke="#9CA3AF"
                   fontSize={12}
-                  tickFormatter={chartMode === 'aum' ? (value) => `$${(value / 1000).toFixed(0)}K` : (value) => `${value.toFixed(1)}%`}
+                  tickFormatter={chartMode === 'aum' || chartMode === 'investment' ? (value) => `$${(value / 1000).toFixed(0)}K` : (value) => `${value.toFixed(1)}%`}
                 />
-                <Tooltip content={chartMode === 'aum' ? <CustomBarTooltip /> : <CustomComparisonTooltip />} />
+                <Tooltip content={chartMode === 'aum' || chartMode === 'investment' ? <CustomBarTooltip /> : <CustomComparisonTooltip />} />
                 {chartMode === 'aum' ? (
                   <Bar 
                     dataKey="endingAUM" 
                     fill="#00FF95"
                     name="Ending AUM"
+                    radius={[4, 4, 0, 0]}
+                  />
+                ) : chartMode === 'investment' ? (
+                  <Bar 
+                    dataKey="investment" 
+                    fill="#00FF95"
+                    name="Investment"
                     radius={[4, 4, 0, 0]}
                   />
                 ) : (
