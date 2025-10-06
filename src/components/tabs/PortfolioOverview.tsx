@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect, useMemo, useCallback } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { PortfolioAsset } from '@/lib/sheetsAdapter';
 import { StackedBarChart, WagmiCard, WagmiSpinner, WagmiText, WagmiButton, RiskDistributionCard, LocationDistributionCard, AssetTypeDistributionCard, DistributionCardSkeleton, ChartSkeleton, Skeleton } from '@/components/ui';
 import SortableHeader from '@/components/ui/SortableHeader';
@@ -16,9 +16,10 @@ interface PortfolioOverviewProps {
   onRefresh?: () => void;
   isPrivacyMode?: boolean;
   dataSource?: 'wagmi-fund' | 'personal-portfolio' | 'performance-dashboard';
+  refreshKey?: number;
 }
 
-export default function PortfolioOverview({ className, onRefresh, isPrivacyMode = false, dataSource = 'wagmi-fund' }: PortfolioOverviewProps) {
+export default function PortfolioOverview({ className, onRefresh, isPrivacyMode = false, dataSource = 'wagmi-fund', refreshKey }: PortfolioOverviewProps) {
 
   const [assets, setAssets] = useState<PortfolioAsset[]>([]);
   const [loading, setLoading] = useState(true);
@@ -42,7 +43,7 @@ export default function PortfolioOverview({ className, onRefresh, isPrivacyMode 
   
   const handleSort = createSortHandler(sortConfig, setSortConfig);
 
-  const fetchPortfolioData = useCallback(async () => {
+  const fetchPortfolioData = async () => {
     try {
       console.log('🔄 Fetching portfolio data...');
       setLoading(true);
@@ -75,18 +76,19 @@ export default function PortfolioOverview({ className, onRefresh, isPrivacyMode 
     } finally {
       setLoading(false);
     }
-  }, [dataSource]);
+  };
 
   useEffect(() => {
     fetchPortfolioData();
-  }, [fetchPortfolioData]);
+  }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
-  // Refresh when onRefresh callback changes (triggered by parent)
+  // Refresh when refreshKey changes (triggered by parent)
   useEffect(() => {
-    if (onRefresh) {
+    if (refreshKey !== undefined && refreshKey > 0) {
+      console.log('Refresh triggered by refreshKey:', refreshKey);
       fetchPortfolioData();
     }
-  }, [onRefresh, fetchPortfolioData]);
+  }, [refreshKey]); // eslint-disable-line react-hooks/exhaustive-deps
 
   // Asset management functions
   const handleAssetSelect = (asset: AssetSearchResult) => {

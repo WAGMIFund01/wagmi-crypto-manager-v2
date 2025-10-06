@@ -243,12 +243,17 @@ export default function DashboardClient({ session, kpiData: initialKpiData, hasE
     }
   }, [dataSource]);
 
+  // Simple refresh counter to trigger child component updates
+  const [refreshCounter, setRefreshCounter] = useState(0);
+  
   // Create refresh function that triggers all data refreshes
-  const triggerDataRefresh = useCallback(() => {
+  const triggerDataRefresh = () => {
     console.log('Data refresh triggered');
+    // Increment counter to force child components to refresh
+    setRefreshCounter(prev => prev + 1);
     // Also trigger KPI data refresh to update AUM ribbon
     handleKpiRefresh();
-  }, [handleKpiRefresh]);
+  };
 
   // Use dev session if in dev mode, otherwise use OAuth session
   const currentSession = isDevMode ? devSession : session;
@@ -275,18 +280,18 @@ export default function DashboardClient({ session, kpiData: initialKpiData, hasE
     switch (activeTab) {
       case 'portfolio':
         console.log('Rendering PortfolioOverview');
-        return <PortfolioOverview onRefresh={triggerDataRefresh} isPrivacyMode={isPrivacyMode} dataSource={dataSource} />;
+        return <PortfolioOverview onRefresh={triggerDataRefresh} isPrivacyMode={isPrivacyMode} dataSource={dataSource} refreshKey={refreshCounter} />;
       case 'analytics':
         console.log('Rendering Analytics');
         // Use PersonalPortfolioAnalytics for personal portfolio, Analytics for WAGMI fund
         if (dataSource === 'personal-portfolio') {
-          return <PersonalPortfolioAnalytics onRefresh={triggerDataRefresh} />;
+          return <PersonalPortfolioAnalytics onRefresh={triggerDataRefresh} refreshKey={refreshCounter} />;
         } else {
-          return <Analytics onRefresh={triggerDataRefresh} dataSource={dataSource} />;
+          return <Analytics onRefresh={triggerDataRefresh} dataSource={dataSource} refreshKey={refreshCounter} />;
         }
       case 'investors':
         console.log('Rendering Investors');
-        return <Investors isPrivacyMode={isPrivacyMode} onRefresh={triggerDataRefresh} dataSource={dataSource} />;
+        return <Investors isPrivacyMode={isPrivacyMode} onRefresh={triggerDataRefresh} dataSource={dataSource} refreshKey={refreshCounter} />;
       case 'performance':
         console.log('Rendering PerformanceDashboard');
         return <PerformanceDashboard />;
@@ -301,7 +306,7 @@ export default function DashboardClient({ session, kpiData: initialKpiData, hasE
           return <PerformanceDashboard />;
         } else {
           console.log('Default: Rendering PortfolioOverview');
-          return <PortfolioOverview onRefresh={triggerDataRefresh} isPrivacyMode={isPrivacyMode} dataSource={dataSource} />;
+          return <PortfolioOverview onRefresh={triggerDataRefresh} isPrivacyMode={isPrivacyMode} dataSource={dataSource} refreshKey={refreshCounter} />;
         }
     }
   };

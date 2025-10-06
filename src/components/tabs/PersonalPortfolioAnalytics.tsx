@@ -8,9 +8,10 @@ import { PersonalPortfolioPerformanceData } from '@/shared/types/performance';
 
 interface PersonalPortfolioAnalyticsProps {
   onRefresh?: () => void;
+  refreshKey?: number;
 }
 
-export default function PersonalPortfolioAnalytics({ onRefresh }: PersonalPortfolioAnalyticsProps) {
+export default function PersonalPortfolioAnalytics({ onRefresh, refreshKey }: PersonalPortfolioAnalyticsProps) {
   const [performanceData, setPerformanceData] = useState<PersonalPortfolioPerformanceData[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -18,6 +19,14 @@ export default function PersonalPortfolioAnalytics({ onRefresh }: PersonalPortfo
   useEffect(() => {
     fetchAnalyticsData();
   }, []); // eslint-disable-line react-hooks/exhaustive-deps
+
+  // Refresh when refreshKey changes (triggered by parent)
+  useEffect(() => {
+    if (refreshKey !== undefined && refreshKey > 0) {
+      console.log('Personal Portfolio Analytics refresh triggered by refreshKey:', refreshKey);
+      fetchAnalyticsData();
+    }
+  }, [refreshKey]); // eslint-disable-line react-hooks/exhaustive-deps
 
   // Refresh when onRefresh callback changes (triggered by parent)
   useEffect(() => {

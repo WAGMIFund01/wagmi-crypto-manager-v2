@@ -34,9 +34,10 @@ interface AnalyticsData {
 interface AnalyticsProps {
   onRefresh?: () => void;
   dataSource?: 'wagmi-fund' | 'personal-portfolio' | 'performance-dashboard';
+  refreshKey?: number;
 }
 
-export default function Analytics({ onRefresh, dataSource = 'wagmi-fund' }: AnalyticsProps) {
+export default function Analytics({ onRefresh, dataSource = 'wagmi-fund', refreshKey }: AnalyticsProps) {
 
   const [analyticsData, setAnalyticsData] = useState<AnalyticsData | null>(null);
   const [performanceData, setPerformanceData] = useState<PerformanceData[]>([]);
@@ -47,12 +48,13 @@ export default function Analytics({ onRefresh, dataSource = 'wagmi-fund' }: Anal
     fetchAnalyticsData();
   }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
-  // Refresh when onRefresh callback changes (triggered by parent)
+  // Refresh when refreshKey changes (triggered by parent)
   useEffect(() => {
-    if (onRefresh) {
+    if (refreshKey !== undefined && refreshKey > 0) {
+      console.log('Analytics refresh triggered by refreshKey:', refreshKey);
       fetchAnalyticsData();
     }
-  }, [onRefresh]);
+  }, [refreshKey]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const fetchAnalyticsData = async () => {
     try {

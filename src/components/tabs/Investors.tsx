@@ -24,9 +24,10 @@ interface InvestorsProps {
   isPrivacyMode?: boolean;
   onRefresh?: () => void; // Changed from number to () => void
   dataSource?: 'wagmi-fund' | 'personal-portfolio' | 'performance-dashboard';
+  refreshKey?: number;
 }
 
-export default function Investors({ isPrivacyMode = false, onRefresh, dataSource = 'wagmi-fund' }: InvestorsProps) {
+export default function Investors({ isPrivacyMode = false, onRefresh, dataSource = 'wagmi-fund', refreshKey }: InvestorsProps) {
 
   const [investors, setInvestors] = useState<Investor[]>([]);
   const [loading, setLoading] = useState(true);
@@ -71,12 +72,13 @@ export default function Investors({ isPrivacyMode = false, onRefresh, dataSource
     fetchInvestors();
   }, []);
 
-  // Refresh when onRefresh callback changes (triggered by parent)
+  // Refresh when refreshKey changes (triggered by parent)
   useEffect(() => {
-    if (onRefresh) { // Changed condition to handle function properly
+    if (refreshKey !== undefined && refreshKey > 0) {
+      console.log('Investors refresh triggered by refreshKey:', refreshKey);
       fetchInvestors();
     }
-  }, [onRefresh]);
+  }, [refreshKey]); // eslint-disable-line react-hooks/exhaustive-deps
 
   // Format currency values
   const formatCurrency = (amount: number) => {
