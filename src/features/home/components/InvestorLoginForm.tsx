@@ -134,10 +134,10 @@ export function InvestorLoginForm() {
     e.preventDefault();
     setHouseholdError('');
 
-    if (householdPassword === 'Temmy') {
+    if (householdPassword === 'teamrasco') {
       // Store household login status
       sessionStorage.setItem('householdLoggedIn', 'true');
-      sessionStorage.setItem('householdUser', 'Temmy');
+      sessionStorage.setItem('householdUser', 'teamrasco');
       
       // Redirect to personal portfolio
       router.push('/personal-portfolio');
