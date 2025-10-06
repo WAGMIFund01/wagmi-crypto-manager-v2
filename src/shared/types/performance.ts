@@ -20,6 +20,7 @@ export interface PersonalPortfolioPerformanceData {
   personalCumulative: number;
   totalCumulative: number;
   total3Cumulative: number;
+  investment: number;
 }
 
 export interface PerformanceDashboardData {
