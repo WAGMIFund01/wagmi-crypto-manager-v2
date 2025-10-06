@@ -135,12 +135,22 @@ export function InvestorLoginForm() {
     setHouseholdError('');
 
     if (householdPassword === 'teamrasco') {
-      // Store household login status
-      sessionStorage.setItem('householdLoggedIn', 'true');
-      sessionStorage.setItem('householdUser', 'teamrasco');
+      // Create a mock session for household access (similar to dev access)
+      const mockSession = {
+        user: {
+          email: 'household@wagmi.com',
+          name: 'Household User',
+          role: 'household'
+        },
+        expires: new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString() // 24 hours
+      };
+
+      // Store in sessionStorage for household access
+      sessionStorage.setItem('householdSession', JSON.stringify(mockSession));
+      sessionStorage.setItem('isHouseholdMode', 'true');
       
-      // Redirect to personal portfolio
-      router.push('/personal-portfolio');
+      // Redirect to module selection (like dev access)
+      router.push('/module-selection');
     } else {
       setHouseholdError('Invalid password. Please try again.');
     }
