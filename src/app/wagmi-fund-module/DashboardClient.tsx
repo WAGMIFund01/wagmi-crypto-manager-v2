@@ -1,7 +1,7 @@
 'use client';
 
 import { useRouter, useSearchParams, usePathname } from 'next/navigation';
-import { useEffect, useState, lazy, Suspense } from 'react';
+import { useEffect, useState, lazy, Suspense, useCallback } from 'react';
 import UniversalNavbar from '@/components/UniversalNavbar';
 import { WagmiSpinner } from '@/components/ui';
 import { COLORS } from '@/shared/constants/colors';
@@ -164,15 +164,8 @@ export default function DashboardClient({ session, kpiData: initialKpiData, hasE
     setIsPrivacyMode(privacyMode);
   };
 
-  // Create refresh function that triggers all data refreshes
-  const triggerDataRefresh = () => {
-    console.log('Data refresh triggered');
-    // Also trigger KPI data refresh to update AUM ribbon
-    handleKpiRefresh();
-  };
-
   // Handle comprehensive data refresh
-  const handleKpiRefresh = async () => {
+  const handleKpiRefresh = useCallback(async () => {
     try {
       // First, update all prices in the database
       console.log(`🔄 Updating prices for ${dataSource}...`);
@@ -248,7 +241,14 @@ export default function DashboardClient({ session, kpiData: initialKpiData, hasE
     } catch (error) {
       console.error('Error refreshing KPI data:', error);
     }
-  };
+  }, [dataSource]);
+
+  // Create refresh function that triggers all data refreshes
+  const triggerDataRefresh = useCallback(() => {
+    console.log('Data refresh triggered');
+    // Also trigger KPI data refresh to update AUM ribbon
+    handleKpiRefresh();
+  }, [handleKpiRefresh]);
 
   // Use dev session if in dev mode, otherwise use OAuth session
   const currentSession = isDevMode ? devSession : session;

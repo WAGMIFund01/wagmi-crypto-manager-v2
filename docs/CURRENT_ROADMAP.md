@@ -166,7 +166,49 @@ interface ApiResponse<T> {
 - [ ] Clear visualization of LP performance
 - [ ] Integration with existing portfolio views
 
-### Phase 3: AI Copilot Enhancement
+### Phase 3: Historical Data Charts Refinement
+**Priority**: HIGH  
+**Timeline**: 1-2 weeks
+
+#### Objectives
+- Enhance historical performance data visualization
+- Improve chart interactivity and user experience
+- Add advanced charting features and analytics
+- Optimize chart performance and responsiveness
+
+#### Deliverables
+1. **Enhanced Chart Components**
+   - Interactive performance charts with zoom/pan
+   - Multiple chart types (line, bar, area, candlestick)
+   - Real-time data updates and animations
+   - Mobile-optimized touch interactions
+
+2. **Advanced Analytics Features**
+   - Performance comparison tools
+   - Benchmark overlay capabilities
+   - Custom date range selection
+   - Export functionality (PNG, PDF, CSV)
+
+3. **Chart Performance Optimization**
+   - Virtual scrolling for large datasets
+   - Lazy loading for historical data
+   - Smooth animations and transitions
+   - Responsive design improvements
+
+4. **New Chart Types**
+   - Portfolio allocation pie charts
+   - Risk-return scatter plots
+   - Correlation heatmaps
+   - Performance attribution charts
+
+#### Success Metrics
+- [ ] Interactive charts with smooth performance
+- [ ] Mobile-optimized chart interactions
+- [ ] Export functionality working
+- [ ] Advanced analytics features implemented
+- [ ] Improved user engagement with charts
+
+### Phase 4: AI Copilot Enhancement
 **Priority**: HIGH  
 **Timeline**: 1-2 weeks
 
@@ -181,7 +223,7 @@ interface ApiResponse<T> {
 3. Quick analysis UI component
 4. Enhanced context preparation for focused queries
 
-### Phase 4: Performance & Scalability
+### Phase 5: Performance & Scalability
 **Priority**: MEDIUM  
 **Timeline**: 2-3 weeks
 
@@ -197,7 +239,7 @@ interface ApiResponse<T> {
 3. Code splitting and lazy loading
 4. Performance monitoring dashboard
 
-### Phase 5: Enterprise Features
+### Phase 6: Enterprise Features
 **Priority**: MEDIUM  
 **Timeline**: 3-4 weeks
 

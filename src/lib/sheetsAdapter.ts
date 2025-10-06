@@ -1163,41 +1163,108 @@ export class SheetsAdapter {
       
       const rows = response.data.values || [];
       
-      // Find the row index of the asset to remove
+      // Find the row index of the asset to remove (using 1-based indexing like WAGMI method)
       let rowIndexToRemove = -1;
+      const matchingRows: number[] = [];
+      console.log(`Looking for asset with symbol: ${symbol.toUpperCase()}`);
+      console.log(`Total rows in Personal portfolio sheet: ${rows.length}`);
+      
       for (let i = 1; i < rows.length; i++) {
         const row = rows[i];
-        if (row && row.length > 1 && row[1]?.toString().toUpperCase() === symbol.toUpperCase()) {
-          rowIndexToRemove = i;
-          break;
+        const rowSymbol = row && row.length > 1 ? row[1]?.toString().toUpperCase() : '';
+        console.log(`Row ${i}: Symbol = "${rowSymbol}", Asset = "${row[0]}"`);
+        
+        if (row && row.length > 1 && rowSymbol === symbol.toUpperCase()) {
+          matchingRows.push(i + 1); // +1 because Google Sheets uses 1-based indexing
+          console.log(`Found matching asset at row ${i + 1}`);
         }
       }
-
-      if (rowIndexToRemove === -1) {
+      
+      if (matchingRows.length === 0) {
+        console.log(`No asset found with symbol: ${symbol}`);
         return {
           success: false,
           error: `Asset ${symbol} not found in Personal portfolio`
         };
       }
+      
+      if (matchingRows.length > 1) {
+        console.log(`⚠️ WARNING: Found ${matchingRows.length} duplicate entries for ${symbol}:`);
+        matchingRows.forEach((rowIndex, index) => {
+          console.log(`  ${index + 1}. Row ${rowIndex}: ${rows[rowIndex - 1]}`);
+        });
+        console.log(`Will delete the first occurrence at row ${matchingRows[0]}`);
+      }
+      
+      rowIndexToRemove = matchingRows[0]; // Delete the first occurrence (1-based indexing)
 
-      // Delete the row
-      await this.sheets.spreadsheets.batchUpdate({
+      // Get the actual sheet ID for Personal portfolio
+      console.log('Getting sheet metadata to find correct sheet ID...');
+      const sheetMetadata = await this.sheets.spreadsheets.get({
+        spreadsheetId: this.sheetId
+      });
+      
+      const personalPortfolioSheet = sheetMetadata.data.sheets?.find(sheet => 
+        sheet.properties?.title === 'Personal portfolio'
+      );
+      
+      if (!personalPortfolioSheet || !personalPortfolioSheet.properties?.sheetId) {
+        throw new Error('Personal portfolio sheet not found or missing sheet ID');
+      }
+      
+      const actualSheetId = personalPortfolioSheet.properties.sheetId;
+      console.log(`Found Personal portfolio sheet ID: ${actualSheetId}`);
+      
+      // Delete the row using the correct sheet ID (convert 1-based to 0-based indexing)
+      console.log(`Attempting to delete row ${rowIndexToRemove}...`);
+      console.log(`Delete request details:`);
+      console.log(`- Sheet ID: ${this.sheetId}`);
+      console.log(`- Row index (1-based): ${rowIndexToRemove}`);
+      console.log(`- Start index (0-based): ${rowIndexToRemove - 1}`);
+      console.log(`- End index (0-based): ${rowIndexToRemove}`);
+      
+      const deleteRequest = {
         spreadsheetId: this.sheetId,
         requestBody: {
           requests: [{
             deleteDimension: {
               range: {
-                sheetId: 0, // Assuming Personal portfolio is the first sheet
+                sheetId: actualSheetId,
                 dimension: 'ROWS',
-                startIndex: rowIndexToRemove,
-                endIndex: rowIndexToRemove + 1
+                startIndex: rowIndexToRemove - 1, // Convert to 0-based index
+                endIndex: rowIndexToRemove
               }
             }
           }]
         }
-      });
+      };
+      
+      console.log('Full delete request:', JSON.stringify(deleteRequest, null, 2));
+      
+      const deleteResponse = await this.sheets.spreadsheets.batchUpdate(deleteRequest);
+      console.log('Delete operation response:', deleteResponse.data);
 
-      console.log(`Asset ${symbol} removed from Personal portfolio successfully`);
+      // Verify the asset was actually removed
+      console.log('Verifying asset removal...');
+      const verifyResponse = await this.sheets.spreadsheets.values.get({
+        spreadsheetId: this.sheetId,
+        range: 'Personal portfolio!A:M'
+      });
+      
+      const verifyRows = verifyResponse.data.values || [];
+      const stillExists = verifyRows.some((row: any[], index: number) => 
+        index > 0 && row && row.length > 1 && row[1]?.toString().toUpperCase() === symbol.toUpperCase()
+      );
+      
+      if (stillExists) {
+        console.log('⚠️ WARNING: Asset still exists after deletion attempt');
+        return {
+          success: false,
+          error: `Asset ${symbol} was not actually removed from Personal portfolio`
+        };
+      }
+      
+      console.log(`✅ Asset ${symbol} removed from Personal portfolio successfully`);
       return {
         success: true
       };
@@ -1767,7 +1834,7 @@ export class SheetsAdapter {
     date: string;
     type: string;
     amount: number;
-    description: string;
+    note: string;
   }>> {
     return trackOperation('getTransactions', async () => {
       try {
@@ -1793,7 +1860,7 @@ export class SheetsAdapter {
           date: string;
           type: string;
           amount: number;
-          description: string;
+          note: string;
         }> = [];
 
         const normalizedInvestorId = investorId.toUpperCase().trim();
@@ -1809,7 +1876,7 @@ export class SheetsAdapter {
                 date: row[4]?.toString() || '', // Column E = date
                 type: row[2]?.toString() || '', // Column C = type
                 amount: parseFloat(row[3]) || 0, // Column D = amount
-                description: row[5]?.toString() || '' // Column F = note
+                note: row[5]?.toString() || '' // Column F = note
               });
             }
           }
