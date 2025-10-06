@@ -1,7 +1,7 @@
 # 🗺️ WAGMI Crypto Investment Manager - Current Roadmap
 
-**Last Updated**: December 19, 2024  
-**Current Branch**: `feature/historical-charts-refinement`
+**Last Updated**: January 6, 2025  
+**Current Branch**: `main`
 
 ## ✅ Completed Phases
 
@@ -44,7 +44,7 @@
 
 ### Phase 3: Historical Data Charts Refinement (COMPLETED ✅)
 **Duration**: December 2024  
-**Status**: Ready for merge to main
+**Status**: Merged to main
 
 #### Achievements:
 - ✅ **Enhanced Chart Components**: Consolidated historical performance and benchmark charts into single interactive component
@@ -98,6 +98,59 @@
 - Professional export capabilities
 - Consolidated and simplified chart interface
 - Robust testing framework for future development
+
+### Phase 3.5: Personal Portfolio KPI Enhancement (COMPLETED ✅)
+**Duration**: January 2025  
+**Status**: Merged to main
+
+#### Achievements:
+- ✅ **Enhanced KPI Display**: MoM and Cumulative return KPIs now visible in Personal Portfolio UniversalNavbar
+- ✅ **Investment Chart Toggle**: New "Investment" chart mode for Personal Portfolio Analytics tab
+- ✅ **Data Integration**: Investment data from Column D of Personal portfolio historical sheet
+- ✅ **KPI Refresh Fix**: Fixed refresh button functionality to maintain all KPIs after refresh
+- ✅ **Type Safety**: Updated all interfaces to include investment field
+- ✅ **Testing Coverage**: Comprehensive test coverage for Personal Portfolio KPI functionality
+
+#### Technical Deliverables:
+1. **Enhanced UniversalNavbar** (`src/components/UniversalNavbar.tsx`)
+   - Updated conditional rendering logic for Personal Portfolio KPIs
+   - MoM and Cumulative return KPIs now display for Personal Portfolio module
+   - Proper data transformation and formatting
+
+2. **Investment Chart Integration** (`src/components/charts/EnhancedPerformanceCharts.tsx`)
+   - Added 'investment' to ChartMode type
+   - New Investment button (Personal Portfolio only)
+   - Currency formatting for Investment chart
+   - Single bar chart display similar to AUM mode
+
+3. **Data Layer Updates** (`src/lib/sheetsAdapter.ts`)
+   - Added investment field to PersonalPortfolioPerformanceData interface
+   - Updated data extraction from Column D of Personal portfolio historical sheet
+   - Proper month filtering and data processing
+
+4. **KPI Refresh Logic** (`src/app/wagmi-fund-module/DashboardClient.tsx`)
+   - Fixed handleKpiRefresh function for Personal Portfolio module
+   - Proper data transformation to maintain all KPIs after refresh
+   - Consistent formatting across all KPI values
+
+5. **Type Safety & Testing**
+   - Updated shared types (`src/shared/types/performance.ts`)
+   - Added comprehensive test coverage (`src/lib/__tests__/personal-portfolio-kpi.test.ts`)
+   - Updated fallback data with investment field
+
+#### Success Metrics:
+- ✅ Personal Portfolio KPIs fully functional in UniversalNavbar
+- ✅ Investment chart toggle working perfectly
+- ✅ KPI refresh maintains all metrics
+- ✅ Type safety across all interfaces
+- ✅ Comprehensive test coverage
+- ✅ Zero production issues
+
+#### Impact:
+- Personal Portfolio module now has complete KPI visibility
+- New Investment chart provides additional analytics capability
+- Improved user experience with consistent KPI display
+- Enhanced data insights for Personal Portfolio management
 
 ---
 
@@ -267,9 +320,9 @@
 4. **Review required**: No direct merges to main [[memory:8807857]]
 
 ### Current Focus
-**Branch**: `feature/historical-charts-refinement`  
-**Goal**: Enhanced charts with mobile optimization and export functionality  
-**Next Milestone**: Merge Phase 3 completion to main and begin Phase 4 (AI Copilot Enhancement)
+**Branch**: `main`  
+**Goal**: All completed phases merged and production-ready  
+**Next Milestone**: Begin Phase 4 (AI Copilot Enhancement) - Portfolio Summary Feature
 
 ---
 
