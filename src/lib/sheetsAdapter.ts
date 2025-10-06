@@ -1926,10 +1926,10 @@ export class SheetsAdapter {
           throw new Error('Google Sheets API client not initialized');
         }
 
-        // Read from MoM performance sheet - columns B (month), G-I (WAGMI), L-M (Total), P-Q (Total3)
+        // Read from MoM performance sheet - expanded range to include all data
         const response = await this.sheets.spreadsheets.values.get({
           spreadsheetId: this.sheetId,
-          range: 'MoM performance!B:Q',
+          range: 'MoM performance!A:Z', // Expanded range to include all data
           valueRenderOption: 'UNFORMATTED_VALUE'
         });
 
@@ -1962,10 +1962,10 @@ export class SheetsAdapter {
         // Process data rows (skip header row at index 0)
         for (let i = 1; i < rows.length; i++) {
           const row = rows[i];
-          if (!row || row.length < 16) continue; // Need columns B through Q (16 columns)
+          if (!row || row.length < 17) continue; // Need columns A through Q (17 columns)
 
-          // Column B (index 0 in B:Q range) - Month
-          const monthValue = row[0];
+          // Column B (index 1 in A:Z range) - Month
+          const monthValue = row[1];
           if (!monthValue) continue;
 
           // Convert Excel serial number to date
@@ -1994,14 +1994,14 @@ export class SheetsAdapter {
           }
 
           // Extract performance data from correct columns
-          // In B:Q range: G=index 5, H=6, I=7, L=10, M=11, P=14, Q=15
-          const endingAUM = parseFloat(row[5]) || 0; // Column G
-          const wagmiMoM = (parseFloat(row[6]) || 0) * 100; // Column H - convert to percentage
-          const wagmiCumulative = (parseFloat(row[7]) || 0) * 100; // Column I - convert to percentage
-          const totalMoM = (parseFloat(row[10]) || 0) * 100; // Column L - convert to percentage
-          const totalCumulative = (parseFloat(row[11]) || 0) * 100; // Column M - convert to percentage
-          const total3MoM = (parseFloat(row[14]) || 0) * 100; // Column P - convert to percentage
-          const total3Cumulative = (parseFloat(row[15]) || 0) * 100; // Column Q - convert to percentage
+          // In A:Z range: G=index 6, H=7, I=8, L=11, M=12, P=15, Q=16
+          const endingAUM = parseFloat(row[6]) || 0; // Column G
+          const wagmiMoM = (parseFloat(row[7]) || 0) * 100; // Column H - convert to percentage
+          const wagmiCumulative = (parseFloat(row[8]) || 0) * 100; // Column I - convert to percentage
+          const totalMoM = (parseFloat(row[11]) || 0) * 100; // Column L - convert to percentage
+          const totalCumulative = (parseFloat(row[12]) || 0) * 100; // Column M - convert to percentage
+          const total3MoM = (parseFloat(row[15]) || 0) * 100; // Column P - convert to percentage
+          const total3Cumulative = (parseFloat(row[16]) || 0) * 100; // Column Q - convert to percentage
 
           // Create month string for return value
           const monthStr = `${monthName}-${year}`;
@@ -2060,10 +2060,10 @@ export class SheetsAdapter {
           throw new Error('Google Sheets API client not initialized');
         }
 
-        // Read from Personal portfolio historical sheet - same structure as WAGMI
+        // Read from Personal portfolio historical sheet - expanded range to include all historical data
         const response = await this.sheets.spreadsheets.values.get({
           spreadsheetId: this.sheetId,
-          range: 'Personal portfolio historical!B:Q',
+          range: 'Personal portfolio historical!A:Z', // Expanded range to include all data
           valueRenderOption: 'UNFORMATTED_VALUE'
         });
 
@@ -2089,10 +2089,10 @@ export class SheetsAdapter {
         // Process data rows (skip header row at index 0)
         for (let i = 1; i < rows.length; i++) {
           const row = rows[i];
-          if (!row || row.length < 16) continue; // Need columns B through Q (16 columns)
+          if (!row || row.length < 17) continue; // Need columns A through Q (17 columns)
 
-          // Column B (index 0 in B:Q range) - Month
-          const monthValue = row[0];
+          // Column B (index 1 in A:Z range) - Month
+          const monthValue = row[1];
           if (!monthValue) continue;
 
           // Convert Excel serial number to date
@@ -2121,14 +2121,13 @@ export class SheetsAdapter {
           }
 
           // Extract performance data from correct columns
-          // In B:Q range: G=index 5, H=6, I=7, L=10, M=11, P=14, Q=15
-          const endingAUM = parseFloat(row[5]) || 0; // Column G
-          const personalMoM = (parseFloat(row[6]) || 0) * 100; // Column H - convert to percentage
-          const personalCumulative = (parseFloat(row[7]) || 0) * 100; // Column I - convert to percentage
-          const totalMoM = (parseFloat(row[10]) || 0) * 100; // Column L - convert to percentage
-          const totalCumulative = (parseFloat(row[11]) || 0) * 100; // Column M - convert to percentage
-          const total3MoM = (parseFloat(row[14]) || 0) * 100; // Column P - convert to percentage
-          const total3Cumulative = (parseFloat(row[15]) || 0) * 100; // Column Q - convert to percentage
+          // In A:Z range: G=index 6, H=7, I=8, L=11, M=12, P=15, Q=16
+          const endingAUM = parseFloat(row[6]) || 0; // Column G - Personal Portfolio historical data
+          const personalMoM = (parseFloat(row[7]) || 0) * 100; // Column H - convert to percentage
+          const totalMoM = (parseFloat(row[11]) || 0) * 100; // Column L - convert to percentage
+          const totalCumulative = (parseFloat(row[12]) || 0) * 100; // Column M - convert to percentage
+          const total3MoM = (parseFloat(row[15]) || 0) * 100; // Column P - convert to percentage
+          const total3Cumulative = (parseFloat(row[16]) || 0) * 100; // Column Q - convert to percentage
 
           // Create month string for return value
           const monthStr = `${monthName}-${year}`;
@@ -2139,10 +2138,17 @@ export class SheetsAdapter {
             personalMoM,
             totalMoM,
             total3MoM,
-            personalCumulative,
+            personalCumulative: 0, // Will be calculated below
             totalCumulative,
             total3Cumulative
           });
+        }
+
+        // Calculate cumulative returns for personal portfolio
+        let personalCumulative = 0;
+        for (let i = 0; i < performanceData.length; i++) {
+          personalCumulative += performanceData[i].personalMoM;
+          performanceData[i].personalCumulative = personalCumulative;
         }
 
         console.log(`✅ Retrieved Personal Portfolio historical performance for ${performanceData.length} months`);

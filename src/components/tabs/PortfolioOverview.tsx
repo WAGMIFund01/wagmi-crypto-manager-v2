@@ -33,8 +33,8 @@ export default function PortfolioOverview({ className, onRefresh, isPrivacyMode 
   const [editingAsset, setEditingAsset] = useState<PortfolioAsset | null>(null);
   const [showEditForm, setShowEditForm] = useState(false);
   
-  // Sorting state
-  const [sortConfig, setSortConfig] = useState<SortConfig>({ key: '', direction: null });
+  // Sorting state - default to descending value
+  const [sortConfig, setSortConfig] = useState<SortConfig>({ key: 'totalValue', direction: 'desc' });
   
   // Sorting logic
   const sortedAssets = useMemo(() => {

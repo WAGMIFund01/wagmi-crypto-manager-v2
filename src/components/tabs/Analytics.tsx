@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react';
 import { PortfolioAsset } from '@/lib/sheetsAdapter';
 import { WagmiSpinner, WagmiButton, PerformerCard, RiskDistributionCard, LocationDistributionCard, AssetTypeDistributionCard } from '@/components/ui';
-import PerformanceCharts from '@/components/charts/PerformanceCharts';
+import EnhancedPerformanceCharts from '@/components/charts/EnhancedPerformanceCharts';
 import { fetchPerformanceData, PerformanceData } from '@/services/performanceDataService';
 
 interface AnalyticsData {
@@ -268,7 +268,7 @@ export default function Analytics({ onRefresh, dataSource = 'wagmi-fund', refres
       {/* Performance Charts Section */}
       {performanceData.length > 0 && (
         <div className="mt-8">
-          <PerformanceCharts data={performanceData} />
+          <EnhancedPerformanceCharts data={performanceData} dataSource="wagmi-fund" />
         </div>
       )}
     </div>

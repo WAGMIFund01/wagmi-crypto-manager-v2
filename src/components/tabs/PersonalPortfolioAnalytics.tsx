@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { WagmiSpinner, WagmiButton } from '@/components/ui';
-import PersonalPortfolioPerformanceCharts from '@/components/charts/PersonalPortfolioPerformanceCharts';
+import EnhancedPerformanceCharts from '@/components/charts/EnhancedPerformanceCharts';
 import { fetchPersonalPortfolioPerformanceData } from '@/services/personalPortfolioPerformanceDataService';
 import { PersonalPortfolioPerformanceData } from '@/shared/types/performance';
 
@@ -88,7 +88,7 @@ export default function PersonalPortfolioAnalytics({ onRefresh, refreshKey }: Pe
       {/* Performance Charts Section */}
       {performanceData.length > 0 && (
         <div className="mt-8">
-          <PersonalPortfolioPerformanceCharts data={performanceData} />
+          <EnhancedPerformanceCharts data={performanceData} dataSource="personal-portfolio" />
         </div>
       )}
     </div>

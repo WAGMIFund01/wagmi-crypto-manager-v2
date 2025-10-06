@@ -43,8 +43,8 @@ export default function Investors({ isPrivacyMode = false, onRefresh, dataSource
     share: [] as string[]
   });
   
-  // Sorting state
-  const [sortConfig, setSortConfig] = useState<SortConfig>({ key: '', direction: null });
+  // Sorting state - default to descending current value
+  const [sortConfig, setSortConfig] = useState<SortConfig>({ key: 'currentValue', direction: 'desc' });
 
   const fetchInvestors = async () => {
     try {

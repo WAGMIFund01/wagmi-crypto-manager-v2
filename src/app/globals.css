@@ -5,6 +5,45 @@
   --foreground: #171717;
 }
 
+/* Enhanced Charts Mobile Optimization */
+.mobile-chart {
+  touch-action: manipulation;
+}
+
+.mobile-chart .recharts-legend-wrapper {
+  font-size: 12px !important;
+}
+
+.mobile-chart .recharts-legend-item {
+  font-size: 12px !important;
+}
+
+.mobile-chart .recharts-legend-item-text {
+  font-size: 12px !important;
+}
+
+@media (max-width: 640px) {
+  .mobile-chart .recharts-cartesian-axis-tick-value {
+    font-size: 10px !important;
+  }
+  
+  .mobile-chart .recharts-legend-wrapper {
+    font-size: 10px !important;
+  }
+  
+  .mobile-chart .recharts-legend-item {
+    font-size: 10px !important;
+  }
+  
+  .mobile-chart .recharts-legend-item-text {
+    font-size: 10px !important;
+  }
+  
+  .mobile-chart .recharts-tooltip-wrapper {
+    font-size: 12px !important;
+  }
+}
+
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
