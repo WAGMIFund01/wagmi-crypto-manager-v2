@@ -11,7 +11,9 @@ export default async function PersonalPortfolioPage() {
   const session = await getServerSession(authOptions);
   
   // Fetch Personal Portfolio KPI data on the server
+  console.log('🔍 Fetching Personal Portfolio KPI data...');
   const kpiData = await fetchPersonalPortfolioKPIData();
+  console.log('📊 Personal Portfolio KPI data result:', kpiData);
   const hasError = !kpiData;
   
   // Transform data for display only if we have valid data

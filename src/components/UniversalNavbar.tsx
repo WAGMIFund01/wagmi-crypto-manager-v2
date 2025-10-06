@@ -690,8 +690,8 @@ export default function UniversalNavbar({
                   </p>
                 </WagmiCard>
 
-                {/* Cumulative Return - Only for WAGMI Fund */}
-                {dataSource !== 'personal-portfolio' && (
+                {/* Cumulative Return - Show for both WAGMI Fund and Personal Portfolio */}
+                {formattedKpiData?.cumulativeReturn && (
                   <WagmiCard variant="ribbon" theme="green" size="sm">
                     <p className="text-xs font-normal text-gray-400 mb-1 uppercase tracking-wide">
                       Cumulative Return
@@ -707,8 +707,8 @@ export default function UniversalNavbar({
                   </WagmiCard>
                 )}
 
-                {/* MoM Return - Only for WAGMI Fund */}
-                {dataSource !== 'personal-portfolio' && (
+                {/* MoM Return - Show for both WAGMI Fund and Personal Portfolio */}
+                {formattedKpiData?.monthOnMonth && (
                   <WagmiCard variant="ribbon" theme="green" size="sm">
                     <p className="text-xs font-normal text-gray-400 mb-1 uppercase tracking-wide">
                       MoM Return
