@@ -17,6 +17,9 @@ export function InvestorLoginForm() {
   const [showDevModal, setShowDevModal] = useState(false);
   const [devPassword, setDevPassword] = useState('');
   const [devError, setDevError] = useState('');
+  const [showHouseholdModal, setShowHouseholdModal] = useState(false);
+  const [householdPassword, setHouseholdPassword] = useState('');
+  const [householdError, setHouseholdError] = useState('');
   const router = useRouter();
 
   const handleInvestorLogin = async (e: React.FormEvent) => {
@@ -121,6 +124,34 @@ export function InvestorLoginForm() {
     setDevError('');
   };
 
+  const handleHouseholdAccess = () => {
+    setShowHouseholdModal(true);
+    setHouseholdPassword('');
+    setHouseholdError('');
+  };
+
+  const handleHouseholdLogin = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setHouseholdError('');
+
+    if (householdPassword === 'Temmy') {
+      // Store household login status
+      sessionStorage.setItem('householdLoggedIn', 'true');
+      sessionStorage.setItem('householdUser', 'Temmy');
+      
+      // Redirect to personal portfolio
+      router.push('/personal-portfolio');
+    } else {
+      setHouseholdError('Invalid password. Please try again.');
+    }
+  };
+
+  const closeHouseholdModal = () => {
+    setShowHouseholdModal(false);
+    setHouseholdPassword('');
+    setHouseholdError('');
+  };
+
   return (
     <div 
       className="min-h-screen flex items-center justify-center p-4 relative"
@@ -207,6 +238,16 @@ export function InvestorLoginForm() {
             Dev Access
           </WagmiButton>
 
+          {/* Household Portfolio Login Button */}
+          <WagmiButton
+            onClick={handleHouseholdAccess}
+            variant="outline"
+            theme="blue"
+            size="lg"
+          >
+            Household Portfolio Login
+          </WagmiButton>
+
           {/* Manager Access Button */}
           <WagmiButton
             onClick={handleManagerLogin}
@@ -275,6 +316,66 @@ export function InvestorLoginForm() {
               </WagmiButton>
             </div>
           </form>
+        </div>
+      </StandardModal>
+
+      {/* Household Portfolio Login Modal */}
+      <StandardModal
+        isOpen={showHouseholdModal}
+        onClose={closeHouseholdModal}
+        title="Household Portfolio Login"
+        size="md"
+        theme="blue"
+      >
+        <div className="space-y-4">
+          <p style={{ color: '#A0A0A0', textAlign: 'center' }}>
+            Enter household password to access personal portfolio
+          </p>
+
+          {/* Household Login Form */}
+          <form onSubmit={handleHouseholdLogin} className="space-y-4">
+              <WagmiInput
+                variant="password"
+                label="Household Password"
+                placeholder="Enter household password"
+                value={householdPassword}
+                onChange={(e) => setHouseholdPassword(e.target.value)}
+                theme="blue"
+                size="md"
+                required
+                autoFocus
+              />
+              
+              {householdError && (
+                <WagmiAlert variant="error" size="md">
+                  {householdError}
+                </WagmiAlert>
+              )}
+              
+              <div className="flex gap-3">
+                <WagmiButton
+                  type="button"
+                  onClick={closeHouseholdModal}
+                  variant="outline"
+                  theme="gray"
+                  size="lg"
+                  className="flex-1"
+                >
+                  Cancel
+                </WagmiButton>
+                
+                <WagmiButton
+                  type="submit"
+                  disabled={!householdPassword.trim()}
+                  variant="primary"
+                  theme="blue"
+                  size="lg"
+                  className="flex-1"
+                >
+                  Access Portfolio
+                </WagmiButton>
+              </div>
+            </form>
         </div>
       </StandardModal>
     </div>
