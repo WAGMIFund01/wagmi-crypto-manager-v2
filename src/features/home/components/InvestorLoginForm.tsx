@@ -6,7 +6,7 @@ import StandardModal from '@/components/ui/StandardModal';
 import WagmiButton from '@/components/ui/WagmiButton';
 import WagmiInput from '@/components/ui/WagmiInput';
 import WagmiAlert from '@/components/ui/WagmiAlert';
-import { DevIcon } from '@/components/ui/icons/WagmiIcons';
+import { ToolsIcon } from '@/components/ui/icons/WagmiIcons';
 import { signIn } from 'next-auth/react';
 // import { Button, Card, CardContent, CardHeader, CardTitle } from '@/shared/components';
 
@@ -255,9 +255,9 @@ export function InvestorLoginForm() {
             variant="outline"
             theme="orange"
             size="lg"
-            icon={<DevIcon />}
+            icon={<ToolsIcon />}
+            title="Dev Access"
           >
-            Dev Access
           </WagmiButton>
 
           {/* Household Portfolio Login Button */}
