@@ -23,11 +23,13 @@ export default function PerformanceDashboardDraft() {
   // Fetch real data when module changes
   useEffect(() => {
     const fetchData = async () => {
+      console.log('🔄 Starting data fetch for module:', selectedModule);
       setLoading(true);
       setError(null);
       
       try {
         const moduleParam = selectedModule === 'wagmi' ? 'wagmi-fund' : 'personal-portfolio';
+        console.log('📡 Fetching data for module param:', moduleParam);
         
         // Fetch both portfolio peak data and LP data in parallel
         const [portfolioResponse, lpResponse] = await Promise.all([
@@ -35,20 +37,27 @@ export default function PerformanceDashboardDraft() {
           fetch(`/api/get-lp-performance-data?module=${moduleParam}`)
         ]);
         
+        console.log('📊 API responses received');
         const portfolioResult = await portfolioResponse.json();
         const lpResult = await lpResponse.json();
+        
+        console.log('📈 Portfolio result:', portfolioResult);
+        console.log('💧 LP result:', lpResult);
         
         if (portfolioResult.success && lpResult.success) {
           setPortfolioData(portfolioResult.data);
           setLpData(lpResult.data);
+          console.log('✅ Data set successfully');
         } else {
+          console.error('❌ API returned error:', { portfolioResult, lpResult });
           setError('Failed to fetch data');
         }
       } catch (err) {
+        console.error('❌ Error fetching data:', err);
         setError('Error loading data');
-        console.error('Error fetching data:', err);
       } finally {
         setLoading(false);
+        console.log('🏁 Data fetch completed');
       }
     };
     
