@@ -8,15 +8,15 @@ export async function GET(request: NextRequest) {
   
   try {
     const { searchParams } = new URL(request.url);
-    const module = searchParams.get('module') || 'wagmi-fund';
+    const selectedModule = searchParams.get('module') || 'wagmi-fund';
     
-    logger.info('Fetching portfolio peak data', { requestId, module });
+    logger.info('Fetching portfolio peak data', { requestId, module: selectedModule });
     
     let historicalData;
     let currentAUM = 0;
     
     try {
-      if (module === 'personal-portfolio') {
+      if (selectedModule === 'personal-portfolio') {
         // Get Personal Portfolio historical data
         historicalData = await sheetsAdapter.getPersonalPortfolioHistoricalPerformance();
         
@@ -48,7 +48,7 @@ export async function GET(request: NextRequest) {
       
       logger.info('Portfolio peak data calculated successfully from live data', { 
         requestId, 
-        module,
+        module: selectedModule,
         currentAUM,
         peakValue,
         ratio,
@@ -68,10 +68,10 @@ export async function GET(request: NextRequest) {
       
       // Fallback to mock data when Google Sheets is unavailable
       const mockData = {
-        currentPortfolioValue: module === 'personal-portfolio' ? 18500 : 20800,
-        portfolioPeakValue: module === 'personal-portfolio' ? 22150 : 24150,
-        peakRatio: module === 'personal-portfolio' ? 84 : 86,
-        distanceToPeak: module === 'personal-portfolio' ? 3650 : 3350,
+        currentPortfolioValue: selectedModule === 'personal-portfolio' ? 18500 : 20800,
+        portfolioPeakValue: selectedModule === 'personal-portfolio' ? 22150 : 24150,
+        peakRatio: selectedModule === 'personal-portfolio' ? 84 : 86,
+        distanceToPeak: selectedModule === 'personal-portfolio' ? 3650 : 3350,
         lastUpdated: new Date().toISOString()
       };
       

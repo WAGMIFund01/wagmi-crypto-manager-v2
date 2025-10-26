@@ -3,7 +3,6 @@
 import React from 'react';
 import WagmiCard from './WagmiCard';
 import WagmiText from './WagmiText';
-import CardHeader from './CardHeader';
 import { formatCurrency } from '@/shared/utils/maskSensitiveData';
 
 interface PortfolioPeakRatioCardProps {
@@ -20,7 +19,6 @@ interface PortfolioPeakRatioCardProps {
 export default function PortfolioPeakRatioCard({
   currentPortfolioValue,
   portfolioPeakValue,
-  lastUpdated,
   isPrivacyMode = false,
   className = ''
 }: PortfolioPeakRatioCardProps) {

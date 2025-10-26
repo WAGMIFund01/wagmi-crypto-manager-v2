@@ -15,8 +15,25 @@ import WagmiSpinner from '@/components/ui/WagmiSpinner';
 export default function PerformanceDashboardDraft() {
   const [isPrivacyMode, setIsPrivacyMode] = useState(false);
   const [selectedModule, setSelectedModule] = useState<'wagmi' | 'personal'>('wagmi');
-  const [portfolioData, setPortfolioData] = useState<any>(null);
-  const [lpData, setLpData] = useState<any>(null);
+  const [portfolioData, setPortfolioData] = useState<{
+    currentPortfolioValue: number;
+    portfolioPeakValue: number;
+    peakRatio: number;
+    distanceToPeak: number;
+    lastUpdated: string;
+  } | null>(null);
+  const [lpData, setLpData] = useState<{
+    initialDeposit: number;
+    currentValue: number;
+    yieldGenerated: number;
+    spotValue: number;
+    capitalAppreciation: number;
+    totalReturn: number;
+    roi: number;
+    oppCostDelta: number;
+    oppCostRatio: number;
+    lastUpdated: string;
+  } | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 

@@ -8,14 +8,14 @@ export async function GET(request: NextRequest) {
   
   try {
     const { searchParams } = new URL(request.url);
-    const module = searchParams.get('module') || 'wagmi-fund';
+    const selectedModule = searchParams.get('module') || 'wagmi-fund';
     
-    logger.info('Fetching LP performance data', { requestId, module });
+    logger.info('Fetching LP performance data', { requestId, module: selectedModule });
     
     try {
       let lpData;
       
-      if (module === 'personal-portfolio') {
+      if (selectedModule === 'personal-portfolio') {
         // Get Personal Portfolio LP data
         lpData = await sheetsAdapter.getPersonalPortfolioLPData();
       } else {
@@ -46,7 +46,7 @@ export async function GET(request: NextRequest) {
       
       logger.info('LP performance data calculated successfully from live data', { 
         requestId, 
-        module,
+        module: selectedModule,
         initialDeposit: lpData.initialDeposit,
         currentValue: lpData.currentValue,
         roi: metrics.roi
@@ -65,15 +65,15 @@ export async function GET(request: NextRequest) {
       
       // Fallback to mock data when Google Sheets is unavailable
       const mockData = {
-        initialDeposit: module === 'personal-portfolio' ? 8500 : 10000,
-        currentValue: module === 'personal-portfolio' ? 10250 : 12450,
-        yieldGenerated: module === 'personal-portfolio' ? 450 : 780,
-        spotValue: module === 'personal-portfolio' ? 10800 : 13100,
-        capitalAppreciation: module === 'personal-portfolio' ? 1750 : 2450,
-        totalReturn: module === 'personal-portfolio' ? 2200 : 3230,
-        roi: module === 'personal-portfolio' ? 26 : 32,
-        oppCostDelta: module === 'personal-portfolio' ? -550 : -650,
-        oppCostRatio: module === 'personal-portfolio' ? 95 : 95,
+        initialDeposit: selectedModule === 'personal-portfolio' ? 8500 : 10000,
+        currentValue: selectedModule === 'personal-portfolio' ? 10250 : 12450,
+        yieldGenerated: selectedModule === 'personal-portfolio' ? 450 : 780,
+        spotValue: selectedModule === 'personal-portfolio' ? 10800 : 13100,
+        capitalAppreciation: selectedModule === 'personal-portfolio' ? 1750 : 2450,
+        totalReturn: selectedModule === 'personal-portfolio' ? 2200 : 3230,
+        roi: selectedModule === 'personal-portfolio' ? 26 : 32,
+        oppCostDelta: selectedModule === 'personal-portfolio' ? -550 : -650,
+        oppCostRatio: selectedModule === 'personal-portfolio' ? 95 : 95,
         lastUpdated: new Date().toISOString()
       };
       
