@@ -31,6 +31,8 @@ export { default as DistributionCard, RiskDistributionCard, LocationDistribution
 // Card Components
 export { default as CardHeader } from './CardHeader';
 export { default as PerformerCard } from './PerformerCard';
+export { default as PortfolioPeakRatioCard } from './PortfolioPeakRatioCard';
+export { default as LiquidityPoolPerformanceCard } from './LiquidityPoolPerformanceCard';
 
 // Loading Components
 export { 

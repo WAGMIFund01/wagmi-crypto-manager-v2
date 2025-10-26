@@ -2182,6 +2182,156 @@ export class SheetsAdapter {
       }
     }, { sheetId: this.sheetId });
   }
+
+  /**
+   * Get WAGMI Fund LP data from KPIs sheet
+   * Reads rows 18-24 from the KPIs sheet for WAGMI LP metrics
+   */
+  async getLPData(): Promise<{
+    initialDeposit: number;
+    currentValue: number;
+    capitalAppreciation: number;
+    yieldGenerated: number;
+    totalReturn: number;
+    roi: number;
+    opportunityCost: number;
+  }> {
+    return trackOperation('getLPData', async () => {
+      try {
+        console.log('📝 Fetching WAGMI Fund LP data from KPIs sheet');
+        
+        if (!this.isServiceAccountInitialized) {
+          await this.initializeServiceAccount();
+        }
+
+        if (!this.sheets) {
+          throw new Error('Google Sheets API client not initialized');
+        }
+
+        // Read LP data from KPIs sheet (rows 18-24)
+        const response = await this.sheets.spreadsheets.values.get({
+          spreadsheetId: this.sheetId,
+          range: 'KPIs!A18:B24', // Rows 18-24 for WAGMI LP data
+          valueRenderOption: 'UNFORMATTED_VALUE'
+        });
+
+        if (!response.data.values || response.data.values.length === 0) {
+          throw new Error('No LP data found in KPIs sheet');
+        }
+
+        const rows = response.data.values;
+        const lpData: any = {};
+
+        // Process LP data rows
+        for (let i = 0; i < rows.length; i++) {
+          const row = rows[i];
+          if (row.length >= 2) {
+            const metric = row[0];
+            const value = parseFloat(row[1]) || 0;
+
+            // Map WAGMI LP metrics
+            if (metric.includes('LP initial deposit amount - WAGMI')) {
+              lpData.initialDeposit = value;
+            } else if (metric.includes('LP current value - WAGMI')) {
+              lpData.currentValue = value;
+            } else if (metric.includes('LP capital appreciation - WAGMI')) {
+              lpData.capitalAppreciation = value;
+            } else if (metric.includes('LP yield generated - WAGMI')) {
+              lpData.yieldGenerated = value;
+            } else if (metric.includes('LP total return')) {
+              lpData.totalReturn = value;
+            } else if (metric.includes('LP RoI - WAGMI')) {
+              lpData.roi = value;
+            } else if (metric.includes('LP opportunity cost/benefit - WAGMI')) {
+              lpData.opportunityCost = value;
+            }
+          }
+        }
+
+        console.log('✅ Retrieved WAGMI Fund LP data:', lpData);
+        return lpData;
+
+      } catch (error) {
+        console.error('❌ Error fetching WAGMI Fund LP data:', error);
+        throw new Error('Failed to fetch WAGMI Fund LP data');
+      }
+    }, { sheetId: this.sheetId });
+  }
+
+  /**
+   * Get Personal Portfolio LP data from KPIs sheet
+   * Reads rows 26-32 from the KPIs sheet for Personal LP metrics
+   */
+  async getPersonalPortfolioLPData(): Promise<{
+    initialDeposit: number;
+    currentValue: number;
+    capitalAppreciation: number;
+    yieldGenerated: number;
+    totalReturn: number;
+    roi: number;
+    opportunityCost: number;
+  }> {
+    return trackOperation('getPersonalPortfolioLPData', async () => {
+      try {
+        console.log('📝 Fetching Personal Portfolio LP data from KPIs sheet');
+        
+        if (!this.isServiceAccountInitialized) {
+          await this.initializeServiceAccount();
+        }
+
+        if (!this.sheets) {
+          throw new Error('Google Sheets API client not initialized');
+        }
+
+        // Read LP data from KPIs sheet (rows 26-32)
+        const response = await this.sheets.spreadsheets.values.get({
+          spreadsheetId: this.sheetId,
+          range: 'KPIs!A26:B32', // Rows 26-32 for Personal LP data
+          valueRenderOption: 'UNFORMATTED_VALUE'
+        });
+
+        if (!response.data.values || response.data.values.length === 0) {
+          throw new Error('No Personal Portfolio LP data found in KPIs sheet');
+        }
+
+        const rows = response.data.values;
+        const lpData: any = {};
+
+        // Process LP data rows
+        for (let i = 0; i < rows.length; i++) {
+          const row = rows[i];
+          if (row.length >= 2) {
+            const metric = row[0];
+            const value = parseFloat(row[1]) || 0;
+
+            // Map Personal Portfolio LP metrics
+            if (metric.includes('LP initial deposit amount - Personal')) {
+              lpData.initialDeposit = value;
+            } else if (metric.includes('LP current value - Personal')) {
+              lpData.currentValue = value;
+            } else if (metric.includes('LP capital appreciation - Personal')) {
+              lpData.capitalAppreciation = value;
+            } else if (metric.includes('LP yield generated - Personal')) {
+              lpData.yieldGenerated = value;
+            } else if (metric.includes('LP total return')) {
+              lpData.totalReturn = value;
+            } else if (metric.includes('LP RoI - Personal')) {
+              lpData.roi = value;
+            } else if (metric.includes('LP opportunity cost/benefit - Personal')) {
+              lpData.opportunityCost = value;
+            }
+          }
+        }
+
+        console.log('✅ Retrieved Personal Portfolio LP data:', lpData);
+        return lpData;
+
+      } catch (error) {
+        console.error('❌ Error fetching Personal Portfolio LP data:', error);
+        throw new Error('Failed to fetch Personal Portfolio LP data');
+      }
+    }, { sheetId: this.sheetId });
+  }
 }
 
 // Export a singleton instance
